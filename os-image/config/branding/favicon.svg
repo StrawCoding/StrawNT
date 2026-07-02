@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="StrawWU">
+  <rect width="64" height="64" rx="14" fill="#0f1419"/>
+  <path d="M12 44 L32 16 L52 44 Z" stroke="#14b8a6" stroke-width="3" fill="none" stroke-linejoin="round"/>
+  <path d="M16 44 L48 44" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+  <path d="M24 44 L40 44" stroke="#60a5fa" stroke-width="1.5" stroke-linecap="round" opacity="0.55"/>
+  <circle cx="32" cy="36" r="4" fill="#f59e0b"/>
+  <circle cx="32" cy="36" r="1.5" fill="#d4a853"/>
+  <circle cx="32" cy="22" r="1.5" fill="#d4a853" opacity="0.85"/>
+  <path d="M12 48 L32 42 L52 48 L52 54 L32 50 L12 54 Z" fill="#111820" stroke="#243040" stroke-width="1"/>
+  <path d="M12 48 L32 42 L32 50 L12 54 Z" fill="#14b8a6" opacity="0.22"/>
+  <path d="M32 42 L52 48 L52 54 L32 50 Z" fill="#f59e0b" opacity="0.22"/>
+</svg>

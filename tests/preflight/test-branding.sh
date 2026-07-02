@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# Preflight: StrawWU branding overlay static checks.
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+BRANDING="${REPO_ROOT}/os-image/config/branding"
+FAIL=0
+
+check() {
+    if "$@"; then
+        echo "PASS: $*"
+    else
+        echo "FAIL: $*"
+        FAIL=1
+    fi
+}
+
+echo "=== StrawWU branding preflight ==="
+
+check test -f "${BRANDING}/etc/os-release"
+check test -f "${BRANDING}/usr/share/plymouth/themes/strawwu-boot/strawwu-boot.plymouth"
+check test -f "${BRANDING}/usr/local/sbin/strawwu-boot-selfcheck"
+check test -f "${BRANDING}/etc/systemd/system/strawwu-boot-selfcheck.service"
+check test -f "${BRANDING}/usr/share/calamares/branding/strawwu/branding.desc"
+check test -x "${REPO_ROOT}/os-image/scripts/apply-branding.sh" || chmod +x "${REPO_ROOT}/os-image/scripts/apply-branding.sh"
+
+if grep -q 'NAME="StrawWU"' "${BRANDING}/etc/os-release"; then
+    echo "PASS: os-release NAME=StrawWU"
+else
+    echo "FAIL: os-release missing NAME=StrawWU"
+    FAIL=1
+fi
+
+if grep -qi 'ubuntu' "${BRANDING}/etc/os-release"; then
+    echo "FAIL: os-release still contains Ubuntu"
+    FAIL=1
+else
+    echo "PASS: os-release has no Ubuntu string"
+fi
+
+if grep -q 'ModuleName=two-step' "${BRANDING}/usr/share/plymouth/themes/strawwu-boot/strawwu-boot.plymouth"; then
+    echo "PASS: plymouth theme uses two-step module"
+else
+    echo "FAIL: plymouth theme module"
+    FAIL=1
+fi
+
+for forbidden in partition.conf welcome.conf settings.conf devices.conf; do
+    if [[ -f "${BRANDING}/etc/calamares/${forbidden}" ]]; then
+        echo "FAIL: branding must not ship calamares ${forbidden}"
+        FAIL=1
+    fi
+done
+echo "PASS: no forbidden calamares overrides in branding"
+
+echo "=== branding preflight done ==="
+exit "${FAIL}"

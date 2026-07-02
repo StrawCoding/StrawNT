@@ -1,0 +1,146 @@
+#!/usr/bin/env bash
+# apply-branding.sh — Overlay StrawWU branding into cloned rootfs and ISO staging.
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+BRANDING_DIR="${REPO_ROOT}/os-image/config/branding"
+WORK_DIR="${STRAWWU_WORK_DIR:-${REPO_ROOT}/os-image/work}"
+ROOTFS_DIR="${WORK_DIR}/rootfs"
+ISO_STAGING="${WORK_DIR}/iso-staging"
+VERSION="${STRAWWU_VERSION:-0.3.0-cleanroom}"
+
+log() { echo "==> $*" >&2; }
+die() { echo "ERROR: $*" >&2; exit 1; }
+
+unmount_chroot() {
+    umount "${ROOTFS_DIR}/run" 2>/dev/null || umount -l "${ROOTFS_DIR}/run" 2>/dev/null || true
+    umount "${ROOTFS_DIR}/dev/pts" 2>/dev/null || umount -l "${ROOTFS_DIR}/dev/pts" 2>/dev/null || true
+    umount "${ROOTFS_DIR}/sys" 2>/dev/null || umount -l "${ROOTFS_DIR}/sys" 2>/dev/null || true
+    umount "${ROOTFS_DIR}/proc" 2>/dev/null || umount -l "${ROOTFS_DIR}/proc" 2>/dev/null || true
+    umount "${ROOTFS_DIR}/dev" 2>/dev/null || umount -l "${ROOTFS_DIR}/dev" 2>/dev/null || true
+}
+
+chroot_run() {
+    mount --bind /dev  "${ROOTFS_DIR}/dev"
+    mount --bind /proc "${ROOTFS_DIR}/proc"
+    mount --bind /sys  "${ROOTFS_DIR}/sys"
+    mount --bind /run  "${ROOTFS_DIR}/run" 2>/dev/null || true
+    trap 'unmount_chroot' EXIT
+    chroot "${ROOTFS_DIR}" "$@"
+    local rc=$?
+    unmount_chroot
+    trap - EXIT
+    return "${rc}"
+}
+
+overlay_rootfs() {
+    [[ -d "${BRANDING_DIR}" ]] || die "branding dir missing: ${BRANDING_DIR}"
+    log "overlaying branding into rootfs"
+    cp -a "${BRANDING_DIR}/." "${ROOTFS_DIR}/"
+    chmod 755 "${ROOTFS_DIR}/usr/local/sbin/strawwu-boot-selfcheck"
+
+    # Version-specific os-release fields
+    if [[ -f "${ROOTFS_DIR}/etc/os-release" ]]; then
+        sed -i "s/^VERSION=.*/VERSION=\"${VERSION}\"/" "${ROOTFS_DIR}/etc/os-release"
+        sed -i "s/^PRETTY_NAME=.*/PRETTY_NAME=\"StrawWU ${VERSION}\"/" "${ROOTFS_DIR}/etc/os-release"
+    fi
+    if [[ -f "${ROOTFS_DIR}/etc/lsb-release" ]]; then
+        sed -i "s/^DISTRIB_RELEASE=.*/DISTRIB_RELEASE=${VERSION}/" "${ROOTFS_DIR}/etc/lsb-release"
+        sed -i "s/^DISTRIB_DESCRIPTION=.*/DISTRIB_DESCRIPTION=\"StrawWU ${VERSION}\"/" "${ROOTFS_DIR}/etc/lsb-release"
+    fi
+}
+
+configure_chroot_branding() {
+    log "configuring plymouth + systemd branding in chroot"
+    chroot_run update-alternatives --install /usr/share/plymouth/themes/default.plymouth \
+        default.plymouth /usr/share/plymouth/themes/strawwu-boot/strawwu-boot.plymouth 200
+    chroot_run update-alternatives --set default.plymouth \
+        /usr/share/plymouth/themes/strawwu-boot/strawwu-boot.plymouth
+    chroot_run plymouth-set-default-theme strawwu-boot 2>/dev/null || true
+    chroot_run systemctl enable strawwu-boot-selfcheck.service
+    if [[ -f "${ROOTFS_DIR}/etc/calamares/settings.conf" ]]; then
+        if grep -q '^branding:' "${ROOTFS_DIR}/etc/calamares/settings.conf"; then
+            sed -i 's/^branding:.*/branding: strawwu/' "${ROOTFS_DIR}/etc/calamares/settings.conf"
+        else
+            printf '\nbranding: strawwu\n' >> "${ROOTFS_DIR}/etc/calamares/settings.conf"
+        fi
+    fi
+    log "rebuilding initramfs for plymouth theme (may take a few minutes)"
+    chroot_run update-initramfs -u -k all 2>/dev/null || chroot_run update-initramfs -u
+}
+
+patch_user_visible_ubuntu() {
+    log "replacing user-visible Ubuntu strings in rootfs"
+    local files
+    files="$(grep -rl 'Ubuntu' \
+        "${ROOTFS_DIR}/etc/issue" \
+        "${ROOTFS_DIR}/etc/issue.net" \
+        "${ROOTFS_DIR}/etc/motd" \
+        "${ROOTFS_DIR}/usr/share/gnome-shell" \
+        2>/dev/null || true)"
+    if [[ -n "${files}" ]]; then
+        # shellcheck disable=SC2086
+        sed -i 's/Ubuntu/StrawWU/g' ${files} 2>/dev/null || true
+    fi
+    if [[ -f "${ROOTFS_DIR}/usr/share/glib-2.0/schemas/10_ubuntu-settings.gschema.override" ]]; then
+        sed -i 's/session-name = "ubuntu"/session-name = "strawwu"/' \
+            "${ROOTFS_DIR}/usr/share/glib-2.0/schemas/10_ubuntu-settings.gschema.override" || true
+        sed -i "s|logo='/usr/share/plymouth/ubuntu-logo.png'|logo='/usr/share/plymouth/themes/strawwu-boot/throbber.svg'|" \
+            "${ROOTFS_DIR}/usr/share/glib-2.0/schemas/10_ubuntu-settings.gschema.override" || true
+    fi
+    if [[ -f "${ROOTFS_DIR}/usr/share/applications/calamares.desktop" ]]; then
+        sed -i 's/calamares -D6/calamares -D6 --branding strawwu/' \
+            "${ROOTFS_DIR}/usr/share/applications/calamares.desktop"
+    fi
+    chroot_run glib-compile-schemas /usr/share/glib-2.0/schemas 2>/dev/null || true
+}
+
+patch_iso_staging() {
+    [[ -d "${ISO_STAGING}" ]] || return 0
+    log "patching ISO staging boot branding"
+    for f in \
+        "${ISO_STAGING}/boot/grub/grub.cfg" \
+        "${ISO_STAGING}/boot/grub/loopback.cfg" \
+        "${ISO_STAGING}/isolinux/txt.cfg" \
+        "${ISO_STAGING}/isolinux/grub.cfg"; do
+        [[ -f "${f}" ]] || continue
+        sed -i \
+            -e 's/Try or Install Ubuntu/Try or Install StrawWU/g' \
+            -e 's/Ubuntu (safe graphics)/StrawWU (safe graphics)/g' \
+            -e 's/Ubuntu/StrawWU/g' \
+            "${f}"
+    done
+    if [[ -f "${ISO_STAGING}/.disk/info" ]]; then
+        echo "StrawWU ${VERSION} amd64" > "${ISO_STAGING}/.disk/info"
+    fi
+    if [[ -f "${ISO_STAGING}/README.diskdefines" ]]; then
+        sed -i 's/Ubuntu/StrawWU/g' "${ISO_STAGING}/README.diskdefines" || true
+    fi
+    if [[ -f "${ISO_STAGING}/casper/initrd" ]]; then
+        bash "${SCRIPT_DIR}/repack-initrd-branding.sh"
+    fi
+}
+
+apply_rootfs_branding() {
+    [[ -d "${ROOTFS_DIR}" ]] || die "rootfs missing: ${ROOTFS_DIR}"
+    overlay_rootfs
+    patch_user_visible_ubuntu
+    configure_chroot_branding
+}
+
+main() {
+    local mode="${1:-rootfs}"
+    case "${mode}" in
+        rootfs) apply_rootfs_branding ;;
+        iso) patch_iso_staging ;;
+        all)
+            apply_rootfs_branding
+            patch_iso_staging
+            ;;
+        *) die "usage: $0 [rootfs|iso|all]" ;;
+    esac
+    log "branding apply complete (${mode})"
+}
+
+main "$@"

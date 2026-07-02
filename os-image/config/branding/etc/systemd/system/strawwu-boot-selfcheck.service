@@ -1,0 +1,17 @@
+[Unit]
+Description=StrawWU boot self-check splash progress
+DefaultDependencies=no
+After=plymouth-start.service
+Before=display-manager.service getty@.service multi-user.target
+ConditionPathExists=!/run/strawwu-boot-selfcheck.done
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/strawwu-boot-selfcheck
+ExecStartPost=/bin/sh -c 'touch /run/strawwu-boot-selfcheck.done'
+RemainAfterExit=yes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

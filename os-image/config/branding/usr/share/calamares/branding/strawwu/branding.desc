@@ -1,0 +1,43 @@
+---
+componentName: strawwu
+
+welcomeStyleCalamares: false
+welcomeExpandingLogo: true
+windowExpanding: normal
+windowSize: 800px,520px
+windowPlacement: center
+sidebar: widget
+navigation: widget
+
+strings:
+    productName: "${NAME}"
+    shortProductName: StrawWU
+    version: "${VERSION}"
+    shortVersion: "${VERSION_ID}"
+    versionedName: "${PRETTY_NAME}"
+    shortVersionedName: StrawWU
+    bootloaderEntryName: StrawWU
+    productUrl: "https://strawwu.local/"
+    supportUrl: "https://strawwu.local/support"
+    knownIssuesUrl: "https://strawwu.local/bugs"
+    releaseNotesUrl: "https://strawwu.local/"
+    donateUrl: ""
+
+images:
+    productIcon: "strawwu-logo.svg"
+    productLogo: "strawwu-logo.svg"
+    productWelcome: "strawwu-logo.svg"
+
+style:
+   SidebarBackground: "#12141c"
+   SidebarText: "#e8e8f0"
+   SidebarTextCurrent: "#12141c"
+   SidebarBackgroundCurrent: "#4f8cff"
+
+slideshow: "show.qml"
+slideshowAPI: 2
+
+uploadServer:
+    type: "none"
+    url: ""
+    sizeLimit: -1

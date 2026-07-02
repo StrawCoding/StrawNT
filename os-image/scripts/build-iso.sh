@@ -75,7 +75,7 @@ Before=multi-user.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/sh -c 'for i in 1 2 3 4 5 6 7 8 9 10; do [ -c /dev/ttyS0 ] && echo STRAWWU_BOOT_OK > /dev/ttyS0 && exit 0; sleep 1; done; exit 1'
+ExecStart=/bin/sh -c 'K=$(uname -r); for i in 1 2 3 4 5 6 7 8 9 10; do if [ -c /dev/ttyS0 ]; then echo STRAWWU_BOOT_OK > /dev/ttyS0; echo "STRAWWU_KERNEL_${K}" > /dev/ttyS0; exit 0; fi; sleep 1; done; exit 1'
 RemainAfterExit=yes
 
 [Install]
@@ -85,14 +85,7 @@ EOF
 }
 
 apply_branding() {
-    if [[ -f "${REPO_ROOT}/os-image/config/branding/etc/os-release" ]]; then
-        log "applying branding overlay"
-        cp -a "${REPO_ROOT}/os-image/config/branding/." "${ROOTFS_DIR}/"
-    fi
-    if [[ -f "${ROOTFS_DIR}/etc/os-release" ]]; then
-        sed -i "s/^VERSION=.*/VERSION=\"${VERSION}\"/" "${ROOTFS_DIR}/etc/os-release" || true
-        sed -i "s/^PRETTY_NAME=.*/PRETTY_NAME=\"StrawWU ${VERSION}\"/" "${ROOTFS_DIR}/etc/os-release" || true
-    fi
+    STRAWWU_VERSION="${VERSION}" bash "${SCRIPT_DIR}/apply-branding.sh" rootfs
 }
 
 resolve_source_iso() {
@@ -205,8 +198,8 @@ write_install_sources() {
     cat > "${ISO_STAGING}/casper/install-sources.yaml" <<EOF
 - default: true
   description:
-    en: StrawWU Ubuntu Desktop (${VERSION})
-  id: ubuntu-desktop
+    en: StrawWU Desktop (${VERSION})
+  id: strawwu-desktop
   locale_support: langpack
   name:
     en: StrawWU Desktop
@@ -243,6 +236,21 @@ rebuild_squashfs() {
         || true
     log "filesystem.size=${size}"
     write_install_sources
+}
+
+sync_casper_kernel() {
+    local marker="${WORK_DIR}/.swap-kernel-ok"
+    [[ -f "${marker}" ]] || return 0
+    grep -q strawwu-kernel "${marker}" 2>/dev/null || return 0
+
+    local vmlinuz initrd
+    vmlinuz="$(ls "${ROOTFS_DIR}/boot/vmlinuz-"* 2>/dev/null | head -1)"
+    initrd="$(ls "${ROOTFS_DIR}/boot/initrd.img-"* 2>/dev/null | head -1)"
+    [[ -f "${vmlinuz}" ]] || die "custom kernel vmlinuz missing in rootfs /boot after swap"
+    [[ -f "${initrd}" ]] || die "custom kernel initrd missing in rootfs /boot after swap"
+    log "syncing casper vmlinuz/initrd from $(basename "${vmlinuz}")"
+    cp -f "${vmlinuz}" "${ISO_STAGING}/casper/vmlinuz"
+    cp -f "${initrd}" "${ISO_STAGING}/casper/initrd"
 }
 
 xorriso_repack() {
@@ -297,7 +305,9 @@ main() {
     mkdir -p "${OUTPUT_DIR}"
     stage_iso_tree "${source_iso}"
     patch_boot_serial_console
+    STRAWWU_VERSION="${VERSION}" bash "${SCRIPT_DIR}/apply-branding.sh" iso
     rebuild_squashfs
+    sync_casper_kernel
     xorriso_repack "${source_iso}"
     write_checksums
 

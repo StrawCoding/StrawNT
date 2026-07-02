@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 280" role="img" aria-label="StrawWU">
+  <rect width="1200" height="280" rx="24" fill="#f4f6f9"/>
+  <path d="M 87.2 171.9 L 140.0 159.8 L 192.8 171.9 L 192.8 192.8 L 140.0 182.9 L 87.2 192.8 Z" fill="#1e293b" stroke="#1e293b" stroke-width="1.7"/>
+  <path d="M 87.2 171.9 L 140.0 159.8 L 140.0 182.9 L 87.2 192.8 Z" fill="#1e293b" opacity="0.22"/>
+  <path d="M 140.0 159.8 L 192.8 171.9 L 192.8 192.8 L 140.0 182.9 Z" fill="#1e293b" opacity="0.22"/>
+  <path d="M 87.2 149.9 L 140.0 91.6 L 192.8 149.9 Z" fill="none" stroke="#1e293b" stroke-width="5.5" stroke-linejoin="round"/>
+  <path d="M 96.0 149.9 L 184.0 149.9" stroke="#1e293b" stroke-width="5.5" stroke-linecap="round"/>
+  <circle cx="140.0" cy="138.9" r="6.6" fill="#1e293b"/>
+  <circle cx="140.0" cy="138.9" r="2.8" fill="#1e293b"/>
+  <circle cx="140.0" cy="99.3" r="3.3" fill="#1e293b" opacity="0.85"/>
+  <text x="290" y="152" font-family="'IBM Plex Sans', 'Noto Sans TC', system-ui, sans-serif" font-size="108" font-weight="600" letter-spacing="-1">
+    <tspan fill="#b8860b">Straw</tspan><tspan fill="#0f172a">WU</tspan>
+  </text>
+  <text x="292" y="196" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="26" fill="#64748b">Desktop OS · Dual Runtime</text>
+</svg>

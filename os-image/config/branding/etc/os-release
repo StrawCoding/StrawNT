@@ -1,0 +1,12 @@
+PRETTY_NAME="StrawWU"
+NAME="StrawWU"
+VERSION_ID="24.04"
+VERSION="0.3.0-cleanroom"
+VERSION_CODENAME=noble
+ID=strawwu
+ID_LIKE=debian
+HOME_URL="https://strawwu.local/"
+SUPPORT_URL="https://strawwu.local/support"
+BUG_REPORT_URL="https://strawwu.local/bugs"
+PRIVACY_POLICY_URL="https://strawwu.local/privacy"
+LOGO=strawwu-logo

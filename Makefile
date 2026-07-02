@@ -1,4 +1,4 @@
-.PHONY: help preflight clone-ubuntu-base swap-kernel build-iso validate-rootfs boot-test-iso test-phase0
+.PHONY: help preflight clone-ubuntu-base swap-kernel build-iso validate-rootfs boot-test-iso test-phase0 test-phase2 kernel-build
 
 REPO_ROOT := $(abspath .)
 SCRIPTS   := os-image/scripts
@@ -15,16 +15,22 @@ help:
 	@echo "  build-iso           Clone + kernel swap + xorriso repack (needs root)"
 	@echo "  validate-rootfs     Verify cloned rootfs has ubuntu calamares"
 	@echo "  boot-test-iso       QEMU BIOS+UEFI boot test (needs built ISO)"
+	@echo "  kernel-build        Build linux-image-strawwu .deb (Phase 2, long)"
 	@echo "  test-phase0         Phase 0 acceptance"
+	@echo "  test-phase2         Phase 2 acceptance"
 
 preflight:
 	bash tests/preflight/test-ubuntu-clone.sh
+	bash tests/preflight/test-branding.sh
 
 clone-ubuntu-base: preflight
 	sudo bash $(SCRIPTS)/clone-ubuntu-base.sh
 
+kernel-build:
+	$(MAKE) -C kernel build
+
 swap-kernel:
-	sudo bash $(SCRIPTS)/swap-kernel.sh
+	sudo STRAWWU_KERNEL_DEB="$${STRAWWU_KERNEL_DEB:-$(shell ls kernel/output/linux-image-strawwu_*.deb 2>/dev/null | head -1)}" bash $(SCRIPTS)/swap-kernel.sh
 
 build-iso: preflight
 	sudo STRAWWU_VERSION=$(VERSION) bash $(SCRIPTS)/build-iso.sh
@@ -38,6 +44,9 @@ validate-rootfs:
 
 boot-test-iso:
 	bash tests/boot/run.sh
+
+test-phase2:
+	bash tests/kernel/test-phase2.sh
 
 test-phase0: preflight
 	@test -f docs/architecture.md

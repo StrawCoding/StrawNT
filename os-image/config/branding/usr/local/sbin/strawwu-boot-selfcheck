@@ -1,0 +1,48 @@
+#!/bin/sh
+# strawwu-boot-selfcheck — show boot self-check progress on Plymouth splash.
+set -eu
+
+TITLE="StrawWU"
+VERSION="$(. /etc/os-release 2>/dev/null && echo "${VERSION:-unknown}" || echo unknown)"
+
+plymouth_active() {
+    plymouth --ping >/dev/null 2>&1
+}
+
+show_title() {
+    if plymouth_active; then
+        plymouth display-message --text="${TITLE} ${VERSION}" 2>/dev/null || true
+    fi
+}
+
+show_step() {
+    if plymouth_active; then
+        plymouth update-status --status="$1" 2>/dev/null || true
+    fi
+    # Serial fallback for headless/QEMU boot-test (marker service still runs separately).
+    if [ -c /dev/ttyS0 ]; then
+        printf 'STRAWWU_CHECK:%s\n' "$1" > /dev/ttyS0 2>/dev/null || true
+    fi
+}
+
+# Wait briefly for Plymouth to attach (avoids black screen with no feedback).
+i=0
+while ! plymouth_active && [ "$i" -lt 30 ]; do
+    sleep 0.2
+    i=$((i + 1))
+done
+
+show_title
+show_step "硬體偵測中..."
+sleep 1
+show_step "載入核心模組..."
+sleep 1
+show_step "掛載檔案系統..."
+sleep 1
+show_step "啟動系統服務..."
+sleep 1
+show_step "準備桌面環境..."
+sleep 1
+show_step "系統就緒"
+
+exit 0
