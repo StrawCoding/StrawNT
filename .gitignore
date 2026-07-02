@@ -1,0 +1,4 @@
+os-image/work/
+os-image/output/cache/
+os-image/output/*.iso
+*.partial
