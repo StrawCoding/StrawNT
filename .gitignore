@@ -1,4 +1,6 @@
 os-image/work/
 os-image/output/cache/
 os-image/output/*.iso
+tests/boot/output/serial-*.log
+tests/boot/output/qemu-*.log
 *.partial

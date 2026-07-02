@@ -47,11 +47,39 @@ for forbidden in partition.conf welcome.conf settings.conf devices.conf; do
 done
 echo "PASS: no forbidden calamares overrides in config/"
 
-LEGACY="../封存/StrawWU-legacy-2026-07-02"
-if [[ -d "${REPO_ROOT}/${LEGACY}" ]] || [[ -d "/mnt/data/code/project/StrawCoding/封存/StrawWU-legacy-2026-07-02" ]]; then
-    echo "PASS: legacy archive present"
+# components/ must not contain copied legacy crates (code artifacts only)
+LEGACY_CRATE_DIRS=(strawwu-nt strawwu-kernel-bridge strawwu-control-center strawwu-runtime)
+for crate in "${LEGACY_CRATE_DIRS[@]}"; do
+    if [[ -d "${REPO_ROOT}/components/${crate}" ]]; then
+        echo "FAIL: legacy crate directory components/${crate}/ — v3.0-cleanroom forbids copying legacy code"
+        FAIL=1
+    fi
+done
+if [[ "${FAIL}" -eq 0 ]]; then
+    echo "PASS: no legacy crate directories in components/"
+fi
+
+# Version policy: MAJOR must be 0 until user authorizes official release
+STRAWWU_VER="${STRAWWU_VERSION:-$(cat "${REPO_ROOT}/VERSION" 2>/dev/null || echo 0.3.0-cleanroom)}"
+VER_MAJOR="${STRAWWU_VER%%.*}"
+if [[ "${STRAWWU_VER}" =~ ^[0-9]+\.[0-9]+\.[0-9]+-cleanroom$ ]]; then
+    echo "PASS: version policy OK (plan build ${STRAWWU_VER})"
+elif [[ "${STRAWWU_OFFICIAL_RELEASE:-0}" != "1" ]] && [[ "${VER_MAJOR}" -ge 1 ]]; then
+    echo "FAIL: semver MAJOR=${VER_MAJOR} (version=${STRAWWU_VER}) — pre-release requires MAJOR=0; official release needs user authorization"
+    FAIL=1
+elif [[ "${STRAWWU_OFFICIAL_RELEASE:-0}" == "1" ]] && [[ ! -f "${REPO_ROOT}/.official-release-authorized" ]]; then
+    echo "FAIL: STRAWWU_OFFICIAL_RELEASE=1 but .official-release-authorized marker missing"
+    FAIL=1
 else
-    echo "WARN: legacy archive dir not found at expected path"
+    echo "PASS: version policy OK (${STRAWWU_VER}, major=${VER_MAJOR})"
+fi
+
+# No legacy path references inside components/
+if grep -rq 'StrawWU-legacy\|封存/StrawWU' "${REPO_ROOT}/components/" 2>/dev/null; then
+    echo "FAIL: legacy path reference in components/"
+    FAIL=1
+else
+    echo "PASS: no legacy path references in components/"
 fi
 
 echo "=== preflight done ==="

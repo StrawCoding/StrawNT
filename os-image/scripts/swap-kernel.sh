@@ -14,13 +14,24 @@ MARKER="${WORK_DIR}/.swap-kernel-ok"
 log() { echo "==> $*"; }
 die() { echo "ERROR: $*" >&2; exit 1; }
 
+unmount_chroot() {
+    umount "${ROOTFS_DIR}/run" 2>/dev/null || umount -l "${ROOTFS_DIR}/run" 2>/dev/null || true
+    umount "${ROOTFS_DIR}/sys" 2>/dev/null || umount -l "${ROOTFS_DIR}/sys" 2>/dev/null || true
+    umount "${ROOTFS_DIR}/proc" 2>/dev/null || umount -l "${ROOTFS_DIR}/proc" 2>/dev/null || true
+    umount "${ROOTFS_DIR}/dev" 2>/dev/null || umount -l "${ROOTFS_DIR}/dev" 2>/dev/null || true
+}
+
 chroot_run() {
     mount --bind /dev  "${ROOTFS_DIR}/dev"
     mount --bind /proc "${ROOTFS_DIR}/proc"
     mount --bind /sys  "${ROOTFS_DIR}/sys"
     mount --bind /run  "${ROOTFS_DIR}/run" 2>/dev/null || true
-    trap 'umount "${ROOTFS_DIR}/run" 2>/dev/null; umount "${ROOTFS_DIR}/sys"; umount "${ROOTFS_DIR}/proc"; umount "${ROOTFS_DIR}/dev"' EXIT
+    trap 'unmount_chroot' EXIT
     chroot "${ROOTFS_DIR}" "$@"
+    local rc=$?
+    unmount_chroot
+    trap - EXIT
+    return "${rc}"
 }
 
 main() {

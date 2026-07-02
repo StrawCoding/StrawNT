@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
-# build-iso.sh — Repack cloned Ubuntu rootfs into StrawWU live ISO.
-#
-# Phase 1: validates clone pipeline; full xorriso repack is stubbed until
-# casper metadata from source ISO is wired (tracked in Phase 1.3).
+# build-iso.sh — Repack cloned Ubuntu rootfs into StrawWU live ISO via xorriso.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -10,39 +7,302 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 WORK_DIR="${STRAWWU_WORK_DIR:-${REPO_ROOT}/os-image/work}"
 ROOTFS_DIR="${WORK_DIR}/rootfs"
 OUTPUT_DIR="${REPO_ROOT}/os-image/output"
-VERSION="${STRAWWU_VERSION:-2.0.0-reboot}"
+ISO_CACHE="${OUTPUT_DIR}/cache"
+ISO_STAGING="${WORK_DIR}/iso-staging"
+ISO_MOUNT="${WORK_DIR}/iso-mount"
+
+UBUNTU_VERSION="${STRAWWU_UBUNTU_VERSION:-24.04.2}"
+UBUNTU_ISO_NAME="ubuntu-${UBUNTU_VERSION}-desktop-amd64.iso"
+VERSION="${STRAWWU_VERSION:-0.3.0-cleanroom}"
 ISO_NAME="StrawWU-${VERSION}-amd64.iso"
 ISO_PATH="${OUTPUT_DIR}/${ISO_NAME}"
 
-log() { echo "==> $*"; }
+log() { echo "==> $*" >&2; }
 die() { echo "ERROR: $*" >&2; exit 1; }
 
-main() {
-    [[ -f "${WORK_DIR}/.clone-ubuntu-base-ok" ]] || die "run make clone-ubuntu-base first"
-    bash "${SCRIPT_DIR}/swap-kernel.sh"
+need_root() {
+    [[ "${EUID:-$(id -u)}" -eq 0 ]] || die "run as root"
+}
 
-    mkdir -p "${OUTPUT_DIR}"
+need_cmd() {
+    for c in "$@"; do command -v "$c" >/dev/null 2>&1 || die "missing command: $c"; done
+}
 
-    # Phase 1 stub: record rootfs manifest as build artifact until xorriso repack lands.
-    local manifest="${OUTPUT_DIR}/StrawWU-${VERSION}-rootfs-manifest.txt"
-    log "writing manifest (Phase 1 stub — full ISO repack in Phase 1.3)"
-    {
-        echo "version=${VERSION}"
-        echo "built=$(date -Is)"
-        echo "rootfs=${ROOTFS_DIR}"
-        echo "kernel_marker=$(cat "${WORK_DIR}/.swap-kernel-ok" 2>/dev/null || echo unknown)"
-        echo "--- packages (sample) ---"
-        chroot "${ROOTFS_DIR}" dpkg -l 2>/dev/null | grep -E 'linux-image|calamares' | head -20 || true
-    } > "${manifest}"
+unmount_chroot() {
+    umount "${ROOTFS_DIR}/run" 2>/dev/null || umount -l "${ROOTFS_DIR}/run" 2>/dev/null || true
+    umount "${ROOTFS_DIR}/dev/pts" 2>/dev/null || umount -l "${ROOTFS_DIR}/dev/pts" 2>/dev/null || true
+    umount "${ROOTFS_DIR}/sys" 2>/dev/null || umount -l "${ROOTFS_DIR}/sys" 2>/dev/null || true
+    umount "${ROOTFS_DIR}/proc" 2>/dev/null || umount -l "${ROOTFS_DIR}/proc" 2>/dev/null || true
+    umount "${ROOTFS_DIR}/dev" 2>/dev/null || umount -l "${ROOTFS_DIR}/dev" 2>/dev/null || true
+}
 
-    if command -v xorriso >/dev/null 2>&1 && [[ "${STRAWWU_ISO_FULL:-0}" == "1" ]]; then
-        die "STRAWWU_ISO_FULL=1 repack not yet implemented — see docs/architecture.md Phase 1.3"
+chroot_run() {
+    mount --bind /dev  "${ROOTFS_DIR}/dev"
+    mount --bind /proc "${ROOTFS_DIR}/proc"
+    mount --bind /sys  "${ROOTFS_DIR}/sys"
+    mount --bind /run  "${ROOTFS_DIR}/run" 2>/dev/null || true
+    trap 'unmount_chroot' EXIT
+    chroot "${ROOTFS_DIR}" "$@"
+    local rc=$?
+    unmount_chroot
+    trap - EXIT
+    return "${rc}"
+}
+
+patch_boot_serial_console() {
+    local console_args="console=ttyS0,115200n8"
+    local cfg
+    for cfg in \
+        "${ISO_STAGING}/boot/grub/grub.cfg" \
+        "${ISO_STAGING}/boot/grub/loopback.cfg" \
+        "${ISO_STAGING}/isolinux/txt.cfg"; do
+        [[ -f "${cfg}" ]] || continue
+        log "patching serial console into ${cfg}"
+        sed -i "/^[[:space:]]*linux[[:space:]]/ s/$/ ${console_args}/" "${cfg}"
+        sed -i "/^[[:space:]]*append[[:space:]]/ s/$/ ${console_args}/" "${cfg}"
+    done
+}
+
+inject_boot_marker() {
+    log "injecting STRAWWU_BOOT_OK serial marker service"
+    mkdir -p "${ROOTFS_DIR}/etc/systemd/system"
+    cat > "${ROOTFS_DIR}/etc/systemd/system/strawwu-boot-marker.service" <<'EOF'
+[Unit]
+Description=StrawWU boot test serial marker
+DefaultDependencies=no
+After=local-fs.target
+Before=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'for i in 1 2 3 4 5 6 7 8 9 10; do [ -c /dev/ttyS0 ] && echo STRAWWU_BOOT_OK > /dev/ttyS0 && exit 0; sleep 1; done; exit 1'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+    chroot_run systemctl enable strawwu-boot-marker.service
+}
+
+apply_branding() {
+    if [[ -f "${REPO_ROOT}/os-image/config/branding/etc/os-release" ]]; then
+        log "applying branding overlay"
+        cp -a "${REPO_ROOT}/os-image/config/branding/." "${ROOTFS_DIR}/"
+    fi
+    if [[ -f "${ROOTFS_DIR}/etc/os-release" ]]; then
+        sed -i "s/^VERSION=.*/VERSION=\"${VERSION}\"/" "${ROOTFS_DIR}/etc/os-release" || true
+        sed -i "s/^PRETTY_NAME=.*/PRETTY_NAME=\"StrawWU ${VERSION}\"/" "${ROOTFS_DIR}/etc/os-release" || true
+    fi
+}
+
+resolve_source_iso() {
+  if [[ -f "${WORK_DIR}/.source-iso-path" ]]; then
+        cat "${WORK_DIR}/.source-iso-path"
+        return
+    fi
+    echo "${ISO_CACHE}/${UBUNTU_ISO_NAME}"
+}
+
+iso_layout() {
+    if [[ -f "${WORK_DIR}/.iso-layout" ]]; then
+        cat "${WORK_DIR}/.iso-layout"
+    else
+        echo "monolithic"
+    fi
+}
+
+stage_iso_tree() {
+    local source_iso="$1"
+    local layout
+    layout="$(iso_layout)"
+    log "staging ISO tree from ${source_iso} (layout=${layout})"
+    rm -rf "${ISO_STAGING}"
+    mkdir -p "${ISO_STAGING}"
+
+    if mountpoint -q "${ISO_MOUNT}" 2>/dev/null; then
+        umount "${ISO_MOUNT}" || true
+    fi
+    mkdir -p "${ISO_MOUNT}"
+    mount -o loop,ro "${source_iso}" "${ISO_MOUNT}"
+    trap 'umount "${ISO_MOUNT}" 2>/dev/null || true' RETURN
+
+    if command -v rsync >/dev/null 2>&1; then
+        if [[ "${layout}" == "layered" ]]; then
+            # Noble live boot needs casper/minimal*.squashfs — keep upstream layers.
+            rsync -a --exclude='casper/filesystem.squashfs' "${ISO_MOUNT}/" "${ISO_STAGING}/"
+        else
+            rsync -a \
+                --exclude='casper/filesystem.squashfs' \
+                --exclude='casper/minimal*.squashfs' \
+                "${ISO_MOUNT}/" "${ISO_STAGING}/"
+        fi
+    else
+        cp -a "${ISO_MOUNT}/." "${ISO_STAGING}/"
+        rm -f "${ISO_STAGING}"/casper/filesystem.squashfs
+        if [[ "${layout}" != "layered" ]]; then
+            rm -f "${ISO_STAGING}"/casper/minimal*.squashfs
+        fi
     fi
 
-    # Touch placeholder ISO path for Makefile target wiring
-    echo "Phase 1 stub — run with STRAWWU_ISO_FULL=1 after Phase 1.3 implementation" > "${ISO_PATH}.stub"
-    sha256sum "${manifest}" | tee "${manifest}.sha256"
-    log "build stub complete: ${manifest}"
+    umount "${ISO_MOUNT}"
+    trap - RETURN
+}
+
+write_layer_size() {
+    local squash="$1"
+    local size_file="$2"
+    local size
+    size="$(du -sb "${squash}" | cut -f1)"
+    echo -n "${size}" > "${size_file}"
+}
+
+make_empty_layer() {
+    local out="$1"
+    local tmp="${WORK_DIR}/.empty-layer"
+    rm -rf "${tmp}"
+    mkdir -p "${tmp}"
+    mksquashfs "${tmp}" "${out}" -comp zstd -noappend -processors 1
+    rm -rf "${tmp}"
+}
+
+rebuild_squashfs_layered() {
+    local base_out="${ISO_STAGING}/casper/minimal.squashfs"
+    local standard_out="${ISO_STAGING}/casper/minimal.standard.squashfs"
+    local lang_out="${ISO_STAGING}/casper/minimal.en.squashfs"
+    local lang_alt="${ISO_STAGING}/casper/minimal.no-languages.squashfs"
+
+    log "layered ISO: repacking merged rootfs into minimal.squashfs (+ empty overlay stubs)"
+    rm -f "${ISO_STAGING}/casper/filesystem.squashfs"
+    mksquashfs "${ROOTFS_DIR}" "${base_out}" -comp zstd -noappend -e boot -processors "${STRAWWU_MKSQUASHFS_PROCESSORS:-4}"
+    make_empty_layer "${standard_out}"
+    if [[ -f "${lang_out}" || -f "${lang_alt}" ]]; then
+        if [[ -f "${lang_out}" ]]; then
+            make_empty_layer "${lang_out}"
+        else
+            make_empty_layer "${lang_alt}"
+        fi
+    fi
+
+    write_layer_size "${base_out}" "${ISO_STAGING}/casper/minimal.size"
+    write_layer_size "${standard_out}" "${ISO_STAGING}/casper/minimal.standard.size"
+    if [[ -f "${lang_out}" ]]; then
+        write_layer_size "${lang_out}" "${ISO_STAGING}/casper/minimal.en.size"
+    elif [[ -f "${lang_alt}" ]]; then
+        write_layer_size "${lang_alt}" "${ISO_STAGING}/casper/minimal.no-languages.size"
+    fi
+
+    unmount_chroot
+    chroot_run dpkg-query -W -f '${Package} ${Version}\n' > "${ISO_STAGING}/casper/minimal.manifest" 2>/dev/null \
+        || true
+    log "layered squashfs repack complete"
+}
+
+write_install_sources() {
+    [[ "$(iso_layout)" == "layered" ]] && return 0
+    unmount_chroot
+    local size
+    size="$(du -sb "${ROOTFS_DIR}" 2>/dev/null | cut -f1)"
+    cat > "${ISO_STAGING}/casper/install-sources.yaml" <<EOF
+- default: true
+  description:
+    en: StrawWU Ubuntu Desktop (${VERSION})
+  id: ubuntu-desktop
+  locale_support: langpack
+  name:
+    en: StrawWU Desktop
+  path: filesystem.squashfs
+  size: ${size}
+  type: fsimage
+  variant: desktop
+EOF
+}
+
+rebuild_squashfs() {
+    [[ -d "${ISO_STAGING}/casper" ]] || die "casper/ not found in staged ISO"
+
+    if [[ "$(iso_layout)" == "layered" ]]; then
+        rebuild_squashfs_layered
+        return 0
+    fi
+
+    local squash_out="${ISO_STAGING}/casper/filesystem.squashfs"
+
+    if [[ -f "${squash_out}" && "${STRAWWU_SKIP_SQUASHFS:-0}" == "1" ]]; then
+        log "STRAWWU_SKIP_SQUASHFS=1: reusing ${squash_out}"
+    else
+        log "mksquashfs → ${squash_out}"
+        rm -f "${squash_out}"
+        mksquashfs "${ROOTFS_DIR}" "${squash_out}" -comp zstd -noappend -e boot -processors "${STRAWWU_MKSQUASHFS_PROCESSORS:-4}"
+    fi
+
+    unmount_chroot
+    local size
+    size="$(du -sx --block-size=1 "${ROOTFS_DIR}" 2>/dev/null | cut -f1)"
+    echo -n "${size}" > "${ISO_STAGING}/casper/filesystem.size"
+    chroot_run dpkg-query -W -f '${Package} ${Version}\n' > "${ISO_STAGING}/casper/filesystem.manifest" 2>/dev/null \
+        || true
+    log "filesystem.size=${size}"
+    write_install_sources
+}
+
+xorriso_repack() {
+    local source_iso="$1"
+    log "xorriso repack (as_mkisofs) → ${ISO_PATH}"
+    rm -f "${ISO_PATH}"
+
+    local report_file="${WORK_DIR}/xorriso-report.txt"
+    xorriso -indev "${source_iso}" -report_el_torito as_mkisofs > "${report_file}" 2>/dev/null \
+        || die "xorriso report_el_torito failed"
+
+    local mkisofs_cmd
+    mkisofs_cmd="$(
+        grep -v '^--modification-date' "${report_file}" \
+            | sed "s|${source_iso}|${ISO_STAGING}|g; s/^-V.*/-V 'StrawWU ${VERSION}'/" \
+            | tr '\n' ' '
+    )"
+
+    # shellcheck disable=SC2086
+    eval xorriso -as mkisofs ${mkisofs_cmd} -o "\"${ISO_PATH}\"" "\"${ISO_STAGING}\"" \
+        2>"${WORK_DIR}/xorriso-mkisofs.log" \
+        || die "xorriso as_mkisofs failed (see ${WORK_DIR}/xorriso-mkisofs.log)"
+    [[ -f "${ISO_PATH}" ]] || die "ISO not created: ${ISO_PATH}"
+    xorriso -indev "${ISO_PATH}" -report_el_torito plain >/dev/null 2>&1 \
+        || die "repacked ISO missing El Torito boot"
+}
+
+write_checksums() {
+    log "writing SHA256SUMS"
+    (
+        cd "${OUTPUT_DIR}"
+        sha256sum "${ISO_NAME}" > SHA256SUMS
+    )
+    cat "${OUTPUT_DIR}/SHA256SUMS"
+}
+
+main() {
+    need_root
+    need_cmd mksquashfs xorriso mount umount du sed dpkg-query
+
+    [[ -f "${WORK_DIR}/.clone-ubuntu-base-ok" ]] || die "run make clone-ubuntu-base first"
+    [[ -d "${ROOTFS_DIR}" ]] || die "rootfs missing: ${ROOTFS_DIR}"
+
+    bash "${SCRIPT_DIR}/swap-kernel.sh"
+    apply_branding
+    inject_boot_marker
+
+    local source_iso
+    source_iso="$(resolve_source_iso)"
+    [[ -f "${source_iso}" ]] || die "source ISO not found: ${source_iso}"
+
+    mkdir -p "${OUTPUT_DIR}"
+    stage_iso_tree "${source_iso}"
+    patch_boot_serial_console
+    rebuild_squashfs
+    xorriso_repack "${source_iso}"
+    write_checksums
+
+    date -Is > "${WORK_DIR}/.build-iso-ok"
+    log "build complete: ${ISO_PATH}"
 }
 
 main "$@"
