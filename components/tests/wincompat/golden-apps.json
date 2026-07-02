@@ -1,0 +1,39 @@
+{
+  "version": "0.3.0-cleanroom",
+  "locked_at": "2026-07-02",
+  "source": "user Q8 decision",
+  "apps": [
+    {
+      "id": "office",
+      "name": "Microsoft Office (suite)",
+      "priority": "P0",
+      "scope": "launch_and_basic_edit",
+      "backend_default": "native",
+      "notes": "Word/Excel 基本開檔與編輯"
+    },
+    {
+      "id": "steam-launcher",
+      "name": "Steam Client",
+      "priority": "P0",
+      "scope": "launcher_only",
+      "backend_default": "native",
+      "notes": "啟動與登入 UI；不驗遊戲執行"
+    },
+    {
+      "id": "epic-launcher",
+      "name": "Epic Games Launcher",
+      "priority": "P0",
+      "scope": "launcher_only",
+      "backend_default": "native",
+      "notes": "啟動與登入 UI；不驗遊戲執行"
+    },
+    {
+      "id": "delta-force-launcher",
+      "name": "三角洲行動啟動器",
+      "priority": "P0",
+      "scope": "launcher_only",
+      "backend_default": "native",
+      "notes": "僅啟動器；不驗遊戲本體與反作弊連線"
+    }
+  ]
+}

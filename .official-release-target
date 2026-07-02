@@ -1,0 +1,4 @@
+1.0.0
+# Target semver when user authorizes official release (Phase 7).
+# NOT authorization to release — requires .official-release-authorized after all phases PASS.
+# Locked: 2026-07-02 per user Q9 decision.
