@@ -11,8 +11,8 @@
 | `source/strawwu-logo-momo.png` | Momo 吉祥物（選用） |
 | `logo-icon.svg` / `logo-icon-*.png` | Plymouth / 桌面 / ISO |
 | `logo-wordmark.svg` | Calamares / 安裝畫面 |
-| `usr/share/plymouth/themes/strawwu-boot/logo.png` | 開機動畫圖標 |
-| `usr/share/plymouth/themes/strawwu-boot/watermark.png` | 開機浮水印字標 |
+| `usr/share/plymouth/themes/strawwu-boot/logo.png` | 開機圓角圖標（Title 顯示 StrawWU） |
+| `usr/share/plymouth/themes/strawwu-boot/watermark.png` | 透明佔位（不使用底部字標） |
 
 ## 色票
 

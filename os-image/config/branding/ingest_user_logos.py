@@ -23,10 +23,51 @@ COLORS = {
 }
 
 ICON_SIZES = (16, 32, 48, 64, 128, 256, 512, 1024)
+ICON_CORNER_RADIUS_PCT = 0.22
+RECT_CORNER_RADIUS_PCT = 0.08
 
 
 def run(cmd: list[str]) -> None:
     subprocess.run(cmd, check=True, capture_output=True)
+
+
+def image_size(path: Path) -> tuple[int, int]:
+    out = subprocess.check_output(["identify", "-format", "%w %h", str(path)], text=True)
+    w, h = out.strip().split()
+    return int(w), int(h)
+
+
+def apply_rounded_corners(src: Path, dst: Path, *, radius_pct: float) -> None:
+    """Round PNG corners; radius_pct is relative to min(width, height)."""
+    w, h = image_size(src)
+    radius = max(4, int(min(w, h) * radius_pct))
+    run(
+        [
+            "convert",
+            str(src),
+            "-alpha",
+            "set",
+            "(",
+            "+clone",
+            "-alpha",
+            "extract",
+            "-draw",
+            f"fill black roundrectangle 0,0,{w - 1},{h - 1},{radius},{radius}",
+            ")",
+            "-alpha",
+            "off",
+            "-compose",
+            "CopyOpacity",
+            "-composite",
+            str(dst),
+        ]
+    )
+    print(f"rounded {dst} (r={radius}px)")
+
+
+def write_transparent_png(path: Path, size: int = 1) -> None:
+    run(["convert", "-size", f"{size}x{size}", "xc:none", str(path)])
+    print(f"wrote transparent {path}")
 
 
 def write_text(path: Path, content: str) -> None:
@@ -40,7 +81,8 @@ def copy_file(src: Path, dst: Path) -> None:
     print(f"copied {src.name} -> {dst}")
 
 
-def rasterize(src: Path, dst: Path, size: int) -> None:
+def rasterize(src: Path, dst: Path, size: int, *, rounded: bool = True) -> None:
+    tmp = dst.with_suffix(".tmp.png")
     run(
         [
             "convert",
@@ -49,13 +91,19 @@ def rasterize(src: Path, dst: Path, size: int) -> None:
             str(src),
             "-resize",
             f"{size}x{size}",
-            str(dst),
+            str(tmp),
         ]
     )
+    if rounded:
+        apply_rounded_corners(tmp, dst, radius_pct=ICON_CORNER_RADIUS_PCT)
+        tmp.unlink(missing_ok=True)
+    else:
+        tmp.replace(dst)
     print(f"wrote {dst} ({size}px)")
 
 
-def rasterize_width(src: Path, dst: Path, width: int) -> None:
+def rasterize_width(src: Path, dst: Path, width: int, *, rounded: bool = True) -> None:
+    tmp = dst.with_suffix(".tmp.png")
     run(
         [
             "convert",
@@ -64,9 +112,14 @@ def rasterize_width(src: Path, dst: Path, width: int) -> None:
             str(src),
             "-resize",
             f"{width}x",
-            str(dst),
+            str(tmp),
         ]
     )
+    if rounded:
+        apply_rounded_corners(tmp, dst, radius_pct=RECT_CORNER_RADIUS_PCT)
+        tmp.unlink(missing_ok=True)
+    else:
+        tmp.replace(dst)
     print(f"wrote {dst} ({width}px wide)")
 
 
@@ -154,7 +207,7 @@ def build_preview() -> str:
     .card {{ background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }}
     .card h2 {{ margin: 0 0 12px; font-size: 0.95rem; color: var(--muted); font-weight: 500; }}
     .preview {{ display: flex; align-items: center; justify-content: center; min-height: 140px; }}
-    .preview img {{ max-width: 100%; height: auto; }}
+    .preview img {{ max-width: 100%; height: auto; border-radius: 22%; }}
     .swatch {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 20px; }}
     .chip {{ border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 0.85rem; }}
     .dot {{ width: 28px; height: 28px; border-radius: 6px; margin-bottom: 6px; }}
@@ -211,11 +264,9 @@ def ingest(source_dir: Path) -> None:
         if src.is_file():
             copy_file(src, dest_source / name)
 
-    # Core branding copies
-    shutil.copy2(icon_png, BRAND / "logo-icon.png")
-    shutil.copy2(primary_png, BRAND / "logo-wordmark.png")
-    print(f"copied icon -> {BRAND / 'logo-icon.png'}")
-    print(f"copied primary -> {BRAND / 'logo-wordmark.png'}")
+    # Core branding copies (rounded corners on all raster logos)
+    rasterize(icon_png, BRAND / "logo-icon.png", 512)
+    rasterize_width(primary_png, BRAND / "logo-wordmark.png", 1200)
 
     # SVG wrappers (Calamares / web; embedded PNG for fidelity)
     wrap_png_as_svg(icon_png, BRAND / "logo-icon.svg", "StrawWU icon")
@@ -225,8 +276,13 @@ def ingest(source_dir: Path) -> None:
 
     mono_light = BRAND / "logo-icon-mono.png"
     mono_dark = BRAND / "logo-icon-mono-dark.png"
-    mono_variant(icon_png, mono_light, light=True)
-    mono_variant(icon_png, mono_dark, light=False)
+    mono_tmp = BRAND / "logo-icon-mono.tmp.png"
+    mono_variant(icon_png, mono_tmp, light=True)
+    apply_rounded_corners(mono_tmp, mono_light, radius_pct=ICON_CORNER_RADIUS_PCT)
+    mono_tmp.unlink(missing_ok=True)
+    mono_variant(icon_png, mono_tmp, light=False)
+    apply_rounded_corners(mono_tmp, mono_dark, radius_pct=ICON_CORNER_RADIUS_PCT)
+    mono_tmp.unlink(missing_ok=True)
     wrap_png_as_svg(mono_light, BRAND / "logo-icon-mono.svg", "StrawWU mono")
     wrap_png_as_svg(mono_dark, BRAND / "logo-icon-mono-dark.svg", "StrawWU mono dark")
 
@@ -239,10 +295,12 @@ def ingest(source_dir: Path) -> None:
     plymouth.mkdir(parents=True, exist_ok=True)
     calamares.mkdir(parents=True, exist_ok=True)
 
+    # Plymouth: icon only (title text rendered by theme); no bottom watermark
     rasterize(icon_png, plymouth / "logo.png", 256)
-    rasterize_width(primary_png, plymouth / "watermark.png", 480)
-    wrap_png_as_svg(primary_png, calamares / "strawwu-logo.svg", "StrawWU")
-    shutil.copy2(primary_png, calamares / "strawwu-logo.png")
+    write_transparent_png(plymouth / "watermark.png")
+    rasterize(icon_png, calamares / "strawwu-logo-icon.png", 256)
+    wrap_png_as_svg(BRAND / "logo-icon.png", calamares / "strawwu-logo.svg", "StrawWU")
+    shutil.copy2(BRAND / "logo-wordmark.png", calamares / "strawwu-logo.png")
 
     if momo_png.is_file():
         rasterize_width(momo_png, BRAND / "logo-momo.png", 1200)
@@ -264,8 +322,8 @@ def ingest(source_dir: Path) -> None:
 | `source/strawwu-logo-momo.png` | Momo 吉祥物（選用） |
 | `logo-icon.svg` / `logo-icon-*.png` | Plymouth / 桌面 / ISO |
 | `logo-wordmark.svg` | Calamares / 安裝畫面 |
-| `usr/share/plymouth/themes/strawwu-boot/logo.png` | 開機動畫圖標 |
-| `usr/share/plymouth/themes/strawwu-boot/watermark.png` | 開機浮水印字標 |
+| `usr/share/plymouth/themes/strawwu-boot/logo.png` | 開機圓角圖標（Title 顯示 StrawWU） |
+| `usr/share/plymouth/themes/strawwu-boot/watermark.png` | 透明佔位（不使用底部字標） |
 
 ## 色票
 

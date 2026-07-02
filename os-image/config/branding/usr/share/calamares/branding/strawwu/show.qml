@@ -21,11 +21,22 @@ Presentation {
         Rectangle {
             anchors.fill: parent
             color: "#0a0e14"
-            Image {
-                source: "strawwu-logo.svg"
-                width: 280; height: 105
-                fillMode: Image.PreserveAspectFit
+            Column {
                 anchors.centerIn: parent
+                spacing: 18
+                Image {
+                    source: "strawwu-logo-icon.png"
+                    width: 128; height: 128
+                    fillMode: Image.PreserveAspectFit
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+                Text {
+                    text: "StrawWU"
+                    color: "#f4f6f9"
+                    font.pixelSize: 36
+                    font.weight: Font.DemiBold
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
             }
         }
     }

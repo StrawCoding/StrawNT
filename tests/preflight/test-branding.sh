@@ -18,7 +18,6 @@ check() {
 echo "=== StrawWU branding preflight ==="
 
 check test -f "${BRANDING}/etc/os-release"
-check test -f "${BRANDING}/usr/share/plymouth/themes/strawwu-boot/watermark.png"
 check test -f "${BRANDING}/usr/share/plymouth/themes/strawwu-boot/logo.png"
 check test -f "${BRANDING}/source/strawwu-logo-icon.png"
 check test -f "${BRANDING}/usr/share/plymouth/themes/strawwu-boot/strawwu-boot.plymouth"
@@ -47,6 +46,15 @@ else
     echo "FAIL: plymouth theme module"
     FAIL=1
 fi
+
+if grep -q 'UseProgressBar=true' "${BRANDING}/usr/share/plymouth/themes/strawwu-boot/strawwu-boot.plymouth"; then
+    echo "PASS: plymouth boot progress bar enabled"
+else
+    echo "FAIL: plymouth missing UseProgressBar"
+    FAIL=1
+fi
+
+check test -f "${BRANDING}/usr/share/calamares/branding/strawwu/strawwu-logo-icon.png"
 
 for forbidden in partition.conf welcome.conf settings.conf devices.conf; do
     if [[ -f "${BRANDING}/etc/calamares/${forbidden}" ]]; then

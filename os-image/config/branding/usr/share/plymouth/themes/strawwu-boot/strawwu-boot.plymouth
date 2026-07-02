@@ -1,20 +1,20 @@
 [Plymouth Theme]
 Name=StrawWU Boot
-Description=StrawWU boot splash with progress and self-check status
+Description=StrawWU boot splash — rounded icon, title, progress bar
 ModuleName=two-step
 
 [two-step]
 Font=Cantarell 11
-TitleFont=Cantarell Light 36
+TitleFont=Cantarell SemiBold 32
 ImageDir=/usr/share/plymouth/themes/strawwu-boot
 DialogHorizontalAlignment=.5
-DialogVerticalAlignment=.55
+DialogVerticalAlignment=.64
 TitleHorizontalAlignment=.5
-TitleVerticalAlignment=.28
+TitleVerticalAlignment=.50
 HorizontalAlignment=.5
-VerticalAlignment=.72
+VerticalAlignment=.36
 WatermarkHorizontalAlignment=.5
-WatermarkVerticalAlignment=.96
+WatermarkVerticalAlignment=.99
 Transition=fade
 TransitionDuration=0.35
 BackgroundStartColor=0x0a0e14
@@ -26,10 +26,14 @@ MessageBelowAnimation=true
 [boot-up]
 UseEndAnimation=true
 UseFirmwareBackground=false
+UseProgressBar=true
+ProgressBarShowPercentComplete=false
 Title=StrawWU
 
 [shutdown]
 UseEndAnimation=true
+UseProgressBar=true
 
 [reboot]
 UseEndAnimation=true
+UseProgressBar=true
