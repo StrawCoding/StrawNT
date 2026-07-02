@@ -20,7 +20,7 @@ Presentation {
     Slide {
         Rectangle {
             anchors.fill: parent
-            color: "#12141c"
+            color: "#0a0e14"
             Image {
                 source: "strawwu-logo.svg"
                 width: 280; height: 105
@@ -33,7 +33,7 @@ Presentation {
     Slide {
         Rectangle {
             anchors.fill: parent
-            color: "#12141c"
+            color: "#0a0e14"
             Column {
                 anchors.centerIn: parent
                 spacing: 16
@@ -56,7 +56,7 @@ Presentation {
     Slide {
         Rectangle {
             anchors.fill: parent
-            color: "#12141c"
+            color: "#0a0e14"
             Column {
                 anchors.centerIn: parent
                 spacing: 12
@@ -64,7 +64,7 @@ Presentation {
                     model: ["硬體偵測", "分割區配置", "系統檔案複製", "開機載入器"]
                     Text {
                         text: "• " + modelData
-                        color: "#4f8cff"
+                        color: "#14b8a6"
                         font.pixelSize: 18
                         anchors.horizontalCenter: parent.horizontalCenter
                     }

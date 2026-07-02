@@ -1,11 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="StrawWU">
-  <rect width="512" height="512" rx="113" fill="#f4f6f9"/>
-  <path d="M 160.0 324.2 L 256.0 302.2 L 352.0 324.2 L 352.0 362.2 L 256.0 344.2 L 160.0 362.2 Z" fill="#0f172a" stroke="#0f172a" stroke-width="3.0"/>
-  <path d="M 160.0 324.2 L 256.0 302.2 L 256.0 344.2 L 160.0 362.2 Z" fill="#0f172a" opacity="0.22"/>
-  <path d="M 256.0 302.2 L 352.0 324.2 L 352.0 362.2 L 256.0 344.2 Z" fill="#0f172a" opacity="0.22"/>
-  <path d="M 160.0 284.2 L 256.0 178.2 L 352.0 284.2 Z" fill="none" stroke="#0f172a" stroke-width="10.0" stroke-linejoin="round"/>
-  <path d="M 176.0 284.2 L 336.0 284.2" stroke="#0f172a" stroke-width="10.0" stroke-linecap="round"/>
-  <circle cx="256.0" cy="264.2" r="12.0" fill="#0f172a"/>
-  <circle cx="256.0" cy="264.2" r="5.0" fill="#0f172a"/>
-  <circle cx="256.0" cy="192.2" r="6.0" fill="#0f172a" opacity="0.85"/>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 1254 1254" role="img" aria-label="StrawWU mono dark">
+  <image width="1254" height="1254" preserveAspectRatio="xMidYMid meet"
+         xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABOYAAATmAQMAAAC/MjxpAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAAGUExURQ8XKgAAAEl+D9IAAAABYktHRAH/Ai3eAAAAB3RJTUUH6gcCDRAa3Fr+pwAAANZJREFUeNrtwQEBAAAAgiD/r25IQAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAI8GBiEAAekLJp0AAAAASUVORK5CYII="/>
 </svg>

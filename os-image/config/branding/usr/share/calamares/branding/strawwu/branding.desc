@@ -29,10 +29,10 @@ images:
     productWelcome: "strawwu-logo.svg"
 
 style:
-   SidebarBackground: "#12141c"
-   SidebarText: "#e8e8f0"
-   SidebarTextCurrent: "#12141c"
-   SidebarBackgroundCurrent: "#4f8cff"
+   SidebarBackground: "#0a0e14"
+   SidebarText: "#f4f6f9"
+   SidebarTextCurrent: "#0a0e14"
+   SidebarBackgroundCurrent: "#14b8a6"
 
 slideshow: "show.qml"
 slideshowAPI: 2

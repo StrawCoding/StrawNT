@@ -2,7 +2,7 @@
 session-name="strawwu"
 
 [org.gnome.login-screen]
-logo='/usr/share/plymouth/themes/strawwu-boot/throbber.svg'
+logo='/usr/share/plymouth/themes/strawwu-boot/logo.png'
 
 [org.gnome.shell]
 welcome-dialog-last-shown-version='0'

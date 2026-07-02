@@ -86,7 +86,7 @@ patch_user_visible_ubuntu() {
     if [[ -f "${ROOTFS_DIR}/usr/share/glib-2.0/schemas/10_ubuntu-settings.gschema.override" ]]; then
         sed -i 's/session-name = "ubuntu"/session-name = "strawwu"/' \
             "${ROOTFS_DIR}/usr/share/glib-2.0/schemas/10_ubuntu-settings.gschema.override" || true
-        sed -i "s|logo='/usr/share/plymouth/ubuntu-logo.png'|logo='/usr/share/plymouth/themes/strawwu-boot/throbber.svg'|" \
+        sed -i "s|logo='/usr/share/plymouth/ubuntu-logo.png'|logo='/usr/share/plymouth/themes/strawwu-boot/logo.png'|" \
             "${ROOTFS_DIR}/usr/share/glib-2.0/schemas/10_ubuntu-settings.gschema.override" || true
     fi
     if [[ -f "${ROOTFS_DIR}/usr/share/applications/calamares.desktop" ]]; then

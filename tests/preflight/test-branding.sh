@@ -18,6 +18,9 @@ check() {
 echo "=== StrawWU branding preflight ==="
 
 check test -f "${BRANDING}/etc/os-release"
+check test -f "${BRANDING}/usr/share/plymouth/themes/strawwu-boot/watermark.png"
+check test -f "${BRANDING}/usr/share/plymouth/themes/strawwu-boot/logo.png"
+check test -f "${BRANDING}/source/strawwu-logo-icon.png"
 check test -f "${BRANDING}/usr/share/plymouth/themes/strawwu-boot/strawwu-boot.plymouth"
 check test -f "${BRANDING}/usr/local/sbin/strawwu-boot-selfcheck"
 check test -f "${BRANDING}/etc/systemd/system/strawwu-boot-selfcheck.service"

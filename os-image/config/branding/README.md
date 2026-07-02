@@ -1,35 +1,27 @@
-# StrawWU Branding Assets (v2 — Direction A)
+# StrawWU Branding Assets (使用者 Logo)
 
-延續官網 favicon 的分層三角標，強化為完整 OS 品牌識別。
+來源目錄：`/mnt/data/Data/檔案/專案資料/StrawWU`
 
 ## 檔案
 
 | 檔案 | 用途 |
 |------|------|
-| `logo-icon.svg` | 主圖標（512）— Plymouth / 桌面 / ISO |
-| `favicon.svg` | Favicon 最佳化（64 viewBox） |
-| `logo-wordmark.svg` | 深色橫式字標 |
-| `logo-wordmark-light.svg` | 淺色背景字標 |
-| `logo-icon-mono.svg` | 單色反白（深色底） |
-| `logo-icon-mono-dark.svg` | 單色深色（淺色底） |
-| `logo-icon-*.png` | 16–1024 點陣匯出 |
+| `source/strawwu-logo-icon.png` | 主圖標原始檔 |
+| `source/strawwu-logo-primary.png` | 橫式字標原始檔 |
+| `source/strawwu-logo-momo.png` | Momo 吉祥物（選用） |
+| `logo-icon.svg` / `logo-icon-*.png` | Plymouth / 桌面 / ISO |
+| `logo-wordmark.svg` | Calamares / 安裝畫面 |
+| `usr/share/plymouth/themes/strawwu-boot/logo.png` | 開機動畫圖標 |
+| `usr/share/plymouth/themes/strawwu-boot/watermark.png` | 開機浮水印字標 |
 
-## 色票（與 StrawWUWeb 一致）
+## 色票
 
 | 角色 | HEX |
 |------|-----|
-| Linux 強調 | `#14b8a6` |
-| Windows 強調 | `#f59e0b` |
-| Straw 品牌 | `#d4a853` |
-| Bridge | `#60a5fa` |
-| 深色背景 | `#0a0e14` |
-| 圖標底 | `#0f1419` |
+| 深色背景 | `#0A0E14` |
+| Linux / Teal | `#14B8A6` |
+| Windows / Amber | `#F59E0B` |
+| Straw 金 | `#D4A853` |
+| Bridge 藍 | `#60A5FA` |
 
-## 設計語意
-
-- **Teal 三角**：Linux 系統層（唯一核心）
-- **Amber 橫線 + 節點**：strawwu-runtime / bridge 調度層
-- **雙色底座**：Linux + Win32 同級 runtime 匯流至單一桌面
-- **Straw 金點**：StrawCoding 系列識別點綴
-
-禁止：Windows 四格窗、Ubuntu 圓圈、Wine 酒杯、玻璃擬態、光暈。
+重新產生：`python3 ingest_user_logos.py`
