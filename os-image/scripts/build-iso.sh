@@ -441,9 +441,25 @@ xorriso_repack() {
 
     # Preserve --interval:... paths that read binary slices (MBR, appended ESP)
     # from the upstream ISO; replacing them with ISO_STAGING breaks UEFI boot.
-    # Use a bash array — eval + unquoted word-split breaks 0s-15s interval specs.
+    # Use a bash array — eval + unquoted word-split breaks multi-token lines
+    # (-append_partition, -e '--interval:...') and passes them as one option.
+    normalize_interval_token() {
+        local token="$1"
+        # xorriso report wraps paths in single quotes inside interval specs.
+        token="${token//\'/}"
+        printf '%s' "${token}"
+    }
+
+    strip_shell_quotes() {
+        local s="$1"
+        if [[ "${s}" == \'*\' || "${s}" == \"*\" ]]; then
+            s="${s:1:${#s}-2}"
+        fi
+        printf '%s' "${s}"
+    }
+
     local -a mkisofs_args=()
-    local line token
+    local line parts interval
     while IFS= read -r line || [[ -n "${line}" ]]; do
         [[ "${line}" =~ ^--modification-date ]] && continue
         if [[ "${line}" =~ ^-V ]]; then
@@ -451,11 +467,24 @@ xorriso_repack() {
             continue
         fi
         if [[ "${line}" == *"--grub2-mbr"* && "${line}" == *" --interval:"* ]]; then
-            mkisofs_args+=(--grub2-mbr "${line#*--grub2-mbr }")
+            interval="$(normalize_interval_token "${line#*--grub2-mbr }")"
+            mkisofs_args+=(--grub2-mbr "${interval}")
             continue
         fi
-        if [[ "${line}" == *"-append_partition"* && "${line}" == *"--interval:"* ]]; then
-            mkisofs_args+=("${line}")
+        if [[ "${line}" == -append_partition\ * && "${line}" == *" --interval:"* ]]; then
+            read -r -a parts <<< "${line}"
+            parts[3]="$(normalize_interval_token "${parts[3]}")"
+            mkisofs_args+=("${parts[@]}")
+            continue
+        fi
+        if [[ "${line}" =~ ^-e[[:space:]] ]]; then
+            interval="$(normalize_interval_token "${line#-e }")"
+            mkisofs_args+=(-e "${interval}")
+            continue
+        fi
+        if [[ "${line}" =~ ^-(b|c)[[:space:]] ]]; then
+            read -r -a parts <<< "${line}"
+            mkisofs_args+=("${parts[0]}" "$(strip_shell_quotes "${parts[1]}")")
             continue
         fi
         # genisoimage-only partition tuning; xorriso -as mkisofs rejects these.
@@ -463,7 +492,7 @@ xorriso_repack() {
             continue
         fi
         if [[ "${line}" == *"--interval:"* ]]; then
-            mkisofs_args+=("${line}")
+            mkisofs_args+=("$(normalize_interval_token "${line}")")
             continue
         fi
         if [[ "${line}" =~ ^-- ]]; then
