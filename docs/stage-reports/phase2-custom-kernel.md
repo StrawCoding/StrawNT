@@ -2,8 +2,9 @@
 
 - **階段 ID**: `phase2-custom-kernel` (3/8)
 - **版本目標**: `0.3.0-cleanroom`
-- **報告時間**: 2026-07-03T18:56+08:00
-- **Worker**: Cursor Agent (Hermes Tick31 收尾完成)
+- **報告時間**: 2026-07-03T19:00+08:00
+- **Worker**: Cursor Agent (Hermes Tick36 收尾 commit)
+- **Commit**: `fb81a806e` fix(phase2): custom kernel boot path — initrd/casper/UEFI harness
 
 ## 階段目標
 
@@ -79,6 +80,11 @@ test-phase2: PASS — deb=.../linux-image-strawwu_6.8.12-1_amd64.deb vmlinuz=...
 - `os-image/config/branding/initrd/scripts/casper-premount/05strawwu-wait-live-media`
 - `tests/boot/run.sh`
 - `tests/preflight/test-iso-before-boot.sh`
+
+## Worker 狀態
+
+- **status**: `idle`（phase2 commit 完成；未手動跑 release-iso / boot-test，交由 pipeline）
+- **驗證重跑** @ 19:00：`make -C kernel build` ✓、`make swap-kernel` ✓、`test-phase2.sh` ✓
 
 ## 建議 Hermes
 
