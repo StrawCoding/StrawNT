@@ -78,11 +78,9 @@ patch_boot_serial_console() {
         sed -i 's/ username=ubuntu//g' "${cfg}"
         sed -i "/^[[:space:]]*linux[[:space:]]/ s/$/ ${console_args}/" "${cfg}"
         sed -i "/^[[:space:]]*append[[:space:]]/ s/$/ ${console_args}/" "${cfg}"
+        # Upstream noble grub has a bare "grub_platform" line UEFI grub treats as a command.
+        sed -i '/^grub_platform$/d' "${cfg}"
     done
-    # Upstream noble grub.cfg has a bare "grub_platform" line that UEFI grub treats as a command.
-    if [[ -f "${ISO_STAGING}/boot/grub/grub.cfg" ]]; then
-        sed -i '/^grub_platform$/d' "${ISO_STAGING}/boot/grub/grub.cfg"
-    fi
 }
 
 inject_boot_marker() {
@@ -92,12 +90,13 @@ inject_boot_marker() {
 [Unit]
 Description=StrawWU boot test serial marker
 DefaultDependencies=no
-After=local-fs.target
-Before=multi-user.target
+After=gdm.service plymouth-quit-wait.service
+Wants=gdm.service
 
 [Service]
 Type=oneshot
-ExecStart=/bin/sh -c 'K=$(uname -r); for i in 1 2 3 4 5 6 7 8 9 10; do if [ -c /dev/ttyS0 ]; then echo STRAWWU_BOOT_OK > /dev/ttyS0; echo "STRAWWU_KERNEL_${K}" > /dev/ttyS0; exit 0; fi; sleep 1; done; exit 1'
+# GDM up = live session ready; tee to serial + console (do not require -c ttyS0 — casper overlay may lag).
+ExecStart=/bin/sh -c 'K=$(uname -r); { echo STRAWWU_BOOT_OK; echo "STRAWWU_KERNEL_${K}"; } | tee /dev/ttyS0 /dev/console >/dev/null 2>&1 || true'
 RemainAfterExit=yes
 
 [Install]
@@ -442,22 +441,48 @@ xorriso_repack() {
 
     # Preserve --interval:... paths that read binary slices (MBR, appended ESP)
     # from the upstream ISO; replacing them with ISO_STAGING breaks UEFI boot.
-    local mkisofs_cmd
-    mkisofs_cmd="$(
-        grep -v '^--modification-date' "${report_file}" \
-            | while IFS= read -r line || [[ -n "${line}" ]]; do
-                if [[ "${line}" == *"--interval:"* ]]; then
-                    printf '%s\n' "${line}"
-                elif [[ "${line}" =~ ^-V ]]; then
-                    printf "%s\n" "-V 'StrawWU ${VERSION}'"
-                else
-                    printf '%s\n' "${line}" | sed "s|${source_iso}|${ISO_STAGING}|g"
-                fi
-            done | tr '\n' ' '
-    )"
+    # Use a bash array — eval + unquoted word-split breaks 0s-15s interval specs.
+    local -a mkisofs_args=()
+    local line token
+    while IFS= read -r line || [[ -n "${line}" ]]; do
+        [[ "${line}" =~ ^--modification-date ]] && continue
+        if [[ "${line}" =~ ^-V ]]; then
+            mkisofs_args+=(-V "StrawWU ${VERSION}")
+            continue
+        fi
+        if [[ "${line}" == *"--grub2-mbr"* && "${line}" == *" --interval:"* ]]; then
+            mkisofs_args+=(--grub2-mbr "${line#*--grub2-mbr }")
+            continue
+        fi
+        if [[ "${line}" == *"-append_partition"* && "${line}" == *"--interval:"* ]]; then
+            mkisofs_args+=("${line}")
+            continue
+        fi
+        # genisoimage-only partition tuning; xorriso -as mkisofs rejects these.
+        if [[ "${line}" =~ ^-(partition_cyl_align|partition_offset)([[:space:]]|$) ]]; then
+            continue
+        fi
+        if [[ "${line}" == *"--interval:"* ]]; then
+            mkisofs_args+=("${line}")
+            continue
+        fi
+        if [[ "${line}" =~ ^-- ]]; then
+            mkisofs_args+=("${line}")
+            continue
+        fi
+        if [[ "${line}" == *" "* ]]; then
+            read -r -a parts <<< "${line}"
+            mkisofs_args+=("${parts[@]}")
+            continue
+        fi
+        line="${line//${source_iso}/${ISO_STAGING}}"
+        mkisofs_args+=("${line}")
+    done < "${report_file}"
 
-    # shellcheck disable=SC2086
-    eval xorriso -return_with SORRY 32 0 -as mkisofs ${mkisofs_cmd} -o "\"${ISO_PATH}\"" "\"${ISO_STAGING}\"" \
+    xorriso -return_with SORRY 0 -as mkisofs \
+        "${mkisofs_args[@]}" \
+        -o "${ISO_PATH}" \
+        "${ISO_STAGING}" \
         2>"${WORK_DIR}/xorriso-mkisofs.log" \
         || die "xorriso as_mkisofs failed (see ${WORK_DIR}/xorriso-mkisofs.log)"
     [[ -f "${ISO_PATH}" ]] || die "ISO not created: ${ISO_PATH}"
@@ -488,16 +513,26 @@ main() {
     if [[ -z "${kernel_deb}" ]]; then
         kernel_deb="$(find "${REPO_ROOT}/kernel/output" -maxdepth 1 -name 'linux-image-strawwu_*.deb' 2>/dev/null | head -1)"
     fi
-    STRAWWU_KERNEL_DEB="${kernel_deb}" bash "${SCRIPT_DIR}/swap-kernel.sh"
-    apply_branding
-    inject_boot_marker
+
+    if [[ "${STRAWWU_SKIP_SQUASHFS:-0}" == "1" ]]; then
+        log "STRAWWU_SKIP_SQUASHFS=1: skip swap-kernel/rootfs branding; refresh ISO staging only"
+        STRAWWU_VERSION="${VERSION}" bash "${SCRIPT_DIR}/apply-branding.sh" iso
+    else
+        STRAWWU_KERNEL_DEB="${kernel_deb}" bash "${SCRIPT_DIR}/swap-kernel.sh"
+        apply_branding
+        inject_boot_marker
+    fi
 
     local source_iso
     source_iso="$(resolve_source_iso)"
     [[ -f "${source_iso}" ]] || die "source ISO not found: ${source_iso}"
 
     mkdir -p "${OUTPUT_DIR}"
-    stage_iso_tree "${source_iso}"
+    if [[ "${STRAWWU_SKIP_SQUASHFS:-0}" == "1" && -d "${ISO_STAGING}/casper" ]]; then
+        log "STRAWWU_SKIP_SQUASHFS=1: reusing existing ISO staging tree"
+    else
+        stage_iso_tree "${source_iso}"
+    fi
     STRAWWU_VERSION="${VERSION}" bash "${SCRIPT_DIR}/apply-branding.sh" iso
     patch_boot_serial_console
     unmount_chroot

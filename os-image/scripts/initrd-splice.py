@@ -139,6 +139,77 @@ def module_stem(name: str) -> str:
     return name
 
 
+def module_suffix(name: str) -> str:
+    for suffix in (".ko.zst", ".ko.xz", ".ko"):
+        if name.endswith(suffix):
+            return suffix
+    return ".ko"
+
+
+def transform_dep_to_zst(content: str) -> str:
+    import re
+
+    return re.sub(r"\.ko(\b|:| )", r".ko.zst\1", content)
+
+
+def install_main_module_metadata(main_dir: Path, new_kver: str, modules_src: Path) -> None:
+    """Noble casper main carries lib/modules/<kver> metadata; early3 holds .ko.zst payloads."""
+    import shutil
+
+    for rel_base in (Path("lib/modules"), Path("usr/lib/modules")):
+        base = main_dir / rel_base
+        if not base.is_dir():
+            continue
+        for child in list(base.iterdir()):
+            if child.is_dir():
+                shutil.rmtree(child)
+
+    meta_dir = main_dir / "lib/modules" / new_kver
+    meta_dir.mkdir(parents=True, exist_ok=True)
+
+    text_meta = ("modules.dep", "modules.alias", "modules.softdep", "modules.symbols")
+    for name in text_meta:
+        src = modules_src / name
+        if src.is_file():
+            (meta_dir / name).write_text(transform_dep_to_zst(src.read_text()))
+
+    for name in (
+        "modules.builtin",
+        "modules.builtin.modinfo",
+        "modules.order",
+        "modules.devname",
+    ):
+        src = modules_src / name
+        if src.is_file():
+            shutil.copy2(src, meta_dir / name)
+
+    for name in (
+        "modules.dep.bin",
+        "modules.alias.bin",
+        "modules.symbols.bin",
+        "modules.builtin.bin",
+        "modules.builtin.alias.bin",
+    ):
+        src = modules_src / name
+        if src.is_file():
+            shutil.copy2(src, meta_dir / name)
+
+
+def write_module_payload(src_ko: Path, dest_path: Path) -> None:
+    """Write a kernel module into initrd early3 using upstream compression layout."""
+    dest_path.parent.mkdir(parents=True, exist_ok=True)
+    if dest_path.name.endswith(".ko.zst"):
+        subprocess.run(
+            ["zstd", "-19", "-T0", "-f", str(src_ko), "-o", str(dest_path)],
+            check=True,
+        )
+    elif dest_path.name.endswith(".ko.xz"):
+        subprocess.run(["xz", "-9", "-f", "-k", str(src_ko)], check=True)
+        src_ko.with_suffix(".ko.xz").replace(dest_path)
+    else:
+        dest_path.write_bytes(src_ko.read_bytes())
+
+
 def replace_modules_tree(modules_root: Path, old_kver: str, new_kver: str, modules_src: Path) -> None:
     old_dir = modules_root / old_kver
     new_dir = modules_root / new_kver
@@ -147,40 +218,27 @@ def replace_modules_tree(modules_root: Path, old_kver: str, new_kver: str, modul
     if not modules_src.is_dir():
         raise ValueError(f"kernel modules missing: {modules_src}")
 
-    new_dir.mkdir(parents=True, exist_ok=True)
+    if new_dir.exists():
+        import shutil
+
+        shutil.rmtree(new_dir)
+    new_dir.mkdir(parents=True)
     src_by_stem = {
         module_stem(mod.name): mod for mod in modules_src.rglob("*") if mod.is_file() and ".ko" in mod.name
     }
 
+    # Noble casper early3 carries only compressed .ko.* under kernel/ — no modules.dep.
     for mod in old_dir.rglob("*"):
         if not mod.is_file() or ".ko" not in mod.name:
             continue
         rel = mod.relative_to(old_dir)
-        dest = src_by_stem.get(module_stem(mod.name))
-        if dest is None:
+        src_ko = src_by_stem.get(module_stem(mod.name))
+        if src_ko is None:
             continue
-        target = new_dir / rel.parent / dest.name
-        target.parent.mkdir(parents=True, exist_ok=True)
+        target = new_dir / rel.parent / mod.name
         if target.exists() or target.is_symlink():
             target.unlink()
-        target.write_bytes(dest.read_bytes())
-
-    for meta in (
-        "modules.builtin",
-        "modules.builtin.modinfo",
-        "modules.order",
-        "modules.dep",
-        "modules.dep.bin",
-        "modules.symbols",
-        "modules.symbols.bin",
-        "modules.alias",
-        "modules.alias.bin",
-        "modules.softdep",
-        "modules.devname",
-    ):
-        src = modules_src / meta
-        if src.is_file():
-            (new_dir / meta).write_bytes(src.read_bytes())
+        write_module_payload(src_ko, target)
 
     if old_dir != new_dir and old_dir.exists():
         import shutil
@@ -264,30 +322,104 @@ def inject_tree_into_dir(target_root: Path, src_root: Path) -> None:
             shutil.copy2(path, dest)
 
 
-def inject_plymouth_into_early3(early3_dir: Path, branding_root: Path) -> None:
+def inject_plymouth_theme_tree(target_root: Path, branding_root: Path) -> None:
     import shutil
 
     theme_src = branding_root / "usr/share/plymouth/themes/strawwu-boot"
     plymouth_conf = branding_root / "etc/plymouth/plymouthd.conf"
     if not theme_src.is_dir():
         return
-    theme_dest = early3_dir / "usr/share/plymouth/themes/strawwu-boot"
+    theme_dest = target_root / "usr/share/plymouth/themes/strawwu-boot"
     if theme_dest.exists():
         shutil.rmtree(theme_dest)
     shutil.copytree(theme_src, theme_dest)
-    conf_dest = early3_dir / "etc/plymouth"
+    conf_dest = target_root / "etc/plymouth"
     conf_dest.mkdir(parents=True, exist_ok=True)
     if plymouth_conf.is_file():
         shutil.copy2(plymouth_conf, conf_dest / "plymouthd.conf")
-    default_link = early3_dir / "usr/share/plymouth/themes/default.plymouth"
+    default_link = target_root / "usr/share/plymouth/themes/default.plymouth"
     default_link.parent.mkdir(parents=True, exist_ok=True)
     if default_link.exists() or default_link.is_symlink():
         default_link.unlink()
     default_link.symlink_to("/usr/share/plymouth/themes/strawwu-boot/strawwu-boot.plymouth")
-    ubuntu_text = early3_dir / "usr/share/plymouth/themes/ubuntu-text/ubuntu-text.plymouth"
+    ubuntu_text = target_root / "usr/share/plymouth/themes/ubuntu-text/ubuntu-text.plymouth"
     if ubuntu_text.is_file():
         text = ubuntu_text.read_text()
         ubuntu_text.write_text(text.replace("title=Ubuntu", "title=StrawWU"))
+
+
+def inject_plymouth_into_early3(early3_dir: Path, branding_root: Path) -> None:
+    inject_plymouth_theme_tree(early3_dir, branding_root)
+
+
+def inject_plymouth_into_main(main_dir: Path, branding_root: Path) -> None:
+    inject_plymouth_theme_tree(main_dir, branding_root)
+
+
+def patch_casper_conf_in_initrd(target_root: Path) -> None:
+    conf = target_root / "etc/casper.conf"
+    if not conf.is_file():
+        return
+    text = conf.read_text()
+    replacements = {
+        'export BUILD_SYSTEM="Ubuntu"': 'export BUILD_SYSTEM="StrawWU"',
+        'export HOST="ubuntu"': 'export HOST="strawwu"',
+        'export USERFULLNAME="Live session user"': 'export USERFULLNAME="StrawWU Live session user"',
+        '# export FLAVOUR="Ubuntu"': 'export FLAVOUR="StrawWU"',
+        'export FLAVOUR="Ubuntu"': 'export FLAVOUR="StrawWU"',
+    }
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+    if 'export FLAVOUR=' not in text:
+        text += '\nexport FLAVOUR="StrawWU"\n'
+    conf.write_text(text)
+
+
+def decompress_main_zst(main_blob: Path, main_dir: Path, scratch: Path) -> None:
+    import shutil
+
+    if main_dir.exists():
+        shutil.rmtree(main_dir)
+    main_dir.mkdir(parents=True)
+    main_cpio = scratch / "main.decompressed.cpio"
+    subprocess.run(["zstd", "-d", "-f", str(main_blob), "-o", str(main_cpio)], check=True)
+    with main_cpio.open("rb") as handle:
+        subprocess.run(
+            ["cpio", "-id", "--quiet", "--no-absolute-filenames"],
+            cwd=main_dir,
+            stdin=handle,
+            check=True,
+        )
+
+
+def recompress_main_dir(main_dir: Path, scratch: Path) -> Path:
+    main_cpio = scratch / "main.repack.cpio"
+    main_zst = scratch / "main.branded.zst"
+    repack_main(main_dir, main_cpio)
+    compress_main_cpio(main_cpio, main_zst, level=19)
+    return main_zst
+
+
+def sync_main_modules_tree(main_dir: Path, new_kver: str, modules_src: Path) -> None:
+    """Caspar main phase runs modprobe from /lib/modules/$(uname -r) metadata."""
+    install_main_module_metadata(main_dir, new_kver, modules_src)
+
+
+def refresh_preserved_main(
+    main_blob: Path,
+    scratch: Path,
+    branding_root: Path | None = None,
+    modules_src: Path | None = None,
+    new_kver: str = "",
+) -> Path:
+    main_dir = scratch / "main-brand"
+    decompress_main_zst(main_blob, main_dir, scratch)
+    if modules_src is not None and new_kver and modules_src.is_dir():
+        sync_main_modules_tree(main_dir, new_kver, modules_src)
+    if branding_root is not None and branding_root.is_dir():
+        inject_plymouth_into_main(main_dir, branding_root)
+        patch_casper_conf_in_initrd(main_dir)
+    return recompress_main_dir(main_dir, scratch)
 
 
 def repack_initrd_phases(
@@ -328,6 +460,16 @@ def repack_initrd_phases(
             _, main_blob = split_prefix_phases(initrd_src, prefix_dir)
         if main_blob is None or not main_blob.is_file():
             raise RuntimeError("preserve-main requested but upstream main.zst missing")
+        if (branding_root is not None and branding_root.is_dir()) or (
+            modules_src is not None and new_kver and modules_src.is_dir()
+        ):
+            main_blob = refresh_preserved_main(
+                main_blob,
+                scratch,
+                branding_root,
+                modules_src,
+                new_kver,
+            )
         concat_initrd(prefix_blobs, main_blob, initrd_out)
         return
 
