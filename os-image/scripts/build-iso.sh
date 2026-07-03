@@ -79,6 +79,10 @@ patch_boot_serial_console() {
         sed -i "/^[[:space:]]*linux[[:space:]]/ s/$/ ${console_args}/" "${cfg}"
         sed -i "/^[[:space:]]*append[[:space:]]/ s/$/ ${console_args}/" "${cfg}"
     done
+    # Upstream noble grub.cfg has a bare "grub_platform" line that UEFI grub treats as a command.
+    if [[ -f "${ISO_STAGING}/boot/grub/grub.cfg" ]]; then
+        sed -i '/^grub_platform$/d' "${ISO_STAGING}/boot/grub/grub.cfg"
+    fi
 }
 
 inject_boot_marker() {
@@ -196,6 +200,8 @@ rebuild_squashfs_layered() {
     log "layered ISO: repacking merged rootfs into minimal.squashfs (+ empty overlay stubs)"
     prepare_squashfs_mount_points
     rm -f "${ISO_STAGING}/casper/filesystem.squashfs"
+    # Upstream rsync leaves casper/*.squashfs read-only; mksquashfs must replace, not append.
+    rm -f "${base_out}" "${standard_out}" "${lang_out}" "${lang_alt}"
     mksquashfs "${ROOTFS_DIR}" "${base_out}" -comp zstd -noappend ${squashfs_exclude_args} -processors "${STRAWWU_MKSQUASHFS_PROCESSORS:-4}"
     make_empty_layer "${standard_out}"
     if [[ -f "${lang_out}" || -f "${lang_alt}" ]]; then
@@ -282,7 +288,7 @@ repack_initrd_phases() {
     [[ -f "${splice}" ]] || die "initrd splice helper missing: ${splice}"
     if [[ -n "${kver}" && -d "${modules_src}" ]]; then
         extra=(--modules-src "${modules_src}" --new-kver "${kver}" --preserve-main --branding-root "${branding_dir}")
-        log "repacking initrd: early3 modules + plymouth, preserve upstream main.zst for ${kver}"
+        log "repacking initrd: early3 modules + plymouth in early3+main, preserve upstream main structure for ${kver}"
     fi
     python3 "${splice}" repack-main-only "${initrd_src}" /dev/null "${initrd_out}" "${scratch}" "${extra[@]}"
 }
@@ -434,15 +440,24 @@ xorriso_repack() {
     xorriso -indev "${source_iso}" -report_el_torito as_mkisofs > "${report_file}" 2>/dev/null \
         || die "xorriso report_el_torito failed"
 
+    # Preserve --interval:... paths that read binary slices (MBR, appended ESP)
+    # from the upstream ISO; replacing them with ISO_STAGING breaks UEFI boot.
     local mkisofs_cmd
     mkisofs_cmd="$(
         grep -v '^--modification-date' "${report_file}" \
-            | sed "s|${source_iso}|${ISO_STAGING}|g; s/^-V.*/-V 'StrawWU ${VERSION}'/" \
-            | tr '\n' ' '
+            | while IFS= read -r line || [[ -n "${line}" ]]; do
+                if [[ "${line}" == *"--interval:"* ]]; then
+                    printf '%s\n' "${line}"
+                elif [[ "${line}" =~ ^-V ]]; then
+                    printf "%s\n" "-V 'StrawWU ${VERSION}'"
+                else
+                    printf '%s\n' "${line}" | sed "s|${source_iso}|${ISO_STAGING}|g"
+                fi
+            done | tr '\n' ' '
     )"
 
     # shellcheck disable=SC2086
-    eval xorriso -as mkisofs ${mkisofs_cmd} -o "\"${ISO_PATH}\"" "\"${ISO_STAGING}\"" \
+    eval xorriso -return_with SORRY 32 0 -as mkisofs ${mkisofs_cmd} -o "\"${ISO_PATH}\"" "\"${ISO_STAGING}\"" \
         2>"${WORK_DIR}/xorriso-mkisofs.log" \
         || die "xorriso as_mkisofs failed (see ${WORK_DIR}/xorriso-mkisofs.log)"
     [[ -f "${ISO_PATH}" ]] || die "ISO not created: ${ISO_PATH}"
@@ -466,7 +481,14 @@ main() {
     [[ -f "${WORK_DIR}/.clone-ubuntu-base-ok" ]] || die "run make clone-ubuntu-base first"
     [[ -d "${ROOTFS_DIR}" ]] || die "rootfs missing: ${ROOTFS_DIR}"
 
-    STRAWWU_KERNEL_DEB="${STRAWWU_KERNEL_DEB:-}" bash "${SCRIPT_DIR}/swap-kernel.sh"
+    local kernel_deb="${STRAWWU_KERNEL_DEB:-}"
+    if [[ -z "${kernel_deb}" && -f "${REPO_ROOT}/kernel/output/.kernel-deb-path" ]]; then
+        kernel_deb="$(cat "${REPO_ROOT}/kernel/output/.kernel-deb-path")"
+    fi
+    if [[ -z "${kernel_deb}" ]]; then
+        kernel_deb="$(find "${REPO_ROOT}/kernel/output" -maxdepth 1 -name 'linux-image-strawwu_*.deb' 2>/dev/null | head -1)"
+    fi
+    STRAWWU_KERNEL_DEB="${kernel_deb}" bash "${SCRIPT_DIR}/swap-kernel.sh"
     apply_branding
     inject_boot_marker
 
