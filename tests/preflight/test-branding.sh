@@ -33,11 +33,22 @@ else
     FAIL=1
 fi
 
-if grep -qi 'ubuntu' "${BRANDING}/etc/os-release"; then
-    echo "FAIL: os-release still contains Ubuntu"
+if grep -qi 'ubuntu' "${BRANDING}/etc/os-release" && ! grep -q '^ID=ubuntu$' "${BRANDING}/etc/os-release"; then
+    echo "FAIL: os-release still contains Ubuntu (except ID=ubuntu for casper)"
+    FAIL=1
+elif grep -q '^NAME="Ubuntu"' "${BRANDING}/etc/os-release" || grep -q '^PRETTY_NAME="Ubuntu' "${BRANDING}/etc/os-release"; then
+    echo "FAIL: os-release still shows Ubuntu branding"
     FAIL=1
 else
-    echo "PASS: os-release has no Ubuntu string"
+    echo "PASS: os-release branding OK (ID=ubuntu allowed for casper live boot)"
+fi
+
+check test -f "${BRANDING}/etc/casper.conf"
+if grep -q 'USERNAME="ubuntu"' "${BRANDING}/etc/casper.conf"; then
+    echo "PASS: casper.conf pins live USERNAME=ubuntu"
+else
+    echo "FAIL: casper.conf must export USERNAME=ubuntu"
+    FAIL=1
 fi
 
 if grep -q 'ModuleName=two-step' "${BRANDING}/usr/share/plymouth/themes/strawwu-boot/strawwu-boot.plymouth"; then

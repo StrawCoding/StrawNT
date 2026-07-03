@@ -1,0 +1,21 @@
+--- a/drivers/misc/Makefile
++++ b/drivers/misc/Makefile
+@@ -70,3 +70,4 @@ obj-$(CONFIG_UID_SYS_STATS)	+= uid_sys_stats.o
+ obj-$(CONFIG_USERCOPY_FALLBACK)	+= usercopy_fallback.o
+ obj-$(CONFIG_SG_POOL)		+= sg_pool.o
+ obj-$(CONFIG_DEVMEM)		+= devmem.o
++obj-$(CONFIG_STRAWWU_IPC)	+= strawwu_ipc/
+--- a/drivers/misc/Kconfig
++++ b/drivers/misc/Kconfig
+@@ -595,3 +595,13 @@ config DEVMEM
+ 	  Say Y here if you want to support the /dev/mem device.
+ 	  The /dev/mem device allows user space access to all of physical
+ 	  memory.
++
++config STRAWWU_IPC
++	tristate "StrawWU kernel-userspace IPC stub"
++	default m
++	help
++	  StrawWU Phase 2 IPC stub (/dev/strawwu_ipc). Provides IOCTL
++	  probe responses for userspace device proxy and anticheat stubs.
++	  Not a Windows kernel driver loader.

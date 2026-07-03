@@ -29,11 +29,17 @@ clone-ubuntu-base: preflight
 kernel-build:
 	$(MAKE) -C kernel build
 
+KERNEL_DEB ?= $(shell ls kernel/output/linux-image-strawwu_*.deb 2>/dev/null | head -1)
+
 swap-kernel:
-	sudo STRAWWU_KERNEL_DEB="$${STRAWWU_KERNEL_DEB:-$(shell ls kernel/output/linux-image-strawwu_*.deb 2>/dev/null | head -1)}" bash $(SCRIPTS)/swap-kernel.sh
+	sudo STRAWWU_KERNEL_DEB="$${STRAWWU_KERNEL_DEB:-$(KERNEL_DEB)}" bash $(SCRIPTS)/swap-kernel.sh
 
 build-iso: preflight
-	sudo STRAWWU_VERSION=$(VERSION) bash $(SCRIPTS)/build-iso.sh
+	sudo STRAWWU_VERSION=$(VERSION) STRAWWU_KERNEL_DEB="$${STRAWWU_KERNEL_DEB:-$(KERNEL_DEB)}" STRAWWU_SKIP_SQUASHFS="$${STRAWWU_SKIP_SQUASHFS:-0}" bash $(SCRIPTS)/build-iso.sh
+
+repack-iso: preflight
+	@test -f os-image/work/.clone-ubuntu-base-ok || (echo "run make clone-ubuntu-base first" && exit 1)
+	sudo STRAWWU_VERSION=$(VERSION) STRAWWU_KERNEL_DEB="$${STRAWWU_KERNEL_DEB:-$(KERNEL_DEB)}" STRAWWU_SKIP_SQUASHFS=1 bash $(SCRIPTS)/build-iso.sh
 
 validate-rootfs:
 	@test -d os-image/work/rootfs/etc || (echo "run make clone-ubuntu-base first" && exit 1)

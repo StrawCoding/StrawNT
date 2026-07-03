@@ -1,6 +1,3 @@
-[org.gnome.desktop.session]
-session-name="strawwu"
-
 [org.gnome.login-screen]
 logo='/usr/share/plymouth/themes/strawwu-boot/logo.png'
 

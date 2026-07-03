@@ -1,13 +1,20 @@
 # StrawWU Custom Kernel
 
-Phase 2 deliverable: build `linux-image-strawwu` .deb from Ubuntu noble kernel source + StrawWU patches.
+Phase 2 deliverable: build `linux-image-strawwu` .deb from Ubuntu noble kernel source + `strawwu_ipc` module.
 
-## Reference (do not reinvent)
+## Build
 
-- Ubuntu noble kernel: `apt source linux-image-$(uname -r)`
-- Package: `linux-image-strawwu_<version>_amd64.deb`
-- Install via: `STRAWWU_KERNEL_DEB=/path/to.deb make swap-kernel`
+```bash
+make -C kernel build          # 20-60 min; needs root for apt source fetch
+export STRAWWU_KERNEL_DEB=$(ls kernel/output/linux-image-strawwu_*.deb | head -1)
+make swap-kernel build-iso boot-test-iso
+make test-phase2
+```
+
+## Module
+
+`strawwu_ipc` — misc char device `/dev/strawwu_ipc` for Phase 6 device-proxy / anticheat IOCTL stubs.
 
 ## Status
 
-Not started — Phase 1 uses Ubuntu `linux-image-generic` to validate clone pipeline.
+Phase 2 — `linux-image-strawwu` .deb + `strawwu_ipc` module; use `make swap-kernel` to install into cloned rootfs.

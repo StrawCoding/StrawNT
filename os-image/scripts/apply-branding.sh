@@ -84,8 +84,6 @@ patch_user_visible_ubuntu() {
         sed -i 's/Ubuntu/StrawWU/g' ${files} 2>/dev/null || true
     fi
     if [[ -f "${ROOTFS_DIR}/usr/share/glib-2.0/schemas/10_ubuntu-settings.gschema.override" ]]; then
-        sed -i 's/session-name = "ubuntu"/session-name = "strawwu"/' \
-            "${ROOTFS_DIR}/usr/share/glib-2.0/schemas/10_ubuntu-settings.gschema.override" || true
         sed -i "s|logo='/usr/share/plymouth/ubuntu-logo.png'|logo='/usr/share/plymouth/themes/strawwu-boot/logo.png'|" \
             "${ROOTFS_DIR}/usr/share/glib-2.0/schemas/10_ubuntu-settings.gschema.override" || true
     fi
@@ -118,7 +116,11 @@ patch_iso_staging() {
         sed -i 's/Ubuntu/StrawWU/g' "${ISO_STAGING}/README.diskdefines" || true
     fi
     if [[ -f "${ISO_STAGING}/casper/initrd" ]]; then
-        bash "${SCRIPT_DIR}/repack-initrd-branding.sh"
+        if [[ -f "${WORK_DIR}/.swap-kernel-ok" ]] && grep -q strawwu-kernel "${WORK_DIR}/.swap-kernel-ok" 2>/dev/null; then
+            log "custom kernel detected — casper initrd will be rebuilt in build-iso sync step"
+        else
+            bash "${SCRIPT_DIR}/repack-initrd-branding.sh"
+        fi
     fi
 }
 

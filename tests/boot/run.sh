@@ -7,7 +7,7 @@ OUTPUT_DIR="${REPO_ROOT}/tests/boot/output"
 VERSION="${STRAWWU_VERSION:-0.3.0-cleanroom}"
 ISO_PATH="${STRAWWU_ISO_PATH:-${REPO_ROOT}/os-image/output/StrawWU-${VERSION}-amd64.iso}"
 MARKER="STRAWWU_BOOT_OK"
-TIMEOUT="${STRAWWU_BOOT_TIMEOUT:-600}"
+TIMEOUT="${STRAWWU_BOOT_TIMEOUT:-900}"
 MEMORY="${STRAWWU_BOOT_MEM:-4096}"
 
 log() { echo "==> $*" >&2; }

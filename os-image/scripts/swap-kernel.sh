@@ -47,12 +47,16 @@ main() {
     [[ -f "${kernel_deb}" ]] || die "kernel deb not found: ${kernel_deb}"
 
     log "installing ${kernel_deb}"
+    mkdir -p "${ROOTFS_DIR}/tmp"
     cp "${kernel_deb}" "${ROOTFS_DIR}/tmp/strawwu-kernel.deb"
-    chroot_run bash -c 'DEBIAN_FRONTEND=noninteractive apt-get update -qq && apt-get install -y /tmp/strawwu-kernel.deb && apt-get purge -y "linux-image-generic*" || true && update-initramfs -u -k all'
+    chroot_run bash -c 'DEBIAN_FRONTEND=noninteractive apt-get update -qq && apt-get install -y /tmp/strawwu-kernel.deb && apt-get purge -y "linux-image-generic*" "linux-image-unsigned-*" 2>/dev/null || true && update-initramfs -u -k all'
     rm -f "${ROOTFS_DIR}/tmp/strawwu-kernel.deb"
 
-    date -Is > "${MARKER}"
-    log "kernel swap complete"
+    local kver=""
+    kver="$(ls "${ROOTFS_DIR}/lib/modules" 2>/dev/null | grep strawwu | head -1 || true)"
+    [[ -n "${kver}" ]] || kver="$(ls "${ROOTFS_DIR}/boot/vmlinuz-"* 2>/dev/null | sed 's|.*/vmlinuz-||' | head -1 || true)"
+    echo "strawwu-kernel:${kver:-unknown}" > "${MARKER}"
+    log "kernel swap complete (${kver:-unknown})"
 }
 
 main "$@"

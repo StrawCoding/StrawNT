@@ -4,3 +4,9 @@ os-image/output/*.iso
 tests/boot/output/serial-*.log
 tests/boot/output/qemu-*.log
 *.partial
+
+# kernel build artifacts (never commit source tree or build logs)
+kernel/build/
+kernel/build.log
+kernel/output/*.deb
+**/__pycache__/
