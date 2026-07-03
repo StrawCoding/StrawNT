@@ -5,8 +5,15 @@ tests/boot/output/serial-*.log
 tests/boot/output/qemu-*.log
 *.partial
 
+# dev-vm local config and disks
+tests/dev-vm/vm.env
+tests/dev-vm/*.qcow2
+
 # kernel build artifacts (never commit source tree or build logs)
 kernel/build/
 kernel/build.log
 kernel/output/*.deb
 **/__pycache__/
+
+# upstream technical references (~370MB; refresh via docs/technical-references/scripts/)
+docs/technical-references/upstream/

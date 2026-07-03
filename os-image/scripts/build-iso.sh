@@ -76,6 +76,10 @@ patch_boot_serial_console() {
         sed -i 's/ console=ttyS0,115200n8//g' "${cfg}"
         sed -i 's/ console=tty0//g' "${cfg}"
         sed -i 's/ username=ubuntu//g' "${cfg}"
+        sed -i 's/ boot=casper//g' "${cfg}"
+        # boot=casper must precede '---' (kernel args); missing on UEFI breaks live-media scan.
+        sed -i '/^[[:space:]]*linux[[:space:]]/ s|\(/casper/vmlinuz\)[[:space:]]*|\1 boot=casper |' "${cfg}"
+        sed -i "/^[[:space:]]*append[[:space:]]/ s/^/boot=casper /" "${cfg}"
         sed -i "/^[[:space:]]*linux[[:space:]]/ s/$/ ${console_args}/" "${cfg}"
         sed -i "/^[[:space:]]*append[[:space:]]/ s/$/ ${console_args}/" "${cfg}"
         # Upstream noble grub has a bare "grub_platform" line UEFI grub treats as a command.
@@ -180,11 +184,19 @@ make_empty_layer() {
     local tmp="${WORK_DIR}/.empty-layer"
     rm -rf "${tmp}"
     mkdir -p "${tmp}"
-    mksquashfs "${tmp}" "${out}" -comp zstd -noappend -processors 1
+    run_mksquashfs "${tmp}" "${out}"
     rm -rf "${tmp}"
 }
 
 squashfs_exclude_args="-e boot"
+
+run_mksquashfs() {
+    local src="$1" dest="$2"
+    local -a comp_args=()
+    iso_mode_squashfs_args comp_args
+    log "mksquashfs ${dest} mode=${STRAWWU_ISO_MODE} comp=${STRAWWU_MKSQUASHFS_COMP[0]}"
+    mksquashfs "${src}" "${dest}" "${comp_args[@]}" ${squashfs_exclude_args}
+}
 
 rebuild_squashfs_layered() {
     if [[ "${STRAWWU_SKIP_SQUASHFS:-0}" == "1" ]]; then
@@ -201,7 +213,7 @@ rebuild_squashfs_layered() {
     rm -f "${ISO_STAGING}/casper/filesystem.squashfs"
     # Upstream rsync leaves casper/*.squashfs read-only; mksquashfs must replace, not append.
     rm -f "${base_out}" "${standard_out}" "${lang_out}" "${lang_alt}"
-    mksquashfs "${ROOTFS_DIR}" "${base_out}" -comp zstd -noappend ${squashfs_exclude_args} -processors "${STRAWWU_MKSQUASHFS_PROCESSORS:-4}"
+    run_mksquashfs "${ROOTFS_DIR}" "${base_out}"
     make_empty_layer "${standard_out}"
     if [[ -f "${lang_out}" || -f "${lang_alt}" ]]; then
         if [[ -f "${lang_out}" ]]; then
@@ -261,7 +273,7 @@ rebuild_squashfs() {
         log "mksquashfs → ${squash_out}"
         prepare_squashfs_mount_points
         rm -f "${squash_out}"
-        mksquashfs "${ROOTFS_DIR}" "${squash_out}" -comp zstd -noappend ${squashfs_exclude_args} -processors "${STRAWWU_MKSQUASHFS_PROCESSORS:-4}"
+        run_mksquashfs "${ROOTFS_DIR}" "${squash_out}"
     fi
 
     unmount_chroot
@@ -531,6 +543,14 @@ write_checksums() {
 main() {
     need_root
     need_cmd mksquashfs xorriso mount umount du sed dpkg-query
+    __build_iso_main "$@"
+}
+
+__build_iso_main() {
+    # shellcheck source=iso-mode.sh
+    source "${SCRIPT_DIR}/iso-mode.sh"
+    iso_mode_resolve
+    iso_mode_log "squashfs processors=${STRAWWU_MKSQUASHFS_PROCESSORS} skip_squashfs=${STRAWWU_SKIP_SQUASHFS}"
 
     [[ -f "${WORK_DIR}/.clone-ubuntu-base-ok" ]] || die "run make clone-ubuntu-base first"
     [[ -d "${ROOTFS_DIR}" ]] || die "rootfs missing: ${ROOTFS_DIR}"
@@ -571,7 +591,14 @@ main() {
     write_checksums
 
     date -Is > "${WORK_DIR}/.build-iso-ok"
-    log "build complete: ${ISO_PATH}"
+    echo "${STRAWWU_ISO_MODE}" > "${WORK_DIR}/.build-iso-mode"
+    log "build complete (${STRAWWU_ISO_MODE}): ${ISO_PATH}"
 }
 
-main "$@"
+__mutex_inner() {
+    __build_iso_main "$@"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi

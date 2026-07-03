@@ -54,8 +54,9 @@ run_qemu_boot() {
     case "${mode}" in
         bios)
             extra_args=(
-                -cdrom "${ISO_PATH}"
-                -boot d
+                -machine pc,accel=kvm:tcg
+                -drive "file=${ISO_PATH},format=raw,if=none,id=cdrom0,media=cdrom,readonly=on"
+                -device ide-cd,drive=cdrom0,bootindex=1
             )
             ;;
         uefi)
@@ -69,7 +70,8 @@ run_qemu_boot() {
                 -drive "if=pflash,format=raw,readonly=on,file=${ovmf}"
                 -drive "if=pflash,format=raw,file=${ovmf_vars_tmp}"
                 -drive "file=${ISO_PATH},format=raw,if=none,id=cdrom0,media=cdrom,readonly=on"
-                -device ide-cd,drive=cdrom0,bootindex=1
+                -device virtio-scsi-pci,id=scsi0
+                -device scsi-cd,bus=scsi0.0,drive=cdrom0,bootindex=1
             )
             ;;
         *)
@@ -120,25 +122,42 @@ run_qemu_boot() {
         '{mode: $mode, status: $status, marker: $marker, iso: $iso, start: $start, end: $end, elapsed_sec: $elapsed, qemu_exit: $qemu_exit, serial_log: $serial_log}'
 }
 
+BOOT_LOCK="${STRAWWU_BOOT_LOCK:-${REPO_ROOT}/os-image/work/.boot-test.lock}"
+
+acquire_boot_lock() {
+    exec 9>"${BOOT_LOCK}"
+    if ! flock -n 9; then
+        local holder
+        holder="$(cat "${BOOT_LOCK}" 2>/dev/null || echo unknown)"
+        die "boot-test already running (holder: ${holder})"
+    fi
+    echo "pid=$$ iso=${ISO_PATH} started=$(date -Is)" > "${BOOT_LOCK}"
+}
+
 main() {
     command -v qemu-system-x86_64 >/dev/null 2>&1 || die "qemu-system-x86_64 not found"
     command -v jq >/dev/null 2>&1 || die "jq not found"
     [[ -f "${ISO_PATH}" ]] || die "ISO not found: ${ISO_PATH} (run make build-iso)"
 
     mkdir -p "${OUTPUT_DIR}"
+    acquire_boot_lock
 
-    local bios_result uefi_result overall
-    bios_result="$(run_qemu_boot bios)"
-    uefi_result="$(run_qemu_boot uefi)"
+    local modes_csv="${STRAWWU_BOOT_TEST_MODES:-bios,uefi}"
+    local run_bios=0 run_uefi=0
+    [[ "${modes_csv}" == *bios* ]] && run_bios=1
+    [[ "${modes_csv}" == *uefi* ]] && run_uefi=1
 
-    local bios_status uefi_status
-    bios_status="$(echo "${bios_result}" | jq -r '.status')"
-    uefi_status="$(echo "${uefi_result}" | jq -r '.status')"
+    local bios_result='{"mode":"bios","status":"SKIPPED"}'
+    local uefi_result='{"mode":"uefi","status":"SKIPPED"}'
+    local overall="PASS"
 
-    if [[ "${bios_status}" == "PASS" && "${uefi_status}" == "PASS" ]]; then
-        overall="PASS"
-    else
-        overall="FAIL"
+    if [[ "${run_bios}" -eq 1 ]]; then
+        bios_result="$(run_qemu_boot bios)"
+        [[ "$(echo "${bios_result}" | jq -r '.status')" == "PASS" ]] || overall="FAIL"
+    fi
+    if [[ "${run_uefi}" -eq 1 ]]; then
+        uefi_result="$(run_qemu_boot uefi)"
+        [[ "$(echo "${uefi_result}" | jq -r '.status')" == "PASS" ]] || overall="FAIL"
     fi
 
     jq -n \
@@ -146,13 +165,14 @@ main() {
         --arg overall "${overall}" \
         --arg marker "${MARKER}" \
         --arg iso "${ISO_PATH}" \
+        --arg modes "${modes_csv}" \
         --argjson bios "${bios_result}" \
         --argjson uefi "${uefi_result}" \
         --arg tested "$(date -Is)" \
-        '{version: $version, status: $overall, marker: $marker, iso: $iso, tested: $tested, bios: $bios, uefi: $uefi}' \
+        '{version: $version, status: $overall, marker: $marker, iso: $iso, tested: $tested, modes_tested: $modes, bios: $bios, uefi: $uefi}' \
         > "${OUTPUT_DIR}/boot-result.json"
 
-    log "boot-result.json → ${OUTPUT_DIR}/boot-result.json (overall: ${overall})"
+    log "boot-result.json → ${OUTPUT_DIR}/boot-result.json (overall: ${overall}, modes: ${modes_csv})"
     cat "${OUTPUT_DIR}/boot-result.json"
 
     [[ "${overall}" == "PASS" ]] || exit 1

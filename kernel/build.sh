@@ -96,6 +96,8 @@ prepare_config() {
     make -C "${tree}" ARCH=x86_64 olddefconfig
     "${tree}/scripts/config" --file "${tree}/.config" --set-str LOCALVERSION "${LOCAL_VERSION}"
     "${tree}/scripts/config" --file "${tree}/.config" --module CONFIG_STRAWWU_IPC
+    "${tree}/scripts/config" --file "${tree}/.config" --enable CONFIG_OVERLAY_FS
+    "${tree}/scripts/config" --file "${tree}/.config" --enable CONFIG_ISO9660_FS
     "${tree}/scripts/config" --file "${tree}/.config" --disable CONFIG_MODULE_SIG
     "${tree}/scripts/config" --file "${tree}/.config" --disable CONFIG_SYSTEM_TRUSTED_KEYRING
     "${tree}/scripts/config" --file "${tree}/.config" --set-str SYSTEM_TRUSTED_KEYS ""

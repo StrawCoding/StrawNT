@@ -149,7 +149,104 @@ def module_suffix(name: str) -> str:
 def transform_dep_to_zst(content: str) -> str:
     import re
 
+    # Noble casper initrd already ships .ko.zst paths; do not double-suffix.
+    if ".ko.zst" in content:
+        return content
     return re.sub(r"\.ko(\b|:| )", r".ko.zst\1", content)
+
+
+def retarget_main_module_metadata(
+    main_dir: Path,
+    old_kver: str,
+    new_kver: str,
+    modules_src: Path,
+) -> None:
+    """Retarget casper initrd main metadata to strawwu kver without bloating deps."""
+    import shutil
+
+    meta_base = main_dir / "lib/modules"
+    if not meta_base.is_dir():
+        return
+
+    old_dir = meta_base / old_kver
+    new_dir = meta_base / new_kver
+    if not old_dir.is_dir():
+        if new_dir.is_dir():
+            for name in ("modules.builtin", "modules.builtin.modinfo"):
+                src = modules_src / name
+                if src.is_file():
+                    shutil.copy2(src, new_dir / name)
+            for stale in new_dir.glob("*.bin"):
+                stale.unlink()
+        return
+
+    if new_dir.exists():
+        shutil.rmtree(new_dir)
+    new_dir.mkdir(parents=True)
+
+    text_meta = ("modules.dep", "modules.alias", "modules.softdep", "modules.symbols")
+    for name in text_meta:
+        src = old_dir / name
+        if src.is_file():
+            (new_dir / name).write_text(transform_dep_to_zst(src.read_text()))
+
+    for name in (
+        "modules.builtin",
+        "modules.builtin.modinfo",
+        "modules.order",
+        "modules.devname",
+    ):
+        src = modules_src / name
+        if src.is_file():
+            shutil.copy2(src, new_dir / name)
+        elif (old_dir / name).is_file():
+            shutil.copy2(old_dir / name, new_dir / name)
+
+    # Stale modules.*.bin from upstream kver breaks modprobe (overlay/isofs load fail).
+    shutil.rmtree(old_dir)
+
+
+CRITICAL_MAIN_MODULES = (
+    "kernel/fs/isofs/isofs.ko",
+    "kernel/fs/overlayfs/overlay.ko",
+    "kernel/fs/squashfs/squashfs.ko",
+)
+
+
+def mirror_critical_modules_to_main(
+    main_dir: Path,
+    modules_src: Path,
+    new_kver: str,
+) -> None:
+    """Duplicate live-boot fs modules into main for modprobe/insmod during casper."""
+    dest_root = main_dir / "usr/lib/modules" / new_kver
+    for rel in CRITICAL_MAIN_MODULES:
+        src_ko = modules_src / rel
+        if not src_ko.is_file():
+            continue
+        dest = dest_root / rel
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        if not dest.is_file():
+            write_module_payload(src_ko, dest)
+        dest_zst = dest_root / f"{rel}.zst"
+        if not dest_zst.is_file():
+            write_module_payload(src_ko, dest_zst)
+
+
+def inject_casper_premount_hooks(main_dir: Path, branding_root: Path) -> None:
+    hook_src = branding_root / "initrd/scripts/casper-premount"
+    if not hook_src.is_dir():
+        return
+    inject_tree_into_dir(main_dir / "scripts/casper-premount", hook_src)
+    order = main_dir / "scripts/casper-premount/ORDER"
+    hook_name = "05strawwu-wait-live-media"
+    if order.is_file():
+        text = order.read_text()
+        needle = f'/scripts/casper-premount/{hook_name}'
+        if needle not in text:
+            order.write_text(f"{needle} \"$@\"\n{text}")
+    else:
+        order.write_text(f'/scripts/casper-premount/{hook_name} "$@"\n')
 
 
 def install_main_module_metadata(main_dir: Path, new_kver: str, modules_src: Path) -> None:
@@ -251,12 +348,12 @@ def replace_early3_modules(
     scratch: Path,
     new_kver: str,
     modules_src: Path,
-) -> Path | None:
+) -> tuple[Path | None, str]:
     prefix_dir = scratch / "prefix"
     prefix_dir.mkdir(parents=True, exist_ok=True)
     prefix_blobs, main_blob = split_prefix_phases(initrd_src, prefix_dir)
     if len(prefix_blobs) < 3:
-        return main_blob
+        return main_blob, ""
 
     early3_blob = prefix_blobs[2]
     early3_dir = scratch / "early3"
@@ -273,13 +370,28 @@ def replace_early3_modules(
     if not modules_root.is_dir():
         raise ValueError("early3 initrd has no modules tree")
 
-    old_kver = next(p.name for p in modules_root.iterdir() if p.is_dir())
+    old_kvers = sorted(p.name for p in modules_root.iterdir() if p.is_dir())
+    if not old_kvers:
+        raise ValueError("early3 initrd has no module version directory")
+    old_kver = old_kvers[0]
     replace_modules_tree(modules_root, old_kver, new_kver, modules_src)
+    # Remove any leftover upstream kver trees (prevents dual 6.11 + 6.8.12 trees).
+    for extra in old_kvers[1:]:
+        extra_dir = modules_root / extra
+        if extra_dir.is_dir():
+            import shutil
+
+            shutil.rmtree(extra_dir)
+    for child in list(modules_root.iterdir()):
+        if child.is_dir() and child.name != new_kver:
+            import shutil
+
+            shutil.rmtree(child)
 
     new_early3 = prefix_dir / "early3.cpio.bin"
     repack_cpio_dir(early3_dir, new_early3)
     prefix_blobs[2] = new_early3
-    return main_blob
+    return main_blob, old_kver
 
 
 def verify_initrd(initrd_path: Path) -> tuple[int, str]:
@@ -356,6 +468,52 @@ def inject_plymouth_into_main(main_dir: Path, branding_root: Path) -> None:
     inject_plymouth_theme_tree(main_dir, branding_root)
 
 
+def patch_casper_live_media_hint(main_dir: Path) -> None:
+    casper = main_dir / "scripts/casper"
+    if not casper.is_file():
+        return
+    text = casper.read_text()
+    needle = "find_livefs() {\n    timeout=\"${1}\""
+    replacement = (
+        "find_livefs() {\n"
+        "    timeout=\"${1}\"\n"
+        "    if [ -z \"${LIVEMEDIA}\" ]; then\n"
+        "        for _dev in /dev/sr0 /dev/cdrom /dev/sr1; do\n"
+        "            [ -b \"${_dev}\" ] || continue\n"
+        "            LIVEMEDIA=\"${_dev}\"\n"
+        "            export LIVEMEDIA\n"
+        "            break\n"
+        "        done\n"
+        "    fi"
+    )
+    if needle in text and "for _dev in /dev/sr0" not in text:
+        casper.write_text(text.replace(needle, replacement, 1))
+
+
+def patch_casper_overlay_insmod(main_dir: Path) -> None:
+    casper = main_dir / "scripts/casper"
+    if not casper.is_file():
+        return
+    text = casper.read_text()
+    replacement = (
+        'grep -q "[[:space:]]overlay$" /proc/filesystems || '
+        'modprobe "${MP_QUIET}" -b overlay 2>/dev/null || '
+        'insmod "/usr/lib/modules/$(uname -r)/kernel/fs/overlayfs/overlay.ko" 2>/dev/null || '
+        'grep -q "[[:space:]]overlay$" /proc/filesystems || '
+        'panic "/cow format specified as \'overlay\' and no support found"'
+    )
+    needles = (
+        'modprobe "${MP_QUIET}" -b overlay || panic "/cow format specified as \'overlay\' and no support found"',
+        'modprobe "${MP_QUIET}" -b overlay || insmod "/usr/lib/modules/$(uname -r)/kernel/fs/overlayfs/overlay.ko" 2>/dev/null || panic "/cow format specified as \'overlay\' and no support found"',
+    )
+    if replacement in text:
+        return
+    for needle in needles:
+        if needle in text:
+            casper.write_text(text.replace(needle, replacement, 1))
+            return
+
+
 def patch_casper_conf_in_initrd(target_root: Path) -> None:
     conf = target_root / "etc/casper.conf"
     if not conf.is_file():
@@ -400,9 +558,20 @@ def recompress_main_dir(main_dir: Path, scratch: Path) -> Path:
     return main_zst
 
 
-def sync_main_modules_tree(main_dir: Path, new_kver: str, modules_src: Path) -> None:
-    """Caspar main phase runs modprobe from /lib/modules/$(uname -r) metadata."""
-    install_main_module_metadata(main_dir, new_kver, modules_src)
+def regenerate_main_module_deps(main_dir: Path, new_kver: str) -> None:
+    """Rebuild modules.dep.bin for mirrored live-boot modules (modprobe needs .bin)."""
+    mod_root = main_dir / "lib/modules" / new_kver
+    if not mod_root.is_dir():
+        return
+    subprocess.run(
+        ["depmod", "-b", str(main_dir), new_kver],
+        check=True,
+    )
+
+
+def sync_main_modules_tree(main_dir: Path, old_kver: str, new_kver: str, modules_src: Path) -> None:
+    """Keep casper minimal modules.dep; only retarget kver + refresh builtins."""
+    retarget_main_module_metadata(main_dir, old_kver, new_kver, modules_src)
 
 
 def refresh_preserved_main(
@@ -411,14 +580,21 @@ def refresh_preserved_main(
     branding_root: Path | None = None,
     modules_src: Path | None = None,
     new_kver: str = "",
+    old_kver: str = "",
 ) -> Path:
     main_dir = scratch / "main-brand"
     decompress_main_zst(main_blob, main_dir, scratch)
-    if modules_src is not None and new_kver and modules_src.is_dir():
-        sync_main_modules_tree(main_dir, new_kver, modules_src)
+    if modules_src is not None and new_kver and modules_src.is_dir() and old_kver:
+        sync_main_modules_tree(main_dir, old_kver, new_kver, modules_src)
+        mirror_critical_modules_to_main(main_dir, modules_src, new_kver)
+        regenerate_main_module_deps(main_dir, new_kver)
     if branding_root is not None and branding_root.is_dir():
         inject_plymouth_into_main(main_dir, branding_root)
+        inject_casper_premount_hooks(main_dir, branding_root)
         patch_casper_conf_in_initrd(main_dir)
+    if modules_src is not None and new_kver and modules_src.is_dir():
+        patch_casper_overlay_insmod(main_dir)
+        patch_casper_live_media_hint(main_dir)
     return recompress_main_dir(main_dir, scratch)
 
 
@@ -436,9 +612,10 @@ def repack_initrd_phases(
     prefix_blobs: list[Path]
     prefix_dir = scratch / "prefix"
     prefix_dir.mkdir(parents=True, exist_ok=True)
+    old_kver = ""
 
     if modules_src is not None and new_kver and modules_src.is_dir():
-        main_blob = replace_early3_modules(initrd_src, scratch, new_kver, modules_src)
+        main_blob, old_kver = replace_early3_modules(initrd_src, scratch, new_kver, modules_src)
         prefix_blobs = sorted(prefix_dir.glob("early*.cpio.bin"), key=lambda p: p.name)
         if branding_root is not None and branding_root.is_dir():
             early3_dir = scratch / "early3-brand"
@@ -469,6 +646,7 @@ def repack_initrd_phases(
                 branding_root,
                 modules_src,
                 new_kver,
+                old_kver,
             )
         concat_initrd(prefix_blobs, main_blob, initrd_out)
         return

@@ -1,0 +1,57 @@
+#!/bin/sh
+# Wait for QEMU/live optical media and preload fs modules before casper mountroot.
+PREREQ=""
+
+prereqs() {
+	echo "$PREREQ"
+}
+
+case $1 in
+prereqs)
+	prereqs
+	exit 0
+	;;
+esac
+
+# strawwu kernel boots faster than stock; sr0 may not be ready when casper first mounts.
+i=0
+while [ "$i" -lt 50 ]; do
+	if [ -b /dev/sr0 ] || [ -b /dev/cdrom ]; then
+		break
+	fi
+	sleep 0.2
+	i=$((i + 1))
+done
+
+KVER="$(uname -r)"
+MODROOT="/usr/lib/modules/${KVER}/kernel/fs"
+
+if command -v udevadm >/dev/null 2>&1; then
+	udevadm settle 2>/dev/null || true
+fi
+
+for ko in \
+	"${MODROOT}/isofs/isofs.ko" \
+	"${MODROOT}/overlayfs/overlay.ko" \
+	"${MODROOT}/squashfs/squashfs.ko"; do
+	[ -f "$ko" ] && insmod "$ko" 2>/dev/null || true
+done
+
+modprobe -q -b isofs 2>/dev/null || true
+modprobe -q -b overlay 2>/dev/null || true
+modprobe -q -b squashfs 2>/dev/null || true
+
+# Probe-mount until the block layer accepts the ISO (ENODEV race on fast boots).
+mkdir -p /cdrom
+i=0
+while [ "$i" -lt 30 ]; do
+	for dev in /dev/sr0 /dev/cdrom; do
+		[ -b "$dev" ] || continue
+		if mount -t iso9660 -o ro "$dev" /cdrom 2>/dev/null; then
+			umount /cdrom 2>/dev/null || true
+			exit 0
+		fi
+	done
+	sleep 0.5
+	i=$((i + 1))
+done
