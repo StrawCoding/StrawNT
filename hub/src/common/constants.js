@@ -14,6 +14,8 @@ module.exports = {
     GET_UPDATE_CHANNEL: 'runtime:get-update-channel',
     STATUS_UPDATE: 'runtime:status-update',
     LOG_ENTRY: 'runtime:log-entry',
+    GET_I18N: 'i18n:get',
+    SET_LOCALE: 'i18n:set-locale',
   },
 
   COLORS: {

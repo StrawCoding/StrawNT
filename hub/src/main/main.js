@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, nativeTheme } = require('electron');
 const path = require('path');
 const RuntimeClient = require('./runtime-client');
+const i18n = require('../common/i18n');
 const { IPC_CHANNELS, UPDATE_CHANNELS } = require('../common/constants');
 
 let mainWindow = null;
@@ -23,7 +24,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: true,
+      sandbox: false,
     },
   });
 
@@ -88,9 +89,24 @@ function setupIpcHandlers() {
     }
     return currentChannel;
   });
+
+  ipcMain.handle(IPC_CHANNELS.GET_I18N, async () => {
+    return {
+      currentLocale: i18n.getLocale(),
+      locales: i18n.getAvailableLocales(),
+      translations: i18n.loadTranslationsForRenderer(i18n.getLocale()),
+    };
+  });
+
+  ipcMain.handle(IPC_CHANNELS.SET_LOCALE, async (_event, locale) => {
+    i18n.setLocale(locale);
+    const translations = i18n.loadTranslationsForRenderer(locale);
+    return { locale, translations };
+  });
 }
 
 app.whenReady().then(() => {
+  i18n.init();
   setupRuntimeClient();
   setupIpcHandlers();
   createWindow();

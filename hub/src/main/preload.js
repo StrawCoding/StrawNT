@@ -7,6 +7,8 @@ const IPC_CHANNELS = {
   GET_UPDATE_CHANNEL: 'runtime:get-update-channel',
   STATUS_UPDATE: 'runtime:status-update',
   LOG_ENTRY: 'runtime:log-entry',
+  GET_I18N: 'i18n:get',
+  SET_LOCALE: 'i18n:set-locale',
 };
 
 contextBridge.exposeInMainWorld('strawwuHub', {
@@ -14,6 +16,8 @@ contextBridge.exposeInMainWorld('strawwuHub', {
   getLogs: (subsystem) => ipcRenderer.invoke(IPC_CHANNELS.GET_LOGS, subsystem),
   getUpdateChannel: () => ipcRenderer.invoke(IPC_CHANNELS.GET_UPDATE_CHANNEL),
   setUpdateChannel: (ch) => ipcRenderer.invoke(IPC_CHANNELS.SET_UPDATE_CHANNEL, ch),
+  getI18n: () => ipcRenderer.invoke(IPC_CHANNELS.GET_I18N),
+  setLocale: (locale) => ipcRenderer.invoke(IPC_CHANNELS.SET_LOCALE, locale),
 
   onStatusUpdate: (callback) => {
     const handler = (_event, data) => callback(data);
