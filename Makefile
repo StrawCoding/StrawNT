@@ -2,7 +2,7 @@
 	build-iso dev-iso release-iso repack-iso validate-rootfs boot-test-iso boot-test-dev-iso \
 	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
-	test-install-e2e test-wincompat
+	test-install-e2e test-wincompat build-debs
 
 REPO_ROOT := $(abspath .)
 SCRIPTS   := os-image/scripts
@@ -129,3 +129,6 @@ test-wincompat:
 	@echo "=== Phase 6: Windows Compatibility Layer ==="
 	cd components && cargo test --workspace
 	bash components/tests/wincompat/generate-compat-matrix.sh
+
+build-debs:
+	bash packaging/build-debs.sh

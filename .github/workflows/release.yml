@@ -113,6 +113,17 @@ jobs:
           \`\`\`
           NOTESEOF
 
+      - name: Install Node.js for Hub build
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build .deb packages
+        run: |
+          bash packaging/build-debs.sh
+        env:
+          STRAWWU_VERSION: ${{ steps.ver.outputs.version }}
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -122,3 +133,12 @@ jobs:
           files: |
             os-image/output/${{ steps.ver.outputs.iso_name }}
             os-image/output/SHA256SUMS
+            packaging/output/*.deb
+
+      - name: Trigger APT repo update
+        run: |
+          gh workflow run update-repo.yml \
+            --repo StrawCoding/strawwu-apt \
+            -f version="${{ steps.ver.outputs.version }}"
+        env:
+          GH_TOKEN: ${{ secrets.APT_DISPATCH_TOKEN }}

@@ -1,0 +1,9 @@
+Package: strawwu-branding
+Version: __VERSION__
+Section: misc
+Priority: optional
+Architecture: all
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU system branding
+ Plymouth boot theme, desktop logos, and system-wide
+ branding assets for StrawWU.

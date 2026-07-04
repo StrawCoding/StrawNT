@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth \
+    /usr/share/plymouth/themes/strawwu-boot/strawwu-boot.plymouth 200 || true
+update-initramfs -u || true

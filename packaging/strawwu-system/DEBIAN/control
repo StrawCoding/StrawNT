@@ -1,0 +1,10 @@
+Package: strawwu-system
+Version: __VERSION__
+Section: metapackages
+Priority: optional
+Architecture: all
+Depends: strawwu-branding (>= __VERSION__), strawwu-hub (>= __VERSION__)
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU system meta-package
+ Installs all StrawWU components including branding,
+ Hub application, and custom kernel.
