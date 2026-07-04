@@ -82,6 +82,20 @@ check test -f "${BRANDING}/usr/share/themes/StrawWU-Dark/gtk-4.0/gtk.css"
 check test -f "${BRANDING}/usr/share/themes/StrawWU-Dark/gtk-3.0/gtk.css"
 check test -f "${BRANDING}/usr/share/themes/StrawWU-Dark/gnome-shell/gnome-shell.css"
 
+if grep -q 'ShellTheme=StrawWU-Dark' "${BRANDING}/usr/share/themes/StrawWU-Dark/index.theme"; then
+    echo "PASS: StrawWU-Dark declares ShellTheme"
+else
+    echo "FAIL: StrawWU-Dark missing ShellTheme"
+    FAIL=1
+fi
+
+if grep -q 'resource:///com/ubuntu/themes' "${BRANDING}/usr/share/themes/StrawWU-Dark/gtk-3.0/gtk.css"; then
+    echo "FAIL: gtk-3.0 theme still uses snap resource:// imports (breaks before snapd ready)"
+    FAIL=1
+else
+    echo "PASS: gtk-3.0 theme uses filesystem imports"
+fi
+
 check test -f "${BRANDING}/usr/share/backgrounds/strawwu/strawwu-wallpaper-dark.png"
 check test -f "${BRANDING}/usr/share/backgrounds/strawwu/strawwu-wallpaper-light.png"
 check test -f "${BRANDING}/usr/share/gnome-background-properties/strawwu-wallpapers.xml"

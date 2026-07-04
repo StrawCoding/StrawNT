@@ -66,6 +66,12 @@ dev-iso: preflight
 		STRAWWU_KERNEL_DEB="$${STRAWWU_KERNEL_DEB:-$(KERNEL_DEB)}" \
 		STRAWWU_SKIP_SQUASHFS=0 bash $(SCRIPTS)/build-iso.sh
 
+dev-iso-e2e: preflight
+	sudo STRAWWU_ISO_MODE=dev-iso STRAWWU_ENABLE_E2E=1 STRAWWU_FORCE_X11=1 \
+		STRAWWU_VERSION=$(VERSION) \
+		STRAWWU_KERNEL_DEB="$${STRAWWU_KERNEL_DEB:-$(KERNEL_DEB)}" \
+		STRAWWU_SKIP_SQUASHFS=0 bash $(SCRIPTS)/build-iso.sh
+
 release-iso: preflight
 	sudo STRAWWU_ISO_MODE=release-iso STRAWWU_VERSION=$(VERSION) \
 		STRAWWU_KERNEL_DEB="$${STRAWWU_KERNEL_DEB:-$(KERNEL_DEB)}" \
@@ -119,7 +125,7 @@ test-phase0: preflight
 validate-calamares-preflight:
 	bash tests/install-e2e/validate-calamares-preflight.sh
 
-validate-partition-probe: validate-calamares-preflight
+validate-partition-probe: validate-calamares-preflight dev-iso-e2e
 	bash tests/install-e2e/partition-probe.sh
 
 test-install-e2e: validate-calamares-preflight validate-partition-probe

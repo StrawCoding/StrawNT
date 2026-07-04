@@ -34,15 +34,15 @@ done
 
 show_title
 show_step "硬體偵測中..."
-sleep 1
+sleep 0.2
 show_step "載入核心模組..."
-sleep 1
+sleep 0.2
 show_step "掛載檔案系統..."
-sleep 1
+sleep 0.2
 show_step "啟動系統服務..."
-sleep 1
+sleep 0.2
 show_step "準備桌面環境..."
-sleep 1
+sleep 0.2
 show_step "系統就緒"
 
 exit 0

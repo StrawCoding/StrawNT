@@ -88,13 +88,31 @@ patch_boot_serial_console() {
 }
 
 force_gdm_x11() {
-    log "forcing GDM to use X11 (xdotool E2E requires X11, not Wayland)"
+    [[ "${STRAWWU_FORCE_X11:-0}" == "1" ]] || return 0
+    log "forcing GDM to use X11 (STRAWWU_FORCE_X11=1 — install-e2e only)"
     local conf="${ROOTFS_DIR}/etc/gdm3/custom.conf"
     if [[ -f "${conf}" ]]; then
         sed -i 's/^#\?WaylandEnable=.*$/WaylandEnable=false/' "${conf}"
         if ! grep -q '^WaylandEnable=false' "${conf}"; then
             sed -i '/^\[daemon\]/a WaylandEnable=false' "${conf}"
         fi
+    fi
+}
+
+configure_live_autologin() {
+    [[ "${STRAWWU_ENABLE_E2E:-0}" == "1" ]] && return 0
+    log "enabling casper live autologin for ubuntu user"
+    local conf="${ROOTFS_DIR}/etc/gdm3/custom.conf"
+    [[ -f "${conf}" ]] || return 0
+    if grep -qE '^#?[[:space:]]*AutomaticLoginEnable' "${conf}"; then
+        sed -i 's/^#\?[[:space:]]*AutomaticLoginEnable.*/AutomaticLoginEnable = true/' "${conf}"
+    else
+        sed -i '/^\[daemon\]/a AutomaticLoginEnable = true' "${conf}"
+    fi
+    if grep -qE '^#?[[:space:]]*AutomaticLogin[[:space:]]*=' "${conf}"; then
+        sed -i 's/^#\?[[:space:]]*AutomaticLogin[[:space:]]*=.*/AutomaticLogin = ubuntu/' "${conf}"
+    else
+        sed -i '/^\[daemon\]/a AutomaticLogin = ubuntu' "${conf}"
     fi
 }
 
@@ -588,6 +606,7 @@ __build_iso_main() {
         STRAWWU_KERNEL_DEB="${kernel_deb}" bash "${SCRIPT_DIR}/swap-kernel.sh"
         bash "${SCRIPT_DIR}/sync-calamares-installer.sh"
         apply_branding
+        configure_live_autologin
         force_gdm_x11
         inject_boot_marker
     fi

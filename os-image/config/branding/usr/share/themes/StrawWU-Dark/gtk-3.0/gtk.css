@@ -1,4 +1,4 @@
-@import url("resource:///com/ubuntu/themes/Yaru-prussiangreen-dark/3.0/gtk.css");
+@import url("/usr/share/themes/Yaru-prussiangreen-dark/gtk-3.0/gtk.css");
 
 @define-color accent_bg_color #14B8A6;
 @define-color accent_color #14B8A6;

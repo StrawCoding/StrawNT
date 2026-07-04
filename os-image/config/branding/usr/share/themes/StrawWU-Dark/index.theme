@@ -6,6 +6,7 @@ Encoding=UTF-8
 
 [X-GNOME-Metatheme]
 GtkTheme=StrawWU-Dark
+ShellTheme=StrawWU-Dark
 MetacityTheme=Yaru-dark
 IconTheme=Yaru-prussiangreen-dark
 CursorTheme=Yaru

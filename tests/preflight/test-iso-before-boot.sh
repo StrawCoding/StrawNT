@@ -240,6 +240,20 @@ if [[ -n "${CASPER_DIR}" && -d "${CASPER_DIR}" ]]; then
       echo "FAIL: squashfs missing strawwu-boot Plymouth theme" >&2
       FAIL=1
     fi
+
+    if squashfs_has_path "${SQUASHFS_PATH}" "etc/systemd/system/multi-user.target.wants/strawwu-e2e-guest-runner.service"; then
+      echo "FAIL: production squashfs must not enable strawwu-e2e-guest-runner (adds 4+ min boot delay)" >&2
+      FAIL=1
+    else
+      echo "PASS: production squashfs has no install-e2e guest runner"
+    fi
+
+    if unsquashfs -cat "${SQUASHFS_PATH}" etc/gdm3/custom.conf 2>/dev/null | grep -q 'AutomaticLogin = ubuntu'; then
+      echo "PASS: GDM live autologin configured for ubuntu"
+    else
+      echo "FAIL: GDM missing AutomaticLogin=ubuntu for live desktop" >&2
+      FAIL=1
+    fi
   fi
 fi
 
