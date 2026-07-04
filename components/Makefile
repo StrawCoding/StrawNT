@@ -148,6 +148,7 @@ test-anticheat-matrix:
 test-device-proxy:
 	@echo "=== 6.11 Device proxy ==="
 	cargo test --manifest-path $(COMPONENTS_DIR)/Cargo.toml -p strawwu-device-proxy -- --nocapture
+	@bash $(COMPONENTS_DIR)/tests/device-proxy/generate-device-matrix.sh
 	@echo "6.11 Device proxy: PASS (PARTIAL)"
 	@echo ""
 	@echo "=== test-device-proxy: PASS ==="
