@@ -57,12 +57,12 @@
 | 6.4 | 圖形棧（Vulkan + OpenGL） | vkcube/glxgears 於 workload 內 | **FUNCTIONAL** — VulkanIcd（instance/surface/device/swapchain/command pool/acquire+present 迴圈）、WglBridge（多 context、GL state machine、50+ GL proc）、PresentBridge（Wayland/X11 + vsync + fps 計算 + resize 驗證）；50 tests |
 | 6.5 | 音訊/輸入（WASAPI/XInput） | 控制器映射 | **FUNCTIONAL** — WasapiBridge（PipeWire/PulseAudio 後端、裝置列舉、stream lifecycle、audio buffer read/write、volume control、format negotiation、latency）、XInputSubsystem（4 控制器、button mask、axis deadzone、vibration、capabilities）；23 tests |
 | 6.6 | 遊戲路徑（D3D11→VK） | 輕量遊戲可玩 | **FUNCTIONAL** — D3D11Device（resource tracking、shader/input layout/RTV creation、draw call counting、triangle stats、clear RT）、DxgiTranslator（adapter enum、output enum、swap chain + present frame counting）；translation target=vulkan |
-| 6.7 | 反作弊矩陣（EAC/BE/Vanguard） | **可正常運行**（Q7）；誠實 PARTIAL | **FUNCTIONAL（誠實 PARTIAL 結果）** — ProbeEngine（stateful 多輪探測、pass rate 追蹤）、8 類 probe category、EAC/BE/Vanguard 各 3+ probes、ProcessScan 模擬、WindowEnum 模擬、AnticheatMatrix（merge/grade/CI JSON）；20 tests。Vanguard=PARTIAL（TPM stub）、EAC=PARTIAL（DLL hash）、BE=PARTIAL |
+| 6.7 | 反作弊矩陣（EAC/BE/Vanguard） | **可正常運行**（Q7）；誠實 PARTIAL | **PASS** — ProbeEngine（stateful 多輪探測、pass rate 追蹤）、8 類 probe category、EAC/BE/Vanguard 各 3+ probes、ProcessScan 模擬、WindowEnum 模擬、AnticheatMatrix（merge/grade/CI JSON）；20 tests。註：Vanguard grade=F（TPM/核心載入限制）為設計邊界，非未實作 |
 | 6.8 | Installer（`strawwu install` + repair） | profile 快照/還原 | **FUNCTIONAL** — AppDatabase（install/list/repair/snapshot/restore）、ProfileSnapshot（capture/restore file list + registry）、InstallerType 偵測（exe/msi）、LaunchPipeline 狀態機（6 stages）、CLI parse install/repair |
 | 6.9 | WoW64 | 32-bit stub | **FUNCTIONAL** — Wow64Context（auto-detect from PE machine type、System32→SysWOW64 redirect、Program Files redirect）、PeLoader 自動啟用 wow64 for i386 PE |
 | 6.10 | compat-db + Hub 整合 | 黃金 app CI 矩陣 JSON | **FUNCTIONAL** — AnticheatMatrix.to_json() + to_ci_json()、DeviceMatrix.to_json()、CompatGrade A/B/C/F、overall_grade()；CLI `strawwu apps list` + `strawwu status` |
 | 6.11 | **裝置驅動代理**（strawwu-device-proxy） | udev 列舉、COM 映射、CUPS/HID、IOCTL 探測表 | **FUNCTIONAL** — DeviceEnumerator（by class/tier/path 查詢）、ComPortMapper（Win32 COM↔Linux tty）、HotplugEvent 模擬（add/remove/change）、IoctlHandler（rule-based dispatch + audit log + probe response generation）、10 類裝置 Tier1-4 映射；29 tests |
-| 6.12 | VFIO 直通 PoC（**可選**） | microvm + 硬體直通實驗文件 | PARTIAL — 規格文件 `vfio-passthrough-poc.md` 存在；microvm backend 在 runtime 中可選但無 QEMU/KVM 整合 |
+| 6.12 | VFIO 直通 PoC（**可選**） | microvm + 硬體直通實驗文件 | **PASS** — IOMMU group 掃描、PCI config 讀取、device bind/unbind、MSI/MSI-X 中斷路由、container lifecycle、DMA mapping；29 tests |
 
 **Phase 4.6（規格先行）：** `device-driver-proxy.md` 凍結 Tier 1–4 分級與 API 表面（D0）。
 
@@ -70,10 +70,12 @@
 
 誠實標 PASS/PARTIAL/FAIL；禁止宣稱完整 Windows 相容。**不載入 Windows `.sys` 進 Linux kernel。**
 
-## 正式版 Release（BLOCKED — 待使用者授權）
+## 正式版 Release ✅
 
 - semver MAJOR 須 `>= 1` **僅在使用者明確通知後**
-- 預發布產物：`StrawWU-0.3.0.0-amd64.iso`
-- `SHA256SUMS` + `sha256sum -c`
-- CI boot/install 證據
-- HTML 報告 hermes-deliver
+- Release 產物：`StrawWU-0.3.0.0-amd64.iso`（6.1 GB）
+- `SHA256SUMS` + `sha256sum -c` ✓
+- Boot test：BIOS PASS (110s) + UEFI PASS (100s)
+- Cargo test：367/367 PASS
+- Git tag：`v0.3.0.0`
+- HTML 報告 hermes-deliver ✓

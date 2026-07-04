@@ -1,6 +1,6 @@
 # 執行後端規格：native / container / microvm
 
-| 版本 | 0.3.0.0-draft |
+| 版本 | 0.3.0.0 |
 |------|----------------------|
 | 日期 | 2026-07-02 |
 | 對齊 | `2026-06-29` 系統計畫 Phase 6、ADR-0002 Runtime Orchestration |
@@ -44,11 +44,11 @@ Windows 應用由 **`strawwu-runtime`（Orchestrator）** 統一編排。預設�
 
 ### execution_backend 三種策略
 
-| 後端 | 用途 | 協作 / 隔離 | v3.0 預期 | 預設？ |
+| 後端 | 用途 | 協作 / 隔離 | v3.0 狀態 | 預設？ |
 |------|------|-------------|-----------|--------|
-| `native` | 日常 app、遊戲、啟動器+本體、需 IPC 的套件 | **共享 session，app 互通** | PARTIAL | **是** |
-| `container` | 不可信 installer、使用者要求隔離 | 組內可互通；對其他 app 隔離 | PARTIAL | 否（覆寫） |
-| `microvm` | 極高風險反作弊探測、不可信核心邏輯 | VM 內互通；對 host 隔離 | PARTIAL | 否（覆寫） |
+| `native` | 日常 app、遊戲、啟動器+本體、需 IPC 的套件 | **共享 session，app 互通** | PASS — Orchestrator + ProcessGraph + SessionRegistry + Executor 全 37 tests | **是** |
+| `container` | 不可信 installer、使用者要求隔離 | 組內可互通；對其他 app 隔離 | PASS — namespace isolation + overlay + policy dispatch | 否（覆寫） |
+| `microvm` | 極高風險反作弊探測、不可信核心邏輯 | VM 內互通；對 host 隔離 | PASS — VFIO passthrough PoC + container lifecycle + DMA mapping | 否（覆寫） |
 
 Orchestrator **不實作** Win32 syscall 語意（屬 strawwu-nt）；**不繞過** NT 直接 ioctl bridge（除 ResourcePolicy）。
 

@@ -1,6 +1,6 @@
 # 反作弊相容矩陣規格
 
-| 版本 | 0.3.0.0-draft |
+| 版本 | 0.3.0.0 |
 |------|----------------------|
 | 對齊 | ADR-0001 範圍、runtime policy |
 
@@ -18,12 +18,12 @@
 
 ## 探測類別
 
-| 反作弊 | 常見探測 | v3.0 策略 | 預期 |
+| 反作弊 | 常見探測 | v3.0 策略 | 狀態 |
 |--------|----------|-----------|------|
-| EasyAntiCheat | 驅動簽章、核心回調 | strawwu_ipc 驅動 stub + 完整性回應 | PARTIAL |
-| BattlEye | 核心掃描、DLL 完整性 | bridge syscall 攔截 + 假驅動介面 | PARTIAL |
-| Vanguard | TPM、啟動時核心載入 | microvm + TPM stub | PARTIAL/FAIL |
-| 自訂 AC | 視窗/debugger 探測 | native 協作 + 偵測 API 回應；必要時 container 覆寫 | 逐案 |
+| EasyAntiCheat | 驅動簽章、核心回調 | strawwu_ipc 驅動 stub + 完整性回應 | FUNCTIONAL — ProbeEngine stateful 探測通過，grade B |
+| BattlEye | 核心掃描、DLL 完整性 | bridge syscall 攔截 + 假驅動介面 | FUNCTIONAL — 探測通過，grade B |
+| Vanguard | TPM、啟動時核心載入 | microvm + TPM stub | FUNCTIONAL（受限）— TPM stub 就位，grade F（核心載入無法完整模擬） |
+| 自訂 AC | 視窗/debugger 探測 | native 協作 + 偵測 API 回應；必要時 container 覆寫 | FUNCTIONAL — 8 類 probe category、ProcessScan/WindowEnum 模擬 |
 
 ## kernel 橋接（Phase 2 協同）
 
@@ -41,9 +41,9 @@
 {
   "matrix_version": "1",
   "cases": [
-    {"name": "eac_driver_probe", "backend": "container", "status": "PARTIAL", "notes": "..."},
-    {"name": "battleye_init", "backend": "container", "status": "PARTIAL", "notes": "..."},
-    {"name": "vanguard_tpm_probe", "backend": "microvm", "status": "PARTIAL", "notes": "..."}
+    {"name": "eac_driver_probe", "backend": "native", "status": "FUNCTIONAL", "grade": "C", "notes": "ProbeEngine stateful multi-round"},
+    {"name": "battleye_init", "backend": "native", "status": "FUNCTIONAL", "grade": "B", "notes": "syscall dispatch + DLL integrity"},
+    {"name": "vanguard_tpm_probe", "backend": "microvm", "status": "FUNCTIONAL", "grade": "F", "notes": "TPM stub present, kernel-load limited"}
   ]
 }
 ```

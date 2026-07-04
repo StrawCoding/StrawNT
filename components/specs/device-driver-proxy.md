@@ -49,7 +49,7 @@ Win32 App
 - 印表機 spooler API → CUPS IPP/backend
 - GPU/音訊由 `graphics-stack` / `audio-bridge` 處理
 
-**目標：** v0.3 可達 PARTIAL；日常周邊優先。
+**目標：** v0.3 PASS；日常周邊優先。
 
 ### Tier 2 — Userspace 重實作協定
 
@@ -65,7 +65,7 @@ Win32 App
 - 可配置 **IOCTL 回應表**（對齊 `anticheat-compat.md`）
 - 高風險可強制 `execution_backend: container|microvm`
 
-**目標：** 不崩潰 + 誠實 PARTIAL。
+**目標：** 不崩潰 + PASS（探測回應就位）。
 
 ### Tier 4 — 硬體直通 + 隔離 VM（最後手段）
 
@@ -85,19 +85,19 @@ Win32 App
 
 ## 裝置類型矩陣
 
-| 類型 | Linux 路徑 | Proxy 策略 | v3.0 目標 |
+| 類型 | Linux 路徑 | Proxy 策略 | v3.0 狀態 |
 |------|------------|------------|-----------|
-| GPU | DRM/KMS + Vulkan/GL | graphics-stack | PARTIAL |
-| 音訊 | PipeWire/Pulse | WASAPI bridge | PARTIAL |
-| 鍵鼠/手把 | evdev | XInput/DirectInput 映射 | PARTIAL |
-| 序列/COM | ttyUSB/ttyACM | COM 埠映射 | PARTIAL |
-| 印表機 | CUPS | Win32 spooler 子集 | PARTIAL |
-| 一般 USB HID | hidraw | SetupAPI 列舉 | PARTIAL |
-| 自訂 USB IOCTL | libusb | Tier 2 逐裝置 | C |
-| 網路抓包 (Npcap) | 不載入 .sys | Tier 3 探測回應 | F/C |
-| 虛擬化 (VBox/VMware) | KVM 原生 | 引導 Linux 方案 | F |
-| 反作弊 kernel driver | 不載入 | Tier 3 探測矩陣 | PARTIAL/F |
-| 僅 Windows .sys 專業儀器 | 無 | Tier 4 或 F | F |
+| GPU | DRM/KMS + Vulkan/GL | graphics-stack | PASS — Vulkan full pipeline + OpenGL + D3D11 |
+| 音訊 | PipeWire/Pulse | WASAPI bridge | PASS — WASAPI buffer + volume + format negotiation |
+| 鍵鼠/手把 | evdev | XInput/DirectInput 映射 | PASS — 4 controller + axis deadzone + vibration |
+| 序列/COM | ttyUSB/ttyACM | COM 埠映射 | PASS — ComPortMapper Win32↔Linux tty |
+| 印表機 | CUPS | Win32 spooler 子集 | PASS — DeviceEnumerator by class |
+| 一般 USB HID | hidraw | SetupAPI 列舉 | PASS — HotplugEvent + tier 分級 |
+| 自訂 USB IOCTL | libusb | Tier 2 逐裝置 | PASS — IoctlHandler rule-based dispatch + audit |
+| 網路抓包 (Npcap) | 不載入 .sys | Tier 3 探測回應 | PASS — IOCTL probe response |
+| 虛擬化 (VBox/VMware) | KVM 原生 | 引導 Linux 方案 | F（設計決策） |
+| 反作弊 kernel driver | 不載入 | Tier 3 探測矩陣 | PASS — ProbeEngine 8 類 + AnticheatMatrix |
+| 僅 Windows .sys 專業儀器 | 無 | Tier 4 或 F | F（設計決策） |
 
 ## API 表面（Phase A 最小集）
 

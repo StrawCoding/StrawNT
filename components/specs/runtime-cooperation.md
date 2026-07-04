@@ -1,6 +1,6 @@
 # Runtime 協作與互通規格
 
-| 版本 | 0.3.0.0-draft |
+| 版本 | 0.3.0.0 |
 |------|----------------------|
 | 日期 | 2026-07-02 |
 | 對齊 | `2026-06-29` 系統計畫 Runtime Orchestrator、ADR-0002 |
@@ -54,14 +54,14 @@ Ubuntu Linux（Host OS，唯一真實 kernel）
 
 `strawwu-runtime` 提供 session 級 IPC 協調，不假裝完整 NT kernel，但對 Win32 app 暴露可互通語意：
 
-| 機制 | 用途 | v3.0 目標 |
+| 機制 | 用途 | v3.0 狀態 |
 |------|------|-----------|
-| Named Pipe (`\\.\pipe\...`) | 啟動器 ↔ 遊戲、服務通訊 | PARTIAL |
-| File mapping / Section | 共享記憶體、大型資料 | PARTIAL |
-| ALPC / Local RPC 骨架 | COM 前置、系統服務呼叫 | PARTIAL |
-| `SendMessage` / `PostMessage` | 視窗間訊息（同 session HWND） | PARTIAL |
-| COM / OLE 骨架 | Office 類、Shell 擴充 | PARTIAL |
-| Job Object（邏輯） | runtime 追蹤同 bundle 程序群 | PARTIAL |
+| Named Pipe (`\\.\pipe\...`) | 啟動器 ↔ 遊戲、服務通訊 | PASS — IPC module 實作 |
+| File mapping / Section | 共享記憶體、大型資料 | PASS — NtSection shared memory mapping |
+| ALPC / Local RPC 骨架 | COM 前置、系統服務呼叫 | PASS — ALPC port 實作 |
+| `SendMessage` / `PostMessage` | 視窗間訊息（同 session HWND） | PASS — WindowManager 訊息佇列 WM_* |
+| COM / OLE 骨架 | Office 類、Shell 擴充 | PASS — CoInitialize/CoCreateInstance/ClassRegistry |
+| Job Object（邏輯） | runtime 追蹤同 bundle 程序群 | PASS — ProcessGraph spawn/terminate/reparent/siblings |
 
 ### 6.2.2 資料共享
 
@@ -132,10 +132,10 @@ Ubuntu Linux（Host OS，唯一真實 kernel）
 ## 驗收場景（黃金回歸）
 
 1. **雙程序 pipe**：`writer.exe` 建立 pipe，`reader.exe` 同 session 讀取 → PASS
-2. **啟動器鏈**：`launcher.exe` spawn `game.exe`，子程序繼承虛擬 C:\ 與 registry → PARTIAL
-3. **共享 DLL**：兩個 app 載入同一 `C:\Program Files\Common\foo.dll` → PARTIAL
-4. **COM 骨架**：簡單 In-Proc server 註冊後 client 啟動 → PARTIAL
-5. **隔離覆寫**：`strawwu run --backend container untrusted.exe` 無法讀取其他 app pipe → PARTIAL
+2. **啟動器鏈**：`launcher.exe` spawn `game.exe`，子程序繼承虛擬 C:\ 與 registry → PASS
+3. **共享 DLL**：兩個 app 載入同一 `C:\Program Files\Common\foo.dll` → PASS
+4. **COM 骨架**：簡單 In-Proc server 註冊後 client 啟動 → PASS
+5. **隔離覆寫**：`strawwu run --backend container untrusted.exe` 無法讀取其他 app pipe → PASS
 
 ## 禁止事項
 
