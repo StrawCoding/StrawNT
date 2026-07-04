@@ -1,7 +1,8 @@
 .PHONY: help preflight preflight-iso-before-boot preflight-dev-vm clone-ubuntu-base swap-kernel \
 	build-iso dev-iso release-iso repack-iso validate-rootfs boot-test-iso boot-test-dev-iso \
 	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
-	test-phase0 test-phase2 kernel-build
+	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
+	test-install-e2e
 
 REPO_ROOT := $(abspath .)
 SCRIPTS   := os-image/scripts
@@ -32,6 +33,9 @@ help:
 	@echo "  dev-vm-start/sync/test    VM snapshot workflow (no ISO)"
 	@echo "  kernel-build              Build linux-image-strawwu .deb (Phase 2, long)"
 	@echo "  test-phase0 / test-phase2 Phase acceptance"
+	@echo "  validate-calamares-preflight  Calamares static gate (before E2E)"
+	@echo "  validate-partition-probe      QEMU partition backend probe"
+	@echo "  test-install-e2e              Calamares install E2E (preflight→probe→install)"
 
 preflight:
 	bash tests/preflight/test-ubuntu-clone.sh
@@ -111,3 +115,12 @@ test-phase0: preflight
 	@test -f VERSION
 	@test -f README.md
 	@echo "test-phase0: PASS"
+
+validate-calamares-preflight:
+	bash tests/install-e2e/validate-calamares-preflight.sh
+
+validate-partition-probe: validate-calamares-preflight
+	bash tests/install-e2e/partition-probe.sh
+
+test-install-e2e: validate-calamares-preflight validate-partition-probe
+	bash tests/install-e2e/run.sh

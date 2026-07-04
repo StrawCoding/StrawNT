@@ -1,0 +1,5 @@
+---
+type: "job"
+name: "partition"
+interface: "python"
+script: "main.py"

@@ -87,6 +87,17 @@ patch_boot_serial_console() {
     done
 }
 
+force_gdm_x11() {
+    log "forcing GDM to use X11 (xdotool E2E requires X11, not Wayland)"
+    local conf="${ROOTFS_DIR}/etc/gdm3/custom.conf"
+    if [[ -f "${conf}" ]]; then
+        sed -i 's/^#\?WaylandEnable=.*$/WaylandEnable=false/' "${conf}"
+        if ! grep -q '^WaylandEnable=false' "${conf}"; then
+            sed -i '/^\[daemon\]/a WaylandEnable=false' "${conf}"
+        fi
+    fi
+}
+
 inject_boot_marker() {
     log "injecting STRAWWU_BOOT_OK serial marker service"
     mkdir -p "${ROOTFS_DIR}/etc/systemd/system"
@@ -100,7 +111,7 @@ Wants=gdm.service
 [Service]
 Type=oneshot
 # GDM up = live session ready; tee to serial + console (do not require -c ttyS0 — casper overlay may lag).
-ExecStart=/bin/sh -c 'K=$(uname -r); { echo STRAWWU_BOOT_OK; echo "STRAWWU_KERNEL_${K}"; } | tee /dev/ttyS0 /dev/console >/dev/null 2>&1 || true'
+ExecStart=/bin/sh -c 'K=$(uname -r); { echo STRAWWU_BOOT_OK; echo STRAWWU-DESKTOP-OK; echo "STRAWWU_KERNEL_${K}"; } | tee /dev/ttyS0 /dev/console /dev/kmsg >/dev/null 2>&1 || true'
 RemainAfterExit=yes
 
 [Install]
@@ -543,6 +554,13 @@ write_checksums() {
 main() {
     need_root
     need_cmd mksquashfs xorriso mount umount du sed dpkg-query
+    local lock="${WORK_DIR}/.build-iso.lock"
+    mkdir -p "${WORK_DIR}"
+    exec 10>"${lock}"
+    if ! flock -n 10; then
+        die "build-iso already running (lock: ${lock}) — wait for the other build to finish"
+    fi
+    echo "pid=$$ started=$(date -Is)" >&10
     __build_iso_main "$@"
 }
 
@@ -568,7 +586,9 @@ __build_iso_main() {
         STRAWWU_VERSION="${VERSION}" bash "${SCRIPT_DIR}/apply-branding.sh" iso
     else
         STRAWWU_KERNEL_DEB="${kernel_deb}" bash "${SCRIPT_DIR}/swap-kernel.sh"
+        bash "${SCRIPT_DIR}/sync-calamares-installer.sh"
         apply_branding
+        force_gdm_x11
         inject_boot_marker
     fi
 
@@ -593,10 +613,6 @@ __build_iso_main() {
     date -Is > "${WORK_DIR}/.build-iso-ok"
     echo "${STRAWWU_ISO_MODE}" > "${WORK_DIR}/.build-iso-mode"
     log "build complete (${STRAWWU_ISO_MODE}): ${ISO_PATH}"
-}
-
-__mutex_inner() {
-    __build_iso_main "$@"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

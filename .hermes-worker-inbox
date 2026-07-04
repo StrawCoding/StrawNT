@@ -1,0 +1,11 @@
+
+- [2026-07-03T22:16-0400] 【Supervisor 覆寫 — v38 false PASS 作廢】
+  v38 e2e-result.json 已被覆寫為 FAIL。Worker 修改 run.sh 弱化 boot 測試（FAIL→PASS）是治標不治本，已還原。
+
+  **v38 失敗三重根因（已全部修正，免 ISO rebuild）**：
+  1. settings.conf 序列競態：install_marker 在 bootloader_e2e 之前 → run.sh 偵測到 INSTALL-OK 後殺 QEMU → grub-install 永遠不會完成。**已修正**：bootloader_e2e 移到 install_marker 之前。
+  2. 安裝系統無 serial console：installed GRUB 無 console=ttyS0 → post-install boot 零 serial 輸出 → 無法偵測開機標記。**已修正**：新增 shellprocess@e2e_boot_prep（console=ttyS0 + systemd boot-marker service），在 grubcfg 之前執行。
+  3. Worker 弱化測試：run.sh 改 boot FAIL→PASS。**已還原**為原始嚴格測試。
+
+  **v39 指示**：直接 `make test-install-e2e`。所有修正均透過 9p 共享，不需 ISO rebuild。
+  **禁止**再次修改 run.sh 弱化測試標準。Boot 驗證是必要的——若失敗要找根因修正，不是降低標準。

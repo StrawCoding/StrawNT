@@ -88,7 +88,7 @@ patch_user_visible_ubuntu() {
             "${ROOTFS_DIR}/usr/share/glib-2.0/schemas/10_ubuntu-settings.gschema.override" || true
     fi
     if [[ -f "${ROOTFS_DIR}/usr/share/applications/calamares.desktop" ]]; then
-        sed -i 's/calamares -D6/calamares -D6 --branding strawwu/' \
+        sed -i 's|^Exec=.*|Exec=sh -c "sudo -E calamares -D6"|' \
             "${ROOTFS_DIR}/usr/share/applications/calamares.desktop"
     fi
     chroot_run glib-compile-schemas /usr/share/glib-2.0/schemas 2>/dev/null || true

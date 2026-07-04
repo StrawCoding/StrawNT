@@ -79,9 +79,10 @@ run_qemu_boot() {
             ;;
     esac
 
-    log "QEMU ${mode} boot (timeout ${TIMEOUT}s)"
+    log "QEMU ${mode} boot (timeout ${TIMEOUT}s, early-exit on marker)"
+    touch "${serial_log}"
     set +e
-    timeout "${TIMEOUT}" qemu-system-x86_64 \
+    qemu-system-x86_64 \
         -m "${MEMORY}" \
         -smp 2 \
         -serial "file:${serial_log}" \
@@ -90,20 +91,45 @@ run_qemu_boot() {
         -netdev user,id=net0 \
         -device virtio-net-pci,netdev=net0 \
         "${extra_args[@]}" \
-        > "${qemu_log}" 2>&1
-    local qemu_rc=$?
+        > "${qemu_log}" 2>&1 &
+    local qemu_pid=$!
+
+    local poll_interval=3
+    local waited=0
+    local qemu_rc=124
+    while (( waited < TIMEOUT )); do
+        if ! kill -0 "${qemu_pid}" 2>/dev/null; then
+            wait "${qemu_pid}" 2>/dev/null || true
+            qemu_rc=$?
+            break
+        fi
+        if grep -q "${MARKER}" "${serial_log}" 2>/dev/null; then
+            log "${mode}: marker found after ${waited}s — killing QEMU"
+            kill "${qemu_pid}" 2>/dev/null; wait "${qemu_pid}" 2>/dev/null || true
+            qemu_rc=0
+            break
+        fi
+        sleep "${poll_interval}"
+        (( waited += poll_interval ))
+    done
+
+    if (( waited >= TIMEOUT )) && kill -0 "${qemu_pid}" 2>/dev/null; then
+        log "${mode}: timeout ${TIMEOUT}s — killing QEMU"
+        kill "${qemu_pid}" 2>/dev/null; wait "${qemu_pid}" 2>/dev/null || true
+        qemu_rc=124
+    fi
     set -e
     sync
-    sleep 2
+    sleep 1
 
     end_ts="$(date -Is)"
     elapsed=$(( $(date -d "${end_ts}" +%s) - $(date -d "${start_ts}" +%s) ))
 
     if grep -q "${MARKER}" "${serial_log}" 2>/dev/null; then
         result="PASS"
-        log "${mode}: found ${MARKER}"
+        log "${mode}: PASS — ${MARKER} found in ${elapsed}s"
     else
-        log "${mode}: marker not found (qemu exit ${qemu_rc})"
+        log "${mode}: FAIL — marker not found after ${elapsed}s (qemu exit ${qemu_rc})"
         tail -30 "${serial_log}" 2>/dev/null >&2 || true
     fi
 

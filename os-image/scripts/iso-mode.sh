@@ -24,6 +24,9 @@ iso_mode_resolve() {
             STRAWWU_MKSQUASHFS_PROCESSORS="${STRAWWU_MKSQUASHFS_PROCESSORS:-$(nproc)}"
             ;;
         release-iso)
+            if [[ "${STRAWWU_SKIP_SQUASHFS:-0}" == "1" ]]; then
+                iso_mode_die "release-iso forbids STRAWWU_SKIP_SQUASHFS=1 (use dev-iso or repack-iso)"
+            fi
             STRAWWU_SKIP_SQUASHFS="${STRAWWU_SKIP_SQUASHFS:-0}"
             STRAWWU_PREFLIGHT_STRICT="${STRAWWU_PREFLIGHT_STRICT:-1}"
             STRAWWU_BOOT_TEST_MODES="${STRAWWU_BOOT_TEST_MODES:-bios,uefi}"

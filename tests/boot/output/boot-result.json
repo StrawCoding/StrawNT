@@ -3,28 +3,21 @@
   "status": "PASS",
   "marker": "STRAWWU_BOOT_OK",
   "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.3.0-cleanroom-amd64.iso",
-  "tested": "2026-07-03T18:55:36+08:00",
-  "modes_tested": "bios,uefi",
+  "tested": "2026-07-03T14:20:13-04:00",
+  "modes_tested": "bios",
   "bios": {
     "mode": "bios",
     "status": "PASS",
     "marker": "STRAWWU_BOOT_OK",
     "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.3.0-cleanroom-amd64.iso",
-    "start": "2026-07-03T18:25:31+08:00",
-    "end": "2026-07-03T18:40:33+08:00",
-    "elapsed_sec": 902,
-    "qemu_exit": 124,
+    "start": "2026-07-03T14:18:27-04:00",
+    "end": "2026-07-03T14:20:13-04:00",
+    "elapsed_sec": 106,
+    "qemu_exit": 0,
     "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/boot/output/serial-bios.log"
   },
   "uefi": {
     "mode": "uefi",
-    "status": "PASS",
-    "marker": "STRAWWU_BOOT_OK",
-    "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.3.0-cleanroom-amd64.iso",
-    "start": "2026-07-03T18:40:33+08:00",
-    "end": "2026-07-03T18:55:36+08:00",
-    "elapsed_sec": 903,
-    "qemu_exit": 124,
-    "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/boot/output/serial-uefi.log"
+    "status": "SKIPPED"
   }
 }

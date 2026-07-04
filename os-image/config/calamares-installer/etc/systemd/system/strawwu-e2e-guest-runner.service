@@ -1,0 +1,14 @@
+[Unit]
+Description=StrawWU install-e2e guest automation (virtio-9p trigger)
+After=network-online.target gdm.service strawwu-boot-marker.service
+Wants=network-online.target
+ConditionVirtualization=!container
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/strawwu-e2e-guest-runner.sh
+RemainAfterExit=yes
+TimeoutStartSec=2100
+
+[Install]
+WantedBy=multi-user.target
