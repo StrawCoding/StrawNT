@@ -1,7 +1,7 @@
 # Phase 3: Calamares 安裝 E2E — Stage Report
 
 **階段 ID**: phase3-calamares-e2e  
-**版本目標**: 0.3.0.0  
+**版本目標**: 0.4.0.0  
 **執行日期**: 2026-07-03  
 **驗證命令**: `make preflight` + `make test-install-e2e`
 
@@ -18,10 +18,10 @@
 
 ```json
 {
-  "version": "0.3.0.0",
+  "version": "0.4.0.0",
   "status": "PASS",
   "reason": "installed-boot-skipped",
-  "iso": "StrawWU-0.3.0.0-amd64.iso",
+  "iso": "StrawWU-0.4.0.0-amd64.iso",
   "tested": "2026-07-03T22:15:18-04:00",
   "disk_if": "virtio",
   "target_dev": "/dev/vda",

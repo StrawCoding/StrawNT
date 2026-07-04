@@ -13,7 +13,7 @@ StrawWU 採用四位版本號 `a.b.c.d`：
 
 | 版本 | 意義 |
 |------|------|
-| `0.3.0.0` | v0.3.0 正式版（Phase 0–7 完成） |
+| `0.4.0.0` | v0.4.0 正式版（Phase 0–7 完成） |
 | `0.3.1.1` | v0.3.1 第一個預覽版 |
 | `0.3.1.2` | v0.3.1 第二個預覽版 |
 | `0.3.1.0` | v0.3.1 正式版 |
@@ -26,7 +26,7 @@ StrawWU 採用四位版本號 `a.b.c.d`：
 | `VERSION` | `a.b.c.d` | 唯一真實來源（Single Source of Truth） |
 | `components/Cargo.toml` | `a.b.c` 或 `a.b.c-preview.d` | Cargo semver 限制 |
 | `hub/package.json` | `a.b.c.d` | npm 允許任意字串 |
-| Git tag | `va.b.c.d` | 例如 `v0.3.0.0` |
+| Git tag | `va.b.c.d` | 例如 `v0.4.0.0` |
 | ISO 檔名 | `StrawWU-a.b.c.d-amd64.iso` | |
 
 ## 規則

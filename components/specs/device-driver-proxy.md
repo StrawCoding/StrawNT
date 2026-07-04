@@ -3,7 +3,7 @@
 | 欄位 | 值 |
 |------|-----|
 | 狀態 | **APPROVED — 已併入 v3.0-cleanroom 計畫** |
-| 版本 | 0.3.0.0 |
+| 版本 | 0.4.0.0 |
 | 日期 | 2026-07-02 |
 | 對齊 | `runtime-cooperation.md`、`execution-backends.md`、`anticheat-compat.md`、Phase 2 `strawwu_ipc` |
 

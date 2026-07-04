@@ -1,6 +1,6 @@
 # StrawWU Phase 路線圖（v3.0-cleanroom）
 
-| 版本 | 0.3.0.0 |
+| 版本 | 0.4.0.0 |
 |------|-----------------|
 | 日期 | 2026-07-02 |
 
@@ -73,9 +73,9 @@
 ## 正式版 Release ✅
 
 - semver MAJOR 須 `>= 1` **僅在使用者明確通知後**
-- Release 產物：`StrawWU-0.3.0.0-amd64.iso`（6.1 GB）
+- Release 產物：`StrawWU-0.4.0.0-amd64.iso`（6.1 GB）
 - `SHA256SUMS` + `sha256sum -c` ✓
 - Boot test：BIOS PASS (110s) + UEFI PASS (100s)
 - Cargo test：367/367 PASS
-- Git tag：`v0.3.0.0`
+- Git tag：`v0.4.0.0`
 - HTML 報告 hermes-deliver ✓

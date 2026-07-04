@@ -134,7 +134,7 @@ cat > "${OUTPUT_DIR}/compat-matrix.json" << JSONEOF
 {
   "matrix_version": "1",
   "generated_at": "$(date +%Y-%m-%d)",
-  "project_version": "0.3.0.0",
+  "project_version": "0.4.0.0",
   "phase": "6",
   "sub_stages": [
     {

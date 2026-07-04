@@ -1,6 +1,6 @@
 # Bridge ABI 規格
 
-| 版本 | 0.3.0.0 |
+| 版本 | 0.4.0.0 |
 |------|-----------------|
 | 日期 | 2026-07-04 |
 | 對齊 | `runtime-cooperation.md`、`execution-backends.md`、Phase 2 `strawwu_ipc` |

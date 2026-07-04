@@ -1,7 +1,7 @@
 PRETTY_NAME="StrawWU"
 NAME="StrawWU"
 VERSION_ID="24.04"
-VERSION="0.3.0-cleanroom"
+VERSION="0.4.0.0"
 VERSION_CODENAME=noble
 ID=ubuntu
 ID_LIKE=debian
