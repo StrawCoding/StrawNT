@@ -7,7 +7,7 @@ E2E_DIR="${REPO_ROOT}/tests/install-e2e"
 OUT_DIR="${E2E_DIR}/output"
 LOG_DIR="${OUT_DIR}/logs"
 GUEST_SHARE="${E2E_DIR}/guest"
-VERSION="${STRAWWU_VERSION:-0.3.0-cleanroom}"
+VERSION="${STRAWWU_VERSION:-0.3.0.0}"
 ISO_PATH="${STRAWWU_ISO_PATH:-${REPO_ROOT}/os-image/output/StrawWU-${VERSION}-amd64.iso}"
 
 DISK_IF="${STRAWWU_E2E_DISK_IF:-virtio}"

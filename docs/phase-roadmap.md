@@ -1,6 +1,6 @@
 # StrawWU Phase 路線圖（v3.0-cleanroom）
 
-| 版本 | 0.3.0-cleanroom |
+| 版本 | 0.3.0.0 |
 |------|-----------------|
 | 日期 | 2026-07-02 |
 
@@ -73,7 +73,7 @@
 ## 正式版 Release（BLOCKED — 待使用者授權）
 
 - semver MAJOR 須 `>= 1` **僅在使用者明確通知後**
-- 預發布產物：`StrawWU-0.3.0-cleanroom-amd64.iso`
+- 預發布產物：`StrawWU-0.3.0.0-amd64.iso`
 - `SHA256SUMS` + `sha256sum -c`
 - CI boot/install 證據
 - HTML 報告 hermes-deliver

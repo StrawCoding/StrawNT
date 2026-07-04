@@ -8,7 +8,7 @@ BRANDING_DIR="${REPO_ROOT}/os-image/config/branding"
 WORK_DIR="${STRAWWU_WORK_DIR:-${REPO_ROOT}/os-image/work}"
 ROOTFS_DIR="${WORK_DIR}/rootfs"
 ISO_STAGING="${WORK_DIR}/iso-staging"
-VERSION="${STRAWWU_VERSION:-0.3.0-cleanroom}"
+VERSION="${STRAWWU_VERSION:-0.3.0.0}"
 
 log() { echo "==> $*" >&2; }
 die() { echo "ERROR: $*" >&2; exit 1; }

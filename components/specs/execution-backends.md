@@ -1,6 +1,6 @@
 # 執行後端規格：native / container / microvm
 
-| 版本 | 0.3.0-cleanroom-draft |
+| 版本 | 0.3.0.0-draft |
 |------|----------------------|
 | 日期 | 2026-07-02 |
 | 對齊 | `2026-06-29` 系統計畫 Phase 6、ADR-0002 Runtime Orchestration |

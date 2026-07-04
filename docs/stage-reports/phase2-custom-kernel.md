@@ -1,7 +1,7 @@
 # Stage Report: phase2-custom-kernel
 
 - **階段 ID**: `phase2-custom-kernel` (3/8)
-- **版本目標**: `0.3.0-cleanroom`
+- **版本目標**: `0.3.0.0`
 - **報告時間**: 2026-07-03T19:00+08:00
 - **Worker**: Cursor Agent (Hermes Tick36 收尾 commit)
 - **Commit**: `fb81a806e` fix(phase2): custom kernel boot path — initrd/casper/UEFI harness
@@ -50,7 +50,7 @@ test-phase2: PASS — deb=.../linux-image-strawwu_6.8.12-1_amd64.deb vmlinuz=...
 | `make preflight-iso-before-boot` | PASS | 18:25 |
 | `STRAWWU_BOOT_TEST_MODES=bios,uefi bash tests/boot/run.sh` | **overall PASS** | 18:55 |
 
-**最新 ISO**: `os-image/output/StrawWU-0.3.0-cleanroom-amd64.iso`  
+**最新 ISO**: `os-image/output/StrawWU-0.3.0.0-amd64.iso`  
 **SHA256**: `aa6b3b4d51821381b061a42b955a16bbfcd6db58d7f139b4180a3dc4f4dc15f3`
 
 ### Boot-test 證據（release ISO @ 18:24）

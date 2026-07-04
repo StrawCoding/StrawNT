@@ -2,14 +2,20 @@
 
 StrawWU 是以 **Ubuntu 官方 live 映像為基底**的桌面作業系統，透過 **clone → 替換自訂 kernel → 疊加 StrawWU 元件** 的方式建置，目標是在單一 OS 內提供 Windows 與 Linux 應用程式同級的 runtime 調度能力。
 
-> **v0.3.0-cleanroom（Released 2026-07-04）** — Phase 0–7 全部完成。完全重新 clean-room 實作，禁止沿用封存 legacy 程式碼。ISO 已通過 BIOS + UEFI boot test。
+> **v0.3.0.0（Released 2026-07-04）** — Phase 0–7 全部完成。完全重新 clean-room 實作，禁止沿用封存 legacy 程式碼。ISO 已通過 BIOS + UEFI boot test。
+
+## 版本規格
+
+採用 `a.b.c.d` 四位版本號（詳見 [docs/versioning.md](docs/versioning.md)）：
+- `a.b.c` = Major.Minor.Patch
+- `d` = Preview 版本號（`0` = 正式版，`≥1` = 預覽版）
 
 ## 版本狀態
 
 | 項目 | 值 |
 |------|-----|
-| 版本 | `v0.3.0-cleanroom` |
-| ISO | `StrawWU-0.3.0-cleanroom-amd64.iso` (6.1 GB) |
+| 版本 | `v0.3.0.0` |
+| ISO | `StrawWU-0.3.0.0-amd64.iso` (6.1 GB) |
 | SHA256 | `50bfe4dc3fb68db49540764d108eacd3e7ec96a25c609930a0f3f1f4670c9ea3` |
 | Kernel | `6.8.12-strawwu` |
 | Tests | 367/367 PASS |
@@ -39,7 +45,7 @@ StrawWU 是以 **Ubuntu 官方 live 映像為基底**的桌面作業系統，透
    anticheat / device-proxy / launcher + Hub GUI
         │
         ▼ repack ISO (xorriso, xz 壓縮)
-   StrawWU-0.3.0-cleanroom-amd64.iso
+   StrawWU-0.3.0.0-amd64.iso
 ```
 
 ## 元件總覽

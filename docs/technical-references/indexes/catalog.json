@@ -1,7 +1,7 @@
 {
   "updated_at": "2026-07-03T18:10:00+08:00",
   "ubuntu_release": "noble",
-  "strawwu_version": "0.3.0-cleanroom",
+  "strawwu_version": "0.3.0.0",
   "total_size_human": "~372MB",
   "refresh_script": "docs/technical-references/scripts/refresh-technical-references.sh",
   "packages": [

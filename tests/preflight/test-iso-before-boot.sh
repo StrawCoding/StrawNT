@@ -6,7 +6,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 WORK_DIR="${REPO_ROOT}/os-image/work"
 OUTPUT_DIR="${REPO_ROOT}/os-image/output"
-VERSION="${STRAWWU_VERSION:-$(cat "${REPO_ROOT}/VERSION" 2>/dev/null || echo 0.3.0-cleanroom)}"
+VERSION="${STRAWWU_VERSION:-$(cat "${REPO_ROOT}/VERSION" 2>/dev/null || echo 0.3.0.0)}"
 ISO_MODE="${STRAWWU_ISO_MODE:-release-iso}"
 STRICT="${STRAWWU_PREFLIGHT_STRICT:-}"
 if [[ -z "${STRICT}" ]]; then

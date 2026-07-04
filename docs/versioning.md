@@ -1,49 +1,37 @@
-# StrawWU 版本政策
+# 版本規格
 
-| 欄位 | 值 |
-|------|-----|
-| 生效日期 | 2026-07-02 |
-| 決策來源 | 使用者明確指示 |
+StrawWU 採用四位版本號 `a.b.c.d`：
 
-## Semver 規則
+| 位置 | 名稱 | 說明 |
+|------|------|------|
+| a | Major | 重大架構變更或正式授權發布（0 = 預授權階段） |
+| b | Minor | 功能里程碑（對應 Phase 或 Quarter） |
+| c | Patch | 修正、改善、非破壞性更新 |
+| d | Preview | 預覽版本號；`0` = 正式版，`≥1` = 預覽版 N |
 
-格式：`MAJOR.MINOR.PATCH`（可選 `-qualifier`，例如 `-cleanroom`、`-phase1`）。
+## 範例
 
-### 正式版之前（預設狀態）
+| 版本 | 意義 |
+|------|------|
+| `0.3.0.0` | v0.3.0 正式版（Phase 0–7 完成） |
+| `0.3.1.1` | v0.3.1 第一個預覽版 |
+| `0.3.1.2` | v0.3.1 第二個預覽版 |
+| `0.3.1.0` | v0.3.1 正式版 |
+| `1.0.0.0` | v1.0.0 正式授權發布（Q9 目標） |
 
-- **MAJOR 必須為 `0`**（`MAJOR >= 1` 禁止）
-- 範例：`0.3.0-cleanroom`、`0.3.1`、`0.4.0-phase6`
-- ISO 檔名：`StrawWU-<version>-amd64.iso`（例：`StrawWU-0.3.0-cleanroom-amd64.iso`）
-- Git tag：`v0.3.0-cleanroom`、`v0.3.0-cleanroom-components` 等
+## 檔案對照
 
-### 正式版
+| 檔案 | 格式 | 說明 |
+|------|------|------|
+| `VERSION` | `a.b.c.d` | 唯一真實來源（Single Source of Truth） |
+| `components/Cargo.toml` | `a.b.c` 或 `a.b.c-preview.d` | Cargo semver 限制 |
+| `hub/package.json` | `a.b.c.d` | npm 允許任意字串 |
+| Git tag | `va.b.c.d` | 例如 `v0.3.0.0` |
+| ISO 檔名 | `StrawWU-a.b.c.d-amd64.iso` | |
 
-- **僅在使用者明確通知後**才可將 `MAJOR` 設為 `>= 1`
-- Hermes / worker **不得**自行宣稱正式版或 bump major
-- 正式版發布須同時滿足：
-  1. 使用者書面/對話確認「可發正式版」及目標版本號
-  2. ISO + SHA256SUMS + `sha256sum -c`
-  3. boot/install 證據 JSON
-  4. HTML 報告 hermes-deliver
-  5. CI 綠燈（若已配置）
+## 規則
 
-### 計畫代號 vs 版本號
-
-| 概念 | 值 | 說明 |
-|------|-----|------|
-| 計畫代號 | `v3.0-cleanroom` | 架構路線名稱，**不是** semver |
-| 當前 semver | `0.3.0-cleanroom` | 實際產物版本號 |
-| 正式版 semver | **1.0.0**（目標，見 `.official-release-target`） | Q9 鎖定；授權前 MAJOR 仍須為 0 |
-
-## 環境變數
-
-- `STRAWWU_VERSION` — 覆寫建置版本（須符合 MAJOR=0 政策，除非已獲正式版授權）
-- `Makefile`：`VERSION ?= 0.3.0-cleanroom`
-
-## Preflight 檢查
-
-`make preflight` 會驗證 `VERSION` / `STRAWWU_VERSION` 的 MAJOR 為 `0`（除非設 `STRAWWU_OFFICIAL_RELEASE=1` 且存在 `.official-release-authorized` 標記檔）。
-
-## Worker 階段版本
-
-各 phase 的 `version` 欄位使用當前 semver（`0.3.0-cleanroom`）。最終 `official-release` 階段在通過前保持 **BLOCKED**，等待使用者授權。
+1. `d=0` 為正式版，`d≥1` 為預覽版（功能不完整或未經完整驗證）
+2. 版本遞增時由 `VERSION` 檔案統一修改，其餘檔案同步
+3. 每次 release 必須有對應 git tag
+4. Preview 版不產正式 release 報告，但須有 boot-test 通過

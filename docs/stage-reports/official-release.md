@@ -1,7 +1,7 @@
 # Stage Report — official-release (Phase 8/8)
 
 **版本目標**: 1.0.0  
-**當前 semver**: 0.3.0-cleanroom  
+**當前 semver**: 0.3.0.0  
 **階段**: 8/8 (official-release)  
 **日期**: 2026-07-04  
 **最後檢查**: 2026-07-04T03:35 UTC-4 (worker-TICK)  
@@ -56,7 +56,7 @@
 
 - `.official-release-target` 內容：`1.0.0`
 - `docs/versioning.md`：MAJOR >= 1 僅在使用者明確通知後
-- Makefile `VERSION ?= 0.3.0-cleanroom`
+- Makefile `VERSION ?= 0.3.0.0`
 - Preflight 閘門：檢查 MAJOR=0 除非 `STRAWWU_OFFICIAL_RELEASE=1` 且 `.official-release-authorized` 存在
 
 ---

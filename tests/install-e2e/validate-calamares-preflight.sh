@@ -119,8 +119,8 @@ fi
 
 if [[ -n "${ISO}" ]]; then
     check_iso_squashfs "${ISO}"
-elif [[ -f "${REPO_ROOT}/os-image/output/StrawWU-$(cat "${REPO_ROOT}/VERSION" 2>/dev/null || echo 0.3.0-cleanroom)-amd64.iso" ]]; then
-    check_iso_squashfs "${REPO_ROOT}/os-image/output/StrawWU-$(cat "${REPO_ROOT}/VERSION" 2>/dev/null || echo 0.3.0-cleanroom)-amd64.iso"
+elif [[ -f "${REPO_ROOT}/os-image/output/StrawWU-$(cat "${REPO_ROOT}/VERSION" 2>/dev/null || echo 0.3.0.0)-amd64.iso" ]]; then
+    check_iso_squashfs "${REPO_ROOT}/os-image/output/StrawWU-$(cat "${REPO_ROOT}/VERSION" 2>/dev/null || echo 0.3.0.0)-amd64.iso"
 fi
 
 if [[ "${FAIL}" -eq 0 ]]; then

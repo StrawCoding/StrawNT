@@ -1,6 +1,6 @@
 # Phase 6 Stage Report — phase6-wincompat
 
-**版本**: 0.3.0-cleanroom  
+**版本**: 0.3.0.0  
 **階段**: 6/8 (phase6-wincompat)  
 **日期**: 2026-07-04  
 **狀態**: 待 Hermes 驗收  

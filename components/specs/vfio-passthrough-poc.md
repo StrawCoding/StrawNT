@@ -1,6 +1,6 @@
 # VFIO 直通 PoC — 實驗文件
 
-| 版本 | 0.3.0-cleanroom |
+| 版本 | 0.3.0.0 |
 |------|-----------------|
 | 狀態 | **實驗性 — 不進 v3.0 MVP** |
 | 對齊 | `device-driver-proxy.md` Tier 4、`execution-backends.md` microvm 後端 |

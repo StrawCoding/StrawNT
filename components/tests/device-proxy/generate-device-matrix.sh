@@ -16,7 +16,7 @@ cat > "${OUTPUT_DIR}/device-matrix.json" << 'JSONEOF'
 {
   "matrix_version": "1",
   "generated_at": "2026-07-04",
-  "project_version": "0.3.0-cleanroom",
+  "project_version": "0.3.0.0",
   "devices": [
     {
       "class": "GPU",

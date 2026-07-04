@@ -60,7 +60,7 @@ if [[ "${FAIL}" -eq 0 ]]; then
 fi
 
 # Version policy: MAJOR must be 0 until user authorizes official release
-STRAWWU_VER="${STRAWWU_VERSION:-$(cat "${REPO_ROOT}/VERSION" 2>/dev/null || echo 0.3.0-cleanroom)}"
+STRAWWU_VER="${STRAWWU_VERSION:-$(cat "${REPO_ROOT}/VERSION" 2>/dev/null || echo 0.3.0.0)}"
 VER_MAJOR="${STRAWWU_VER%%.*}"
 if [[ "${STRAWWU_VER}" =~ ^[0-9]+\.[0-9]+\.[0-9]+-cleanroom$ ]]; then
     echo "PASS: version policy OK (plan build ${STRAWWU_VER})"
