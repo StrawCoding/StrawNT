@@ -62,8 +62,10 @@ body {
 }
 
 .brand-icon {
-  font-size: 20px;
-  color: var(--teal);
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  object-fit: contain;
 }
 
 .titlebar h1 {

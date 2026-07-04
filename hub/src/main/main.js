@@ -17,6 +17,7 @@ function createWindow() {
     minHeight: 520,
     backgroundColor: '#0A0E14',
     title: 'StrawWU Hub',
+    icon: path.join(__dirname, '..', '..', 'assets', 'icon.png'),
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
