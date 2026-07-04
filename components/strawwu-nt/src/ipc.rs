@@ -81,6 +81,137 @@ pub struct PipeNamespace {
     pipes: Vec<NamedPipe>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SharedMemorySection {
+    pub name: String,
+    pub size: usize,
+    pub data: Vec<u8>,
+    pub creator_pid: u64,
+    pub mapped_pids: Vec<u64>,
+}
+
+impl SharedMemorySection {
+    pub fn create(name: &str, size: usize, creator_pid: u64) -> Self {
+        Self {
+            name: name.to_string(),
+            size,
+            data: vec![0u8; size],
+            creator_pid,
+            mapped_pids: vec![creator_pid],
+        }
+    }
+
+    pub fn map_view(&mut self, pid: u64) -> Result<(), SectionError> {
+        if self.mapped_pids.contains(&pid) {
+            return Err(SectionError::AlreadyMapped);
+        }
+        self.mapped_pids.push(pid);
+        Ok(())
+    }
+
+    pub fn unmap_view(&mut self, pid: u64) -> Result<(), SectionError> {
+        let before = self.mapped_pids.len();
+        self.mapped_pids.retain(|&p| p != pid);
+        if self.mapped_pids.len() == before {
+            return Err(SectionError::NotMapped);
+        }
+        Ok(())
+    }
+
+    pub fn write(&mut self, offset: usize, data: &[u8]) -> Result<usize, SectionError> {
+        if offset >= self.size {
+            return Err(SectionError::OutOfBounds);
+        }
+        let available = self.size - offset;
+        let to_write = data.len().min(available);
+        self.data[offset..offset + to_write].copy_from_slice(&data[..to_write]);
+        Ok(to_write)
+    }
+
+    pub fn read(&self, offset: usize, len: usize) -> Result<Vec<u8>, SectionError> {
+        if offset >= self.size {
+            return Err(SectionError::OutOfBounds);
+        }
+        let available = self.size - offset;
+        let to_read = len.min(available);
+        Ok(self.data[offset..offset + to_read].to_vec())
+    }
+
+    pub fn is_mapped_by(&self, pid: u64) -> bool {
+        self.mapped_pids.contains(&pid)
+    }
+}
+
+#[derive(Debug, Clone, thiserror::Error)]
+pub enum SectionError {
+    #[error("section not found")]
+    NotFound,
+    #[error("process already has a view mapped")]
+    AlreadyMapped,
+    #[error("process does not have a view mapped")]
+    NotMapped,
+    #[error("offset out of bounds")]
+    OutOfBounds,
+    #[error("section name already exists")]
+    NameConflict,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub struct SharedMemoryNamespace {
+    sections: Vec<SharedMemorySection>,
+}
+
+impl SharedMemoryNamespace {
+    pub fn new() -> Self {
+        Self { sections: Vec::new() }
+    }
+
+    pub fn create_section(&mut self, name: &str, size: usize, creator_pid: u64) -> Result<usize, SectionError> {
+        if self.sections.iter().any(|s| s.name == name) {
+            return Err(SectionError::NameConflict);
+        }
+        let idx = self.sections.len();
+        self.sections.push(SharedMemorySection::create(name, size, creator_pid));
+        Ok(idx)
+    }
+
+    pub fn map_view(&mut self, name: &str, pid: u64) -> Result<(), SectionError> {
+        let section = self.sections.iter_mut()
+            .find(|s| s.name == name)
+            .ok_or(SectionError::NotFound)?;
+        section.map_view(pid)
+    }
+
+    pub fn unmap_view(&mut self, name: &str, pid: u64) -> Result<(), SectionError> {
+        let section = self.sections.iter_mut()
+            .find(|s| s.name == name)
+            .ok_or(SectionError::NotFound)?;
+        section.unmap_view(pid)
+    }
+
+    pub fn write_section(&mut self, name: &str, offset: usize, data: &[u8]) -> Result<usize, SectionError> {
+        let section = self.sections.iter_mut()
+            .find(|s| s.name == name)
+            .ok_or(SectionError::NotFound)?;
+        section.write(offset, data)
+    }
+
+    pub fn read_section(&self, name: &str, offset: usize, len: usize) -> Result<Vec<u8>, SectionError> {
+        let section = self.sections.iter()
+            .find(|s| s.name == name)
+            .ok_or(SectionError::NotFound)?;
+        section.read(offset, len)
+    }
+
+    pub fn section_count(&self) -> usize {
+        self.sections.len()
+    }
+
+    pub fn get_section(&self, name: &str) -> Option<&SharedMemorySection> {
+        self.sections.iter().find(|s| s.name == name)
+    }
+}
+
 impl PipeNamespace {
     pub fn new() -> Self {
         Self { pipes: Vec::new() }
