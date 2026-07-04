@@ -2,15 +2,41 @@
 
 v3.0-cleanroom 全新實作，禁止複製封存 legacy crate。
 
-## 規劃結構（Phase 4+）
+## 結構
 
 ```
 components/
-├── specs/               # API/ABI 規格文件
-├── strawwu-bridge/      # kernel↔userspace IPC
-├── strawwu-runtime/     # 行程調度、subsys 註冊
-├── strawwu-launcher/    # PE/ELF 啟動骨架
-└── packaging/           # .deb 建置
+├── Cargo.toml              # Workspace root
+├── Makefile                # make test / make package
+├── specs/                  # API/ABI 規格文件
+│   ├── bridge-abi.md
+│   ├── runtime-cooperation.md
+│   ├── execution-backends.md
+│   ├── device-driver-proxy.md
+│   ├── graphics-stack.md
+│   └── anticheat-compat.md
+├── strawwu-bridge/         # kernel↔userspace IPC + seccomp policy
+├── strawwu-runtime/        # SubsystemSession + orchestrator + process graph
+├── strawwu-launcher/       # PE/ELF 偵測 + CLI (strawwu 指令)
+├── packaging/              # .deb 建置腳本
+│   ├── debian/
+│   └── build-deb.sh
+└── tests/                  # 整合測試資料
+    └── wincompat/
 ```
 
-Phase 1–3 專注 Ubuntu clone 管線；元件實作自 Phase 4 起依鎖序推進。
+## 建置與測試
+
+```bash
+make -C components test      # 單元測試 + 規格完整性 + 結構檢查
+make -C components package   # 建置 release binary + .deb 打包
+make -C components build     # 僅 cargo build --release
+make -C components check     # 快速 cargo check
+```
+
+## 設計原則
+
+- **預設不使用 sandbox** — app 在共享 SubsystemSession 內互通
+- **native 後端為預設** — container/microvm 僅作覆寫
+- **禁止 WinBox / strawwu-box** — 統一使用 `strawwu` CLI
+- **禁止 Wine/Proton** — 全部自行實作翻譯層

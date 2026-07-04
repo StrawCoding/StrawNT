@@ -20,3 +20,7 @@ kernel/output/*.deb
 
 # upstream technical references (~370MB; refresh via docs/technical-references/scripts/)
 docs/technical-references/upstream/
+
+# Rust/Cargo build artifacts
+components/target/
+components/packaging/output/

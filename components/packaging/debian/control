@@ -1,0 +1,27 @@
+Source: strawwu-components
+Section: utils
+Priority: optional
+Maintainer: StrawCoding <dev@strawcoding.org>
+Build-Depends: debhelper-compat (= 13), cargo, rustc
+Standards-Version: 4.6.2
+
+Package: strawwu-bridge
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: StrawWU kernel-userspace IPC bridge
+ Provides the bridge daemon (strawwu-bridged) that translates
+ between Win32 subsystem calls and Linux syscalls via seccomp policy.
+
+Package: strawwu-runtime
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}, strawwu-bridge (= ${binary:Version})
+Description: StrawWU runtime orchestrator
+ Manages SubsystemSession lifecycle, process graph, app profiles,
+ and workload scheduling for native/container/microvm backends.
+
+Package: strawwu-launcher
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}, strawwu-runtime (= ${binary:Version})
+Description: StrawWU application launcher
+ CLI tool (strawwu) for launching PE/ELF binaries in the
+ StrawWU runtime environment.

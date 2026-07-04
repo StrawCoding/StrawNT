@@ -1,0 +1,12 @@
+[workspace]
+resolver = "2"
+members = [
+    "strawwu-bridge",
+    "strawwu-runtime",
+    "strawwu-launcher",
+]
+
+[workspace.package]
+version = "0.3.0"
+edition = "2021"
+license = "MIT"

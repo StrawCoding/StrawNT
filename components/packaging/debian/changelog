@@ -1,0 +1,8 @@
+strawwu-components (0.3.0-1) noble; urgency=medium
+
+  * Phase 4 greenfield: initial component packaging
+  * strawwu-bridge: IPC ABI + seccomp policy engine
+  * strawwu-runtime: SubsystemSession orchestrator
+  * strawwu-launcher: PE/ELF detection + CLI
+
+ -- StrawCoding <dev@strawcoding.org>  Fri, 04 Jul 2026 01:00:00 -0400
