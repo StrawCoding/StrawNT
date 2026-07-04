@@ -35,6 +35,8 @@ jobs:
   build-and-release:
     needs: test
     runs-on: self-hosted
+    env:
+      STRAWWU_WORK_DIR: /opt/strawwu-build/work
     steps:
       - uses: actions/checkout@v4
 
@@ -58,6 +60,12 @@ jobs:
 
       - name: Preflight checks
         run: make preflight
+
+      - name: Prepare Ubuntu base rootfs
+        run: make clone-ubuntu-base
+
+      - name: Swap kernel
+        run: make swap-kernel
 
       - name: Build release ISO
         run: make release-iso
