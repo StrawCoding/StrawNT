@@ -1,0 +1,114 @@
+{
+  "matrix_version": "1",
+  "generated_at": "2026-07-04",
+  "project_version": "0.3.0-cleanroom",
+  "phase": "6",
+  "sub_stages": [
+    {
+      "id": "6.1",
+      "name": "strawwu-nt (TEB/PEB/PE loader)",
+      "status": "PARTIAL",
+      "tests_pass": true,
+      "notes": "PE parser, TEB/PEB, NT syscall dispatch stubs"
+    },
+    {
+      "id": "6.2",
+      "name": "Execution backends + runtime cooperation",
+      "status": "PARTIAL",
+      "tests_pass": true,
+      "notes": "Native shared session default; container/microvm override; Named Pipe IPC"
+    },
+    {
+      "id": "6.3",
+      "name": "Daily apps (USER32/GDI32/COM/.NET stubs)",
+      "status": "PARTIAL",
+      "tests_pass": true,
+      "notes": "kernel32/user32/gdi32/ole32 stub registry; resolve returns Success/Stub/NotImplemented"
+    },
+    {
+      "id": "6.4",
+      "name": "Graphics: Vulkan (DXGI→VK)",
+      "status": "PARTIAL",
+      "tests_pass": true,
+      "notes": "VulkanIcd stub, DXGI factory/adapter/swapchain stubs"
+    },
+    {
+      "id": "6.4b",
+      "name": "Graphics: OpenGL (wgl→GLX/EGL)",
+      "status": "PARTIAL",
+      "tests_pass": true,
+      "notes": "WglBridge with GLX/EGL backend, GL 2.1 subset, wglGetProcAddress stub"
+    },
+    {
+      "id": "6.5",
+      "name": "Audio/Input (WASAPI→PipeWire, XInput)",
+      "status": "PARTIAL",
+      "tests_pass": true,
+      "notes": "WASAPI bridge with PipeWire backend; XInput 4-controller subsystem"
+    },
+    {
+      "id": "6.6",
+      "name": "Game path (D3D11→VK)",
+      "status": "PARTIAL",
+      "tests_pass": true,
+      "notes": "D3D11 device/buffer/texture/RTV/present stubs translating to Vulkan"
+    },
+    {
+      "id": "6.7",
+      "name": "Anti-cheat matrix (EAC/BE/Vanguard)",
+      "status": "PARTIAL",
+      "tests_pass": true,
+      "notes": "EAC: driver stub PARTIAL; BE: scan intercept PARTIAL; Vanguard: TPM stub PARTIAL/FAIL"
+    },
+    {
+      "id": "6.8",
+      "name": "Installer (strawwu install + repair)",
+      "status": "PARTIAL",
+      "tests_pass": true,
+      "notes": "App database, installer type detection, profile snapshot/restore"
+    },
+    {
+      "id": "6.9",
+      "name": "WoW64 (32-bit PE path)",
+      "status": "PARTIAL",
+      "tests_pass": true,
+      "notes": "WoW64 context, System32→SysWOW64 redirect, Program Files (x86)"
+    },
+    {
+      "id": "6.10",
+      "name": "compat-db + Hub integration",
+      "status": "PARTIAL",
+      "tests_pass": true,
+      "notes": "compat-matrix.json generated; grade A/B/C/F system"
+    },
+    {
+      "id": "6.11",
+      "name": "device-proxy (udev/COM/CUPS/HID/IOCTL)",
+      "status": "PARTIAL",
+      "tests_pass": true,
+      "notes": "10-class device map; IOCTL handler with allow/deny/stub/audit policy"
+    },
+    {
+      "id": "6.12",
+      "name": "VFIO passthrough PoC (optional)",
+      "status": "PARTIAL",
+      "tests_pass": true,
+      "notes": "Experimental documentation only; no runtime code"
+    }
+  ],
+  "anticheat_matrix": {
+    "cases": [
+      {"name": "eac_driver_probe", "backend": "native", "status": "PARTIAL", "grade": "C"},
+      {"name": "battleye_init", "backend": "native", "status": "PARTIAL", "grade": "C"},
+      {"name": "vanguard_tpm_probe", "backend": "microvm", "status": "PARTIAL", "grade": "F"}
+    ]
+  },
+  "device_matrix_ref": "device-matrix.json",
+  "summary": {
+    "total_sub_stages": 13,
+    "pass": 0,
+    "partial": 13,
+    "fail": 0,
+    "overall": "PARTIAL"
+  }
+}

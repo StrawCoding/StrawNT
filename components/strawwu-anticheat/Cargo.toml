@@ -1,0 +1,14 @@
+[package]
+name = "strawwu-anticheat"
+version = "0.3.0"
+edition = "2021"
+description = "StrawWU anti-cheat compatibility matrix — EAC/BattlEye/Vanguard probe stubs"
+license = "MIT"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+strawwu-bridge = { path = "../strawwu-bridge" }
+
+[dev-dependencies]

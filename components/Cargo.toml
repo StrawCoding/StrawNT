@@ -4,6 +4,11 @@ members = [
     "strawwu-bridge",
     "strawwu-runtime",
     "strawwu-launcher",
+    "strawwu-nt",
+    "strawwu-graphics",
+    "strawwu-audio",
+    "strawwu-anticheat",
+    "strawwu-device-proxy",
 ]
 
 [workspace.package]
