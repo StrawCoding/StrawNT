@@ -4,6 +4,9 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+read_repo_version() {
+    tr -d '[:space:]' < "${REPO_ROOT}/VERSION" 2>/dev/null || echo "0.4.0.0"
+}
 WORK_DIR="${STRAWWU_WORK_DIR:-${REPO_ROOT}/os-image/work}"
 ROOTFS_DIR="${WORK_DIR}/rootfs"
 OUTPUT_DIR="${REPO_ROOT}/os-image/output"
@@ -13,7 +16,7 @@ ISO_MOUNT="${WORK_DIR}/iso-mount"
 
 UBUNTU_VERSION="${STRAWWU_UBUNTU_VERSION:-24.04.2}"
 UBUNTU_ISO_NAME="ubuntu-${UBUNTU_VERSION}-desktop-amd64.iso"
-VERSION="${STRAWWU_VERSION:-0.3.0.0}"
+VERSION="${STRAWWU_VERSION:-$(read_repo_version)}"
 ISO_NAME="StrawWU-${VERSION}-amd64.iso"
 ISO_PATH="${OUTPUT_DIR}/${ISO_NAME}"
 

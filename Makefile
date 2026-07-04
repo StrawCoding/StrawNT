@@ -2,7 +2,7 @@
 	build-iso dev-iso release-iso repack-iso validate-rootfs boot-test-iso boot-test-dev-iso \
 	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
-	test-install-e2e test-wincompat build-debs
+	test-install-e2e test-wincompat build-debs bump-version check-version-bump
 
 REPO_ROOT := $(abspath .)
 SCRIPTS   := os-image/scripts
@@ -122,6 +122,12 @@ test-phase0: preflight
 	@test -f VERSION
 	@test -f README.md
 	@echo "test-phase0: PASS"
+
+bump-version:
+	bash scripts/bump-version.sh $(BUMP_MODE)
+
+check-version-bump:
+	bash scripts/check-version-bump.sh
 
 validate-calamares-preflight:
 	bash tests/install-e2e/validate-calamares-preflight.sh

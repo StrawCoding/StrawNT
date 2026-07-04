@@ -8,7 +8,10 @@ BRANDING_DIR="${REPO_ROOT}/os-image/config/branding"
 WORK_DIR="${STRAWWU_WORK_DIR:-${REPO_ROOT}/os-image/work}"
 ROOTFS_DIR="${WORK_DIR}/rootfs"
 ISO_STAGING="${WORK_DIR}/iso-staging"
-VERSION="${STRAWWU_VERSION:-0.3.0.0}"
+read_repo_version() {
+    tr -d '[:space:]' < "${REPO_ROOT}/VERSION" 2>/dev/null || echo "0.4.0.0"
+}
+VERSION="${STRAWWU_VERSION:-$(read_repo_version)}"
 
 log() { echo "==> $*" >&2; }
 die() { echo "ERROR: $*" >&2; exit 1; }

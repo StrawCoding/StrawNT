@@ -32,6 +32,17 @@ StrawWU 採用四位版本號 `a.b.c.d`：
 ## 規則
 
 1. `d=0` 為正式版，`d≥1` 為預覽版（功能不完整或未經完整驗證）
-2. 版本遞增時由 `VERSION` 檔案統一修改，其餘檔案同步
-3. 每次 release 必須有對應 git tag
-4. Preview 版不產正式 release 報告，但須有 boot-test 通過
+2. **硬性：只要有任何程式／設定／文件改動，就必須疊代版本**（不可沿用舊版號重打 ISO／發佈）
+3. 版本遞增時由 `VERSION` 檔案統一修改，`scripts/bump-version.sh` 會同步 `hub/package.json` 與 `components/Cargo.toml`
+4. 每次 release 必須有對應 git tag
+5. Preview 版不產正式 release 報告，但須有 boot-test 通過
+6. CI 執行 `scripts/check-version-bump.sh`：相對 `origin/main` 有非忽略路徑變更時，`VERSION` 必須一併遞增
+
+### 疊代方式
+
+| 情境 | 指令 | 範例 |
+|------|------|------|
+| 一般改動（預設） | `bash scripts/bump-version.sh` | `0.4.0.0` → `0.4.0.1` |
+| 連續 preview | `bash scripts/bump-version.sh preview` | `0.4.0.1` → `0.4.0.2` |
+| 發佈 patch 正式版 | `bash scripts/bump-version.sh patch` | `0.4.0.3` → `0.4.1.0` |
+| Minor / Major | `bash scripts/bump-version.sh minor\|major` | 里程碑或架構變更 |
