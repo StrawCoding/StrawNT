@@ -6,7 +6,7 @@
 
 REPO_ROOT := $(abspath .)
 SCRIPTS   := os-image/scripts
-VERSION   ?= 0.3.0-cleanroom
+VERSION   ?= $(shell cat VERSION 2>/dev/null || echo 0.3.0.0)
 export STRAWWU_VERSION := $(VERSION)
 
 help:

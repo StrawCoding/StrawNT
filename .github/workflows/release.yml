@@ -1,0 +1,116 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust component tests
+        working-directory: components
+        run: cargo test --workspace
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Hub tests
+        working-directory: hub
+        run: |
+          npm ci
+          npm test
+
+  build-and-release:
+    needs: test
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse version from VERSION file
+        id: ver
+        run: |
+          VERSION=$(cat VERSION)
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+          PREVIEW=$(echo "$VERSION" | awk -F. '{print $4}')
+          if [ "${PREVIEW:-0}" -gt 0 ] 2>/dev/null; then
+            echo "is_preview=true" >> "$GITHUB_OUTPUT"
+            echo "release_name=StrawWU v${VERSION} (Preview ${PREVIEW})" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_preview=false" >> "$GITHUB_OUTPUT"
+            echo "release_name=StrawWU v${VERSION}" >> "$GITHUB_OUTPUT"
+          fi
+
+          ISO_NAME="StrawWU-${VERSION}-amd64.iso"
+          echo "iso_name=${ISO_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Preflight checks
+        run: make preflight
+
+      - name: Build release ISO
+        run: make release-iso
+
+      - name: ISO integrity gate
+        run: make preflight-iso-before-boot
+
+      - name: Generate SHA256SUMS
+        working-directory: os-image/output
+        run: sha256sum ${{ steps.ver.outputs.iso_name }} > SHA256SUMS
+
+      - name: Generate release notes
+        id: notes
+        run: |
+          VERSION="${{ steps.ver.outputs.version }}"
+          IS_PREVIEW="${{ steps.ver.outputs.is_preview }}"
+          RUST_TESTS=$(cd components && cargo test --workspace 2>&1 | grep -E '^test result' | tail -1 || echo "N/A")
+          HUB_TESTS=$(cd hub && npm test 2>&1 | grep -E 'passing|Tests:' | tail -1 || echo "N/A")
+          ISO_SIZE=$(du -h "os-image/output/${{ steps.ver.outputs.iso_name }}" | cut -f1)
+          SHA256=$(cut -d' ' -f1 os-image/output/SHA256SUMS)
+
+          if [ "$IS_PREVIEW" = "true" ]; then
+            BADGE="⚠️ This is a **preview release** — features may be incomplete or unstable."
+          else
+            BADGE="✅ This is a **stable release**."
+          fi
+
+          cat > /tmp/release-notes.md << NOTESEOF
+          ${BADGE}
+
+          ## ISO
+          | Item | Value |
+          |------|-------|
+          | Filename | \`${{ steps.ver.outputs.iso_name }}\` |
+          | Size | ${ISO_SIZE} |
+          | SHA256 | \`${SHA256}\` |
+
+          ## Tests
+          - **Rust components**: ${RUST_TESTS}
+          - **Hub (Electron)**: ${HUB_TESTS}
+
+          ## Verify
+          \`\`\`bash
+          sha256sum -c SHA256SUMS
+          \`\`\`
+          NOTESEOF
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ steps.ver.outputs.release_name }}
+          body_path: /tmp/release-notes.md
+          prerelease: ${{ steps.ver.outputs.is_preview == 'true' }}
+          files: |
+            os-image/output/${{ steps.ver.outputs.iso_name }}
+            os-image/output/SHA256SUMS
