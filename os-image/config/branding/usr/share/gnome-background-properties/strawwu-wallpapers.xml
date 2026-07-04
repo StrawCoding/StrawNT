@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
+<wallpapers>
+  <wallpaper deleted="false">
+    <name>StrawWU Dark</name>
+    <filename>/usr/share/backgrounds/strawwu/strawwu-wallpaper-dark.png</filename>
+    <options>zoom</options>
+    <shade_type>solid</shade_type>
+    <pcolor>#0A0E14</pcolor>
+    <scolor>#0A0E14</scolor>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>StrawWU Light</name>
+    <filename>/usr/share/backgrounds/strawwu/strawwu-wallpaper-light.png</filename>
+    <options>zoom</options>
+    <shade_type>solid</shade_type>
+    <pcolor>#EFF2F6</pcolor>
+    <scolor>#EFF2F6</scolor>
+  </wallpaper>
+</wallpapers>

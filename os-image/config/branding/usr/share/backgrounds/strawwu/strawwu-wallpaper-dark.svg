@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160">
+  <defs>
+    <radialGradient id="glow-teal" cx="50%" cy="45%" r="60%" fx="50%" fy="42%">
+      <stop offset="0%" stop-color="#14B8A6" stop-opacity="0.12"/>
+      <stop offset="40%" stop-color="#14B8A6" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#14B8A6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow-amber" cx="75%" cy="65%" r="35%" fx="75%" fy="60%">
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.06"/>
+      <stop offset="60%" stop-color="#F59E0B" stop-opacity="0.02"/>
+      <stop offset="100%" stop-color="#F59E0B" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow-blue" cx="25%" cy="70%" r="30%" fx="25%" fy="65%">
+      <stop offset="0%" stop-color="#60A5FA" stop-opacity="0.05"/>
+      <stop offset="60%" stop-color="#60A5FA" stop-opacity="0.015"/>
+      <stop offset="100%" stop-color="#60A5FA" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bg-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0D1117"/>
+      <stop offset="50%" stop-color="#0A0E14"/>
+      <stop offset="100%" stop-color="#080B10"/>
+    </linearGradient>
+    <linearGradient id="line-teal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#14B8A6" stop-opacity="0"/>
+      <stop offset="30%" stop-color="#14B8A6" stop-opacity="0.3"/>
+      <stop offset="70%" stop-color="#14B8A6" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#14B8A6" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="line-amber" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity="0"/>
+      <stop offset="40%" stop-color="#F59E0B" stop-opacity="0.2"/>
+      <stop offset="60%" stop-color="#F59E0B" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#F59E0B" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="line-gold" x1="0" y1="0" x2="1" y2="0.5">
+      <stop offset="0%" stop-color="#D4A853" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#D4A853" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#D4A853" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Deep dark background -->
+  <rect width="3840" height="2160" fill="url(#bg-grad)"/>
+
+  <!-- Subtle ambient glows -->
+  <rect width="3840" height="2160" fill="url(#glow-teal)"/>
+  <rect width="3840" height="2160" fill="url(#glow-amber)"/>
+  <rect width="3840" height="2160" fill="url(#glow-blue)"/>
+
+  <!-- Geometric accent lines - abstract topology -->
+  <path d="M0 800 Q960 650 1920 780 T3840 700" stroke="url(#line-teal)" stroke-width="1.5" fill="none" opacity="0.6"/>
+  <path d="M0 850 Q1200 700 2400 830 T3840 760" stroke="url(#line-teal)" stroke-width="0.8" fill="none" opacity="0.35"/>
+  <path d="M800 2160 Q1400 1400 2600 1500 T3840 1300" stroke="url(#line-amber)" stroke-width="1" fill="none" opacity="0.4"/>
+  <path d="M0 1600 Q900 1500 1800 1580 T3840 1500" stroke="url(#line-gold)" stroke-width="0.6" fill="none" opacity="0.25"/>
+
+  <!-- Subtle grid/mesh in the upper-right -->
+  <g opacity="0.04" stroke="#14B8A6" stroke-width="0.5" fill="none">
+    <line x1="2800" y1="0" x2="3200" y2="400"/>
+    <line x1="3000" y1="0" x2="3400" y2="400"/>
+    <line x1="3200" y1="0" x2="3600" y2="400"/>
+    <line x1="3400" y1="0" x2="3800" y2="400"/>
+    <line x1="2800" y1="100" x2="3800" y2="100"/>
+    <line x1="2800" y1="200" x2="3800" y2="200"/>
+    <line x1="2800" y1="300" x2="3800" y2="300"/>
+  </g>
+
+  <!-- Lower-left subtle geometric -->
+  <g opacity="0.03" stroke="#60A5FA" stroke-width="0.5" fill="none">
+    <circle cx="400" cy="1800" r="120"/>
+    <circle cx="400" cy="1800" r="200"/>
+    <circle cx="400" cy="1800" r="280"/>
+  </g>
+
+  <!-- Subtle vignette -->
+  <rect width="3840" height="2160" opacity="0.015" fill="#F4F6F9"/>
+</svg>

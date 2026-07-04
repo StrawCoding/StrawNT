@@ -70,6 +70,46 @@ configure_chroot_branding() {
     chroot_run update-initramfs -u -k all 2>/dev/null || chroot_run update-initramfs -u
 }
 
+configure_desktop_theme() {
+    log "installing StrawWU desktop theme"
+
+    # Replace Ubuntu distributor-logo in all icon themes that ship one
+    local logo_svg="${BRANDING_DIR}/logo-icon.svg"
+    if [[ -f "${logo_svg}" ]]; then
+        for icon_dir in Humanity Humanity-Dark ubuntu-mono-dark ubuntu-mono-light; do
+            local target_base="${ROOTFS_DIR}/usr/share/icons/${icon_dir}"
+            [[ -d "${target_base}" ]] || continue
+            find "${target_base}" -name 'distributor-logo*' -type f | while read -r f; do
+                local ext="${f##*.}"
+                if [[ "${ext}" == "svg" ]]; then
+                    cp "${logo_svg}" "${f}"
+                fi
+            done
+        done
+    fi
+
+    # Replace Ubuntu distributor-logo PNGs at standard sizes
+    for size in 48 128 256; do
+        local src="${BRANDING_DIR}/logo-icon-${size}.png"
+        [[ -f "${src}" ]] || continue
+        for icon_dir in Humanity Humanity-Dark; do
+            local dst="${ROOTFS_DIR}/usr/share/icons/${icon_dir}/places/${size}/distributor-logo.png"
+            [[ -d "$(dirname "${dst}")" ]] && cp "${src}" "${dst}" 2>/dev/null || true
+        done
+    done
+
+    # Update icon cache for modified icon themes
+    for theme in hicolor Humanity Humanity-Dark; do
+        local theme_dir="${ROOTFS_DIR}/usr/share/icons/${theme}"
+        [[ -d "${theme_dir}" ]] && chroot_run gtk-update-icon-cache -f "/usr/share/icons/${theme}" 2>/dev/null || true
+    done
+
+    # Remove SVG source files from rootfs (not needed at runtime)
+    rm -f "${ROOTFS_DIR}/usr/share/backgrounds/strawwu/"*.svg 2>/dev/null || true
+
+    log "desktop theme installation complete"
+}
+
 patch_user_visible_ubuntu() {
     log "replacing user-visible Ubuntu strings in rootfs"
     local files
@@ -128,6 +168,7 @@ apply_rootfs_branding() {
     [[ -d "${ROOTFS_DIR}" ]] || die "rootfs missing: ${ROOTFS_DIR}"
     overlay_rootfs
     patch_user_visible_ubuntu
+    configure_desktop_theme
     configure_chroot_branding
 }
 

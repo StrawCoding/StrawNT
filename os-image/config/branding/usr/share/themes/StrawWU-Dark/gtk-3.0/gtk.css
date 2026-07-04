@@ -1,0 +1,13 @@
+@import url("resource:///com/ubuntu/themes/Yaru-prussiangreen-dark/3.0/gtk.css");
+
+@define-color accent_bg_color #14B8A6;
+@define-color accent_color #14B8A6;
+@define-color accent_fg_color #ffffff;
+@define-color theme_bg_color #0F1318;
+@define-color theme_fg_color #F4F6F9;
+@define-color theme_base_color #141920;
+@define-color theme_text_color #F4F6F9;
+@define-color headerbar_bg_color #0A0E14;
+@define-color headerbar_fg_color #F4F6F9;
+@define-color theme_selected_bg_color #14B8A6;
+@define-color theme_selected_fg_color #ffffff;

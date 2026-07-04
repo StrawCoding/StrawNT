@@ -1,0 +1,15 @@
+[Desktop Entry]
+Name=StrawWU-Dark
+Type=X-GNOME-Metatheme
+Comment=StrawWU desktop OS dark theme — Teal accent, deep background
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=StrawWU-Dark
+MetacityTheme=Yaru-dark
+IconTheme=Yaru-prussiangreen-dark
+CursorTheme=Yaru
+CursorSize=24
+X-Yaru-Dark=true
+X-Yaru-Accent-Name=strawwu
+X-Yaru-Accent-Color=#14B8A6
