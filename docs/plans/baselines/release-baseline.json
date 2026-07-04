@@ -1,0 +1,75 @@
+{
+  "schema": "strawwu-release-baseline/v1",
+  "generated_at": "2026-07-04",
+  "version": "0.4.0.2",
+  "channels": {
+    "dev": {
+      "iso_mode": "dev-iso",
+      "compression": "zstd",
+      "signed": false
+    },
+    "nightly": {
+      "iso_mode": "dev-iso",
+      "compression": "zstd",
+      "signed": false
+    },
+    "beta": {
+      "iso_mode": "release-iso",
+      "compression": "xz",
+      "signed": "sha256+gpg"
+    },
+    "stable": {
+      "iso_mode": "release-iso",
+      "compression": "xz",
+      "signed": "sha256+gpg"
+    }
+  },
+  "squashfs": {
+    "present": true,
+    "ubuntu_packages": [
+      "ubuntu-advantage-desktop-daemon",
+      "ubuntu-desktop",
+      "ubuntu-desktop-minimal",
+      "ubuntu-docs",
+      "ubuntu-drivers-common",
+      "ubuntu-keyring",
+      "ubuntu-minimal",
+      "ubuntu-mono",
+      "ubuntu-pro-client",
+      "ubuntu-pro-client-l10n",
+      "ubuntu-release-upgrader-core",
+      "ubuntu-release-upgrader-gtk",
+      "ubuntu-report",
+      "ubuntu-session",
+      "ubuntu-settings",
+      "ubuntu-standard",
+      "ubuntu-wallpapers",
+      "ubuntu-wallpapers-noble"
+    ],
+    "ubuntu_package_count": 18,
+    "strawwu_deb_count": 0
+  },
+  "artifacts": {
+    "iso_files": [
+      "StrawWU-0.3.0.0-amd64.iso",
+      "StrawWU-0.4.0.0-amd64.iso",
+      "StrawWU-0.4.0.1-amd64.iso"
+    ],
+    "latest_iso": "StrawWU-0.4.0.1-amd64.iso",
+    "gpg_signing_ready": true,
+    "apt_repo_ready": false,
+    "release_manifest_ready": false
+  },
+  "scripts": {
+    "build_iso": "os-image/scripts/build-iso.sh",
+    "bump_version": "scripts/bump-version.sh",
+    "release_sign": null,
+    "publish_debs": null
+  },
+  "wave0_gaps": [
+    "no GPG release-sign script",
+    "no APT publish pipeline",
+    "no release-manifest.json generator",
+    "18 ubuntu-* packages still in squashfs"
+  ]
+}

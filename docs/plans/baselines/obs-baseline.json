@@ -1,0 +1,37 @@
+{
+  "schema": "strawwu-obs-baseline/v1",
+  "generated_at": "2026-07-04",
+  "version": "0.4.0.1",
+  "log_paths": {
+    "boot-selfcheck": "/var/log/strawwu/boot-selfcheck.log",
+    "install": "/var/log/strawwu/install.log",
+    "target-setup": "/var/log/strawwu/target-setup.log",
+    "firstboot": "/var/log/strawwu/firstboot.log",
+    "app-registry": "/var/log/strawwu/app-registry.log",
+    "update": "/var/log/strawwu/update.log",
+    "wincompat": "/var/log/strawwu/wincompat.log"
+  },
+  "error_codes": [
+    "SWU-BT-001",
+    "SWU-IN-001",
+    "SWU-IN-002",
+    "SWU-FB-001",
+    "SWU-FB-003",
+    "SWU-AR-004",
+    "SWU-UP-005",
+    "SWU-WC-006",
+    "SWU-FP-007",
+    "SWU-RE-008"
+  ],
+  "bug_bundle": {
+    "format": "bundle.strawwu-bug",
+    "auto_upload_default": false,
+    "consent_required": true,
+    "schema_ready": false
+  },
+  "wave0_gaps": [
+    "/var/log/strawwu/ not yet created in rootfs",
+    "bug bundle CLI not implemented",
+    "structured JSON logging not wired"
+  ]
+}

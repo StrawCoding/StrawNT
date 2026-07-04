@@ -2,7 +2,7 @@
 	build-iso dev-iso release-iso repack-iso validate-rootfs boot-test-iso boot-test-dev-iso \
 	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
-	test-install-e2e test-wincompat build-debs bump-version check-version-bump
+	test-install-e2e test-wincompat test-wave0-baseline build-debs bump-version check-version-bump
 
 REPO_ROOT := $(abspath .)
 SCRIPTS   := os-image/scripts
@@ -36,6 +36,7 @@ help:
 	@echo "  validate-calamares-preflight  Calamares static gate (before E2E)"
 	@echo "  validate-partition-probe      QEMU partition backend probe"
 	@echo "  test-install-e2e              Calamares install E2E (preflight→probe→install)"
+	@echo "  test-wave0-baseline           Wave 0 preflight baselines (12 scripts + JSON)"
 
 preflight:
 	bash tests/preflight/test-ubuntu-clone.sh
@@ -142,6 +143,9 @@ test-wincompat:
 	@echo "=== Phase 6: Windows Compatibility Layer ==="
 	cd components && cargo test --workspace
 	bash components/tests/wincompat/generate-compat-matrix.sh
+
+test-wave0-baseline:
+	bash tests/preflight/test-wave0-baseline.sh
 
 build-debs:
 	bash packaging/build-debs.sh

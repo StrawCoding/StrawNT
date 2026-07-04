@@ -1,0 +1,26 @@
+{
+  "schema": "strawwu-perf-baseline/v1",
+  "generated_at": "2026-07-04",
+  "version": "0.4.0.1",
+  "measurements": {
+    "latest_iso_bytes": 6520250368,
+    "latest_iso_gb": 6.07,
+    "latest_iso_file": "StrawWU-0.4.0.1-amd64.iso",
+    "squashfs_bytes": 5451675054,
+    "squashfs_gb": 5.08,
+    "live_boot_to_plymouth_sec": null,
+    "installed_idle_ram_mb": null,
+    "firstboot_complete_sec": null
+  },
+  "budgets_v05": {
+    "release_iso_max_gb": 7.0,
+    "live_boot_to_plymouth_max_sec": 45,
+    "installed_idle_ram_max_mb": 2500,
+    "firstboot_complete_max_sec": 180
+  },
+  "wave0_gaps": [
+    "boot-time not measured yet",
+    "idle RAM not measured yet",
+    "firstboot duration not measured yet"
+  ]
+}
