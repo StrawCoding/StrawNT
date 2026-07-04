@@ -106,6 +106,52 @@ pub fn simulate_battleye_probes() -> Vec<ProbeResult> {
     ]
 }
 
+pub fn simulate_window_enumeration_probes() -> Vec<ProbeResult> {
+    vec![
+        ProbeResult {
+            category: ProbeCategory::WindowEnumeration,
+            probe_name: "hidden_window_check".into(),
+            passed: true,
+            response: "no suspicious hidden windows detected in enum".into(),
+        },
+        ProbeResult {
+            category: ProbeCategory::WindowEnumeration,
+            probe_name: "overlay_window_check".into(),
+            passed: true,
+            response: "overlay windows filtered from enumeration".into(),
+        },
+        ProbeResult {
+            category: ProbeCategory::WindowEnumeration,
+            probe_name: "tool_window_visibility".into(),
+            passed: false,
+            response: "debug tool window visible — PARTIAL".into(),
+        },
+    ]
+}
+
+pub fn simulate_process_scan_probes() -> Vec<ProbeResult> {
+    vec![
+        ProbeResult {
+            category: ProbeCategory::ProcessScan,
+            probe_name: "process_list_filter".into(),
+            passed: true,
+            response: "host-side processes hidden from guest enumeration".into(),
+        },
+        ProbeResult {
+            category: ProbeCategory::ProcessScan,
+            probe_name: "module_list_filter".into(),
+            passed: true,
+            response: "injected modules not visible in LDR list".into(),
+        },
+        ProbeResult {
+            category: ProbeCategory::ProcessScan,
+            probe_name: "thread_enumeration".into(),
+            passed: true,
+            response: "bridge threads excluded from NtQuerySystemInformation".into(),
+        },
+    ]
+}
+
 pub fn simulate_vanguard_probes() -> Vec<ProbeResult> {
     vec![
         ProbeResult {
@@ -127,6 +173,68 @@ pub fn simulate_vanguard_probes() -> Vec<ProbeResult> {
             response: "process list filtered".into(),
         },
     ]
+}
+
+use std::collections::HashMap;
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ProbeEngine {
+    run_history: HashMap<String, Vec<ProbeResult>>,
+    run_count: u64,
+}
+
+impl ProbeEngine {
+    pub fn new() -> Self {
+        Self {
+            run_history: HashMap::new(),
+            run_count: 0,
+        }
+    }
+
+    pub fn run_probe_suite(&mut self, ac_type: AnticheatType) -> Vec<ProbeResult> {
+        let mut results = match ac_type {
+            AnticheatType::EasyAntiCheat => simulate_eac_probes(),
+            AnticheatType::BattlEye => simulate_battleye_probes(),
+            AnticheatType::Vanguard => simulate_vanguard_probes(),
+            AnticheatType::CustomAc | AnticheatType::None => {
+                simulate_process_scan_probes()
+            }
+        };
+
+        results.extend(simulate_window_enumeration_probes());
+        results.extend(simulate_process_scan_probes());
+
+        self.run_count += 1;
+        let key = ac_type.as_str().to_string();
+        self.run_history
+            .entry(key)
+            .or_default()
+            .extend(results.clone());
+
+        results
+    }
+
+    pub fn probe_pass_rate(&self, ac_type: AnticheatType) -> f64 {
+        let key = ac_type.as_str();
+        match self.run_history.get(key) {
+            Some(results) if !results.is_empty() => {
+                let passed = results.iter().filter(|r| r.passed).count();
+                passed as f64 / results.len() as f64
+            }
+            _ => 0.0,
+        }
+    }
+
+    pub fn total_runs(&self) -> u64 {
+        self.run_count
+    }
+
+    pub fn results_for(&self, ac_type: AnticheatType) -> &[ProbeResult] {
+        match self.run_history.get(ac_type.as_str()) {
+            Some(v) => v,
+            None => &[],
+        }
+    }
 }
 
 #[cfg(test)]
@@ -165,5 +273,55 @@ mod tests {
     fn anticheat_type_str() {
         assert_eq!(AnticheatType::EasyAntiCheat.as_str(), "EasyAntiCheat");
         assert_eq!(AnticheatType::BattlEye.as_str(), "BattlEye");
+    }
+
+    #[test]
+    fn window_enumeration_probes_run() {
+        let results = simulate_window_enumeration_probes();
+        assert_eq!(results.len(), 3);
+        assert!(results.iter().any(|r| r.category == ProbeCategory::WindowEnumeration));
+        assert!(results.iter().any(|r| !r.passed));
+    }
+
+    #[test]
+    fn process_scan_probes_all_pass() {
+        let results = simulate_process_scan_probes();
+        assert_eq!(results.len(), 3);
+        assert!(results.iter().all(|r| r.passed));
+    }
+
+    #[test]
+    fn probe_engine_run_suite_eac() {
+        let mut engine = ProbeEngine::new();
+        let results = engine.run_probe_suite(AnticheatType::EasyAntiCheat);
+        assert!(!results.is_empty());
+        assert_eq!(engine.total_runs(), 1);
+
+        let stored = engine.results_for(AnticheatType::EasyAntiCheat);
+        assert_eq!(stored.len(), results.len());
+    }
+
+    #[test]
+    fn probe_engine_pass_rate() {
+        let mut engine = ProbeEngine::new();
+        engine.run_probe_suite(AnticheatType::BattlEye);
+
+        let rate = engine.probe_pass_rate(AnticheatType::BattlEye);
+        assert!(rate > 0.0 && rate <= 1.0);
+
+        assert_eq!(engine.probe_pass_rate(AnticheatType::Vanguard), 0.0);
+    }
+
+    #[test]
+    fn probe_engine_multiple_runs_accumulate() {
+        let mut engine = ProbeEngine::new();
+        engine.run_probe_suite(AnticheatType::EasyAntiCheat);
+        let count1 = engine.results_for(AnticheatType::EasyAntiCheat).len();
+
+        engine.run_probe_suite(AnticheatType::EasyAntiCheat);
+        let count2 = engine.results_for(AnticheatType::EasyAntiCheat).len();
+
+        assert_eq!(count2, count1 * 2);
+        assert_eq!(engine.total_runs(), 2);
     }
 }

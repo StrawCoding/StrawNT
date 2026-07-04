@@ -81,6 +81,12 @@ fn main() {
         Command::Repair { app_id } => {
             println!("strawwu: repair {app_id} (stub)");
         }
+        Command::Status => {
+            println!("strawwu: status — runtime idle, 0 sessions active");
+        }
+        Command::Config(_) => {
+            println!("strawwu: config (stub)");
+        }
     }
 }
 

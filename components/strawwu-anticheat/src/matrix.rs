@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::probes::{self, AnticheatType};
+use crate::probes::{self, AnticheatType, ProbeResult};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum CompatStatus {
@@ -123,6 +123,92 @@ impl AnticheatMatrix {
     pub fn no_crash(&self) -> bool {
         self.cases.iter().all(|c| c.status != CompatStatus::Fail || c.grade != CompatGrade::F || c.probe_pass_count > 0)
     }
+
+    pub fn merge_probe_results(&mut self, results: &[ProbeResult]) {
+        if results.is_empty() {
+            return;
+        }
+        let pass_count = results.iter().filter(|r| r.passed).count();
+        let total = results.len();
+        let ratio = pass_count as f64 / total as f64;
+
+        let (status, grade) = if ratio >= 1.0 {
+            (CompatStatus::Pass, CompatGrade::A)
+        } else if ratio >= 0.75 {
+            (CompatStatus::Partial, CompatGrade::B)
+        } else if ratio >= 0.5 {
+            (CompatStatus::Partial, CompatGrade::C)
+        } else {
+            (CompatStatus::Fail, CompatGrade::F)
+        };
+
+        let first_category = &results[0].category;
+        let name = format!("merged_probe_{}", results[0].probe_name);
+
+        self.cases.push(CompatCase {
+            name,
+            anticheat_type: format!("{:?}", first_category),
+            backend: "native".into(),
+            status,
+            grade,
+            notes: format!("{}/{} probes passed", pass_count, total),
+            probe_pass_count: pass_count,
+            probe_total_count: total,
+        });
+    }
+
+    pub fn get_case(&self, name: &str) -> Option<&CompatCase> {
+        self.cases.iter().find(|c| c.name == name)
+    }
+
+    pub fn overall_grade(&self) -> CompatGrade {
+        if self.cases.is_empty() {
+            return CompatGrade::F;
+        }
+
+        let total_pass: usize = self.cases.iter().map(|c| c.probe_pass_count).sum();
+        let total_probes: usize = self.cases.iter().map(|c| c.probe_total_count).sum();
+
+        if total_probes == 0 {
+            return CompatGrade::F;
+        }
+
+        let ratio = total_pass as f64 / total_probes as f64;
+        if ratio >= 0.9 {
+            CompatGrade::A
+        } else if ratio >= 0.7 {
+            CompatGrade::B
+        } else if ratio >= 0.5 {
+            CompatGrade::C
+        } else {
+            CompatGrade::F
+        }
+    }
+
+    pub fn to_ci_json(&self) -> String {
+        #[derive(Serialize)]
+        struct CiEntry<'a> {
+            name: &'a str,
+            status: &'a str,
+            grade: &'a str,
+            pass: usize,
+            total: usize,
+        }
+
+        let entries: Vec<CiEntry<'_>> = self
+            .cases
+            .iter()
+            .map(|c| CiEntry {
+                name: &c.name,
+                status: c.status.as_str(),
+                grade: c.grade.as_str(),
+                pass: c.probe_pass_count,
+                total: c.probe_total_count,
+            })
+            .collect();
+
+        serde_json::to_string(&entries).unwrap_or_default()
+    }
 }
 
 #[cfg(test)]
@@ -175,5 +261,49 @@ mod tests {
     fn compat_grade_str() {
         assert_eq!(CompatGrade::A.as_str(), "A");
         assert_eq!(CompatGrade::F.as_str(), "F");
+    }
+
+    #[test]
+    fn merge_probe_results_creates_case() {
+        let mut matrix = AnticheatMatrix::generate();
+        let initial_count = matrix.cases.len();
+
+        let results = probes::simulate_battleye_probes();
+        matrix.merge_probe_results(&results);
+
+        assert_eq!(matrix.cases.len(), initial_count + 1);
+        let merged = matrix.cases.last().unwrap();
+        assert!(merged.name.starts_with("merged_probe_"));
+        assert_eq!(merged.probe_total_count, results.len());
+    }
+
+    #[test]
+    fn get_case_by_name() {
+        let matrix = AnticheatMatrix::generate();
+        let case = matrix.get_case("eac_driver_probe");
+        assert!(case.is_some());
+        assert_eq!(case.unwrap().anticheat_type, "EasyAntiCheat");
+
+        assert!(matrix.get_case("nonexistent").is_none());
+    }
+
+    #[test]
+    fn overall_grade_reflects_matrix() {
+        let matrix = AnticheatMatrix::generate();
+        let grade = matrix.overall_grade();
+        assert!(
+            grade == CompatGrade::C || grade == CompatGrade::B || grade == CompatGrade::F,
+            "expected a realistic grade for partial/fail matrix, got {:?}",
+            grade
+        );
+    }
+
+    #[test]
+    fn to_ci_json_compact() {
+        let matrix = AnticheatMatrix::generate();
+        let json = matrix.to_ci_json();
+        assert!(json.contains("eac_driver_probe"));
+        assert!(json.contains("PARTIAL"));
+        assert!(!json.contains('\n'));
     }
 }

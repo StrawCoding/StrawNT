@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[repr(u32)]
@@ -155,6 +155,7 @@ pub struct FileHandle(pub u64);
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct VirtualFileSystem {
     files: HashMap<String, Vec<u8>>,
+    directories: HashSet<String>,
     open_handles: HashMap<u64, VirtualFile>,
     next_handle: u64,
 }
@@ -163,6 +164,7 @@ impl VirtualFileSystem {
     pub fn new() -> Self {
         let mut vfs = Self {
             files: HashMap::new(),
+            directories: HashSet::new(),
             open_handles: HashMap::new(),
             next_handle: 0x1000,
         };
@@ -171,11 +173,62 @@ impl VirtualFileSystem {
     }
 
     fn populate_system_files(&mut self) {
+        self.directories.insert(r"C:\".into());
+        self.directories.insert(r"C:\Windows".into());
+        self.directories.insert(r"C:\Windows\System32".into());
+        self.directories.insert(r"C:\Windows\System32\drivers".into());
+        self.directories.insert(r"C:\Windows\SysWOW64".into());
+        self.directories.insert(r"C:\Windows\Temp".into());
+        self.directories.insert(r"C:\Users".into());
+        self.directories.insert(r"C:\Program Files".into());
+        self.directories.insert(r"C:\Program Files (x86)".into());
+        self.directories.insert(r"C:\ProgramData".into());
+
         self.files.insert(r"C:\Windows\System32\ntdll.dll".into(), vec![0x4D, 0x5A]);
         self.files.insert(r"C:\Windows\System32\kernel32.dll".into(), vec![0x4D, 0x5A]);
         self.files.insert(r"C:\Windows\System32\user32.dll".into(), vec![0x4D, 0x5A]);
         self.files.insert(r"C:\Windows\System32\gdi32.dll".into(), vec![0x4D, 0x5A]);
         self.files.insert(r"C:\Windows\System32\advapi32.dll".into(), vec![0x4D, 0x5A]);
+        self.files.insert(r"C:\Windows\System32\ws2_32.dll".into(), vec![0x4D, 0x5A]);
+        self.files.insert(r"C:\Windows\System32\msvcrt.dll".into(), vec![0x4D, 0x5A]);
+        self.files.insert(r"C:\Windows\System32\ole32.dll".into(), vec![0x4D, 0x5A]);
+    }
+
+    pub fn create_directory(&mut self, path: &str) {
+        self.directories.insert(path.to_string());
+    }
+
+    pub fn directory_exists(&self, path: &str) -> bool {
+        self.directories.contains(path)
+    }
+
+    pub fn list_directory(&self, dir_path: &str) -> Vec<String> {
+        let prefix = if dir_path.ends_with('\\') {
+            dir_path.to_string()
+        } else {
+            format!(r"{}\", dir_path)
+        };
+
+        let mut entries: Vec<String> = Vec::new();
+
+        for file_path in self.files.keys() {
+            if let Some(rest) = file_path.strip_prefix(&prefix) {
+                if !rest.contains('\\') {
+                    entries.push(file_path.clone());
+                }
+            }
+        }
+
+        for sub_dir in &self.directories {
+            if let Some(rest) = sub_dir.strip_prefix(&prefix) {
+                if !rest.is_empty() && !rest.contains('\\') {
+                    entries.push(sub_dir.clone());
+                }
+            }
+        }
+
+        entries.sort();
+        entries
     }
 
     pub fn create_file(&mut self, path: &str, access: FileAccessMode) -> Result<FileHandle, NtStatus> {
@@ -270,12 +323,35 @@ impl VirtualFileSystem {
     }
 }
 
+// --- NT Section (shared memory sections) ---
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NtSection {
+    pub name: String,
+    pub size: u64,
+    pub base_address: u64,
+    pub mapped: bool,
+}
+
 // --- NT Kernel Dispatch ---
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+pub struct DispatchStats {
+    pub total_calls: u64,
+    pub file_ops: u64,
+    pub memory_ops: u64,
+    pub section_ops: u64,
+    pub query_ops: u64,
+    pub denied_ops: u64,
+}
 
 #[derive(Debug, Default)]
 pub struct NtKernel {
     pub memory: VirtualMemoryManager,
     pub filesystem: VirtualFileSystem,
+    pub sections: HashMap<String, NtSection>,
+    pub stats: DispatchStats,
+    next_section_base: u64,
 }
 
 impl NtKernel {
@@ -283,25 +359,73 @@ impl NtKernel {
         Self {
             memory: VirtualMemoryManager::new(),
             filesystem: VirtualFileSystem::new(),
+            sections: HashMap::new(),
+            stats: DispatchStats::default(),
+            next_section_base: 0x0000_00F0_0000_0000,
         }
     }
 
+    pub fn create_section(&mut self, name: &str, size: u64) -> Result<u64, NtStatus> {
+        if size == 0 {
+            return Err(NtStatus::InvalidParameter);
+        }
+        if self.sections.contains_key(name) {
+            return Err(NtStatus::ObjectNameCollision);
+        }
+
+        let base = self.next_section_base;
+        let aligned_size = (size + 0xFFF) & !0xFFF;
+        self.next_section_base += aligned_size;
+
+        self.sections.insert(name.to_string(), NtSection {
+            name: name.to_string(),
+            size: aligned_size,
+            base_address: base,
+            mapped: false,
+        });
+
+        Ok(base)
+    }
+
+    pub fn map_view(&mut self, name: &str) -> Result<u64, NtStatus> {
+        let section = self.sections.get_mut(name)
+            .ok_or(NtStatus::ObjectNameNotFound)?;
+        section.mapped = true;
+        Ok(section.base_address)
+    }
+
     pub fn dispatch(&mut self, syscall: NtSyscall) -> NtStatus {
+        self.stats.total_calls += 1;
+
         match syscall {
-            NtSyscall::NtClose => NtStatus::Success,
-            NtSyscall::NtCreateFile => NtStatus::Success,
-            NtSyscall::NtReadFile => NtStatus::Success,
-            NtSyscall::NtWriteFile => NtStatus::Success,
-            NtSyscall::NtAllocateVirtualMemory => NtStatus::Success,
-            NtSyscall::NtFreeVirtualMemory => NtStatus::Success,
-            NtSyscall::NtProtectVirtualMemory => NtStatus::Success,
-            NtSyscall::NtCreateSection => NtStatus::Success,
-            NtSyscall::NtMapViewOfSection => NtStatus::Success,
-            NtSyscall::NtQueryInformationProcess => NtStatus::Success,
-            NtSyscall::NtQuerySystemInformation => NtStatus::Success,
-            NtSyscall::NtLoadDriver => NtStatus::AccessDenied,
-            NtSyscall::NtUnloadDriver => NtStatus::AccessDenied,
-            NtSyscall::NtDeviceIoControlFile => NtStatus::Success,
+            NtSyscall::NtClose => {
+                NtStatus::Success
+            }
+            NtSyscall::NtCreateFile | NtSyscall::NtReadFile | NtSyscall::NtWriteFile => {
+                self.stats.file_ops += 1;
+                NtStatus::Success
+            }
+            NtSyscall::NtAllocateVirtualMemory
+            | NtSyscall::NtFreeVirtualMemory
+            | NtSyscall::NtProtectVirtualMemory => {
+                self.stats.memory_ops += 1;
+                NtStatus::Success
+            }
+            NtSyscall::NtCreateSection | NtSyscall::NtMapViewOfSection => {
+                self.stats.section_ops += 1;
+                NtStatus::Success
+            }
+            NtSyscall::NtQueryInformationProcess | NtSyscall::NtQuerySystemInformation => {
+                self.stats.query_ops += 1;
+                NtStatus::Success
+            }
+            NtSyscall::NtLoadDriver | NtSyscall::NtUnloadDriver => {
+                self.stats.denied_ops += 1;
+                NtStatus::AccessDenied
+            }
+            NtSyscall::NtDeviceIoControlFile => {
+                NtStatus::Success
+            }
         }
     }
 }
@@ -513,5 +637,126 @@ mod tests {
         assert_eq!(kernel.dispatch(NtSyscall::NtCreateFile), NtStatus::Success);
         assert_eq!(kernel.dispatch(NtSyscall::NtAllocateVirtualMemory), NtStatus::Success);
         assert_eq!(kernel.dispatch(NtSyscall::NtLoadDriver), NtStatus::AccessDenied);
+    }
+
+    // Directory support tests
+
+    #[test]
+    fn vfs_default_directories_exist() {
+        let vfs = VirtualFileSystem::new();
+        assert!(vfs.directory_exists(r"C:\Windows"));
+        assert!(vfs.directory_exists(r"C:\Windows\System32"));
+        assert!(vfs.directory_exists(r"C:\Users"));
+        assert!(vfs.directory_exists(r"C:\Program Files"));
+        assert!(vfs.directory_exists(r"C:\Program Files (x86)"));
+    }
+
+    #[test]
+    fn vfs_create_directory() {
+        let mut vfs = VirtualFileSystem::new();
+        assert!(!vfs.directory_exists(r"C:\MyApp"));
+        vfs.create_directory(r"C:\MyApp");
+        assert!(vfs.directory_exists(r"C:\MyApp"));
+    }
+
+    #[test]
+    fn vfs_list_directory_files() {
+        let vfs = VirtualFileSystem::new();
+        let entries = vfs.list_directory(r"C:\Windows\System32");
+        assert!(entries.contains(&r"C:\Windows\System32\ntdll.dll".to_string()));
+        assert!(entries.contains(&r"C:\Windows\System32\kernel32.dll".to_string()));
+        assert!(entries.contains(&r"C:\Windows\System32\user32.dll".to_string()));
+    }
+
+    #[test]
+    fn vfs_list_directory_subdirs() {
+        let vfs = VirtualFileSystem::new();
+        let entries = vfs.list_directory(r"C:\Windows");
+        assert!(entries.contains(&r"C:\Windows\System32".to_string()));
+        assert!(entries.contains(&r"C:\Windows\SysWOW64".to_string()));
+        assert!(entries.contains(&r"C:\Windows\Temp".to_string()));
+    }
+
+    #[test]
+    fn vfs_list_empty_directory() {
+        let mut vfs = VirtualFileSystem::new();
+        vfs.create_directory(r"C:\EmptyDir");
+        let entries = vfs.list_directory(r"C:\EmptyDir");
+        assert!(entries.is_empty());
+    }
+
+    #[test]
+    fn vfs_additional_system_files() {
+        let vfs = VirtualFileSystem::new();
+        assert!(vfs.file_exists(r"C:\Windows\System32\ws2_32.dll"));
+        assert!(vfs.file_exists(r"C:\Windows\System32\msvcrt.dll"));
+        assert!(vfs.file_exists(r"C:\Windows\System32\ole32.dll"));
+    }
+
+    // NtSection tests
+
+    #[test]
+    fn section_create() {
+        let mut kernel = NtKernel::new();
+        let base = kernel.create_section("TestSection", 0x10000).unwrap();
+        assert!(base > 0);
+        assert!(kernel.sections.contains_key("TestSection"));
+    }
+
+    #[test]
+    fn section_duplicate_name_rejected() {
+        let mut kernel = NtKernel::new();
+        kernel.create_section("Dup", 0x1000).unwrap();
+        assert_eq!(kernel.create_section("Dup", 0x1000).unwrap_err(), NtStatus::ObjectNameCollision);
+    }
+
+    #[test]
+    fn section_zero_size_rejected() {
+        let mut kernel = NtKernel::new();
+        assert_eq!(kernel.create_section("Bad", 0).unwrap_err(), NtStatus::InvalidParameter);
+    }
+
+    #[test]
+    fn section_map_view() {
+        let mut kernel = NtKernel::new();
+        let base = kernel.create_section("MapMe", 0x2000).unwrap();
+        let mapped_base = kernel.map_view("MapMe").unwrap();
+        assert_eq!(base, mapped_base);
+        assert!(kernel.sections.get("MapMe").unwrap().mapped);
+    }
+
+    #[test]
+    fn section_map_view_not_found() {
+        let mut kernel = NtKernel::new();
+        assert_eq!(kernel.map_view("NoSuch").unwrap_err(), NtStatus::ObjectNameNotFound);
+    }
+
+    // Dispatch stats tests
+
+    #[test]
+    fn dispatch_tracks_stats() {
+        let mut kernel = NtKernel::new();
+        kernel.dispatch(NtSyscall::NtCreateFile);
+        kernel.dispatch(NtSyscall::NtReadFile);
+        kernel.dispatch(NtSyscall::NtAllocateVirtualMemory);
+        kernel.dispatch(NtSyscall::NtCreateSection);
+        kernel.dispatch(NtSyscall::NtQueryInformationProcess);
+        kernel.dispatch(NtSyscall::NtLoadDriver);
+
+        assert_eq!(kernel.stats.total_calls, 6);
+        assert_eq!(kernel.stats.file_ops, 2);
+        assert_eq!(kernel.stats.memory_ops, 1);
+        assert_eq!(kernel.stats.section_ops, 1);
+        assert_eq!(kernel.stats.query_ops, 1);
+        assert_eq!(kernel.stats.denied_ops, 1);
+    }
+
+    #[test]
+    fn dispatch_close_does_not_count_subsystem() {
+        let mut kernel = NtKernel::new();
+        kernel.dispatch(NtSyscall::NtClose);
+        assert_eq!(kernel.stats.total_calls, 1);
+        assert_eq!(kernel.stats.file_ops, 0);
+        assert_eq!(kernel.stats.memory_ops, 0);
     }
 }

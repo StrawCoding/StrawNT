@@ -17,8 +17,16 @@ pub enum Command {
     Repair {
         app_id: String,
     },
+    Status,
+    Config(ConfigSubcommand),
     Version,
     Help,
+}
+
+#[derive(Debug, Clone)]
+pub enum ConfigSubcommand {
+    Show,
+    Set { key: String, value: String },
 }
 
 #[derive(Debug, Clone)]
@@ -50,6 +58,8 @@ pub fn parse_args(args: &[String]) -> Result<Command, String> {
                 app_id: args[1].clone(),
             })
         }
+        "status" => Ok(Command::Status),
+        "config" => parse_config(&args[1..]),
         "--version" | "version" => Ok(Command::Version),
         "--help" | "help" => Ok(Command::Help),
         _ => Err(format!("unknown command: {}", args[0])),
@@ -160,6 +170,22 @@ fn parse_profile(args: &[String]) -> Result<Command, String> {
     }
 }
 
+fn parse_config(args: &[String]) -> Result<Command, String> {
+    match args.first().map(|s| s.as_str()) {
+        Some("show") | None => Ok(Command::Config(ConfigSubcommand::Show)),
+        Some("set") => {
+            if args.len() < 3 {
+                return Err("config set requires <key> <value>".into());
+            }
+            Ok(Command::Config(ConfigSubcommand::Set {
+                key: args[1].clone(),
+                value: args[2].clone(),
+            }))
+        }
+        Some(other) => Err(format!("unknown config subcommand: {other}")),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -229,6 +255,39 @@ mod tests {
     #[test]
     fn unknown_command_error() {
         let result = parse_args(&args("invalid"));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn parse_status() {
+        let cmd = parse_args(&args("status")).unwrap();
+        assert!(matches!(cmd, Command::Status));
+    }
+
+    #[test]
+    fn parse_config_show() {
+        let cmd = parse_args(&args("config")).unwrap();
+        assert!(matches!(cmd, Command::Config(ConfigSubcommand::Show)));
+
+        let cmd2 = parse_args(&args("config show")).unwrap();
+        assert!(matches!(cmd2, Command::Config(ConfigSubcommand::Show)));
+    }
+
+    #[test]
+    fn parse_config_set() {
+        let cmd = parse_args(&args("config set backend container")).unwrap();
+        match cmd {
+            Command::Config(ConfigSubcommand::Set { key, value }) => {
+                assert_eq!(key, "backend");
+                assert_eq!(value, "container");
+            }
+            _ => panic!("expected Config Set"),
+        }
+    }
+
+    #[test]
+    fn parse_config_set_missing_value() {
+        let result = parse_args(&args("config set onlykey"));
         assert!(result.is_err());
     }
 }

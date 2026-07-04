@@ -9,16 +9,39 @@ pub struct DxgiAdapter {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DxgiOutput {
+    pub name: String,
+    pub width: u32,
+    pub height: u32,
+    pub refresh_rate_numerator: u32,
+    pub refresh_rate_denominator: u32,
+    pub attached_to_adapter: usize,
+}
+
+impl DxgiOutput {
+    pub fn refresh_rate_hz(&self) -> f64 {
+        if self.refresh_rate_denominator == 0 {
+            return 0.0;
+        }
+        self.refresh_rate_numerator as f64 / self.refresh_rate_denominator as f64
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DxgiTranslator {
     pub adapters: Vec<DxgiAdapter>,
+    pub outputs: Vec<DxgiOutput>,
     pub initialized: bool,
+    pub frame_count: u64,
 }
 
 impl DxgiTranslator {
     pub fn new() -> Self {
         Self {
             adapters: Vec::new(),
+            outputs: Vec::new(),
             initialized: false,
+            frame_count: 0,
         }
     }
 
@@ -28,6 +51,14 @@ impl DxgiTranslator {
             vendor_id: 0x1337,
             device_id: 0x0001,
             dedicated_video_memory: 256 * 1024 * 1024,
+        });
+        self.outputs.push(DxgiOutput {
+            name: "StrawWU Virtual Monitor 0".into(),
+            width: 1920,
+            height: 1080,
+            refresh_rate_numerator: 60000,
+            refresh_rate_denominator: 1000,
+            attached_to_adapter: 0,
         });
         self.initialized = true;
         Ok(())
@@ -40,11 +71,28 @@ impl DxgiTranslator {
         Ok(&self.adapters)
     }
 
+    pub fn enum_outputs(&self) -> Vec<&DxgiOutput> {
+        self.outputs.iter().collect()
+    }
+
+    pub fn get_adapter_desc(&self, index: usize) -> Option<&DxgiAdapter> {
+        self.adapters.get(index)
+    }
+
+    pub fn present(&mut self, sync_interval: u32) -> Result<(), DxgiError> {
+        if !self.initialized {
+            return Err(DxgiError::NotInitialized);
+        }
+        let _ = sync_interval;
+        self.frame_count += 1;
+        Ok(())
+    }
+
     pub fn create_swap_chain(&self) -> Result<u64, DxgiError> {
         if !self.initialized {
             return Err(DxgiError::NotInitialized);
         }
-        Ok(0x5743_0001) // swap chain handle stub
+        Ok(0x5743_0001)
     }
 }
 
@@ -96,5 +144,43 @@ mod tests {
         let dxgi = DxgiTranslator::new();
         assert!(dxgi.enum_adapters().is_err());
         assert!(dxgi.create_swap_chain().is_err());
+    }
+
+    #[test]
+    fn dxgi_enum_outputs() {
+        let mut dxgi = DxgiTranslator::new();
+        dxgi.create_factory().unwrap();
+        let outputs = dxgi.enum_outputs();
+        assert_eq!(outputs.len(), 1);
+        assert_eq!(outputs[0].width, 1920);
+        assert_eq!(outputs[0].height, 1080);
+        let hz = outputs[0].refresh_rate_hz();
+        assert!((hz - 60.0).abs() < 0.01);
+    }
+
+    #[test]
+    fn dxgi_get_adapter_desc() {
+        let mut dxgi = DxgiTranslator::new();
+        dxgi.create_factory().unwrap();
+        let adapter = dxgi.get_adapter_desc(0).unwrap();
+        assert_eq!(adapter.vendor_id, 0x1337);
+        assert!(dxgi.get_adapter_desc(99).is_none());
+    }
+
+    #[test]
+    fn dxgi_present_increments_frame() {
+        let mut dxgi = DxgiTranslator::new();
+        dxgi.create_factory().unwrap();
+        assert_eq!(dxgi.frame_count, 0);
+        dxgi.present(1).unwrap();
+        dxgi.present(1).unwrap();
+        dxgi.present(0).unwrap();
+        assert_eq!(dxgi.frame_count, 3);
+    }
+
+    #[test]
+    fn dxgi_present_uninit_fails() {
+        let mut dxgi = DxgiTranslator::new();
+        assert!(dxgi.present(1).is_err());
     }
 }
