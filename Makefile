@@ -90,7 +90,8 @@ validate-rootfs:
 
 boot-test-iso: boot-test-release-iso
 
-boot-test-dev-iso: preflight-iso-before-boot
+boot-test-dev-iso:
+	STRAWWU_ISO_MODE=dev-iso bash tests/preflight/test-iso-before-boot.sh
 	STRAWWU_ISO_MODE=dev-iso STRAWWU_BOOT_TEST_MODES=bios bash tests/boot/run.sh
 
 boot-test-release-iso: preflight-iso-before-boot

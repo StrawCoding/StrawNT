@@ -4,7 +4,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 OUTPUT_DIR="${REPO_ROOT}/tests/boot/output"
-VERSION="${STRAWWU_VERSION:-0.3.0.0}"
+VERSION="${STRAWWU_VERSION:-$(cat "${REPO_ROOT}/VERSION" 2>/dev/null || echo 0.4.0.0)}"
 ISO_PATH="${STRAWWU_ISO_PATH:-${REPO_ROOT}/os-image/output/StrawWU-${VERSION}-amd64.iso}"
 MARKER="STRAWWU_BOOT_OK"
 TIMEOUT="${STRAWWU_BOOT_TIMEOUT:-900}"
