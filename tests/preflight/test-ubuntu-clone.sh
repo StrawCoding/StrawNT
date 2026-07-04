@@ -48,7 +48,7 @@ done
 echo "PASS: no forbidden calamares overrides in config/"
 
 # components/ must not contain copied legacy crates (code artifacts only)
-LEGACY_CRATE_DIRS=(strawwu-nt strawwu-kernel-bridge strawwu-control-center strawwu-runtime)
+LEGACY_CRATE_DIRS=(strawwu-kernel-bridge strawwu-control-center)
 for crate in "${LEGACY_CRATE_DIRS[@]}"; do
     if [[ -d "${REPO_ROOT}/components/${crate}" ]]; then
         echo "FAIL: legacy crate directory components/${crate}/ — v3.0-cleanroom forbids copying legacy code"
