@@ -1,0 +1,28 @@
+const path = require('path');
+
+module.exports = {
+  SOCKET_PATH: process.env.STRAWWU_SOCKET || '/run/strawwu/runtime.sock',
+
+  SUBSYSTEM_NAMES: ['strawwu-runtime', 'strawwu-bridge', 'strawwu-nt', 'strawwu-launcher'],
+
+  UPDATE_CHANNELS: ['stable', 'beta', 'nightly'],
+
+  IPC_CHANNELS: {
+    GET_STATUS: 'runtime:get-status',
+    GET_LOGS: 'runtime:get-logs',
+    SET_UPDATE_CHANNEL: 'runtime:set-update-channel',
+    GET_UPDATE_CHANNEL: 'runtime:get-update-channel',
+    STATUS_UPDATE: 'runtime:status-update',
+    LOG_ENTRY: 'runtime:log-entry',
+  },
+
+  COLORS: {
+    bg: '#0A0E14',
+    teal: '#14B8A6',
+    amber: '#F59E0B',
+    strawGold: '#D4A853',
+    bridgeBlue: '#60A5FA',
+    text: '#F4F6F9',
+    muted: '#A9B6C3',
+  },
+};

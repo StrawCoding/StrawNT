@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'">
+  <title>StrawWU Hub</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="titlebar">
+      <div class="titlebar-brand">
+        <span class="brand-icon">⬡</span>
+        <h1>StrawWU Hub</h1>
+      </div>
+      <div class="titlebar-meta">
+        <span id="connection-indicator" class="indicator disconnected"></span>
+        <span id="connection-text">Mock Mode</span>
+      </div>
+    </header>
+
+    <nav class="sidebar">
+      <button class="nav-btn active" data-tab="status">
+        <span class="nav-icon">◉</span>
+        <span>子系統狀態</span>
+      </button>
+      <button class="nav-btn" data-tab="logs">
+        <span class="nav-icon">☰</span>
+        <span>系統日誌</span>
+      </button>
+      <button class="nav-btn" data-tab="updates">
+        <span class="nav-icon">⟳</span>
+        <span>更新通道</span>
+      </button>
+    </nav>
+
+    <main class="content">
+      <!-- Status Panel -->
+      <section id="tab-status" class="tab-panel active">
+        <h2>子系統狀態</h2>
+        <div id="status-grid" class="status-grid">
+          <!-- populated by JS -->
+        </div>
+        <div class="actions-bar">
+          <button id="btn-refresh-status" class="btn btn-primary">重新整理</button>
+        </div>
+      </section>
+
+      <!-- Logs Panel -->
+      <section id="tab-logs" class="tab-panel">
+        <h2>系統日誌</h2>
+        <div class="log-controls">
+          <select id="log-subsystem-filter">
+            <option value="">全部子系統</option>
+            <option value="strawwu-runtime">strawwu-runtime</option>
+            <option value="strawwu-bridge">strawwu-bridge</option>
+            <option value="strawwu-nt">strawwu-nt</option>
+            <option value="strawwu-launcher">strawwu-launcher</option>
+          </select>
+          <select id="log-level-filter">
+            <option value="">全部等級</option>
+            <option value="ERROR">ERROR</option>
+            <option value="WARN">WARN</option>
+            <option value="INFO">INFO</option>
+            <option value="DEBUG">DEBUG</option>
+          </select>
+          <button id="btn-refresh-logs" class="btn btn-secondary">重新載入</button>
+        </div>
+        <div id="log-container" class="log-container">
+          <!-- populated by JS -->
+        </div>
+      </section>
+
+      <!-- Updates Panel -->
+      <section id="tab-updates" class="tab-panel">
+        <h2>更新通道</h2>
+        <p class="muted-text">選擇 StrawWU 的更新通道。變更後將在下次更新檢查時生效。</p>
+        <div class="channel-cards">
+          <label class="channel-card" data-channel="stable">
+            <input type="radio" name="update-channel" value="stable">
+            <div class="channel-info">
+              <span class="channel-name">Stable</span>
+              <span class="channel-desc">穩定版 — 經過完整測試的正式版本</span>
+            </div>
+            <span class="channel-badge badge-stable">推薦</span>
+          </label>
+          <label class="channel-card" data-channel="beta">
+            <input type="radio" name="update-channel" value="beta">
+            <div class="channel-info">
+              <span class="channel-name">Beta</span>
+              <span class="channel-desc">測試版 — 包含即將發布的新功能</span>
+            </div>
+            <span class="channel-badge badge-beta">搶先體驗</span>
+          </label>
+          <label class="channel-card" data-channel="nightly">
+            <input type="radio" name="update-channel" value="nightly">
+            <div class="channel-info">
+              <span class="channel-name">Nightly</span>
+              <span class="channel-desc">每日建置 — 最新但可能不穩定</span>
+            </div>
+            <span class="channel-badge badge-nightly">開發者</span>
+          </label>
+        </div>
+        <div id="channel-status" class="channel-status"></div>
+      </section>
+    </main>
+  </div>
+  <script src="renderer.js"></script>
+</body>
+</html>

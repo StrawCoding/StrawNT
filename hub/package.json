@@ -1,0 +1,60 @@
+{
+  "name": "strawwu-hub",
+  "version": "0.3.0",
+  "description": "StrawWU Desktop Control Center — subsystem status, logs, and update channel management",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test 'test/*.test.js'",
+    "dist": "electron-builder --linux deb",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "homepage": "https://github.com/StrawCoding/StrawWU",
+  "author": {
+    "name": "StrawCoding",
+    "email": "dev@strawcoding.xyz"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^35.0.0",
+    "electron-builder": "^26.0.0"
+  },
+  "build": {
+    "appId": "xyz.wastebase.strawwu.hub",
+    "productName": "StrawWU Hub",
+    "directories": {
+      "output": "dist"
+    },
+    "linux": {
+      "target": "deb",
+      "category": "System",
+      "icon": "assets/icon.png",
+      "executableName": "strawwu-hub"
+    },
+    "deb": {
+      "depends": [
+        "libgtk-3-0",
+        "libnotify4",
+        "libnss3",
+        "libxss1",
+        "libxtst6",
+        "xdg-utils",
+        "libatspi2.0-0",
+        "libuuid1",
+        "libsecret-1-0"
+      ]
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "resources/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "resources/",
+        "to": "resources/",
+        "filter": ["**/*"]
+      }
+    ]
+  }
+}

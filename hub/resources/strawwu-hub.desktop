@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=StrawWU Hub
+Comment=StrawWU Desktop Control Center
+Exec=/opt/StrawWU Hub/strawwu-hub %U
+Icon=strawwu-hub
+Type=Application
+Categories=System;Monitor;
+Keywords=strawwu;control;hub;subsystem;
+StartupWMClass=strawwu-hub
+StartupNotify=true
