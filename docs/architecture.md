@@ -60,7 +60,7 @@ Phase 1 可暫用 Ubuntu `linux-image-generic` 驗證 clone 管線，Phase 2 起
 
 - `kernel/` 目錄：基於 Ubuntu noble kernel source + StrawWU patches
 - 產出 `linux-image-strawwu_<ver>_amd64.deb`
-- `strawwu-kernel-bridge` 模組编入 kernel 或 loadable module
+- `strawwu-kernel-bridge` 模組編入 kernel 或 loadable module
 
 ## 6. 驗證順序
 
