@@ -6,8 +6,10 @@ pub mod wow64;
 pub mod ipc;
 pub mod installer;
 pub mod registry;
+pub mod loader;
 
-pub use pe::{PeFile, PeMachine, PeSubsystem};
-pub use teb::{ThreadEnvironmentBlock, ProcessEnvironmentBlock};
-pub use ntdll::NtStatus;
+pub use pe::{PeFile, PeMachine, PeSubsystem, ImportEntry};
+pub use teb::{ThreadEnvironmentBlock, ProcessEnvironmentBlock, LoadedModule};
+pub use ntdll::{NtStatus, NtKernel, VirtualMemoryManager, VirtualFileSystem, FileHandle};
 pub use wow64::Wow64Context;
+pub use loader::PeLoader;

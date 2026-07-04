@@ -139,7 +139,6 @@ dependencies = [
  "serde",
  "serde_json",
  "strawwu-bridge",
- "strawwu-runtime",
  "thiserror",
 ]
 
@@ -150,6 +149,7 @@ dependencies = [
  "serde",
  "serde_json",
  "strawwu-bridge",
+ "strawwu-nt",
  "thiserror",
 ]
 

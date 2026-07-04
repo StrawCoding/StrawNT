@@ -1,6 +1,311 @@
 use serde::{Deserialize, Serialize};
 
+use std::collections::{HashMap, VecDeque};
+
 use crate::ntdll::NtStatus;
+
+// --- Window Handle (HWND) System ---
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
+pub struct Hwnd(pub u64);
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WindowClass {
+    pub class_name: String,
+    pub style: u32,
+    pub instance: u64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Window {
+    pub hwnd: Hwnd,
+    pub class_name: String,
+    pub title: String,
+    pub x: i32,
+    pub y: i32,
+    pub width: u32,
+    pub height: u32,
+    pub visible: bool,
+    pub parent: Option<Hwnd>,
+    pub style: u32,
+    pub ex_style: u32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WinMsg {
+    pub hwnd: Hwnd,
+    pub message: u32,
+    pub wparam: u64,
+    pub lparam: i64,
+}
+
+pub const WM_CREATE: u32 = 0x0001;
+pub const WM_DESTROY: u32 = 0x0002;
+pub const WM_PAINT: u32 = 0x000F;
+pub const WM_CLOSE: u32 = 0x0010;
+pub const WM_QUIT: u32 = 0x0012;
+pub const WM_KEYDOWN: u32 = 0x0100;
+pub const WM_KEYUP: u32 = 0x0101;
+pub const WM_MOUSEMOVE: u32 = 0x0200;
+pub const WM_LBUTTONDOWN: u32 = 0x0201;
+pub const WM_LBUTTONUP: u32 = 0x0202;
+
+#[derive(Debug, Default)]
+pub struct WindowManager {
+    classes: HashMap<String, WindowClass>,
+    windows: HashMap<u64, Window>,
+    message_queue: VecDeque<WinMsg>,
+    next_hwnd: u64,
+    desktop_hwnd: Hwnd,
+}
+
+impl WindowManager {
+    pub fn new() -> Self {
+        Self {
+            classes: HashMap::new(),
+            windows: HashMap::new(),
+            message_queue: VecDeque::new(),
+            next_hwnd: 0x0001_0000,
+            desktop_hwnd: Hwnd(0x0000_FFFF),
+        }
+    }
+
+    pub fn register_class(&mut self, class_name: &str, style: u32, instance: u64) -> bool {
+        if self.classes.contains_key(class_name) {
+            return false;
+        }
+        self.classes.insert(class_name.to_string(), WindowClass {
+            class_name: class_name.to_string(),
+            style,
+            instance,
+        });
+        true
+    }
+
+    pub fn create_window(
+        &mut self,
+        class_name: &str,
+        title: &str,
+        x: i32,
+        y: i32,
+        width: u32,
+        height: u32,
+        parent: Option<Hwnd>,
+        style: u32,
+        ex_style: u32,
+    ) -> Option<Hwnd> {
+        if !self.classes.contains_key(class_name) {
+            return None;
+        }
+
+        let hwnd = Hwnd(self.next_hwnd);
+        self.next_hwnd += 1;
+
+        let window = Window {
+            hwnd,
+            class_name: class_name.to_string(),
+            title: title.to_string(),
+            x,
+            y,
+            width,
+            height,
+            visible: false,
+            parent,
+            style,
+            ex_style,
+        };
+
+        self.windows.insert(hwnd.0, window);
+
+        self.message_queue.push_back(WinMsg {
+            hwnd,
+            message: WM_CREATE,
+            wparam: 0,
+            lparam: 0,
+        });
+
+        Some(hwnd)
+    }
+
+    pub fn show_window(&mut self, hwnd: Hwnd, show: bool) -> bool {
+        if let Some(win) = self.windows.get_mut(&hwnd.0) {
+            win.visible = show;
+            if show {
+                self.message_queue.push_back(WinMsg {
+                    hwnd,
+                    message: WM_PAINT,
+                    wparam: 0,
+                    lparam: 0,
+                });
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn destroy_window(&mut self, hwnd: Hwnd) -> bool {
+        if self.windows.remove(&hwnd.0).is_some() {
+            self.message_queue.push_back(WinMsg {
+                hwnd,
+                message: WM_DESTROY,
+                wparam: 0,
+                lparam: 0,
+            });
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn get_message(&mut self) -> Option<WinMsg> {
+        self.message_queue.pop_front()
+    }
+
+    pub fn post_message(&mut self, hwnd: Hwnd, message: u32, wparam: u64, lparam: i64) -> bool {
+        if hwnd.0 != 0 && !self.windows.contains_key(&hwnd.0) {
+            return false;
+        }
+        self.message_queue.push_back(WinMsg { hwnd, message, wparam, lparam });
+        true
+    }
+
+    pub fn post_quit_message(&mut self, exit_code: i32) {
+        self.message_queue.push_back(WinMsg {
+            hwnd: Hwnd(0),
+            message: WM_QUIT,
+            wparam: exit_code as u64,
+            lparam: 0,
+        });
+    }
+
+    pub fn get_desktop_window(&self) -> Hwnd {
+        self.desktop_hwnd
+    }
+
+    pub fn set_window_text(&mut self, hwnd: Hwnd, text: &str) -> bool {
+        if let Some(win) = self.windows.get_mut(&hwnd.0) {
+            win.title = text.to_string();
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn get_window(&self, hwnd: Hwnd) -> Option<&Window> {
+        self.windows.get(&hwnd.0)
+    }
+
+    pub fn window_count(&self) -> usize {
+        self.windows.len()
+    }
+
+    pub fn pending_messages(&self) -> usize {
+        self.message_queue.len()
+    }
+}
+
+// --- GDI Device Context ---
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct Hdc(pub u64);
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct HGdiObj(pub u64);
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DeviceContext {
+    pub hdc: Hdc,
+    pub width: u32,
+    pub height: u32,
+    pub bits_per_pixel: u32,
+    pub selected_objects: Vec<HGdiObj>,
+    pub background_mode: u32,
+    pub text_color: u32,
+    pub bk_color: u32,
+}
+
+#[derive(Debug, Default)]
+pub struct GdiManager {
+    contexts: HashMap<u64, DeviceContext>,
+    next_hdc: u64,
+    next_obj: u64,
+}
+
+impl GdiManager {
+    pub fn new() -> Self {
+        Self {
+            contexts: HashMap::new(),
+            next_hdc: 0xDC_0001,
+            next_obj: 0xAB_0001,
+        }
+    }
+
+    pub fn create_dc(&mut self, width: u32, height: u32) -> Hdc {
+        let hdc = Hdc(self.next_hdc);
+        self.next_hdc += 1;
+        self.contexts.insert(hdc.0, DeviceContext {
+            hdc,
+            width,
+            height,
+            bits_per_pixel: 32,
+            selected_objects: Vec::new(),
+            background_mode: 1, // TRANSPARENT
+            text_color: 0x0000_0000,
+            bk_color: 0x00FF_FFFF,
+        });
+        hdc
+    }
+
+    pub fn create_compatible_dc(&mut self, source: Hdc) -> Option<Hdc> {
+        let src = self.contexts.get(&source.0)?;
+        let width = src.width;
+        let height = src.height;
+        Some(self.create_dc(width, height))
+    }
+
+    pub fn delete_dc(&mut self, hdc: Hdc) -> bool {
+        self.contexts.remove(&hdc.0).is_some()
+    }
+
+    pub fn select_object(&mut self, hdc: Hdc, obj: HGdiObj) -> Option<HGdiObj> {
+        let dc = self.contexts.get_mut(&hdc.0)?;
+        let old = dc.selected_objects.last().copied();
+        dc.selected_objects.push(obj);
+        old
+    }
+
+    pub fn get_device_caps(&self, hdc: Hdc, cap_index: u32) -> Option<u32> {
+        let dc = self.contexts.get(&hdc.0)?;
+        match cap_index {
+            8 => Some(dc.width),    // HORZRES
+            10 => Some(dc.height),  // VERTRES
+            12 => Some(dc.bits_per_pixel), // BITSPIXEL
+            88 => Some(96),         // LOGPIXELSX
+            90 => Some(96),         // LOGPIXELSY
+            _ => Some(0),
+        }
+    }
+
+    pub fn set_bk_mode(&mut self, hdc: Hdc, mode: u32) -> Option<u32> {
+        let dc = self.contexts.get_mut(&hdc.0)?;
+        let old = dc.background_mode;
+        dc.background_mode = mode;
+        Some(old)
+    }
+
+    pub fn create_gdi_object(&mut self) -> HGdiObj {
+        let obj = HGdiObj(self.next_obj);
+        self.next_obj += 1;
+        obj
+    }
+
+    pub fn dc_count(&self) -> usize {
+        self.contexts.len()
+    }
+}
+
+// --- Original Win32 DLL and Stub types below ---
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Win32Dll {
@@ -67,6 +372,7 @@ pub struct Win32Function {
     pub status: StubStatus,
 }
 
+#[derive(Debug)]
 pub struct Win32StubRegistry {
     stubs: Vec<Win32Function>,
 }
@@ -280,5 +586,132 @@ mod tests {
         let reg = Win32StubRegistry::new();
         assert!(reg.lookup("gdi32.dll", "BitBlt").is_some());
         assert!(reg.lookup("gdi32.dll", "CreateCompatibleDC").is_some());
+    }
+
+    // Window Manager tests
+
+    #[test]
+    fn window_create_and_show() {
+        let mut wm = WindowManager::new();
+        wm.register_class("MyWndClass", 0, 0x1000);
+        let hwnd = wm.create_window("MyWndClass", "Hello", 100, 100, 800, 600, None, 0, 0).unwrap();
+        assert!(hwnd.0 > 0);
+        assert_eq!(wm.window_count(), 1);
+
+        wm.show_window(hwnd, true);
+        let win = wm.get_window(hwnd).unwrap();
+        assert!(win.visible);
+        assert_eq!(win.title, "Hello");
+    }
+
+    #[test]
+    fn window_unregistered_class_fails() {
+        let mut wm = WindowManager::new();
+        assert!(wm.create_window("NoClass", "X", 0, 0, 100, 100, None, 0, 0).is_none());
+    }
+
+    #[test]
+    fn window_message_queue() {
+        let mut wm = WindowManager::new();
+        wm.register_class("Cls", 0, 0);
+        let hwnd = wm.create_window("Cls", "T", 0, 0, 640, 480, None, 0, 0).unwrap();
+
+        // WM_CREATE should be queued
+        let msg = wm.get_message().unwrap();
+        assert_eq!(msg.message, WM_CREATE);
+        assert_eq!(msg.hwnd, hwnd);
+
+        wm.post_message(hwnd, WM_KEYDOWN, 0x41, 0);
+        let msg2 = wm.get_message().unwrap();
+        assert_eq!(msg2.message, WM_KEYDOWN);
+    }
+
+    #[test]
+    fn window_quit_message() {
+        let mut wm = WindowManager::new();
+        wm.post_quit_message(0);
+        let msg = wm.get_message().unwrap();
+        assert_eq!(msg.message, WM_QUIT);
+    }
+
+    #[test]
+    fn window_destroy() {
+        let mut wm = WindowManager::new();
+        wm.register_class("C", 0, 0);
+        let hwnd = wm.create_window("C", "X", 0, 0, 100, 100, None, 0, 0).unwrap();
+        wm.get_message(); // drain WM_CREATE
+        assert!(wm.destroy_window(hwnd));
+        assert_eq!(wm.window_count(), 0);
+        let msg = wm.get_message().unwrap();
+        assert_eq!(msg.message, WM_DESTROY);
+    }
+
+    #[test]
+    fn window_set_text() {
+        let mut wm = WindowManager::new();
+        wm.register_class("C", 0, 0);
+        let hwnd = wm.create_window("C", "Old", 0, 0, 100, 100, None, 0, 0).unwrap();
+        wm.set_window_text(hwnd, "New Title");
+        assert_eq!(wm.get_window(hwnd).unwrap().title, "New Title");
+    }
+
+    #[test]
+    fn window_desktop() {
+        let wm = WindowManager::new();
+        let desktop = wm.get_desktop_window();
+        assert!(desktop.0 > 0);
+    }
+
+    // GDI Manager tests
+
+    #[test]
+    fn gdi_create_dc() {
+        let mut gdi = GdiManager::new();
+        let hdc = gdi.create_dc(1920, 1080);
+        assert!(hdc.0 > 0);
+        assert_eq!(gdi.dc_count(), 1);
+    }
+
+    #[test]
+    fn gdi_compatible_dc() {
+        let mut gdi = GdiManager::new();
+        let hdc = gdi.create_dc(800, 600);
+        let compat = gdi.create_compatible_dc(hdc).unwrap();
+        assert_ne!(hdc.0, compat.0);
+        assert_eq!(gdi.dc_count(), 2);
+    }
+
+    #[test]
+    fn gdi_device_caps() {
+        let mut gdi = GdiManager::new();
+        let hdc = gdi.create_dc(1920, 1080);
+        assert_eq!(gdi.get_device_caps(hdc, 8), Some(1920));  // HORZRES
+        assert_eq!(gdi.get_device_caps(hdc, 10), Some(1080)); // VERTRES
+        assert_eq!(gdi.get_device_caps(hdc, 12), Some(32));   // BITSPIXEL
+        assert_eq!(gdi.get_device_caps(hdc, 88), Some(96));   // LOGPIXELSX
+    }
+
+    #[test]
+    fn gdi_select_object() {
+        let mut gdi = GdiManager::new();
+        let hdc = gdi.create_dc(100, 100);
+        let obj = gdi.create_gdi_object();
+        gdi.select_object(hdc, obj);
+    }
+
+    #[test]
+    fn gdi_delete_dc() {
+        let mut gdi = GdiManager::new();
+        let hdc = gdi.create_dc(100, 100);
+        assert!(gdi.delete_dc(hdc));
+        assert_eq!(gdi.dc_count(), 0);
+    }
+
+    #[test]
+    fn gdi_set_bk_mode() {
+        let mut gdi = GdiManager::new();
+        let hdc = gdi.create_dc(100, 100);
+        let old = gdi.set_bk_mode(hdc, 2).unwrap(); // OPAQUE
+        assert_eq!(old, 1); // was TRANSPARENT
     }
 }
