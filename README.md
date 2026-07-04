@@ -18,9 +18,11 @@ StrawWU 是以 **Ubuntu 官方 live 映像為基底**的桌面作業系統，透
 | ISO | `StrawWU-0.3.0.0-amd64.iso` (6.1 GB) |
 | SHA256 | `50bfe4dc3fb68db49540764d108eacd3e7ec96a25c609930a0f3f1f4670c9ea3` |
 | Kernel | `6.8.12-strawwu` |
-| Tests | 367/367 PASS |
+| Tests | 402/402 PASS (367 Rust + 35 Hub) |
 | Windows 相容 | 13/13 sub-stages PASS |
+| i18n | 206 語言（Ubuntu 完整清單） |
 | Boot test | BIOS PASS / UEFI PASS |
+| CI | GitHub Actions release workflow |
 
 ## 核心原則
 
@@ -61,7 +63,7 @@ StrawWU 是以 **Ubuntu 官方 live 映像為基底**的桌面作業系統，透
 | `strawwu-device-proxy` | 裝置代理 — udev 列舉, COM port, hotplug, IOCTL, VFIO passthrough |
 | `strawwu-launcher` | Launcher — AppDatabase, installer, WoW64, CLI |
 
-**Hub（Electron）**— 桌面控制中心 GUI，顯示 subsystem 狀態、app 管理、更新通道。
+**Hub（Electron）**— 桌面控制中心 GUI，顯示 subsystem 狀態、app 管理、更新通道、206 語言即時切換。
 
 ## Repository 結構
 
@@ -83,7 +85,9 @@ StrawWU/
 ├── kernel/                        # 自訂 kernel 6.8.12-strawwu
 ├── hub/                           # Electron 控制中心
 │   ├── src/
+│   ├── locales/                   # 206 語言翻譯檔
 │   └── dist/
+├── .github/workflows/             # CI: release ISO on tag push
 ├── components/                    # 8 Rust crates（workspace）
 │   ├── Cargo.toml
 │   ├── strawwu-nt/
@@ -124,6 +128,7 @@ make release-iso                # 完整 ISO 建置（xz 壓縮，約 30 分鐘�
 make preflight-iso-before-boot  # ISO 完整性閘門
 make boot-test-iso              # QEMU BIOS + UEFI 開機驗證
 make test-wincompat             # Windows 相容層測試（367 tests）
+make test-hub                   # Hub 單元測試（35 tests）
 ```
 
 開發模式（快速迭代）：
@@ -141,6 +146,22 @@ make dev-vm-sync                # rsync 變更至 VM
 - Node.js 18+ (Hub)
 - xorriso, squashfs-tools, qemu-system-x86
 - 約 20 GB 磁碟空間
+
+## 國際化（i18n）
+
+Hub 支援 **206 語言**（取自 Ubuntu `/usr/share/i18n/SUPPORTED` 完整清單）：
+- 完整翻譯：English (`en`)、繁體中文 (`zh`)
+- 其餘語言含 stub 翻譯（fallback 至 English），供社群貢獻
+- 功能：系統語言自動偵測、即時切換、fallback chain、參數替換
+- Language 面板：可搜尋語言網格，含原文名稱 + 英文名稱 + 語言代碼
+
+## CI/CD
+
+GitHub Actions workflow（`.github/workflows/release.yml`）：
+- **觸發**：push tag `v*`
+- **流程**：cargo test → npm test → preflight → build ISO → SHA256SUMS → GitHub Release
+- **版本判斷**：`d=0` → 正式 Release；`d≥1` → Pre-release（Preview N）
+- **Runner**：self-hosted（需 root + xorriso + squashfs-tools）
 
 ## 授權
 
