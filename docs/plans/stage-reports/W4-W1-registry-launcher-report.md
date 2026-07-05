@@ -41,9 +41,11 @@ Windows app 註冊整合 — `strawwu run` / `install` 寫入 User App Registry�
 | Phase 6 預設 | execution_backend 預設 native；container/microvm 僅覆寫 |
 | 三表分離 | 僅 User App Registry；不混 compat-db / AppDatabase |
 
-## 驗收命令輸出（2026-07-05T06:52 UTC-4，worker 終驗）
+## 驗收命令輸出
 
-### `make test-wincompat-registry` — exit 0（~1.4s）
+### 2026-07-05T07:14 UTC-4（worker 階段 20/47 終驗）
+
+#### `make test-wincompat-registry` — exit 0（~0.7s）
 
 Log: `/tmp/w4-w1-test-wincompat-registry.log`
 
@@ -53,11 +55,15 @@ Log: `/tmp/w4-w1-test-wincompat-registry.log`
 
 關鍵檢查項：launcher registry.rs、RegistryStore upsert、cargo build/test launcher（34 unit tests）+ app-registry（10 unit tests）、`strawwu run` 寫入 demo-app（win32/launcher/installed）、`apps list`、`--backend container` upsert、`install` pending、status 計數 2。
 
-### `make preflight` — exit 0（~111s）
+#### `make preflight` — exit 0（~45s）
 
 Log: `/tmp/w4-w1-preflight.log`
 
 含 W0 baseline + W1–W3 全部階段 + W4-D2/D3/R2/F3 + **W4-W1 wincompat-registry** 全部 exit 0（最終行 `=== W4-W1 wincompat-registry done: PASS ===`）。
+
+### 2026-07-05T06:58 UTC-4（companion 初驗）
+
+同上兩命令 exit 0；preflight ~114s。
 
 ## 變更檔案清單
 
@@ -114,7 +120,10 @@ Version: 0.4.1.20
 |------|------|
 | 2026-07-05T06:42 UTC-4 | `[worker-START]` w4-w1-registry-launcher |
 | 2026-07-05T06:50 UTC-4 | 修復 registry 測試 env 競態（RegistryEnvGuard） |
-| 2026-07-05T06:52 UTC-4 | `[worker-DONE]` 終驗：`make test-wincompat-registry` + `make preflight` exit 0 — 待 Hermes mark PASS |
+| 2026-07-05T06:52 UTC-4 | `[worker-DONE]` 初驗：`make test-wincompat-registry` + `make preflight` exit 0 |
+| 2026-07-05T06:57 UTC-4 | `[worker-TICK]` companion 複驗：兩命令 exit 0 — 待 Hermes mark PASS |
+| 2026-07-05T07:12 UTC-4 | `[worker-TICK]` companion check status=IN_PROGRESS |
+| 2026-07-05T07:14 UTC-4 | `[worker-DONE]` 階段 20/47 終驗：`make test-wincompat-registry` + `make preflight` exit 0 — 待 Hermes mark PASS |
 
 ## 下一步
 
