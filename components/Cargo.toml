@@ -9,9 +9,10 @@ members = [
     "strawwu-audio",
     "strawwu-anticheat",
     "strawwu-device-proxy",
+    "strawwu-app-registry",
 ]
 
 [workspace.package]
-version = "0.4.1-preview.6"
+version = "0.4.1-preview.7"
 edition = "2021"
 license = "MIT"

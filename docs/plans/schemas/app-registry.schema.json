@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://strawwu.local/schemas/app-registry.schema.json",
+  "title": "StrawWU App Registry",
+  "description": "User-installed applications tracked by strawwu-app-registry (separate from compat-db and AppDatabase stub).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "apps"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "apps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/app_entry"
+      }
+    }
+  },
+  "$defs": {
+    "app_kind": {
+      "type": "string",
+      "enum": ["win32", "linux", "flatpak", "native"]
+    },
+    "app_source": {
+      "type": "string",
+      "enum": ["installer", "launcher", "flatpak", "seed", "manual"]
+    },
+    "install_state": {
+      "type": "string",
+      "enum": ["pending", "installing", "installed", "failed", "removed"]
+    },
+    "execution_backend": {
+      "type": "string",
+      "enum": ["native", "container", "microvm"]
+    },
+    "app_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "kind", "source", "install_state"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$",
+          "description": "Stable slug used by launcher, Hub, and uninstall hooks."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "kind": {
+          "$ref": "#/$defs/app_kind"
+        },
+        "source": {
+          "$ref": "#/$defs/app_source"
+        },
+        "install_state": {
+          "$ref": "#/$defs/install_state"
+        },
+        "protected": {
+          "type": "boolean",
+          "default": false,
+          "description": "System or seeded apps that must not be removed via UI."
+        },
+        "install_path": {
+          "type": "string"
+        },
+        "desktop_entry": {
+          "type": "string",
+          "description": "Path to .desktop file when registered from desktop integration."
+        },
+        "execution_backend": {
+          "$ref": "#/$defs/execution_backend"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

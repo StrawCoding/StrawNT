@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-05T02:27:45.945121",
+  "generated_at": "2026-07-05T02:42:49.071760",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 6,
-  "failed": 41,
+  "passed": 7,
+  "failed": 40,
   "all_pass": false,
   "stages": [
     {
@@ -38,8 +38,8 @@
     },
     {
       "id": "w2-i1-calamares-settings",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w2-r1-app-registry",

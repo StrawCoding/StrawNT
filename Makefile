@@ -2,7 +2,7 @@
 	build-iso dev-iso release-iso repack-iso validate-rootfs boot-test-iso boot-test-dev-iso \
 	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
-	test-install-e2e test-wincompat 	test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-bug-reporter test-calamares-settings purge-ubuntu-telemetry \
+	test-install-e2e test-wincompat 	test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-bug-reporter test-calamares-settings test-app-registry purge-ubuntu-telemetry \
 	install-flatpak-setup install-bug-reporter install-calamares-settings nosnap-harden build-debs bump-version check-version-bump
 
 REPO_ROOT := $(abspath .)
@@ -44,6 +44,7 @@ help:
 	@echo "  test-nosnap                   W1-F2 snapd absent + meta mask verification"
 	@echo "  test-bug-reporter             W2-B2 strawwu-bug-reporter CLI/GTK/consent verification"
 	@echo "  test-calamares-settings       W2-I1 strawwu-calamares-settings deb (replaces ubuntu-common)"
+	@echo "  test-app-registry             W2-R1 strawwu-app-registry crate + CLI + schema"
 	@echo "  purge-ubuntu-telemetry        chroot purge apport/whoopsie/ubuntu-pro/snapd (needs root)"
 	@echo "  install-flatpak-setup         chroot install flatpak + strawwu-flatpak-setup (needs root)"
 	@echo "  install-bug-reporter          chroot install strawwu-bug-reporter (needs root)"
@@ -59,6 +60,7 @@ preflight:
 	bash tests/preflight/test-initrd-overlays.sh
 	bash tests/preflight/test-bug-reporter.sh
 	bash tests/preflight/test-calamares-settings.sh
+	bash tests/preflight/test-app-registry.sh
 
 preflight-dev-vm:
 	bash tests/preflight/test-dev-vm-ready.sh
@@ -185,6 +187,9 @@ test-bug-reporter:
 
 test-calamares-settings:
 	bash tests/preflight/test-calamares-settings.sh
+
+test-app-registry:
+	bash tests/preflight/test-app-registry.sh
 
 install-calamares-settings:
 	sudo bash $(SCRIPTS)/chroot-install-calamares-settings.sh

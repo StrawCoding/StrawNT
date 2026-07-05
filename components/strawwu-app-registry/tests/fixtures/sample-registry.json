@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "updated_at": "2026-07-05T06:00:00Z",
+  "apps": [
+    {
+      "id": "notepad-plus",
+      "name": "Notepad++",
+      "kind": "win32",
+      "source": "installer",
+      "install_state": "installed",
+      "protected": false,
+      "install_path": "/home/user/.strawwu/apps/notepad-plus",
+      "execution_backend": "native",
+      "created_at": "2026-07-05T06:00:00Z",
+      "updated_at": "2026-07-05T06:00:00Z"
+    },
+    {
+      "id": "strawwu-hub",
+      "name": "StrawWU Hub",
+      "kind": "native",
+      "source": "seed",
+      "install_state": "installed",
+      "protected": true,
+      "execution_backend": "native",
+      "created_at": "2026-07-05T06:00:00Z",
+      "updated_at": "2026-07-05T06:00:00Z"
+    }
+  ]
+}
