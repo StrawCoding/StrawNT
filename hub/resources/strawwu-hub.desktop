@@ -1,10 +1,11 @@
 [Desktop Entry]
-Name=StrawWU Hub
-Comment=StrawWU Desktop Control Center
+Name=StrawWU Settings
+Comment=StrawWU System Settings Center
 Exec=/opt/StrawWU Hub/strawwu-hub %U
 Icon=strawwu-hub
 Type=Application
-Categories=System;Monitor;
-Keywords=strawwu;control;hub;subsystem;
+Categories=Settings;System;
+Keywords=settings;preferences;configure;strawwu;hub;control;
 StartupWMClass=strawwu-hub
 StartupNotify=true
+OnlyShowIn=GNOME;Unity;

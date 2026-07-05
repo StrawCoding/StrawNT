@@ -11,7 +11,12 @@ describe('Constants', () => {
     assert.ok(channels.SET_UPDATE_CHANNEL);
     assert.ok(channels.GET_UPDATE_CHANNEL);
     assert.ok(channels.STATUS_UPDATE);
-    assert.ok(channels.LOG_ENTRY);
+    assert.ok(channels.GET_I18N);
+    assert.ok(channels.SET_LOCALE);
+    assert.ok(channels.GET_ABOUT);
+    assert.ok(channels.GET_WINCOMPAT);
+    assert.ok(channels.OPEN_LEGAL);
+    assert.ok(channels.LAUNCH_BUG_REPORT);
   });
 
   it('should have three update channels', () => {

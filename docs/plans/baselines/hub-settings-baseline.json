@@ -1,0 +1,29 @@
+{
+  "schema": "strawwu-hub-settings-baseline/v1",
+  "wave": "W4-D3",
+  "version": "0.4.1.17",
+  "package": "strawwu-hub",
+  "role": "system-settings-center",
+  "desktop_categories": [
+    "Settings",
+    "System"
+  ],
+  "panels": [
+    "status",
+    "logs",
+    "updates",
+    "language",
+    "wincompat",
+    "system",
+    "about"
+  ],
+  "legal_docs": [
+    "/usr/share/strawwu/legal/privacy.html",
+    "/usr/share/strawwu/legal/eula.html",
+    "/usr/share/strawwu/legal/third-party.html"
+  ],
+  "bug_report_entry": "strawwu-bug-report-gtk",
+  "compat_matrix_dev": "components/tests/wincompat/output/compat-matrix.json",
+  "compat_matrix_installed": "/usr/share/strawwu/compat-matrix.json",
+  "manifest": "hub/resources/settings-manifest.json"
+}

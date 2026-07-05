@@ -8,6 +8,10 @@ const $channelStatus = document.getElementById('channel-status');
 const $languageList = document.getElementById('language-list');
 const $languageSearch = document.getElementById('language-search');
 const $languageStatus = document.getElementById('language-status');
+const $wincompatStatus = document.getElementById('wincompat-status');
+const $wincompatGrades = document.getElementById('wincompat-grades');
+const $systemShortcuts = document.getElementById('system-shortcuts');
+const $aboutInfo = document.getElementById('about-info');
 
 let currentLogs = [];
 let currentTranslations = {};
@@ -219,6 +223,116 @@ document.querySelectorAll('input[name="update-channel"]').forEach((radio) => {
   });
 });
 
+// --- WinCompat ---
+function gradeClass(grade) {
+  if (!grade) return 'grade-unknown';
+  if (grade === 'A' || grade === 'B') return 'grade-good';
+  if (grade === 'C' || grade === 'D') return 'grade-partial';
+  return 'grade-poor';
+}
+
+function renderWinCompat(data) {
+  if (!data) return;
+  const status = data.sessionStatus || {};
+  $wincompatStatus.innerHTML = `
+    <div class="info-row">
+      <span class="info-label">${t('wincompat.session')}</span>
+      <span class="info-value">${escapeHtml(status.output || t('wincompat.unavailable'))}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">${t('wincompat.overall')}</span>
+      <span class="info-value badge-overall">${escapeHtml(data.overallGrade || 'PARTIAL')}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">${t('wincompat.matrix')}</span>
+      <span class="info-value">${data.compatMatrix?.available ? t('wincompat.matrix_loaded') : t('wincompat.matrix_mock')}</span>
+    </div>
+  `;
+
+  const grades = data.grades || [];
+  $wincompatGrades.innerHTML = grades.length
+    ? grades
+        .map(
+          (g) => `
+      <div class="grade-card">
+        <div class="grade-card-header">
+          <span class="grade-name">${escapeHtml(g.name)}</span>
+          <span class="grade-badge ${gradeClass(g.grade)}">${escapeHtml(g.grade)}</span>
+        </div>
+        <div class="grade-meta">
+          <span>${escapeHtml(g.status)}</span>
+          <span>${escapeHtml(g.backend)}</span>
+        </div>
+      </div>
+    `,
+        )
+        .join('')
+    : `<p class="muted-text">${t('wincompat.no_grades')}</p>`;
+}
+
+async function refreshWinCompat() {
+  const data = await strawwuHub.getWinCompat();
+  renderWinCompat(data);
+}
+
+document.getElementById('btn-refresh-wincompat').addEventListener('click', refreshWinCompat);
+
+// --- System Shortcuts ---
+const SHORTCUT_LABELS = {
+  wifi: 'system.shortcut.wifi',
+  network: 'system.shortcut.network',
+  display: 'system.shortcut.display',
+  sound: 'system.shortcut.sound',
+  power: 'system.shortcut.power',
+  region: 'system.shortcut.region',
+  users: 'system.shortcut.users',
+};
+
+async function renderSystemShortcuts() {
+  const shortcuts = await strawwuHub.getSystemShortcuts();
+  $systemShortcuts.innerHTML = (shortcuts || [])
+    .map(
+      (s) => `
+    <button class="shortcut-btn" data-desktop="${escapeHtml(s.desktop)}">
+      <span class="shortcut-label">${t(SHORTCUT_LABELS[s.id] || s.id)}</span>
+      <span class="shortcut-arrow">→</span>
+    </button>
+  `,
+    )
+    .join('');
+
+  $systemShortcuts.querySelectorAll('.shortcut-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      try {
+        await strawwuHub.openDesktopShortcut(btn.dataset.desktop);
+      } catch {
+        btn.classList.add('shortcut-error');
+      }
+    });
+  });
+}
+
+// --- About ---
+async function renderAbout() {
+  const about = await strawwuHub.getAbout();
+  if (!about) return;
+  $aboutInfo.innerHTML = `
+    <div class="about-brand">
+      <img class="brand-icon-lg" src="../../assets/icon.png" alt="StrawWU">
+      <div>
+        <div class="about-product">${escapeHtml(about.productName)}</div>
+        <div class="about-version">${t('about.version', { version: about.version })}</div>
+        <div class="about-os muted-text">${escapeHtml(about.osName)}</div>
+      </div>
+    </div>
+  `;
+}
+
+document.getElementById('btn-open-privacy').addEventListener('click', () => strawwuHub.openLegal('privacy'));
+document.getElementById('btn-open-eula').addEventListener('click', () => strawwuHub.openLegal('eula'));
+document.getElementById('btn-open-third-party').addEventListener('click', () => strawwuHub.openLegal('third_party'));
+document.getElementById('btn-bug-report').addEventListener('click', () => strawwuHub.launchBugReport());
+
 // --- Live Updates ---
 strawwuHub.onStatusUpdate((data) => {
   if (data) renderStatus(data);
@@ -244,6 +358,9 @@ initI18n().then(() => {
   refreshStatus();
   refreshLogs();
   initUpdateChannel();
+  refreshWinCompat();
+  renderSystemShortcuts();
+  renderAbout();
 });
 
 setInterval(refreshStatus, 10000);

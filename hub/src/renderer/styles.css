@@ -102,6 +102,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  overflow-y: auto;
 }
 
 .nav-btn {
@@ -544,3 +545,185 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--muted);
 }
+
+/* Settings center — W4-D3 panels */
+.section-subtitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 24px 0 12px;
+}
+
+.info-card,
+.about-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.info-value {
+  font-size: 13px;
+  text-align: right;
+  font-family: var(--font-mono);
+}
+
+.badge-overall {
+  color: var(--teal);
+  font-weight: 600;
+}
+
+.grade-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.grade-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.grade-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.grade-name {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.grade-badge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.grade-good {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--success);
+}
+
+.grade-partial {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--warn);
+}
+
+.grade-poor {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--error);
+}
+
+.grade-unknown {
+  background: var(--bg-elevated);
+  color: var(--muted);
+}
+
+.grade-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+
+.shortcut-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.shortcut-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.shortcut-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--teal-dim);
+}
+
+.shortcut-btn.shortcut-error {
+  border-color: var(--error);
+}
+
+.shortcut-arrow {
+  color: var(--teal);
+}
+
+.about-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brand-icon-lg {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+}
+
+.about-product {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.about-version {
+  font-size: 13px;
+  color: var(--teal);
+  margin-top: 4px;
+}
+
+.about-os {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.about-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.about-note {
+  margin-top: 20px;
+  font-size: 12px;
+  line-height: 1.5;
+  max-width: 640px;
+}
+

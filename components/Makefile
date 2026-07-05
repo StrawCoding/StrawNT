@@ -1,9 +1,10 @@
 .PHONY: help build test package clean check fmt \
 	test-wincompat test-execution-backends test-graphics-vulkan test-graphics-opengl \
-	test-anticheat-matrix test-device-proxy generate-compat-matrix
+	test-anticheat-matrix test-device-proxy generate-compat-matrix test-hub
 
 VERSION ?= 0.3.0
 COMPONENTS_DIR := $(abspath .)
+HUB_DIR := $(abspath $(COMPONENTS_DIR)/../hub)
 
 help:
 	@echo "StrawWU components $(VERSION)"
@@ -24,6 +25,7 @@ help:
 	@echo "  test-anticheat-matrix    Anti-cheat probe matrix tests"
 	@echo "  test-device-proxy        Device proxy + IOCTL tests"
 	@echo "  generate-compat-matrix   Generate compat-matrix.json"
+	@echo "  test-hub                 Hub / Settings Center unit tests (W4-D3)"
 
 build:
 	cargo build --release --workspace --manifest-path $(COMPONENTS_DIR)/Cargo.toml
@@ -157,6 +159,13 @@ generate-compat-matrix:
 	@echo "=== Generating compat-matrix.json ==="
 	@bash $(COMPONENTS_DIR)/tests/wincompat/generate-compat-matrix.sh
 	@echo ""
+
+test-hub:
+	@echo "=== W4-D3 strawwu-hub / Settings Center unit tests ==="
+	@test -d $(HUB_DIR) || (echo "FAIL: hub/ directory missing" && exit 1)
+	cd $(HUB_DIR) && npm test
+	@echo ""
+	@echo "=== test-hub: PASS ==="
 
 package: build
 	@echo "=== Building .deb package ==="

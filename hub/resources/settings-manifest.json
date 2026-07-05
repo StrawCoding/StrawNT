@@ -1,0 +1,40 @@
+{
+  "schema": "strawwu-hub-settings/v1",
+  "wave": "W4-D3",
+  "role": "system-settings-center",
+  "desktop": {
+    "categories": ["Settings", "System"],
+    "keywords": ["settings", "preferences", "configure", "strawwu", "hub"]
+  },
+  "panels": [
+    { "id": "status", "group": "system" },
+    { "id": "logs", "group": "system" },
+    { "id": "updates", "group": "system" },
+    { "id": "language", "group": "personalization" },
+    { "id": "wincompat", "group": "compatibility" },
+    { "id": "system", "group": "shortcuts" },
+    { "id": "about", "group": "info" }
+  ],
+  "legal": {
+    "privacy": "/usr/share/strawwu/legal/privacy.html",
+    "eula": "/usr/share/strawwu/legal/eula.html",
+    "third_party": "/usr/share/strawwu/legal/third-party.html"
+  },
+  "bug_report": {
+    "gtk": "strawwu-bug-report-gtk",
+    "cli": "strawwu-bug-report"
+  },
+  "compat_matrix": {
+    "installed": "/usr/share/strawwu/compat-matrix.json",
+    "dev": "components/tests/wincompat/output/compat-matrix.json"
+  },
+  "system_shortcuts": [
+    { "id": "wifi", "desktop": "gnome-wifi-panel.desktop" },
+    { "id": "network", "desktop": "gnome-network-panel.desktop" },
+    { "id": "display", "desktop": "gnome-display-panel.desktop" },
+    { "id": "sound", "desktop": "gnome-sound-panel.desktop" },
+    { "id": "power", "desktop": "gnome-power-panel.desktop" },
+    { "id": "region", "desktop": "gnome-region-panel.desktop" },
+    { "id": "users", "desktop": "gnome-user-accounts-panel.desktop" }
+  ]
+}

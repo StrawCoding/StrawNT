@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, nativeTheme } = require('electron');
 const path = require('path');
 const RuntimeClient = require('./runtime-client');
+const settingsService = require('./settings-service');
 const i18n = require('../common/i18n');
 const { IPC_CHANNELS, UPDATE_CHANNELS } = require('../common/constants');
 
@@ -103,6 +104,15 @@ function setupIpcHandlers() {
     const translations = i18n.loadTranslationsForRenderer(locale);
     return { locale, translations };
   });
+
+  ipcMain.handle(IPC_CHANNELS.GET_ABOUT, async () => settingsService.getAboutInfo());
+  ipcMain.handle(IPC_CHANNELS.GET_WINCOMPAT, async () => settingsService.getWinCompatInfo());
+  ipcMain.handle(IPC_CHANNELS.GET_SYSTEM_SHORTCUTS, async () => settingsService.getSystemShortcuts());
+  ipcMain.handle(IPC_CHANNELS.OPEN_LEGAL, async (_event, docId) => settingsService.openLegalDoc(docId));
+  ipcMain.handle(IPC_CHANNELS.LAUNCH_BUG_REPORT, async () => settingsService.launchBugReporter(true));
+  ipcMain.handle(IPC_CHANNELS.OPEN_DESKTOP_SHORTCUT, async (_event, desktopFile) =>
+    settingsService.openDesktopShortcut(desktopFile),
+  );
 }
 
 app.whenReady().then(() => {

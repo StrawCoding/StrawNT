@@ -29,6 +29,9 @@ describe('i18n system', () => {
       'nav.logs',
       'nav.updates',
       'nav.language',
+      'nav.wincompat',
+      'nav.system',
+      'nav.about',
       'status.title',
       'status.refresh',
       'logs.title',
@@ -37,6 +40,9 @@ describe('i18n system', () => {
       'language.title',
       'language.search',
       'language.applied',
+      'about.title',
+      'wincompat.title',
+      'system.title',
     ];
     for (const key of requiredKeys) {
       assert.ok(en[key], `Missing key in en.json: ${key}`);

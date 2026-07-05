@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-05T05:36:09.110352",
+  "generated_at": "2026-07-05T05:52:19.351085",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 15,
-  "failed": 32,
+  "passed": 16,
+  "failed": 31,
   "all_pass": false,
   "stages": [
     {
@@ -83,8 +83,8 @@
     },
     {
       "id": "w4-d2-strawwu-shell",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w4-d3-hub-settings",

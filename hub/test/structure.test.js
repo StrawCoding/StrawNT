@@ -18,6 +18,9 @@ describe('Hub directory structure', () => {
     'assets/icon.png',
     'resources/strawwu-hub.desktop',
     'resources/strawwu-hub-autostart.desktop',
+    'resources/settings-manifest.json',
+    'src/common/settings-paths.js',
+    'src/main/settings-service.js',
   ];
 
   for (const file of requiredFiles) {
@@ -45,8 +48,8 @@ describe('Hub directory structure', () => {
       'utf8',
     );
     assert.ok(desktop.includes('[Desktop Entry]'));
-    assert.ok(desktop.includes('Name=StrawWU Hub'));
-    assert.ok(desktop.includes('Type=Application'));
+    assert.ok(desktop.includes('Name=StrawWU Settings'));
+    assert.ok(desktop.includes('Categories=Settings;System;'));
   });
 
   it('should have autostart desktop file with X-GNOME-Autostart', () => {

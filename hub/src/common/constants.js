@@ -16,6 +16,12 @@ module.exports = {
     LOG_ENTRY: 'runtime:log-entry',
     GET_I18N: 'i18n:get',
     SET_LOCALE: 'i18n:set-locale',
+    GET_ABOUT: 'settings:get-about',
+    GET_WINCOMPAT: 'settings:get-wincompat',
+    GET_SYSTEM_SHORTCUTS: 'settings:get-system-shortcuts',
+    OPEN_LEGAL: 'settings:open-legal',
+    LAUNCH_BUG_REPORT: 'settings:launch-bug-report',
+    OPEN_DESKTOP_SHORTCUT: 'settings:open-desktop-shortcut',
   },
 
   COLORS: {

@@ -1,7 +1,7 @@
 {
   "name": "strawwu-hub",
-  "version": "0.4.1.16",
-  "description": "StrawWU Desktop Control Center — subsystem status, logs, and update channel management",
+  "version": "0.4.1.17",
+  "description": "StrawWU System Settings Center — subsystem status, Windows compat, legal docs, and update channel management",
   "main": "src/main/main.js",
   "scripts": {
     "start": "electron .",
@@ -21,7 +21,7 @@
   },
   "build": {
     "appId": "xyz.wastebase.strawwu.hub",
-    "productName": "StrawWU Hub",
+    "productName": "StrawWU Settings",
     "directories": {
       "output": "dist"
     },
@@ -47,7 +47,8 @@
     "files": [
       "src/**/*",
       "assets/**/*",
-      "resources/**/*"
+      "resources/**/*",
+      "locales/**/*"
     ],
     "extraResources": [
       {

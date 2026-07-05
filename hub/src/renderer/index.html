@@ -12,7 +12,7 @@
     <header class="titlebar">
       <div class="titlebar-brand">
         <img class="brand-icon" src="../../assets/icon.png" alt="StrawWU">
-        <h1 data-i18n="app.title">StrawWU Hub</h1>
+        <h1 data-i18n="app.title">StrawWU Settings</h1>
       </div>
       <div class="titlebar-meta">
         <span id="connection-indicator" class="indicator disconnected"></span>
@@ -32,6 +32,18 @@
       <button class="nav-btn" data-tab="updates">
         <span class="nav-icon">⟳</span>
         <span data-i18n="nav.updates">Update Channel</span>
+      </button>
+      <button class="nav-btn" data-tab="wincompat">
+        <span class="nav-icon">⊞</span>
+        <span data-i18n="nav.wincompat">Windows Compat</span>
+      </button>
+      <button class="nav-btn" data-tab="system">
+        <span class="nav-icon">⚙</span>
+        <span data-i18n="nav.system">System</span>
+      </button>
+      <button class="nav-btn" data-tab="about">
+        <span class="nav-icon">ℹ</span>
+        <span data-i18n="nav.about">About</span>
       </button>
       <button class="nav-btn" data-tab="language">
         <span class="nav-icon">🌐</span>
@@ -114,6 +126,39 @@
         </div>
         <div id="language-list" class="language-list"></div>
         <div id="language-status" class="channel-status"></div>
+      </section>
+
+      <!-- Windows Compat Panel -->
+      <section id="tab-wincompat" class="tab-panel">
+        <h2 data-i18n="wincompat.title">Windows Compatibility</h2>
+        <p class="muted-text" data-i18n="wincompat.description">Session status and compatibility grades for Windows apps.</p>
+        <div id="wincompat-status" class="info-card"></div>
+        <h3 class="section-subtitle" data-i18n="wincompat.grades_title">Compat Grades</h3>
+        <div id="wincompat-grades" class="grade-grid"></div>
+        <div class="actions-bar">
+          <button id="btn-refresh-wincompat" class="btn btn-secondary" data-i18n="wincompat.refresh">Refresh</button>
+        </div>
+      </section>
+
+      <!-- System Shortcuts Panel -->
+      <section id="tab-system" class="tab-panel">
+        <h2 data-i18n="system.title">System Settings</h2>
+        <p class="muted-text" data-i18n="system.description">Open GNOME control panels for hardware and account settings.</p>
+        <div id="system-shortcuts" class="shortcut-grid"></div>
+      </section>
+
+      <!-- About Panel -->
+      <section id="tab-about" class="tab-panel">
+        <h2 data-i18n="about.title">About StrawWU</h2>
+        <div id="about-info" class="about-card"></div>
+        <h3 class="section-subtitle" data-i18n="about.legal_title">Legal &amp; Support</h3>
+        <div class="about-actions">
+          <button id="btn-open-privacy" class="btn btn-secondary" data-i18n="about.privacy">Privacy Policy</button>
+          <button id="btn-open-eula" class="btn btn-secondary" data-i18n="about.eula">EULA</button>
+          <button id="btn-open-third-party" class="btn btn-secondary" data-i18n="about.third_party">Third-Party Notices</button>
+          <button id="btn-bug-report" class="btn btn-primary" data-i18n="about.bug_report">Report a Bug</button>
+        </div>
+        <p class="muted-text about-note" data-i18n="about.trademark_note">StrawWU is not affiliated with Canonical, Microsoft, or Ubuntu. Windows compatibility mode does not imply Microsoft certification.</p>
       </section>
     </main>
   </div>
