@@ -6,7 +6,7 @@
 | 日期 | 2026-07-05 |
 | Worker | 階段 15/47（w3-w0-wincompat-baseline） |
 | 結果 | **待 Hermes mark**（worker 不自宣稱 PASS） |
-| Companion | `[worker-TICK]` 2026-07-05T05:21:31-0400 status=IN_PROGRESS → 終驗完成 |
+| Companion | `[worker-TICK]` 2026-07-05T05:34:12-0400 Hermes 續跑 → 2026-07-05T05:36-0400 終驗完成 |
 
 ## 目標
 
@@ -37,9 +37,9 @@ rootfs 納入 strawwu CLI + status — Live ISO 上可執行 `strawwu status`（
 | 日誌路徑 | `/var/log/strawwu/wincompat.log`（postinst 建目錄；寫入待 W5+） |
 | 建置 | `cargo build --release --bin strawwu` → amd64 deb（~176K） |
 
-## 驗收命令輸出（2026-07-05T05:25 UTC-4，worker 終驗）
+## 驗收命令輸出（2026-07-05T05:36 UTC-4，Hermes 續跑終驗）
 
-### `make test-wincompat-os` — exit 0（~0.9s）
+### `make test-wincompat-os` — exit 0（~0.7s）
 
 Log: `/tmp/w3-w0-test-wincompat-os.log`
 
@@ -49,7 +49,9 @@ Log: `/tmp/w3-w0-test-wincompat-os.log`
 
 關鍵檢查項：deb 建置 PASS、`strawwu-wincompat_0.4.1.15_amd64.deb`（176K）、CLI unit tests PASS、rootfs+squashfs `/usr/bin/strawwu` 存在且 `strawwu status` 可執行、chroot marker 存在。
 
-### `make preflight` — exit 0（~102s）
+`strawwu status` 實際輸出：`strawwu: status — runtime idle, 0 sessions active`
+
+### `make preflight` — exit 0（~108s）
 
 Log: `/tmp/w3-w0-preflight.log`
 

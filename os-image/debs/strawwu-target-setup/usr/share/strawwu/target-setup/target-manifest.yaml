@@ -3,6 +3,7 @@ schema: strawwu-target-manifest/v1
 packages:
   - strawwu-initd
   - strawwu-wincompat
+  - strawwu-shell
   - strawwu-session
   - strawwu-update-notifier
   - strawwu-bug-reporter

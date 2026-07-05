@@ -1,13 +1,14 @@
 {
   "schema": "strawwu-desktop-baseline/v1",
   "wave": "W3-D1",
-  "version": "0.4.1.15",
+  "version": "0.4.1.16",
   "packages": {
     "strawwu-session": {
       "path": "os-image/debs/strawwu-session",
       "gdm_session": "strawwu-session",
-      "interim_compositor": "gnome-shell",
-      "shell_target_wave": "W4-D2"
+      "interim_compositor": "strawwu-shell",
+      "shell_target_wave": "W4-D2",
+      "shell_package": "strawwu-shell"
     },
     "strawwu-desktop": {
       "path": "os-image/debs/strawwu-desktop",

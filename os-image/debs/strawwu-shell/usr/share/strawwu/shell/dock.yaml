@@ -1,0 +1,6 @@
+schema: strawwu-shell-dock/v1
+position: BOTTOM
+icon_size: 48
+extend_height: false
+show_mounts: false
+autohide: false

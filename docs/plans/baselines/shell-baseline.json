@@ -1,0 +1,22 @@
+{
+  "schema": "strawwu-shell-baseline/v1",
+  "wave": "W4-D2",
+  "version": "0.4.1.16",
+  "package": "strawwu-shell",
+  "launcher": "/usr/bin/strawwu-shell",
+  "session_mode": "strawwu",
+  "builtin_dock_extension": "strawwu-dock@strawwu",
+  "fork_strategy": "session-mode-overlay",
+  "extension_public_api": false,
+  "disabled_ubuntu_extensions": [
+    "ubuntu-dock@ubuntu.com",
+    "ubuntu-appindicators@ubuntu.com",
+    "ding@rastersoft.com",
+    "desktop-icons@csoriano"
+  ],
+  "manifests": {
+    "shell": "usr/share/strawwu/shell/shell.yaml",
+    "dock": "usr/share/strawwu/shell/dock.yaml",
+    "disabled": "usr/share/strawwu/shell/disabled-extensions.json"
+  }
+}

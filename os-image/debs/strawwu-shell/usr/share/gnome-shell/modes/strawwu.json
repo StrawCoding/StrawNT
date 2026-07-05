@@ -1,0 +1,10 @@
+{
+  "parentMode": "user",
+  "stylesheetName": "StrawWU-Dark/gnome-shell.css",
+  "enabledExtensions": [
+    "strawwu-dock@strawwu"
+  ],
+  "debugFlags": [
+    "backtrace-crashes-all"
+  ]
+}

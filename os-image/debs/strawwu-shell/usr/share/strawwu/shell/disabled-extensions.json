@@ -1,0 +1,11 @@
+{
+  "schema": "strawwu-shell-disabled-extensions/v1",
+  "description": "Ubuntu/upstream extensions blocked in strawwu session mode",
+  "extensions": [
+    "ubuntu-dock@ubuntu.com",
+    "ubuntu-appindicators@ubuntu.com",
+    "ding@rastersoft.com",
+    "desktop-icons@csoriano",
+    "tiling-assistant@leleat-on-github"
+  ]
+}

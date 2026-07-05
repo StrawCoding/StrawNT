@@ -55,7 +55,7 @@ verify_prerequisites() {
 build_debs() {
     local version="${STRAWWU_VERSION:-$(tr -d '[:space:]' < "${REPO_ROOT}/VERSION")}"
     local pkg
-    for pkg in strawwu-initd strawwu-wincompat strawwu-session strawwu-update-notifier strawwu-bug-reporter \
+    for pkg in strawwu-initd strawwu-wincompat strawwu-shell strawwu-session strawwu-update-notifier strawwu-bug-reporter \
         strawwu-flatpak-setup strawwu-desktop strawwu-live-install-ux \
         strawwu-target-setup strawwu-calamares-settings; do
         local build="${DEBS_ROOT}/${pkg}/build-deb.sh"
@@ -86,7 +86,7 @@ stage_debs() {
     install -d -m 0755 "${STAGED}"
 
     local pkg deb
-    for pkg in strawwu-initd strawwu-wincompat strawwu-session strawwu-update-notifier strawwu-bug-reporter \
+    for pkg in strawwu-initd strawwu-wincompat strawwu-shell strawwu-session strawwu-update-notifier strawwu-bug-reporter \
         strawwu-flatpak-setup strawwu-desktop; do
         deb="$(latest_deb "${pkg}")"
         [[ -n "${deb}" && -f "${deb}" ]] || die "deb missing for ${pkg}"
@@ -147,6 +147,7 @@ STRAWWU_TARGET_DEB_DIR=/usr/share/strawwu/target-setup/staged-debs \
     strawwu-target-setup --calamares-chroot
 
 command -v strawwu-session >/dev/null
+command -v strawwu-shell >/dev/null
 command -v strawwu >/dev/null
 strawwu status | grep -qi status
 dpkg-query -W -f='${Status}' strawwu-wincompat 2>/dev/null | grep -q "ok installed"
@@ -185,6 +186,7 @@ sync_squashfs() {
         "${ROOTFS_DIR}/usr/bin/strawwu-initd" \
         "${ROOTFS_DIR}/usr/bin/strawwu" \
         "${ROOTFS_DIR}/usr/bin/strawwu-session" \
+        "${ROOTFS_DIR}/usr/bin/strawwu-shell" \
         "${ROOTFS_DIR}/usr/bin/strawwu-update-notifier" \
         "${SQUASH_SRC}/usr/bin/" 2>/dev/null || true
     rsync -a \
@@ -208,6 +210,15 @@ sync_squashfs() {
     rsync -a \
         "${ROOTFS_DIR}/etc/calamares/" \
         "${SQUASH_SRC}/etc/calamares/" 2>/dev/null || true
+    rsync -a \
+        "${ROOTFS_DIR}/usr/share/gnome-shell/modes/strawwu.json" \
+        "${SQUASH_SRC}/usr/share/gnome-shell/modes/" 2>/dev/null || true
+    rsync -a \
+        "${ROOTFS_DIR}/usr/share/gnome-shell/extensions/strawwu-dock@strawwu/" \
+        "${SQUASH_SRC}/usr/share/gnome-shell/extensions/strawwu-dock@strawwu/" 2>/dev/null || true
+    rsync -a \
+        "${ROOTFS_DIR}/usr/share/strawwu/shell/" \
+        "${SQUASH_SRC}/usr/share/strawwu/shell/" 2>/dev/null || true
     rsync -a \
         "${ROOTFS_DIR}/var/lib/strawwu/" \
         "${SQUASH_SRC}/var/lib/strawwu/" 2>/dev/null || true

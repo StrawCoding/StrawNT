@@ -1,0 +1,8 @@
+{
+  "uuid": "strawwu-dock@strawwu",
+  "name": "StrawWU Dock",
+  "description": "Built-in bottom dock for StrawWU Shell (not a public extension API).",
+  "shell-version": ["45", "46"],
+  "version": 1,
+  "session-modes": ["user", "strawwu"]
+}

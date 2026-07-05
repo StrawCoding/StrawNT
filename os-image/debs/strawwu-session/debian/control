@@ -3,11 +3,11 @@ Version: __VERSION__
 Section: gnome
 Priority: optional
 Architecture: all
-Depends: gnome-session-bin, gnome-session-common, gnome-settings-daemon (>= 3.37.0), gnome-shell (>= 45), xwayland, session-migration
+Depends: gnome-session-bin, gnome-session-common, gnome-settings-daemon (>= 3.37.0), strawwu-shell, xwayland, session-migration
 Recommends: xdg-desktop-portal-gnome
 Maintainer: StrawCoding <apt@wastebase.xyz>
 Provides: x-session-manager
-Description: StrawWU desktop session (GNOME Shell interim)
- Registers the StrawWU session for GDM and launches GNOME Shell
- with StrawWU branding until strawwu-shell (W4-D2) replaces the
- compositor. Hub autostart is enabled when the Hub package is present.
+Description: StrawWU desktop session
+ Registers the StrawWU session for GDM and launches strawwu-shell
+ (GNOME Shell fork profile with built-in dock). Hub autostart is
+ enabled when the Hub package is present.

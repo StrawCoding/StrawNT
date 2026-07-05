@@ -25,7 +25,7 @@ def test_launcher_exists_and_uses_gnome_session() -> None:
     assert LAUNCHER.is_file()
     text = LAUNCHER.read_text()
     assert "gnome-session --session=strawwu" in text
-    assert "GNOME_SHELL_SESSION_MODE=ubuntu" in text
+    assert "GNOME_SHELL_SESSION_MODE=strawwu" in text
 
 
 def test_xsession_desktop() -> None:

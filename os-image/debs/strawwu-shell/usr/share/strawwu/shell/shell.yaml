@@ -1,0 +1,21 @@
+schema: strawwu-shell-profile/v1
+wave: W4-D2
+version: __VERSION__
+fork:
+  upstream: gnome-shell
+  strategy: session-mode-overlay
+  session_mode: strawwu
+  launcher: /usr/bin/strawwu-shell
+dock:
+  builtin: true
+  extension_uuid: strawwu-dock@strawwu
+  config: dock.yaml
+extensions:
+  public_api: false
+  disabled_manifest: disabled-extensions.json
+panel:
+  stable: true
+overview:
+  stable: true
+notifications:
+  stable: true

@@ -64,10 +64,10 @@ else
     fail "strawwu.session missing Name=StrawWU"
 fi
 
-if grep -q 'gnome-session --session=strawwu' "${SESSION_DIR}/usr/bin/strawwu-session"; then
-    pass "launcher uses gnome-session --session=strawwu"
+if grep -q 'GNOME_SHELL_SESSION_MODE=strawwu' "${SESSION_DIR}/usr/bin/strawwu-session"; then
+    pass "launcher uses strawwu shell session mode"
 else
-    fail "launcher missing gnome-session --session=strawwu"
+    fail "launcher missing GNOME_SHELL_SESSION_MODE=strawwu"
 fi
 
 if python3 "${SESSION_TEST}"; then
@@ -186,8 +186,9 @@ data = {
         "strawwu-session": {
             "path": "os-image/debs/strawwu-session",
             "gdm_session": "strawwu-session",
-            "interim_compositor": "gnome-shell",
+            "interim_compositor": "strawwu-shell",
             "shell_target_wave": "W4-D2",
+            "shell_package": "strawwu-shell",
         },
         "strawwu-desktop": {
             "path": "os-image/debs/strawwu-desktop",

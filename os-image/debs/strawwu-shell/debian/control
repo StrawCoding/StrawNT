@@ -1,0 +1,12 @@
+Package: strawwu-shell
+Version: __VERSION__
+Section: gnome
+Priority: optional
+Architecture: all
+Depends: gnome-shell (>= 45), gjs, mutter (>= 45)
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Provides: strawwu-compositor
+Description: StrawWU GNOME Shell fork profile with built-in dock
+ StrawWU shell profile: custom session mode, built-in bottom dock
+ extension, and Ubuntu extension blocklist. Wraps upstream gnome-shell;
+ third-party extension API deferred to v1.0 (W4-D2).

@@ -1,0 +1,20 @@
+#!/bin/sh
+# strawwu-shell — StrawWU GNOME Shell fork launcher (W4-D2).
+# Sets strawwu session mode and execs upstream gnome-shell.
+set -e
+
+export GNOME_SHELL_SESSION_MODE="${GNOME_SHELL_SESSION_MODE:-strawwu}"
+export STRAWWU_SHELL=1
+export XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:-StrawWU:GNOME}"
+
+REAL_SHELL="/usr/bin/gnome-shell"
+if [ -x /usr/libexec/gnome-shell ]; then
+    REAL_SHELL="/usr/libexec/gnome-shell"
+fi
+
+if [ ! -x "${REAL_SHELL}" ]; then
+    echo "strawwu-shell: gnome-shell binary missing" >&2
+    exit 1
+fi
+
+exec "${REAL_SHELL}" "$@"

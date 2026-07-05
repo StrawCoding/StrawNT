@@ -1,0 +1,4 @@
+[org.gnome.shell]
+disabled-extensions=['ubuntu-dock@ubuntu.com', 'ubuntu-appindicators@ubuntu.com', 'ding@rastersoft.com', 'desktop-icons@csoriano', 'tiling-assistant@leleat-on-github']
+enabled-extensions=['strawwu-dock@strawwu']
+development-tools=false

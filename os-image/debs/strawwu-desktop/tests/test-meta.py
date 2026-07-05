@@ -21,11 +21,11 @@ FORBIDDEN = (
 
 REQUIRED_DEPENDS = (
     "strawwu-session",
+    "strawwu-shell",
     "strawwu-initd",
     "strawwu-bug-reporter",
     "strawwu-flatpak-setup",
     "gdm3",
-    "gnome-shell",
     "xorg",
 )
 
