@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-05T07:30:11.527298",
+  "generated_at": "2026-07-05T07:45:07.763046",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 21,
-  "failed": 26,
+  "passed": 22,
+  "failed": 25,
   "all_pass": false,
   "stages": [
     {
@@ -113,8 +113,8 @@
     },
     {
       "id": "w5-n3-firstboot",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w5-n4-finished-meta",

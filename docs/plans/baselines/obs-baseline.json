@@ -27,7 +27,17 @@
     "format": "bundle.strawwu-bug",
     "auto_upload_default": false,
     "consent_required": true,
-    "schema_ready": true
+    "schema_ready": true,
+    "cli": "strawwu-bug-report",
+    "entries": [
+      "manifest.json",
+      "system.json",
+      "journal.txt",
+      "dmesg.txt",
+      "logs/",
+      "registry.json",
+      "user-notes.txt"
+    ]
   },
   "wave0_gaps": [
     "structured JSON logging not wired"
