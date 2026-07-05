@@ -119,6 +119,69 @@ impl RegistryStore {
         Ok(self.data.find(id).expect("just inserted"))
     }
 
+    /// Register or refresh an app launched via `strawwu run` (W4-W1).
+    pub fn upsert_from_launch(
+        &mut self,
+        id: &str,
+        name: &str,
+        kind: AppKind,
+        install_path: Option<String>,
+        backend: Option<ExecutionBackend>,
+    ) -> Result<&AppEntry, RegistryError> {
+        if let Some(app) = self.data.find_mut(id) {
+            app.name = name.to_string();
+            app.kind = kind;
+            app.source = AppSource::Launcher;
+            app.install_state = InstallState::Installed;
+            app.install_path = install_path;
+            app.execution_backend = backend.or(Some(ExecutionBackend::Native));
+            app.touch();
+            self.data.touch();
+            self.flush()?;
+            self.log_event("upsert", id);
+            return Ok(self.data.find(id).expect("just updated"));
+        }
+
+        self.register_new(
+            id,
+            name,
+            kind,
+            AppSource::Launcher,
+            install_path,
+            false,
+            backend,
+        )
+    }
+
+    /// Record a pending install initiated via `strawwu install` (W4-W1 stub).
+    pub fn upsert_from_install(
+        &mut self,
+        id: &str,
+        name: &str,
+        installer_path: Option<String>,
+    ) -> Result<&AppEntry, RegistryError> {
+        if let Some(app) = self.data.find_mut(id) {
+            app.name = name.to_string();
+            app.kind = AppKind::Win32;
+            app.source = AppSource::Installer;
+            app.install_state = InstallState::Pending;
+            app.install_path = installer_path;
+            app.execution_backend = Some(ExecutionBackend::Native);
+            app.touch();
+            self.data.touch();
+            self.flush()?;
+            self.log_event("install-pending", id);
+            return Ok(self.data.find(id).expect("just updated"));
+        }
+
+        let mut entry = AppEntry::new(id, name, AppKind::Win32, AppSource::Installer);
+        entry.install_state = InstallState::Pending;
+        entry.install_path = installer_path;
+        entry.execution_backend = Some(ExecutionBackend::Native);
+        self.register(entry)?;
+        Ok(self.data.find(id).expect("just inserted"))
+    }
+
     pub fn preview_remove(&self, id: &str) -> Result<RemovePreview, RegistryError> {
         let app = self
             .data
@@ -248,5 +311,41 @@ mod tests {
             .unwrap();
         let err = store.remove("system-app", false).unwrap_err();
         assert!(matches!(err, RegistryError::Protected(_)));
+    }
+
+    #[test]
+    fn upsert_from_launch_updates_existing() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("registry.json");
+        std::env::set_var(
+            "STRAWWU_APP_REGISTRY_LOG",
+            dir.path().join("registry.log").to_string_lossy().as_ref(),
+        );
+        let mut store = RegistryStore::open_at(path.clone()).unwrap();
+
+        store
+            .upsert_from_launch(
+                "demo-app",
+                "Demo App",
+                AppKind::Win32,
+                Some("/opt/demo".into()),
+                None,
+            )
+            .unwrap();
+        store
+            .upsert_from_launch(
+                "demo-app",
+                "Demo App Updated",
+                AppKind::Win32,
+                Some("/opt/demo2".into()),
+                Some(ExecutionBackend::Container),
+            )
+            .unwrap();
+
+        let app = store.get("demo-app").expect("app");
+        assert_eq!(app.name, "Demo App Updated");
+        assert_eq!(app.install_path.as_deref(), Some("/opt/demo2"));
+        assert_eq!(app.source, AppSource::Launcher);
+        assert_eq!(app.execution_backend, Some(ExecutionBackend::Container));
     }
 }

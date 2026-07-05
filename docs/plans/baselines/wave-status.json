@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-05T06:27:57.774602",
+  "generated_at": "2026-07-05T06:42:17.335068",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 18,
-  "failed": 29,
+  "passed": 19,
+  "failed": 28,
   "all_pass": false,
   "stages": [
     {
@@ -98,8 +98,8 @@
     },
     {
       "id": "w4-f3-flathub-hub",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w4-w1-registry-launcher",

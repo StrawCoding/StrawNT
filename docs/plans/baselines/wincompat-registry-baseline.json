@@ -1,0 +1,28 @@
+{
+  "schema": "strawwu-wincompat-registry-baseline/v1",
+  "wave": "W4-W1",
+  "version": "0.4.1.20",
+  "launcher_crate": "strawwu-launcher",
+  "registry_crate": "strawwu-app-registry",
+  "registry_path": "/var/lib/strawwu/app-registry.json",
+  "registry_env": "STRAWWU_APP_REGISTRY",
+  "integration": {
+    "run": {
+      "registers": true,
+      "source": "launcher",
+      "upsert": true
+    },
+    "install": {
+      "registers": true,
+      "source": "installer",
+      "state": "pending"
+    },
+    "apps_list": {
+      "reads": "app-registry"
+    },
+    "status": {
+      "reads": "app-registry"
+    }
+  },
+  "dod": "strawwu run registers AppRecord in user app registry"
+}

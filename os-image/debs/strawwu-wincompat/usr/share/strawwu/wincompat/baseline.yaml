@@ -2,7 +2,16 @@ schema: strawwu-wincompat-baseline/v1
 cli: /usr/bin/strawwu
 log_path: /var/log/strawwu/wincompat.log
 state_dir: /var/lib/strawwu/wincompat
+registry_path: /var/lib/strawwu/app-registry.json
+execution_backend_default: native
 commands:
   - status
   - version
   - help
+  - run
+  - install
+  - apps
+registry_integration:
+  run_registers: true
+  install_registers: pending
+  apps_list_source: app-registry
