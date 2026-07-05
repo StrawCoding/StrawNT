@@ -1,0 +1,18 @@
+schema: strawwu-target-identity-manifest/v1
+wave: W5-I3
+description: >-
+  Post-install target branding: GRUB menu title, Plymouth theme,
+  initramfs refresh, user-visible issue/motd. Runs in Calamares chroot
+  after target-setup staged debs.
+
+grub:
+  dropin: /etc/default/grub.d/99-strawwu-identity.cfg
+  distributor: StrawWU
+
+plymouth:
+  theme: strawwu-boot
+  conf: /etc/plymouth/plymouthd.conf
+
+lifecycle_key: lifecycle.target_identity
+log_path: /var/log/strawwu/target-identity.log
+error_code: SWU-IN-003

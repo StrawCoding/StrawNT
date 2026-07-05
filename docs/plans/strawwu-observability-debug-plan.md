@@ -11,6 +11,7 @@
 | boot-selfcheck | `/var/log/strawwu/boot-selfcheck.log` |
 | install (Calamares) | `/var/log/strawwu/install.log` |
 | target-setup | `/var/log/strawwu/target-setup.log` |
+| target-identity | `/var/log/strawwu/target-identity.log` |
 | firstboot | `/var/log/strawwu/firstboot.log` |
 | App Registry | `/var/log/strawwu/app-registry.log` |
 | update/upgrade | `/var/log/strawwu/update.log` |

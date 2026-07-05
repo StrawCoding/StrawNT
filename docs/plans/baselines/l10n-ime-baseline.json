@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-l10n-ime-baseline/v1",
   "wave": "W4-L10N",
-  "version": "0.4.1.27",
+  "version": "0.4.1.28",
   "package": "strawwu-l10n-ime",
   "framework": "fcitx5",
   "default_engine": "chewing",

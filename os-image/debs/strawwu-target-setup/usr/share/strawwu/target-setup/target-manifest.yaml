@@ -13,4 +13,5 @@ packages:
   - strawwu-install-init
   - strawwu-desktop-actions
   - strawwu-registry-hooks
+  - strawwu-target-identity
   - strawwu-desktop

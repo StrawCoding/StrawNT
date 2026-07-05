@@ -1,0 +1,15 @@
+Package: strawwu-target-identity
+Version: __VERSION__
+Section: admin
+Priority: optional
+Architecture: all
+Depends: strawwu-initd,
+         python3
+Recommends: grub-pc | grub-efi-amd64,
+            plymouth
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU installed-target GRUB/Plymouth identity hook
+ Calamares chroot hook applying LEG3 branding on the installed system:
+ GRUB_DISTRIBUTOR, Plymouth strawwu-boot theme, initramfs refresh,
+ and user-visible issue/motd strings. Writes lifecycle.target_identity
+ via strawwu-initd.

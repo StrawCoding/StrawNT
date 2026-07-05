@@ -56,7 +56,7 @@ build_debs() {
     local version="${STRAWWU_VERSION:-$(tr -d '[:space:]' < "${REPO_ROOT}/VERSION")}"
     local pkg
     for pkg in strawwu-initd strawwu-wincompat strawwu-shell strawwu-session strawwu-update-notifier strawwu-bug-reporter \
-        strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-install-init strawwu-desktop-actions strawwu-registry-hooks strawwu-desktop strawwu-live-install-ux \
+        strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-install-init strawwu-desktop-actions strawwu-registry-hooks strawwu-target-identity strawwu-desktop strawwu-live-install-ux \
         strawwu-target-setup strawwu-calamares-settings; do
         local build="${DEBS_ROOT}/${pkg}/build-deb.sh"
         [[ -x "${build}" ]] || die "missing build script: ${build}"
@@ -87,7 +87,7 @@ stage_debs() {
 
     local pkg deb
     for pkg in strawwu-initd strawwu-wincompat strawwu-shell strawwu-session strawwu-update-notifier strawwu-bug-reporter \
-        strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-install-init strawwu-desktop-actions strawwu-desktop; do
+        strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-install-init strawwu-desktop-actions strawwu-registry-hooks strawwu-target-identity strawwu-desktop; do
         deb="$(latest_deb "${pkg}")"
         [[ -n "${deb}" && -f "${deb}" ]] || die "deb missing for ${pkg}"
         cp -f "${deb}" "${STAGED}/"
@@ -167,6 +167,14 @@ command -v strawwu-firstboot >/dev/null
 test -f /etc/xdg/autostart/strawwu-firstboot.desktop
 strawwu-initd get lifecycle.target_setup | grep -q done
 
+STRAWWU_TARGET_DEB_DIR=/usr/share/strawwu/target-setup/staged-debs \
+    strawwu-target-identity --calamares-chroot --skip-initramfs
+
+command -v strawwu-target-identity >/dev/null
+test -f /etc/default/grub.d/99-strawwu-identity.cfg
+grep -q 'GRUB_DISTRIBUTOR="StrawWU"' /etc/default/grub.d/99-strawwu-identity.cfg
+strawwu-initd get lifecycle.target_identity | grep -q done
+
 # Live ISO transition: keep upstream metas until W5-B4 (preflight purge baseline).
 for transitional in ubuntu-minimal ubuntu-desktop-minimal ubuntu-desktop; do
     if ! dpkg-query -W -f='${Status}' "${transitional}" 2>/dev/null | grep -q "ok installed"; then
@@ -201,6 +209,7 @@ sync_squashfs() {
         "${ROOTFS_DIR}/usr/bin/strawwu-shell" \
         "${ROOTFS_DIR}/usr/bin/strawwu-update-notifier" \
         "${ROOTFS_DIR}/usr/bin/strawwu-firstboot" \
+        "${ROOTFS_DIR}/usr/bin/strawwu-target-identity" \
         "${SQUASH_SRC}/usr/bin/" 2>/dev/null || true
     rsync -a \
         "${ROOTFS_DIR}/usr/share/strawwu/wincompat/" \
@@ -256,6 +265,15 @@ sync_squashfs() {
     rsync -a \
         "${ROOTFS_DIR}/usr/share/strawwu/shell/" \
         "${SQUASH_SRC}/usr/share/strawwu/shell/" 2>/dev/null || true
+    rsync -a \
+        "${ROOTFS_DIR}/usr/lib/strawwu-target-identity/" \
+        "${SQUASH_SRC}/usr/lib/strawwu-target-identity/" 2>/dev/null || true
+    rsync -a \
+        "${ROOTFS_DIR}/etc/default/grub.d/99-strawwu-identity.cfg" \
+        "${SQUASH_SRC}/etc/default/grub.d/" 2>/dev/null || true
+    rsync -a \
+        "${ROOTFS_DIR}/usr/share/strawwu/target-identity/" \
+        "${SQUASH_SRC}/usr/share/strawwu/target-identity/" 2>/dev/null || true
     rsync -a \
         "${ROOTFS_DIR}/var/lib/strawwu/" \
         "${SQUASH_SRC}/var/lib/strawwu/" 2>/dev/null || true

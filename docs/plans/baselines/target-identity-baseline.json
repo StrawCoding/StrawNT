@@ -1,0 +1,22 @@
+{
+  "schema": "strawwu-target-identity-baseline/v1",
+  "wave": "W5-I3",
+  "version": "0.4.1.28",
+  "package": "strawwu-target-identity",
+  "log_path": "/var/log/strawwu/target-identity.log",
+  "marker_path": "/var/lib/strawwu/setup/target-identity.ok",
+  "error_code": "SWU-IN-003",
+  "grub": {
+    "dropin": "/etc/default/grub.d/99-strawwu-identity.cfg",
+    "distributor": "StrawWU"
+  },
+  "plymouth": {
+    "theme": "strawwu-boot"
+  },
+  "calamares": {
+    "shellprocess": "shellprocess_target-identity.conf",
+    "exec_order": "after target_setup, before install_marker"
+  },
+  "lifecycle_key": "lifecycle.target_identity",
+  "manifest": "usr/share/strawwu/target-identity/target-identity-manifest.yaml"
+}

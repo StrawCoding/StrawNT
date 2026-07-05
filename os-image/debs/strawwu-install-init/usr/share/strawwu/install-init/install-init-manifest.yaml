@@ -23,6 +23,7 @@ packages:
     - strawwu-firstboot
     - strawwu-desktop-actions
     - strawwu-registry-hooks
+    - strawwu-target-identity
     - strawwu-desktop
   state_cli: strawwu-initd
 
