@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=StrawWU Hub
+Comment=StrawWU Desktop Control Center (Autostart)
+Exec=sh -c 'test -x "/opt/StrawWU Hub/strawwu-hub" && exec "/opt/StrawWU Hub/strawwu-hub" --hidden'
+Icon=strawwu-hub
+Type=Application
+X-GNOME-Autostart-enabled=true
+Hidden=false
+NoDisplay=true

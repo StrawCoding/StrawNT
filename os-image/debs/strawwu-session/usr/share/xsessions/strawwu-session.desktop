@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=StrawWU
+Comment=StrawWU desktop session
+Exec=env GNOME_SHELL_SESSION_MODE=ubuntu /usr/bin/strawwu-session
+TryExec=/usr/bin/gnome-shell
+Type=Application
+DesktopNames=StrawWU;GNOME
+X-GDM-SessionRegisters=true
+X-GDM-CanRunHeadless=true

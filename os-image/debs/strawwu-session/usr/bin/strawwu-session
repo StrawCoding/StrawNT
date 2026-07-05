@@ -1,0 +1,13 @@
+#!/bin/sh
+# strawwu-session — StrawWU login session (W3-D1).
+# Interim: GNOME Shell + Hub autostart until strawwu-shell (W4-D2).
+set -e
+
+export GNOME_SHELL_SESSION_MODE=ubuntu
+export XDG_CURRENT_DESKTOP=StrawWU:GNOME
+
+if [ -f /var/lib/strawwu/setup/state.json ] && command -v strawwu-initd >/dev/null 2>&1; then
+    strawwu-initd set lifecycle.boot_selfcheck done 2>/dev/null || true
+fi
+
+exec /usr/bin/gnome-session --session=strawwu "$@"

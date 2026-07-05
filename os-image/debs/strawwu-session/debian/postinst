@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+case "${1}" in
+    configure)
+        if command -v update-alternatives >/dev/null 2>&1; then
+            update-alternatives --install /usr/bin/x-session-manager \
+                x-session-manager /usr/bin/strawwu-session 50 \
+                2>/dev/null || true
+        fi
+        ;;
+esac
+
+echo "strawwu-session: installed (GDM session StrawWU; interim GNOME Shell)"
+
+exit 0

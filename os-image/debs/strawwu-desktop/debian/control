@@ -1,0 +1,34 @@
+Package: strawwu-desktop
+Version: __VERSION__
+Section: metapackages
+Priority: optional
+Architecture: amd64
+Depends: strawwu-session,
+         gdm3,
+         gnome-shell,
+         gnome-control-center,
+         gnome-settings-daemon,
+         nautilus,
+         network-manager,
+         pipewire-pulse,
+         wireplumber,
+         xorg,
+         xdg-desktop-portal-gnome,
+         strawwu-initd,
+         strawwu-bug-reporter,
+         strawwu-flatpak-setup
+Recommends: firefox,
+            gnome-terminal,
+            gnome-text-editor,
+            file-roller,
+            evince,
+            gnome-calculator,
+            gnome-system-monitor,
+            ibus,
+            im-config
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU desktop meta package
+ Meta package for the StrawWU desktop environment. Replaces
+ ubuntu-desktop for new installs: no snapd, apport, whoopsie,
+ ubuntu-report, or ubuntu-pro-client in Depends/Recommends.
+ Interim session uses GNOME Shell until strawwu-shell (W4-D2).

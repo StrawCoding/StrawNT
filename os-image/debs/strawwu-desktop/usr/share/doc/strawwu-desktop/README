@@ -1,0 +1,18 @@
+StrawWU Desktop Meta Package
+============================
+
+This meta package declares the StrawWU desktop dependency set without
+Ubuntu telemetry or snapd packages.
+
+Replacement path:
+  - W3-D1: deb scaffold + preflight (this package)
+  - W5-B4: disable upstream ubuntu-desktop on installed systems
+  - W6-B5: ubuntu-* meta audit / full replacement
+
+Session:
+  strawwu-session registers GDM entry; interim GNOME Shell until W4-D2 shell.
+
+Forbidden in Depends/Recommends:
+  snapd, apport, whoopsie, ubuntu-report, ubuntu-pro-client
+
+See docs/plans/strawwu-desktop-plan.md

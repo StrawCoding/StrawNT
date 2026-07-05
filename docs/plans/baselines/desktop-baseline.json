@@ -1,0 +1,28 @@
+{
+  "schema": "strawwu-desktop-baseline/v1",
+  "wave": "W3-D1",
+  "version": "0.4.1.10",
+  "packages": {
+    "strawwu-session": {
+      "path": "os-image/debs/strawwu-session",
+      "gdm_session": "strawwu-session",
+      "interim_compositor": "gnome-shell",
+      "shell_target_wave": "W4-D2"
+    },
+    "strawwu-desktop": {
+      "path": "os-image/debs/strawwu-desktop",
+      "replaces_ubuntu_desktop_wave": "W5-B4",
+      "audit_wave": "W6-B5"
+    }
+  },
+  "forbidden_meta_deps": [
+    "snapd",
+    "snap-confine",
+    "apport",
+    "whoopsie",
+    "ubuntu-report",
+    "ubuntu-pro-client"
+  ],
+  "session_registered": true,
+  "meta_scaffold_ready": true
+}
