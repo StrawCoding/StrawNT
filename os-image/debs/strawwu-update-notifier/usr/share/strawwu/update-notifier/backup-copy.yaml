@@ -1,0 +1,31 @@
+schema: strawwu-backup-copy/v1
+wave: W3-B3
+purpose: pre-upgrade backup reminder (text only; no backup tooling in v0.5)
+
+en:
+  notify_title: "StrawWU updates available"
+  notify_body: "System updates are ready. Review changes before installing."
+  backup_title: "Back up before upgrading"
+  backup_body: |
+    StrawWU recommends backing up important files before installing
+    system updates, especially major upgrades.
+
+    Copy personal data to external storage or cloud backup. Full
+    backup tooling (strawwu-backup) is planned for a future release.
+
+    Continue only after you have a recent backup.
+  backup_confirm: "I understand — continue"
+
+zh_TW:
+  notify_title: "StrawWU 有可用的系統更新"
+  notify_body: "系統更新已就緒。安裝前請先檢視變更內容。"
+  backup_title: "升級前請先備份"
+  backup_body: |
+    StrawWU 建議在安裝系統更新（尤其是重大升級）前，
+    先備份重要檔案。
+
+    請將個人資料複製到外接儲存裝置或雲端備份。
+    完整備份工具（strawwu-backup）將於後續版本提供。
+
+    確認已有近期備份後再繼續。
+  backup_confirm: "我已了解，繼續"

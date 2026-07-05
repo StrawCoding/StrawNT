@@ -1,0 +1,18 @@
+#!/bin/bash
+# APT hook: show StrawWU backup reminder before package upgrades.
+set -euo pipefail
+
+if [[ -n "${STRAWWU_SKIP_PRE_UPGRADE_REMINDER:-}" ]]; then
+    exit 0
+fi
+
+if [[ ! -x /usr/bin/strawwu-update-notifier ]]; then
+    exit 0
+fi
+
+# Only remind when upgrading (not fresh chroot installs with empty stdin edge cases).
+if [[ -t 0 ]] || [[ ! -s /dev/stdin ]]; then
+    exit 0
+fi
+
+/usr/bin/strawwu-update-notifier pre-upgrade 2>/dev/null || true

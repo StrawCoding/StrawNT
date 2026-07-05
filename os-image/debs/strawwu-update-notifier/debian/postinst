@@ -1,0 +1,23 @@
+#!/bin/bash
+set -e
+
+LOG_DIR="/var/log/strawwu"
+STATE_DIR="/var/lib/strawwu"
+
+install -d -m 0755 "${LOG_DIR}"
+install -d -m 0755 "${STATE_DIR}"
+
+STATE_FILE="${STATE_DIR}/update-notifier-state"
+if [[ ! -f "${STATE_FILE}" ]]; then
+    printf '%s\n' "last_backup_reminder=0" > "${STATE_FILE}"
+    chmod 0644 "${STATE_FILE}"
+fi
+
+# Hide upstream autostart when our package replaces update-notifier.
+if [[ -f /etc/xdg/autostart/update-notifier.desktop ]]; then
+    if ! grep -q '^Hidden=true' /etc/xdg/autostart/update-notifier.desktop 2>/dev/null; then
+        printf '\nHidden=true\n' >> /etc/xdg/autostart/update-notifier.desktop
+    fi
+fi
+
+echo "strawwu-update-notifier: installed (Provides update-notifier)"

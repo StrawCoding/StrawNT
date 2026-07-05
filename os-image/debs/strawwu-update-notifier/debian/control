@@ -1,0 +1,15 @@
+Package: strawwu-update-notifier
+Version: __VERSION__
+Section: utils
+Priority: optional
+Architecture: all
+Depends: python3, libnotify-bin, apt
+Recommends: zenity, update-manager
+Provides: update-notifier
+Conflicts: update-notifier
+Replaces: update-notifier
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU update notifier (replaces update-notifier)
+ Checks for system updates and shows StrawWU-branded notifications.
+ Displays a backup reminder before upgrades (text only; full backup
+ tooling deferred). Logs to /var/log/strawwu/update.log.

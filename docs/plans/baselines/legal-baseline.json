@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-legal-baseline/v1",
   "generated_at": "2026-07-05",
-  "version": "0.4.1.11",
+  "version": "0.4.1.12",
   "trademark": {
     "ui_brand": "StrawWU",
     "os_release_id": "ubuntu",

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=StrawWU Update Notifier
+Name[zh_TW]=StrawWU 更新通知
+Comment=Check for system updates
+Comment[zh_TW]=檢查系統更新
+Exec=strawwu-update-notifier notify
+Icon=software-update-available
+Categories=System;
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
+X-StrawWU-UpdateNotifier=true

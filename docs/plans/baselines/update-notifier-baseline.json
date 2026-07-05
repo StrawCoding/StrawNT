@@ -1,0 +1,16 @@
+{
+  "schema": "strawwu-update-notifier-baseline/v1",
+  "wave": "W3-B3",
+  "version": "0.4.1.12",
+  "package": "strawwu-update-notifier",
+  "replaces": "update-notifier",
+  "log_path": "/var/log/strawwu/update.log",
+  "error_code_rollback": "SWU-UP-005",
+  "backup_reminder": {
+    "mode": "text_only",
+    "copy_path": "usr/share/strawwu/update-notifier/backup-copy.yaml",
+    "zh_tw_title": "升級前請先備份"
+  },
+  "apt_hook": "etc/apt/apt.conf.d/99strawwu-update-notifier",
+  "autostart": "strawwu-update-notifier.desktop"
+}
