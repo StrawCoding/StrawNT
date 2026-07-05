@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-release-baseline/v1",
   "generated_at": "2026-07-04",
-  "version": "0.4.0.2",
+  "version": "0.4.1.1",
   "channels": {
     "dev": {
       "iso_mode": "dev-iso",
@@ -27,7 +27,6 @@
   "squashfs": {
     "present": true,
     "ubuntu_packages": [
-      "ubuntu-advantage-desktop-daemon",
       "ubuntu-desktop",
       "ubuntu-desktop-minimal",
       "ubuntu-docs",
@@ -35,19 +34,32 @@
       "ubuntu-keyring",
       "ubuntu-minimal",
       "ubuntu-mono",
-      "ubuntu-pro-client",
-      "ubuntu-pro-client-l10n",
       "ubuntu-release-upgrader-core",
       "ubuntu-release-upgrader-gtk",
-      "ubuntu-report",
       "ubuntu-session",
       "ubuntu-settings",
       "ubuntu-standard",
       "ubuntu-wallpapers",
       "ubuntu-wallpapers-noble"
     ],
-    "ubuntu_package_count": 18,
+    "ubuntu_package_count": 14,
     "strawwu_deb_count": 0
+  },
+  "purge": {
+    "wave": "W1-B1",
+    "completed": true,
+    "targets_removed": [
+      "apport",
+      "apport-core-dump-handler",
+      "whoopsie",
+      "ubuntu-report",
+      "ubuntu-pro-client",
+      "ubuntu-pro-client-l10n",
+      "ubuntu-advantage-desktop-daemon",
+      "snapd",
+      "snap-confine"
+    ],
+    "telemetry_packages_present": []
   },
   "artifacts": {
     "iso_files": [
@@ -70,6 +82,7 @@
     "no GPG release-sign script",
     "no APT publish pipeline",
     "no release-manifest.json generator",
-    "18 ubuntu-* packages still in squashfs"
+    "14 ubuntu-* packages still in squashfs",
+    "W1-B1 purge complete — snap transition apps removed (Flathub in F1)"
   ]
 }

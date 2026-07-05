@@ -42,4 +42,4 @@ make preflight-iso-before-boot
 
 ## 完成後
 
-Hermes mark PASS → Wave 1 完成；Hermes 通知並準備 Wave 2（B2 bug-reporter + I1 calamares）。
+Hermes mark PASS → 自動啟動 W2-B2-bug-reporter（Wave 2 鎖序已配置）。

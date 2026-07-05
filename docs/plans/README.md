@@ -43,12 +43,22 @@
 | `strawwu-device-proxy-os-plan.md` | DDP0–DDP3 |
 | `strawwu-performance-budget-plan.md` | PERF0–PERF2 |
 | `strawwu-greeter-session-plan.md` | GRT0–GRT2 |
+| `strawwu-deferred-scope.md` | 延後 5 項 · P2/P3 邊界 |
 
 ## Kickoff 任務書
 
-| 文件 | Wave | 狀態 |
-|------|------|------|
-| `kickoff/W0-baseline.md` | W0 | PASS (v0.4.0.2) |
+**全自動鎖序（47 段）** 見 `kickoff/WAVE-AUTO-SEQUENCE.md`。
+
+| 項目 | 值 |
+|------|-----|
+| 總 stage | 47 |
+| 起點 | `w0-baseline` ✅ PASS |
+| 現行 | `w1-b1-purge` 🔄 IN_PROGRESS |
+| 終點 | `w8-mvp-closeout` |
+| 全 PASS 驗證 | `make test-wave-all-pass` |
+| 進度 JSON | `baselines/wave-status.json` |
+
+每 stage 任務書：`docs/plans/kickoff/W*-*.md`（47 份 + 索引）
 
 ## 基線 JSON
 
@@ -57,6 +67,7 @@
 | `baselines/release-baseline.json` | RE0 發行基線 |
 | `baselines/obs-baseline.json` | OBS0 可觀測性基線 |
 | `baselines/perf-baseline.json` | PERF0 效能基線 |
+| `baselines/wave-status.json` | Wave 0–8 全 stage 狀態（自動更新） |
 
 ## Hermes 交付
 

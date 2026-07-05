@@ -47,6 +47,12 @@ isos = Path(iso_file).read_text().splitlines()
 isos = [x for x in isos if x.strip()]
 repo_path = Path(repo)
 squashfs_status = repo_path / "os-image/work/squashfs-root/var/lib/dpkg/status"
+purge_marker = repo_path / "os-image/work/.purge-ubuntu-telemetry-ok"
+purge_targets = [
+    "apport", "apport-core-dump-handler", "whoopsie", "ubuntu-report",
+    "ubuntu-pro-client", "ubuntu-pro-client-l10n", "ubuntu-advantage-desktop-daemon",
+    "snapd", "snap-confine",
+]
 
 data = {
     "schema": "strawwu-release-baseline/v1",
@@ -63,6 +69,12 @@ data = {
         "ubuntu_packages": ubuntu,
         "ubuntu_package_count": len(ubuntu),
         "strawwu_deb_count": 0,
+    },
+    "purge": {
+        "wave": "W1-B1",
+        "completed": purge_marker.is_file(),
+        "targets_removed": purge_targets,
+        "telemetry_packages_present": [p for p in purge_targets if p in ubuntu],
     },
     "artifacts": {
         "iso_files": isos,
@@ -84,6 +96,9 @@ data = {
         f"{len(ubuntu)} ubuntu-* packages still in squashfs",
     ],
 }
+if purge_marker.is_file():
+    data["wave0_gaps"] = [g for g in data["wave0_gaps"] if "purge" not in g.lower()]
+    data["wave0_gaps"].append("W1-B1 purge complete — snap transition apps removed (Flathub in F1)")
 Path(out).parent.mkdir(parents=True, exist_ok=True)
 Path(out).write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 PY

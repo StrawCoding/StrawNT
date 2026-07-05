@@ -50,7 +50,7 @@ has_rootfs() {
 list_installed_packages() {
     local status_file="$1"
     awk '/^Package: / { pkg=$2 }
-         /^Status: / && /install/ { print pkg }' "${status_file}" | sort -u
+         /^Status: / && / ok installed/ { print pkg }' "${status_file}" | sort -u
 }
 
 list_squashfs_packages() {
@@ -64,6 +64,39 @@ package_installed_in_squashfs() {
     has_squashfs || return 1
     list_squashfs_packages | grep -qx "${pkg}"
 }
+
+list_rootfs_packages() {
+    if has_rootfs && [[ -f "${ROOTFS}/var/lib/dpkg/status" ]]; then
+        list_installed_packages "${ROOTFS}/var/lib/dpkg/status"
+    fi
+}
+
+package_installed_in_rootfs() {
+    local pkg="$1"
+    has_rootfs || return 1
+    list_rootfs_packages | grep -qx "${pkg}"
+}
+
+package_installed_in_filesystem() {
+    local pkg="$1"
+    if package_installed_in_rootfs "${pkg}"; then
+        return 0
+    fi
+    package_installed_in_squashfs "${pkg}"
+}
+
+# W1-B1 purge targets — must stay absent from rootfs/squashfs after purge.
+PURGE_TARGET_PACKAGES=(
+    apport
+    apport-core-dump-handler
+    whoopsie
+    ubuntu-report
+    ubuntu-pro-client
+    ubuntu-pro-client-l10n
+    ubuntu-advantage-desktop-daemon
+    snapd
+    snap-confine
+)
 
 count_squashfs_packages() {
     local pattern="${1:-.*}"

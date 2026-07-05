@@ -1,0 +1,50 @@
+# Wave 2 — 信任/可觀測/法務基線
+
+| 任務 ID | w2-trust-baseline |
+|---------|-------|
+| Wave | 2 |
+| 計畫 | `strawwu-security-trust-model.md` |
+| 狀態 | 待執行 |
+
+## 目標
+
+SEC2+OBS1+LEG2 preflight
+
+## 必讀
+
+- `docs/plans/strawwu-security-trust-model.md`
+- `docs/plans/strawwu-ai-worker-sop.md`
+- `docs/plans/strawwu-prd-v0.5.md`
+
+## PASS 條件
+
+```bash
+cd /mnt/data/code/project/StrawCoding/StrawWU
+make test-security-baseline
+make test-observability
+make test-legal-trademark
+make preflight
+# exit 0
+```
+
+## 必須交付
+
+1. 本階段實作產物（見計畫文件）
+2. `docs/plans/stage-reports/W2-TRUST-baseline-report.md`
+3. VERSION bump（`scripts/bump-version.sh`）
+4. 對應 preflight 腳本（若尚不存在）
+
+## 禁止
+
+- 修改 `kernel/` 源碼（除非本 stage 明確要求）
+- `SKIP_SQUASHFS=1` 進 release 驗收
+- 并行 boot-test 寫同一 ISO
+- worker 自宣稱 PASS
+
+## 延後範圍（勿擴 scope）
+
+見 `strawwu-deferred-scope.md` §3：**v0.5 預設關閉所有使用統計**；僅 bug consent + privacy 文案，不做 telemetry daemon。
+
+## 完成後
+
+Hermes mark PASS → 自動啟動 **w3-d1-desktop-meta**（勿問使用者）。

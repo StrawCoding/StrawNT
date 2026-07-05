@@ -18,6 +18,7 @@ echo "=== StrawWU preflight ==="
 
 check test -f "${REPO_ROOT}/docs/architecture.md"
 check test -f "${REPO_ROOT}/os-image/scripts/clone-ubuntu-base.sh"
+check test -f "${REPO_ROOT}/os-image/scripts/chroot-purge-ubuntu-telemetry.sh"
 check test -f "${REPO_ROOT}/os-image/scripts/swap-kernel.sh"
 check test -f "${REPO_ROOT}/os-image/scripts/build-iso.sh"
 check test -x "${REPO_ROOT}/os-image/scripts/clone-ubuntu-base.sh" || chmod +x "${REPO_ROOT}/os-image/scripts/"*.sh

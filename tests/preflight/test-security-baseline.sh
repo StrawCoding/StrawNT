@@ -12,9 +12,9 @@ telemetry_packages=(apport whoopsie ubuntu-report ubuntu-pro-client snapd)
 if has_squashfs; then
     for pkg in "${telemetry_packages[@]}"; do
         if package_installed_in_squashfs "${pkg}"; then
-            pass "squashfs has ${pkg} (purge target Wave B1)"
+            fail "squashfs still has ${pkg} (W1-B1 purge target — should be absent)"
         else
-            warn "squashfs missing ${pkg}"
+            pass "squashfs absent ${pkg}"
         fi
     done
 else

@@ -2,7 +2,8 @@
 	build-iso dev-iso release-iso repack-iso validate-rootfs boot-test-iso boot-test-dev-iso \
 	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
-	test-install-e2e test-wincompat test-wave0-baseline build-debs bump-version check-version-bump
+	test-install-e2e test-wincompat test-wave0-baseline test-wave-all-pass test-purge-baseline purge-ubuntu-telemetry \
+	build-debs bump-version check-version-bump
 
 REPO_ROOT := $(abspath .)
 SCRIPTS   := os-image/scripts
@@ -37,10 +38,14 @@ help:
 	@echo "  validate-partition-probe      QEMU partition backend probe"
 	@echo "  test-install-e2e              Calamares install E2E (preflight→probe→install)"
 	@echo "  test-wave0-baseline           Wave 0 preflight baselines (12 scripts + JSON)"
+	@echo "  test-wave-all-pass            Verify all 47 wave stages PASS (MVP closeout gate)"
+	@echo "  test-purge-baseline           W1-B1 telemetry/pro/snap purge verification"
+	@echo "  purge-ubuntu-telemetry        chroot purge apport/whoopsie/ubuntu-pro/snapd (needs root)"
 
 preflight:
 	bash tests/preflight/test-ubuntu-clone.sh
 	bash tests/preflight/test-branding.sh
+	bash tests/preflight/test-purge-baseline.sh
 
 preflight-dev-vm:
 	bash tests/preflight/test-dev-vm-ready.sh
@@ -146,6 +151,15 @@ test-wincompat:
 
 test-wave0-baseline:
 	bash tests/preflight/test-wave0-baseline.sh
+
+test-wave-all-pass:
+	bash tests/preflight/test-wave-all-pass.sh
+
+test-purge-baseline:
+	bash tests/preflight/test-purge-baseline.sh
+
+purge-ubuntu-telemetry:
+	sudo bash $(SCRIPTS)/chroot-purge-ubuntu-telemetry.sh
 
 build-debs:
 	bash packaging/build-debs.sh

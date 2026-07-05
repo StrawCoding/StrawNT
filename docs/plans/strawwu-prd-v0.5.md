@@ -29,6 +29,16 @@ StrawWU 是**可安裝的桌面 OS**，在 Linux 原生體驗之上提供**受�
 - 自研 compositor（D5）
 - per-app 預設 sandbox（container 僅可選）
 
+**延後範圍（詳見 `strawwu-deferred-scope.md`）：**
+
+| 項目 | v0.5 | 備註 |
+|------|------|------|
+| 多使用者 / 家庭帳號 | 單使用者即可 | 併入 N3 + GRT |
+| 備份 / 時光機 | 僅升級 rollback | 併入 UPG |
+| opt-in 使用統計 | **預設關閉** | 併入 SEC + LEG |
+| 社群 / 支援渠道 | 佔位連結 | 非 blocking |
+| shell 插件 API | 不做 | v1.0 extension point |
+
 ## 5. MVP 必備（v0.5.0.0）
 
 - 全程 StrawWU 品牌（開機→桌面→安裝→firstboot）
@@ -46,6 +56,11 @@ StrawWU 是**可安裝的桌面 OS**，在 Linux 原生體驗之上提供**受�
 - 完整 HW 矩陣 stable gate
 - Office/Steam/Epic launcher（Phase 8）
 - self-hosted CI（Q6）
+- 家庭帳號 / 多使用者 Hub 分頁
+- `strawwu-backup` 時光機 PoC
+- opt-in 使用統計後端
+- 官方社群 / 支援渠道
+- strawwu-shell 插件 extension point
 
 ## 7. 競品差異
 

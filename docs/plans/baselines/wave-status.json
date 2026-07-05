@@ -1,0 +1,245 @@
+{
+  "generated_at": "2026-07-04T14:48:50.892210",
+  "target_mvp": "0.5.0.0",
+  "total": 47,
+  "passed": 1,
+  "failed": 46,
+  "all_pass": false,
+  "stages": [
+    {
+      "id": "w0-baseline",
+      "status": "PASS",
+      "pass": true
+    },
+    {
+      "id": "w1-b1-purge",
+      "status": "IN_PROGRESS",
+      "pass": false
+    },
+    {
+      "id": "w1-f1-flathub",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w1-f2-nosnap",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w1-s1-initrd",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w2-b2-bug-reporter",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w2-i1-calamares-settings",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w2-r1-app-registry",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w2-n1-initd",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w2-trust-baseline",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w3-d1-desktop-meta",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w3-i2-live-ux",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w3-b3-update-notifier",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w3-n2-target-setup",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w3-w0-wincompat-baseline",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w4-d2-strawwu-shell",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w4-d3-hub-settings",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w4-r2-apps-page",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w4-f3-flathub-hub",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w4-w1-registry-launcher",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w4-l10n-ime",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w5-n3-firstboot",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w5-n4-finished-meta",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w5-d4-context-menu",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w5-r4-install-hooks",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w5-i3-target-identity",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w5-b4-disable-upstream-init",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w5-w4-wincompat-gui",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w5-grt-session",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w6-n5-install-e2e",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w6-i4-installed-boot",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w6-f5-target-flathub",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w6-b5-meta-audit",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w6-r5-deep-uninstall",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w6-w6-wincompat-e2e",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w6-hw1-live-usb",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w6-doc1-user-docs",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w7-re-manifest-gpg",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w7-re-apt-repo",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w7-ci-nightly",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w7-perf-legal-gate",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w8-hw-matrix",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w8-s2-initrd-core",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w8-s3-initrd-bottom",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w8-s4-initramfs-hooks",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w8-doc-handbook",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "w8-mvp-closeout",
+      "status": "PENDING",
+      "pass": false
+    }
+  ]
+}
