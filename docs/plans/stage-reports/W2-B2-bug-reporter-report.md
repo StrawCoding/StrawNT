@@ -2,10 +2,10 @@
 
 | 任務 | W2-B2-bug-reporter |
 |------|---------------------|
-| 版本 | 0.4.1.5 |
+| 版本 | 0.4.1.6 |
 | 日期 | 2026-07-05 |
 | Worker | 階段 6/47（w2-b2-bug-reporter） |
-| 結果 | **待 Hermes mark**（worker 不自宣稱 PASS） |
+| 結果 | **Hermes mark PASS**（2026-07-05T02:41:43-0400 worker-DONE）→ next=w2-i1-calamares-settings |
 
 ## 交付物
 
@@ -33,9 +33,9 @@
 | 預設行為 | 僅本地 bundle；`upload_opt_in=false`；上傳端點留待後續 Wave |
 | Bundle schema | `manifest.json`、`system.json`、`journal.txt`、`dmesg.txt`、`logs/`、`user-notes.txt` |
 
-## 驗收命令輸出（2026-07-05T02:15 UTC-4，worker 複驗）
+## 驗收命令輸出（2026-07-05T02:42 UTC-4，worker 複驗）
 
-### `make test-bug-reporter` — exit 0
+### `make test-bug-reporter` — exit 0（~6s）
 
 Log: `/tmp/w2-b2-test-bug-reporter.log`
 
@@ -45,7 +45,7 @@ Log: `/tmp/w2-b2-test-bug-reporter.log`
 
 關鍵檢查項：deb 建置（14K）、4 項 privacy 單元測試、CLI dry-run/bundle/validate、rootfs+squashfs 已安裝 `strawwu-bug-reporter`、apport 套件 absent、`/var/log/strawwu` 存在、`obs-baseline.json` schema_ready=true。
 
-### `make preflight` — exit 0（~25s）
+### `make preflight` — exit 0（~22s）
 
 Log: `/tmp/w2-b2-preflight.log`
 
@@ -58,7 +58,7 @@ Log: `/tmp/w2-b2-chroot-install.log`
 | 項目 | 結果 |
 |------|------|
 | marker | `os-image/work/.bug-reporter-ok` 存在 |
-| deb | `strawwu-bug-reporter_0.4.1.5_all.deb`（~14K） |
+| deb | `strawwu-bug-reporter_0.4.1.6_all.deb`（~14K） |
 | rootfs CLI | `/usr/bin/strawwu-bug-report` 可執行 |
 | consent 預設 | `/var/lib/strawwu/bug-upload-consent` → `upload_opt_in=false` |
 
@@ -80,7 +80,7 @@ Log: `/tmp/w2-b2-chroot-install.log`
 
 ## VERSION
 
-`0.4.1.4` → `0.4.1.5`（iterate）
+`0.4.1.4` → `0.4.1.5` → `0.4.1.6`（iterate）
 
 ## 建議 commit message
 
@@ -91,9 +91,16 @@ feat(w2): add strawwu-bug-reporter replacing apport
 - Privacy filter (password/token/SSH/home paths)
 - chroot install hook + preflight test-bug-reporter
 Tests: make test-bug-reporter PASS, make preflight PASS
-Version: 0.4.1.5
+Version: 0.4.1.6
 ```
+
+## Hermes 標記
+
+| 時間 | 事件 |
+|------|------|
+| 2026-07-05T02:27:46-0400 | `[worker-PASS]` stage PASS → next=**w2-i1-calamares-settings** |
+| 2026-07-05T02:41:43-0400 | `[worker-DONE]` stage ended with PASS |
 
 ## 下一步
 
-Hermes mark PASS → 自動啟動 **w2-i1-calamares-settings**（依 kickoff 鎖序）。
+**w2-i1-calamares-settings**（Hermes 已啟動下一階段）。

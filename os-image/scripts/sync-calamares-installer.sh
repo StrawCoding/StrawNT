@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# sync-calamares-installer.sh — overlay upstream-aligned Calamares installer configs into rootfs.
+# sync-calamares-installer.sh — overlay E2E-only Calamares helpers into rootfs.
+# Calamares settings live in strawwu-calamares-settings deb (W2-I1).
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -14,9 +15,20 @@ die() { echo "ERROR: $*" >&2; exit 1; }
 [[ -d "${ROOTFS_DIR}/etc" ]] || die "rootfs missing: ${ROOTFS_DIR}"
 [[ -d "${INSTALLER_DIR}" ]] || die "calamares-installer overlay missing"
 
-log "syncing Calamares installer overlay into rootfs"
-cp -a "${INSTALLER_DIR}/." "${ROOTFS_DIR}/"
-chmod 755 "${ROOTFS_DIR}/usr/local/lib/calamares/strawwu-post-install-marker.sh"
+log "syncing Calamares E2E overlay into rootfs (settings deb owns etc/calamares)"
+for rel in \
+    usr/local/lib/calamares/strawwu-post-install-marker.sh \
+    usr/local/sbin/strawwu-e2e-guest-runner.sh \
+    etc/systemd/system/strawwu-e2e-guest-runner.service; do
+    src="${INSTALLER_DIR}/${rel}"
+    dst="${ROOTFS_DIR}/${rel}"
+    if [[ -f "${src}" ]]; then
+        mkdir -p "$(dirname "${dst}")"
+        cp -f "${src}" "${dst}"
+    fi
+done
+
+chmod 755 "${ROOTFS_DIR}/usr/local/lib/calamares/strawwu-post-install-marker.sh" 2>/dev/null || true
 chmod 755 "${ROOTFS_DIR}/usr/local/sbin/strawwu-e2e-guest-runner.sh" 2>/dev/null || true
 
 for required in \
@@ -25,7 +37,7 @@ for required in \
     modules/welcome.conf \
     modules/unpackfs.conf; do
     [[ -f "${ROOTFS_DIR}/etc/calamares/${required}" ]] \
-        || die "overlay missing etc/calamares/${required}"
+        || die "rootfs missing etc/calamares/${required} (install strawwu-calamares-settings)"
 done
 
 if ! grep -qE 'type:[[:space:]]*any' "${ROOTFS_DIR}/etc/calamares/modules/partition.conf"; then

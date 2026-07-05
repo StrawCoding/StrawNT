@@ -2,7 +2,7 @@
 # clone-ubuntu-base.sh — Extract Ubuntu noble desktop live rootfs from official ISO.
 #
 # Noble (24.04+) live ISOs use layered casper/minimal*.squashfs; we merge layers
-# then apt-install calamares-settings-ubuntu-common inside chroot.
+# then install strawwu-calamares-settings deb inside chroot (replaces ubuntu-common).
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -154,20 +154,36 @@ chroot_run() {
 }
 
 install_calamares() {
-    if [[ -f "${ROOTFS_DIR}/usr/bin/calamares" ]]; then
-        log "calamares already present in extracted rootfs"
+    if [[ -f "${ROOTFS_DIR}/usr/bin/calamares" ]] \
+        && dpkg-query --root="${ROOTFS_DIR}" -W -f='${Status}' strawwu-calamares-settings 2>/dev/null | grep -q "ok installed"; then
+        log "calamares + strawwu-calamares-settings already present in rootfs"
         return 0
     fi
 
-    log "installing calamares + calamares-settings-ubuntu-common in chroot"
+    local deb_build="${REPO_ROOT}/os-image/debs/strawwu-calamares-settings/build-deb.sh"
+    [[ -x "${deb_build}" ]] || die "missing ${deb_build}"
+
+    log "building strawwu-calamares-settings deb"
+    STRAWWU_VERSION="${STRAWWU_VERSION:-$(tr -d '[:space:]' < "${REPO_ROOT}/VERSION")}" \
+        bash "${deb_build}"
+
+    local deb_file
+    deb_file="$(ls -1 "${REPO_ROOT}/os-image/debs/strawwu-calamares-settings/output/"strawwu-calamares-settings_*.deb 2>/dev/null | tail -1)"
+    [[ -n "${deb_file}" && -f "${deb_file}" ]] || die "strawwu-calamares-settings .deb not built"
+
+    log "installing calamares + strawwu-calamares-settings in chroot"
+    cp -f "${deb_file}" "${ROOTFS_DIR}/tmp/strawwu-calamares-settings.deb"
     cp -f /etc/resolv.conf "${ROOTFS_DIR}/etc/resolv.conf" 2>/dev/null || true
     chroot_run bash -c '
         set -euo pipefail
         export DEBIAN_FRONTEND=noninteractive
         apt-get update -qq
-        apt-get install -y --no-install-recommends \
-            calamares \
-            calamares-settings-ubuntu-common
+        apt-get install -y --no-install-recommends calamares
+        if dpkg-query -W -f="${Status}" calamares-settings-ubuntu-common 2>/dev/null | grep -q "ok installed"; then
+            apt-get remove -y --purge calamares-settings-ubuntu-common || true
+        fi
+        dpkg -i /tmp/strawwu-calamares-settings.deb
+        rm -f /tmp/strawwu-calamares-settings.deb
     '
 }
 
@@ -188,8 +204,11 @@ verify_rootfs() {
     for f in "${required[@]}"; do
         [[ -e "${ROOTFS_DIR}${f}" ]] || die "missing in rootfs: ${f}"
     done
-    [[ -d "${ROOTFS_DIR}/usr/share/doc/calamares-settings-ubuntu-common" ]] \
-        || die "missing calamares-settings-ubuntu-common package"
+    [[ -d "${ROOTFS_DIR}/usr/share/doc/strawwu-calamares-settings" ]] \
+        || die "missing strawwu-calamares-settings package"
+    if [[ -d "${ROOTFS_DIR}/usr/share/doc/calamares-settings-ubuntu-common" ]]; then
+        die "calamares-settings-ubuntu-common still present (should be replaced)"
+    fi
     if ! grep -qi 'ubuntu' "${ROOTFS_DIR}/etc/os-release"; then
         die "/etc/os-release does not look like Ubuntu"
     fi

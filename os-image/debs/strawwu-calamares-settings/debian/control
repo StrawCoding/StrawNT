@@ -1,0 +1,14 @@
+Package: strawwu-calamares-settings
+Version: __VERSION__
+Section: admin
+Priority: optional
+Architecture: all
+Depends: calamares
+Conflicts: calamares-settings-ubuntu-common
+Replaces: calamares-settings-ubuntu-common
+Provides: calamares-settings-ubuntu-common
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU Calamares installer settings (replaces ubuntu-common)
+ Upstream-aligned Calamares module configs for StrawWU live
+ installer. Replaces calamares-settings-ubuntu-common without
+ snap-seed-glue. Branding: strawwu (see strawwu-branding).
