@@ -1,0 +1,20 @@
+#!/usr/bin/env python3
+"""StrawWU bug report GTK consent UI."""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+LIB = Path(__file__).resolve().parent.parent / "lib" / "strawwu-bug-reporter"
+sys.path.insert(0, str(LIB))
+
+from consent_gtk import run_consent_dialog  # noqa: E402
+
+
+def main() -> int:
+    return run_consent_dialog()
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

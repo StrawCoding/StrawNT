@@ -2,8 +2,8 @@
 	build-iso dev-iso release-iso repack-iso validate-rootfs boot-test-iso boot-test-dev-iso \
 	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
-	test-install-e2e test-wincompat 	test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap purge-ubuntu-telemetry \
-	install-flatpak-setup nosnap-harden build-debs bump-version check-version-bump
+	test-install-e2e test-wincompat 	test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-bug-reporter purge-ubuntu-telemetry \
+	install-flatpak-setup install-bug-reporter nosnap-harden build-debs bump-version check-version-bump
 
 REPO_ROOT := $(abspath .)
 SCRIPTS   := os-image/scripts
@@ -42,8 +42,10 @@ help:
 	@echo "  test-purge-baseline           W1-B1 telemetry/pro/snap purge verification"
 	@echo "  test-flatpak                  W1-F1 flatpak + flathub remote verification"
 	@echo "  test-nosnap                   W1-F2 snapd absent + meta mask verification"
+	@echo "  test-bug-reporter             W2-B2 strawwu-bug-reporter CLI/GTK/consent verification"
 	@echo "  purge-ubuntu-telemetry        chroot purge apport/whoopsie/ubuntu-pro/snapd (needs root)"
 	@echo "  install-flatpak-setup         chroot install flatpak + strawwu-flatpak-setup (needs root)"
+	@echo "  install-bug-reporter          chroot install strawwu-bug-reporter (needs root)"
 	@echo "  nosnap-harden                 chroot mask snapd Recommends + /snap stub (needs root)"
 
 preflight:
@@ -53,6 +55,7 @@ preflight:
 	bash tests/preflight/test-flatpak.sh
 	bash tests/preflight/test-nosnap.sh
 	bash tests/preflight/test-initrd-overlays.sh
+	bash tests/preflight/test-bug-reporter.sh
 
 preflight-dev-vm:
 	bash tests/preflight/test-dev-vm-ready.sh
@@ -173,6 +176,12 @@ test-nosnap:
 
 test-initrd-overlays:
 	bash tests/preflight/test-initrd-overlays.sh
+
+test-bug-reporter:
+	bash tests/preflight/test-bug-reporter.sh
+
+install-bug-reporter:
+	sudo bash $(SCRIPTS)/chroot-install-bug-reporter.sh
 
 nosnap-harden:
 	sudo bash $(SCRIPTS)/chroot-nosnap-harden.sh

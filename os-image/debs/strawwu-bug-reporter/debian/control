@@ -1,0 +1,12 @@
+Package: strawwu-bug-reporter
+Version: __VERSION__
+Section: utils
+Priority: optional
+Architecture: all
+Depends: python3, python3-gi, gir1.2-gtk-3.0, systemd
+Recommends: util-linux
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU bug reporter (replaces apport)
+ Creates local .strawwu-bug diagnostic bundles with privacy
+ filtering. GTK consent UI for optional upload opt-in.
+ No automatic upload; user consent required.

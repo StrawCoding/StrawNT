@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+"""StrawWU bug report CLI — creates local .strawwu-bug bundles (no upload by default)."""
+
+from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+
+LIB = Path(__file__).resolve().parent.parent / "lib" / "strawwu-bug-reporter"
+sys.path.insert(0, str(LIB))
+
+from bundle import create_bundle, validate_bundle  # noqa: E402
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Create a StrawWU diagnostic bug bundle (.strawwu-bug). "
+        "Upload requires explicit consent via strawwu-bug-report-gtk or --upload-consent.",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=Path,
+        default=Path.home() / "strawwu-report.strawwu-bug",
+        help="Output bundle path (default: ~/strawwu-report.strawwu-bug)",
+    )
+    parser.add_argument("--notes", default="", help="Optional user description")
+    parser.add_argument(
+        "--upload-consent",
+        action="store_true",
+        help="User opted in to upload (endpoint not yet configured in v0.5)",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Validate collectors without writing bundle",
+    )
+    parser.add_argument(
+        "--validate",
+        type=Path,
+        metavar="BUNDLE",
+        help="Validate an existing bundle and exit",
+    )
+    args = parser.parse_args()
+
+    if args.validate:
+        errors = validate_bundle(args.validate)
+        if errors:
+            for err in errors:
+                print(f"INVALID: {err}", file=sys.stderr)
+            return 1
+        print(f"OK: {args.validate}")
+        return 0
+
+    if args.dry_run:
+        create_bundle(args.output, notes=args.notes, dry_run=True)
+        print("dry-run: collectors OK")
+        return 0
+
+    path = create_bundle(
+        args.output,
+        notes=args.notes,
+        upload_consent=args.upload_consent,
+    )
+    errors = validate_bundle(path)
+    if errors:
+        for err in errors:
+            print(f"WARN: bundle validation: {err}", file=sys.stderr)
+        return 1
+
+    print(path)
+    if args.upload_consent:
+        print(
+            "Note: upload consent recorded; remote endpoint will be configured in a later release.",
+            file=sys.stderr,
+        )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

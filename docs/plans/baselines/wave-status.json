@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-05T01:25:04.273694",
+  "generated_at": "2026-07-05T02:11:42.910800",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 4,
-  "failed": 43,
+  "passed": 5,
+  "failed": 42,
   "all_pass": false,
   "stages": [
     {
@@ -28,8 +28,8 @@
     },
     {
       "id": "w1-s1-initrd",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w2-b2-bug-reporter",

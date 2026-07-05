@@ -5,8 +5,9 @@
 | 版本 | 0.4.1.4 |
 | 日期 | 2026-07-05 |
 | Worker | 階段 5/47（w1-s1-initrd） |
-| 最後驗證 | 2026-07-05T02:02 UTC-4（worker session 重跑） |
-| 結果 | **待 Hermes mark**（worker 不自宣稱 PASS） |
+| 最後驗證 | 2026-07-05T02:11 UTC-4（companion worker 重跑） |
+| Commit | `e0de8a0ff` feat(w1): initrd overlays |
+| 結果 | **PASS**（Hermes mark 2026-07-05T02:11:43-0400，v0.4.1.4） |
 
 ## 交付物
 
@@ -33,13 +34,13 @@
 | wait-live-media | 自 branding 遷移至 `initrd/overlays/`（單一來源） |
 | splice | `refresh_preserved_main` 注入 overlays 後 recompress main.zst |
 
-## 驗收命令輸出（2026-07-05T02:01–02:02 UTC-4，worker session 重跑）
+## 驗收命令輸出（2026-07-05T02:10–02:11 UTC-4，companion worker 重跑）
 
 ### `make preflight` — exit 0
 
 含 `test-initrd-overlays.sh` 全部 PASS（含 staged initrd 內三個 overlay 腳本含 StrawWU marker）。
 
-Log: `/tmp/w1-s1-preflight-20260705-020139.log`
+Log: `/tmp/w1-s1-preflight-20260705-021024.log`
 
 ### `make preflight-iso-before-boot`（release-iso 預設）— exit 0
 
@@ -48,7 +49,7 @@ Log: `/tmp/w1-s1-preflight-20260705-020139.log`
 - ISO 5.35GB、initrd 68.9MB、minimal.squashfs xz ~1.3GB — 全部 PASS
 - branded 內容 marker/plymouth/GDM 均 PASS
 
-Log: `/tmp/w1-s1-iso-preflight-20260705-020201.log`
+Log: `/tmp/w1-s1-iso-preflight-20260705-021044.log`
 
 ## 環境修復（本 session）
 
@@ -97,4 +98,4 @@ Tests: make preflight PASS; make preflight-iso-before-boot PASS (release-iso)
 
 ## 下一步
 
-Hermes mark PASS → 自動啟動 **W2-B2-bug-reporter**（依 kickoff 鎖序）。
+Hermes mark PASS（2026-07-05T02:11:43-0400）→ 下一階段 **W2-B2-bug-reporter**。

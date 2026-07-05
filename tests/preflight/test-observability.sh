@@ -34,11 +34,18 @@ else
     fail "boot-selfcheck script missing from branding"
 fi
 
-python3 - "${BASELINES_DIR}/obs-baseline.json" "${VERSION}" <<'PY'
+bug_reporter_dir="${REPO_ROOT}/os-image/debs/strawwu-bug-reporter"
+schema_ready=false
+if [[ -f "${bug_reporter_dir}/usr/lib/strawwu-bug-reporter/bundle.py" ]]; then
+    schema_ready=true
+fi
+
+python3 - "${BASELINES_DIR}/obs-baseline.json" "${VERSION}" "${schema_ready}" <<'PY'
 import json, sys
 from pathlib import Path
 
-out, version = sys.argv[1:3]
+out, version, schema_ready_str = sys.argv[1:4]
+schema_ready = schema_ready_str.lower() == "true"
 data = {
     "schema": "strawwu-obs-baseline/v1",
     "generated_at": "2026-07-04",
@@ -61,14 +68,15 @@ data = {
         "format": "bundle.strawwu-bug",
         "auto_upload_default": False,
         "consent_required": True,
-        "schema_ready": False,
+        "schema_ready": schema_ready,
     },
     "wave0_gaps": [
-        "/var/log/strawwu/ not yet created in rootfs",
-        "bug bundle CLI not implemented",
+        "/var/log/strawwu/ not yet created in rootfs" if not schema_ready else None,
+        "bug bundle CLI not implemented" if not schema_ready else None,
         "structured JSON logging not wired",
     ],
 }
+data["wave0_gaps"] = [g for g in data["wave0_gaps"] if g]
 Path(out).parent.mkdir(parents=True, exist_ok=True)
 Path(out).write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 PY

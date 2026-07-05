@@ -4,7 +4,7 @@
 |---------|-------|
 | Wave | 2 |
 | 計畫 | `strawwu-ubuntu-components-plan.md` |
-| 狀態 | 待執行 |
+| 狀態 | 實作完成，待 Hermes mark |
 
 ## 目標
 

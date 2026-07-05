@@ -1,0 +1,22 @@
+#!/bin/bash
+set -e
+
+LOG_DIR="/var/log/strawwu"
+CONSENT_DIR="/var/lib/strawwu"
+
+install -d -m 0755 "${LOG_DIR}"
+install -d -m 0755 "${CONSENT_DIR}"
+
+# Disable any residual apport configuration (W1-B1 purge removes packages).
+if [[ -f /etc/default/apport ]]; then
+    printf '%s\n' "enabled=0" > /etc/default/apport
+fi
+
+# Default: no auto-upload consent.
+CONSENT_FILE="${CONSENT_DIR}/bug-upload-consent"
+if [[ ! -f "${CONSENT_FILE}" ]]; then
+    printf '%s\n' "upload_opt_in=false" > "${CONSENT_FILE}"
+    chmod 0644 "${CONSENT_FILE}"
+fi
+
+echo "strawwu-bug-reporter: installed (local bundle only by default)"
