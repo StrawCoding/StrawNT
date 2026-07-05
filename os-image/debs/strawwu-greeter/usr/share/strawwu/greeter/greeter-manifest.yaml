@@ -1,0 +1,27 @@
+schema: strawwu-greeter-manifest/v1
+wave: W5-GRT
+description: >-
+  GRT0 GDM greeter StrawWU branding (theme + logo + no upstream copy).
+  GRT1 default session strawwu-session. GRT2 live autologin via build-iso.sh
+  (STRAWWU_LIVE_AUTOLOGIN=1); installed targets use single-user greeter.
+
+default_session: strawwu-session
+error_code: SWU-GR-001
+log_path: /var/log/strawwu/greeter.log
+marker_path: /var/lib/strawwu/setup/greeter.ok
+lifecycle_key: lifecycle.greeter
+
+theme:
+  gtk: StrawWU-Dark
+  gnome_shell_css: /usr/share/gnome-shell/theme/strawwu-greeter.css
+  wallpaper: /usr/share/backgrounds/strawwu/strawwu-wallpaper-dark.png
+
+gdm:
+  greeter_dconf: /etc/gdm3/greeter.dconf-defaults
+  custom_conf: /etc/gdm3/custom.conf
+  single_user:
+    disable_user_list: true
+  live_autologin:
+    handler: os-image/scripts/build-iso.sh
+    casper_live_user: ubuntu
+    env: STRAWWU_LIVE_AUTOLOGIN=1

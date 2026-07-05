@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-05T10:27:03.154205",
+  "generated_at": "2026-07-05T10:44:09.210004",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 27,
-  "failed": 20,
+  "passed": 28,
+  "failed": 19,
   "all_pass": false,
   "stages": [
     {
@@ -143,8 +143,8 @@
     },
     {
       "id": "w5-w4-wincompat-gui",
-      "status": "IN_PROGRESS",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w5-grt-session",

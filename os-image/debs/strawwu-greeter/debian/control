@@ -1,0 +1,14 @@
+Package: strawwu-greeter
+Version: __VERSION__
+Section: gnome
+Priority: optional
+Architecture: all
+Depends: strawwu-initd,
+         strawwu-session,
+         gdm3,
+         python3
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU GDM greeter theme and session defaults
+ Applies StrawWU branding to the GDM login screen: StrawWU-Dark
+ theme, distributor logo, no Ubuntu greeter copy, default session
+ strawwu-session. Live ISO autologin remains configured by build-iso.

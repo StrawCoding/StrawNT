@@ -1,0 +1,17 @@
+# StrawWU GDM greeter defaults (installed to /etc/gdm3/greeter.dconf-defaults)
+[org/gnome/desktop/interface]
+gtk-theme='StrawWU-Dark'
+color-scheme='prefer-dark'
+cursor-theme='Yaru'
+icon-theme='Yaru'
+
+[org/gnome/login-screen]
+disable-user-list=true
+disable-restart-buttons=false
+
+[org/gnome/shell]
+always-show-log-out=false
+
+[org/gnome/shell/extensions/user-theme]
+enabled=true
+name='StrawWU-Dark'

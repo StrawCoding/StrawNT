@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+"""StrawWU greeter CLI — GDM theme + strawwu-session defaults."""
+from __future__ import annotations
+
+import argparse
+import importlib.util
+import sys
+from pathlib import Path
+
+_CORE = Path(__file__).resolve().parent.parent / "lib" / "strawwu-greeter" / "core.py"
+_spec = importlib.util.spec_from_file_location("strawwu_greeter_core", _CORE)
+_mod = importlib.util.module_from_spec(_spec)
+assert _spec.loader is not None
+_spec.loader.exec_module(_mod)
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="strawwu-greeter",
+        description="Apply StrawWU GDM greeter theme and session defaults.",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Log actions without modifying the system",
+    )
+    sub = parser.add_subparsers(dest="command")
+    sub.add_parser("apply", help="Apply greeter branding (default)")
+    sub.add_parser("version", help="Print version")
+
+    args = parser.parse_args(argv)
+    if args.command == "version":
+        return _mod.cmd_version()
+
+    if args.command in (None, "apply"):
+        return _mod.run_greeter_apply(dry_run=args.dry_run)
+
+    parser.print_help()
+    return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

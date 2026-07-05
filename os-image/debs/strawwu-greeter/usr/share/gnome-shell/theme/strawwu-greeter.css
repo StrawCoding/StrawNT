@@ -1,0 +1,28 @@
+# StrawWU greeter — GDM login screen overlay (GRT0)
+# Teal accent on lock dialog; no upstream greeter copy.
+
+#lockDialogGroup {
+  background-color: #1a2426;
+  background-image: url("/usr/share/backgrounds/strawwu/strawwu-wallpaper-dark.png");
+  background-size: cover;
+}
+
+.login-dialog-banner {
+  color: #2dd4bf;
+}
+
+.login-dialog .modal-dialog-button-box .modal-dialog-button {
+  background-color: #0d9488;
+  color: #f7f7f7;
+}
+
+.login-dialog .modal-dialog-button-box .modal-dialog-button:hover {
+  background-color: #14b8a6;
+}
+
+.login-dialog-logo-bin {
+  background-image: url("/usr/share/icons/hicolor/scalable/apps/distributor-logo.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}

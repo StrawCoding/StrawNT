@@ -14,6 +14,7 @@
 | target-identity | `/var/log/strawwu/target-identity.log` |
 | disable-upstream-init | `/var/log/strawwu/disable-upstream-init.log` |
 | firstboot | `/var/log/strawwu/firstboot.log` |
+| greeter | `/var/log/strawwu/greeter.log` |
 | App Registry | `/var/log/strawwu/app-registry.log` |
 | update/upgrade | `/var/log/strawwu/update.log` |
 | Windows compat | `/var/log/strawwu/wincompat.log` |

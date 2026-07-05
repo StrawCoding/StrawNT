@@ -16,6 +16,7 @@ packages:
     - strawwu-wincompat
     - strawwu-shell
     - strawwu-session
+    - strawwu-greeter
     - strawwu-update-notifier
     - strawwu-bug-reporter
     - strawwu-flatpak-setup

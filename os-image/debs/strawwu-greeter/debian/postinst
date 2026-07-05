@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+if [ "$1" = "configure" ] && command -v strawwu-greeter >/dev/null 2>&1; then
+    strawwu-greeter apply || true
+fi
+echo "strawwu-greeter: installed (GDM StrawWU greeter theme + strawwu-session default)"

@@ -5,7 +5,7 @@
 | 版本 | 0.4.1.31 |
 | 日期 | 2026-07-05 |
 | Worker | 階段 28/47（w5-w4-wincompat-gui） |
-| 結果 | **待 Hermes mark**（worker 不自宣稱 PASS） |
+| 結果 | **Hermes mark PASS**（2026-07-05T10:44 UTC-4） |
 
 ## 目標
 
@@ -39,9 +39,9 @@ GUI app 啟動 smoke — PE GUI 子系統（notepad 等）經 `strawwu run` 建�
 | Registry | `run` upsert 含 `desktop_entry`（W5-D4 待辦：launcher 自動注入） |
 | 結構化日誌 | `STRAWWU_WINCOMPAT_LOG` / `/var/log/strawwu/wincompat.log` — `gui_smoke` 事件 |
 
-## 驗收命令輸出（2026-07-05 UTC-4）
+## 驗收命令輸出（2026-07-05 UTC-4，本 worker 複驗）
 
-### `make test-wincompat-gui` — exit 0（~0.5s）
+### `make test-wincompat-gui` — exit 0（~0.4s）
 
 Log: `/tmp/w5-w4-test-wincompat-gui-cursor.log`
 
@@ -63,11 +63,11 @@ Log: `/tmp/w5-w4-test-wincompat-gui-cursor.log`
 strawwu: launched /tmp/.../notepad.exe (format=PE, pid=1, backend=native, app_id=notepad, gui-smoke=PASS hwnd=65536 compositor=mutter visible=true)
 ```
 
-### `make preflight` — exit 0（~115s）
+### `make preflight` — exit 0（~168s）
 
 Log: `/tmp/w5-w4-preflight-cursor.log`
 
-含 W0–W5 全部階段 + **W5-W4 wincompat-gui**（行 1208：`=== W5-W4 wincompat-gui done: PASS ===`）；最終階段 W5-B4 disable-upstream-init 亦 PASS。
+含 W0–W5 全部階段 + **W5-W4 wincompat-gui**（行 1208：`=== W5-W4 wincompat-gui done: PASS ===`）；最終階段 W5-B4 disable-upstream-init 亦 PASS（行 1643）。
 
 WARN（預期/環境）：W5-B4 `ubuntu-desktop` 仍留 rootfs/squashfs（disable-upstream-init 標 WARN，不阻斷 PASS）。
 
@@ -129,8 +129,11 @@ Version: 0.4.1.31
 |------|------|
 | 2026-07-05T10:05 UTC-4 | `[worker-START]` w5-w4-wincompat-gui |
 | 2026-07-05T10:16 UTC-4 | 前次 worker：test-wincompat-gui + preflight exit 0 |
-| 2026-07-05T10:26 UTC-4 | Cursor worker 複驗：`make test-wincompat-gui` exit 0、`make preflight` exit 0 — 待 Hermes mark |
+| 2026-07-05T10:26 UTC-4 | Cursor worker 複驗：test-wincompat-gui + preflight exit 0 |
+| 2026-07-05T10:38 UTC-4 | 階段 28/47 worker 最終複驗：`make test-wincompat-gui` exit 0（17 項 PASS）、`make preflight` exit 0（W5-W4 行 1208） |
+| 2026-07-05T10:44 UTC-4 | **Hermes `[worker-PASS]`** → w5-w4-wincompat-gui PASS；下一階段 **w5-grt-session** |
+| 2026-07-05T10:45 UTC-4 | 階段 28/47 worker 收尾：`make test-wincompat-gui` exit 0（Log: `/tmp/w5-w4-test-wincompat-gui-final.log`） |
 
 ## 下一階段
 
-**w5-grt-session**（Hermes mark PASS 後自動啟動，勿問使用者）。
+**w5-grt-session**（已啟動排程）。

@@ -55,7 +55,7 @@ verify_prerequisites() {
 build_debs() {
     local version="${STRAWWU_VERSION:-$(tr -d '[:space:]' < "${REPO_ROOT}/VERSION")}"
     local pkg
-    for pkg in strawwu-initd strawwu-wincompat strawwu-shell strawwu-session strawwu-update-notifier strawwu-bug-reporter \
+    for pkg in strawwu-initd strawwu-wincompat strawwu-shell strawwu-session strawwu-greeter strawwu-update-notifier strawwu-bug-reporter \
         strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-install-init strawwu-desktop-actions strawwu-registry-hooks strawwu-target-identity strawwu-disable-upstream-init strawwu-desktop strawwu-live-install-ux \
         strawwu-target-setup strawwu-calamares-settings; do
         local build="${DEBS_ROOT}/${pkg}/build-deb.sh"
@@ -87,7 +87,7 @@ stage_debs() {
     rm -f "${STAGED}"/*.deb
 
     local pkg deb
-    for pkg in strawwu-initd strawwu-wincompat strawwu-shell strawwu-session strawwu-update-notifier strawwu-bug-reporter \
+    for pkg in strawwu-initd strawwu-wincompat strawwu-shell strawwu-session strawwu-greeter strawwu-update-notifier strawwu-bug-reporter \
         strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-install-init strawwu-desktop-actions strawwu-registry-hooks strawwu-target-identity strawwu-disable-upstream-init strawwu-desktop; do
         deb="$(latest_deb "${pkg}")"
         [[ -n "${deb}" && -f "${deb}" ]] || die "deb missing for ${pkg}"
@@ -218,6 +218,7 @@ sync_squashfs() {
         "${ROOTFS_DIR}/usr/bin/strawwu-firstboot" \
         "${ROOTFS_DIR}/usr/bin/strawwu-target-identity" \
         "${ROOTFS_DIR}/usr/bin/strawwu-disable-upstream-init" \
+        "${ROOTFS_DIR}/usr/bin/strawwu-greeter" \
         "${SQUASH_SRC}/usr/bin/" 2>/dev/null || true
     rsync -a \
         "${ROOTFS_DIR}/usr/share/strawwu/wincompat/" \
@@ -264,6 +265,20 @@ sync_squashfs() {
     rsync -a \
         "${ROOTFS_DIR}/usr/share/strawwu/install-init/" \
         "${SQUASH_SRC}/usr/share/strawwu/install-init/" 2>/dev/null || true
+    rsync -a \
+        "${ROOTFS_DIR}/usr/lib/strawwu-greeter/" \
+        "${SQUASH_SRC}/usr/lib/strawwu-greeter/" 2>/dev/null || true
+    rsync -a \
+        "${ROOTFS_DIR}/usr/share/strawwu/greeter/" \
+        "${SQUASH_SRC}/usr/share/strawwu/greeter/" 2>/dev/null || true
+    install -d "${SQUASH_SRC}/etc/gdm3"
+    rsync -a \
+        "${ROOTFS_DIR}/etc/gdm3/greeter.dconf-defaults" \
+        "${SQUASH_SRC}/etc/gdm3/" 2>/dev/null || true
+    install -d "${SQUASH_SRC}/usr/share/gnome-shell/theme"
+    rsync -a \
+        "${ROOTFS_DIR}/usr/share/gnome-shell/theme/strawwu-greeter.css" \
+        "${SQUASH_SRC}/usr/share/gnome-shell/theme/" 2>/dev/null || true
     rsync -a \
         "${ROOTFS_DIR}/usr/share/gnome-shell/modes/strawwu.json" \
         "${SQUASH_SRC}/usr/share/gnome-shell/modes/" 2>/dev/null || true

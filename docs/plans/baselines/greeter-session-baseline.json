@@ -1,0 +1,24 @@
+{
+  "schema": "strawwu-greeter-session-baseline/v1",
+  "wave": "W5-GRT",
+  "version": "0.4.1.32",
+  "package": "strawwu-greeter",
+  "log_path": "/var/log/strawwu/greeter.log",
+  "marker_path": "/var/lib/strawwu/setup/greeter.ok",
+  "error_code": "SWU-GR-001",
+  "grt": {
+    "grt0": "GDM theme StrawWU-Dark + distributor logo CSS",
+    "grt1": "DefaultSession=strawwu-session",
+    "grt2": "live autologin via build-iso.sh (AutomaticLogin=ubuntu)"
+  },
+  "default_session": "strawwu-session",
+  "theme": {
+    "gtk": "StrawWU-Dark",
+    "css": "/usr/share/gnome-shell/theme/strawwu-greeter.css"
+  },
+  "single_user": {
+    "disable_user_list": true
+  },
+  "lifecycle_key": "lifecycle.greeter",
+  "manifest": "usr/share/strawwu/greeter/greeter-manifest.yaml"
+}

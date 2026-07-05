@@ -1,0 +1,1 @@
+"""StrawWU greeter package."""

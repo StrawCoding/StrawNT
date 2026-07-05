@@ -1,0 +1,5 @@
+# GRT2 live ISO autologin — applied by os-image/scripts/build-iso.sh (not postinst).
+# Reference only; do not install this file into /etc/gdm3/custom.conf directly.
+[daemon]
+AutomaticLoginEnable=true
+AutomaticLogin=ubuntu
