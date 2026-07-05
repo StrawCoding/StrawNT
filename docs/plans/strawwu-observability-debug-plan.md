@@ -12,6 +12,7 @@
 | install (Calamares) | `/var/log/strawwu/install.log` |
 | target-setup | `/var/log/strawwu/target-setup.log` |
 | target-identity | `/var/log/strawwu/target-identity.log` |
+| disable-upstream-init | `/var/log/strawwu/disable-upstream-init.log` |
 | firstboot | `/var/log/strawwu/firstboot.log` |
 | App Registry | `/var/log/strawwu/app-registry.log` |
 | update/upgrade | `/var/log/strawwu/update.log` |
@@ -44,6 +45,7 @@ bundle.strawwu-bug (zip)
 | SWU-BT-001 | boot selfcheck failed |
 | SWU-IN-001 | Calamares install failed |
 | SWU-IN-002 | target setup chroot failed |
+| SWU-IN-004 | disable upstream init failed |
 | SWU-FB-001 | firstboot crash |
 | SWU-FB-003 | firstboot state mismatch |
 | SWU-AR-004 | app registry corrupt |

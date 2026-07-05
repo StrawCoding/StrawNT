@@ -105,6 +105,7 @@ preflight:
 	bash tests/preflight/test-context-menu.sh
 	bash tests/preflight/test-registry-hooks.sh
 	bash tests/preflight/test-target-identity.sh
+	bash tests/preflight/test-upstream-init-disabled.sh
 
 preflight-dev-vm:
 	bash tests/preflight/test-dev-vm-ready.sh
@@ -297,6 +298,9 @@ test-registry-hooks:
 
 test-target-identity:
 	bash tests/preflight/test-target-identity.sh
+
+test-upstream-init-disabled:
+	bash tests/preflight/test-upstream-init-disabled.sh
 
 install-calamares-settings:
 	sudo bash $(SCRIPTS)/chroot-install-calamares-settings.sh

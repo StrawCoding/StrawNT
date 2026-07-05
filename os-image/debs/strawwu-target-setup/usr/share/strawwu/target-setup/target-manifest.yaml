@@ -14,4 +14,5 @@ packages:
   - strawwu-desktop-actions
   - strawwu-registry-hooks
   - strawwu-target-identity
+  - strawwu-disable-upstream-init
   - strawwu-desktop

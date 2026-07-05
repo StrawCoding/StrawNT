@@ -1,0 +1,32 @@
+schema: strawwu-disable-upstream-init-manifest/v1
+wave: W5-B4
+description: >-
+  Disable upstream cloud-init and GNOME Initial Setup on live and installed
+  systems. Purge ubuntu-desktop/ubuntu-session metas during Calamares chroot;
+  strawwu-firstboot replaces upstream first-run UX.
+
+cloud_init:
+  disabled_marker: /etc/cloud/cloud-init.disabled
+  masked_units:
+    - cloud-init.service
+    - cloud-init-local.service
+    - cloud-init-hotplugd.service
+    - cloud-config.service
+    - cloud-final.service
+    - cloud-init.target
+
+gnome_initial_setup:
+  dconf_keyfile: /etc/dconf/db/local.d/01-strawwu-no-gnome-initial-setup
+  masked_units:
+    - gnome-initial-setup.service
+    - gnome-initial-setup-first-login.service
+
+upstream_metas_purge:
+  - ubuntu-desktop
+  - ubuntu-desktop-minimal
+  - ubuntu-session
+
+lifecycle_key: lifecycle.upstream_init_disabled
+log_path: /var/log/strawwu/disable-upstream-init.log
+marker_path: /var/lib/strawwu/setup/upstream-init-disabled.ok
+error_code: SWU-IN-004

@@ -44,23 +44,27 @@
 | 錯誤碼 | `SWU-IN-003` |
 | 日誌 | 結構化 JSON → `/var/log/strawwu/target-identity.log` |
 
-## 驗收命令輸出（2026-07-05T09:11 UTC-4，worker 終驗）
+## 驗收命令輸出
 
-### `make test-target-identity` — exit 0（~0.8s）
+### 2026-07-05T09:34–09:36 UTC-4（companion check 終驗）
 
-Log: `/tmp/w5-i3-test-target-identity3.log`
+#### `make test-target-identity` — exit 0（~0.8s）
+
+Log: `/tmp/w5-i3-test-target-identity-worker.log`
 
 ```
 === W5-I3 target-identity done: PASS ===
 ```
 
-關鍵檢查項：deb 結構、grubcfg/bootloader 預設、Calamares shellprocess 時序、5 項單元測試 PASS、CLI dry-run、`strawwu-target-identity_0.4.1.28_all.deb`（9.4K）、rootfs grub drop-in + CLI 存在。
+關鍵檢查項：deb 結構、grubcfg/bootloader 預設、Calamares shellprocess 時序、5 項單元測試 PASS、CLI dry-run、`strawwu-target-identity_0.4.1.28_all.deb`（9.4K）、rootfs grub drop-in + CLI 存在。squashfs 有 WARN（不阻斷）。
 
-### `make preflight` — exit 0（~111s）
+#### `make preflight` — exit 0（~112s）
 
-Log: `/tmp/w5-i3-preflight.log`
+Log: `/tmp/w5-i3-preflight-worker.log`
 
 含 W0 baseline + W1–W4 全部階段 + W5-N3/N4/D4/R4 + **W5-I3 target-identity** 全部 exit 0。
+
+### 2026-07-05T09:19–09:22 UTC-4（worker 初終驗，同上結果）
 
 ### chroot 同步
 
@@ -131,7 +135,11 @@ Version: 0.4.1.28
 | 時間 | 事件 |
 |------|------|
 | 2026-07-05T09:04:16-0400 | `[worker-TICK]` w5-r4 PASS → w5-i3 launched |
-| 2026-07-05T09:11:00-0400 | worker 終驗完成 — 待 Hermes mark PASS |
+| 2026-07-05T09:11:00-0400 | worker 初驗完成 |
+| 2026-07-05T09:19:07-0400 | `[worker-TICK]` periodic companion check status=IN_PROGRESS |
+| 2026-07-05T09:22:00-0400 | worker 初終驗完成 |
+| 2026-07-05T09:34:07-0400 | `[worker-TICK]` periodic companion check status=IN_PROGRESS |
+| 2026-07-05T09:36:00-0400 | companion check 終驗完成 — 待 Hermes mark PASS |
 
 ## 下一步
 

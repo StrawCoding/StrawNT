@@ -6,7 +6,7 @@ Ubuntu telemetry or snapd packages.
 
 Replacement path:
   - W3-D1: deb scaffold + preflight (this package)
-  - W5-B4: disable upstream ubuntu-desktop on installed systems
+  - W5-B4: disable upstream ubuntu-desktop/cloud-init/gnome-initial-setup on installed systems
   - W6-B5: ubuntu-* meta audit / full replacement
 
 Session:

@@ -56,7 +56,7 @@ build_debs() {
     local version="${STRAWWU_VERSION:-$(tr -d '[:space:]' < "${REPO_ROOT}/VERSION")}"
     local pkg
     for pkg in strawwu-initd strawwu-wincompat strawwu-shell strawwu-session strawwu-update-notifier strawwu-bug-reporter \
-        strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-install-init strawwu-desktop-actions strawwu-registry-hooks strawwu-target-identity strawwu-desktop strawwu-live-install-ux \
+        strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-install-init strawwu-desktop-actions strawwu-registry-hooks strawwu-target-identity strawwu-disable-upstream-init strawwu-desktop strawwu-live-install-ux \
         strawwu-target-setup strawwu-calamares-settings; do
         local build="${DEBS_ROOT}/${pkg}/build-deb.sh"
         [[ -x "${build}" ]] || die "missing build script: ${build}"
@@ -87,7 +87,7 @@ stage_debs() {
 
     local pkg deb
     for pkg in strawwu-initd strawwu-wincompat strawwu-shell strawwu-session strawwu-update-notifier strawwu-bug-reporter \
-        strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-install-init strawwu-desktop-actions strawwu-registry-hooks strawwu-target-identity strawwu-desktop; do
+        strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-install-init strawwu-desktop-actions strawwu-registry-hooks strawwu-target-identity strawwu-disable-upstream-init strawwu-desktop; do
         deb="$(latest_deb "${pkg}")"
         [[ -n "${deb}" && -f "${deb}" ]] || die "deb missing for ${pkg}"
         cp -f "${deb}" "${STAGED}/"
@@ -175,14 +175,19 @@ test -f /etc/default/grub.d/99-strawwu-identity.cfg
 grep -q 'GRUB_DISTRIBUTOR="StrawWU"' /etc/default/grub.d/99-strawwu-identity.cfg
 strawwu-initd get lifecycle.target_identity | grep -q done
 
-# Live ISO transition: keep upstream metas until W5-B4 (preflight purge baseline).
-for transitional in ubuntu-minimal ubuntu-desktop-minimal ubuntu-desktop; do
-    if ! dpkg-query -W -f='${Status}' "${transitional}" 2>/dev/null | grep -q "ok installed"; then
-        (cd /tmp && apt-get download "${transitional}" 2>/dev/null && dpkg -i --force-depends "${transitional}"_*.deb && rm -f "${transitional}"_*.deb) || true
-    fi
-done
+STRAWWU_TARGET_DEB_DIR=/usr/share/strawwu/target-setup/staged-debs \
+    strawwu-disable-upstream-init --calamares-chroot
 
-# Re-purge telemetry if apt pulled them back during meta restore.
+command -v strawwu-disable-upstream-init >/dev/null
+test -f /etc/cloud/cloud-init.disabled
+strawwu-initd get lifecycle.upstream_init_disabled | grep -q done
+
+# W5-B4: keep ubuntu-minimal base; upstream desktop metas purged by disable-upstream-init.
+if ! dpkg-query -W -f='${Status}' ubuntu-minimal 2>/dev/null | grep -q "ok installed"; then
+    (cd /tmp && apt-get download ubuntu-minimal 2>/dev/null && dpkg -i --force-depends ubuntu-minimal_*.deb && rm -f ubuntu-minimal_*.deb) || true
+fi
+
+# Re-purge telemetry if apt pulled them back during meta operations.
 for purge_pkg in apport apport-core-dump-handler python3-apport whoopsie ubuntu-report ubuntu-pro-client ubuntu-pro-client-l10n ubuntu-advantage-desktop-daemon snapd snap-confine; do
     if dpkg-query -W -f='${Status}' "${purge_pkg}" 2>/dev/null | grep -q "ok installed"; then
         dpkg --purge --force-all "${purge_pkg}" 2>/dev/null || apt-get remove -y --purge "${purge_pkg}" 2>/dev/null || true
@@ -210,6 +215,7 @@ sync_squashfs() {
         "${ROOTFS_DIR}/usr/bin/strawwu-update-notifier" \
         "${ROOTFS_DIR}/usr/bin/strawwu-firstboot" \
         "${ROOTFS_DIR}/usr/bin/strawwu-target-identity" \
+        "${ROOTFS_DIR}/usr/bin/strawwu-disable-upstream-init" \
         "${SQUASH_SRC}/usr/bin/" 2>/dev/null || true
     rsync -a \
         "${ROOTFS_DIR}/usr/share/strawwu/wincompat/" \
@@ -265,6 +271,19 @@ sync_squashfs() {
     rsync -a \
         "${ROOTFS_DIR}/usr/share/strawwu/shell/" \
         "${SQUASH_SRC}/usr/share/strawwu/shell/" 2>/dev/null || true
+    rsync -a \
+        "${ROOTFS_DIR}/usr/lib/strawwu-disable-upstream-init/" \
+        "${SQUASH_SRC}/usr/lib/strawwu-disable-upstream-init/" 2>/dev/null || true
+    rsync -a \
+        "${ROOTFS_DIR}/usr/share/strawwu/disable-upstream-init/" \
+        "${SQUASH_SRC}/usr/share/strawwu/disable-upstream-init/" 2>/dev/null || true
+    rsync -a \
+        "${ROOTFS_DIR}/etc/cloud/cloud-init.disabled" \
+        "${SQUASH_SRC}/etc/cloud/" 2>/dev/null || true
+    install -d "${SQUASH_SRC}/etc/dconf/db/local.d"
+    rsync -a \
+        "${ROOTFS_DIR}/etc/dconf/db/local.d/01-strawwu-no-gnome-initial-setup" \
+        "${SQUASH_SRC}/etc/dconf/db/local.d/" 2>/dev/null || true
     rsync -a \
         "${ROOTFS_DIR}/usr/lib/strawwu-target-identity/" \
         "${SQUASH_SRC}/usr/lib/strawwu-target-identity/" 2>/dev/null || true

@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+"""StrawWU disable upstream init CLI — cloud-init/gnome-initial-setup off."""
+from __future__ import annotations
+
+import argparse
+import importlib.util
+import sys
+from pathlib import Path
+
+_CORE = Path(__file__).resolve().parent.parent / "lib" / "strawwu-disable-upstream-init" / "core.py"
+_spec = importlib.util.spec_from_file_location("strawwu_disable_upstream_init_core", _CORE)
+_mod = importlib.util.module_from_spec(_spec)
+assert _spec.loader is not None
+_spec.loader.exec_module(_mod)
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="strawwu-disable-upstream-init",
+        description="Disable cloud-init/gnome-initial-setup and purge upstream desktop metas.",
+    )
+    parser.add_argument(
+        "--calamares-chroot",
+        action="store_true",
+        help="Invoked by Calamares shellprocess inside target chroot (includes meta purge)",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Log actions without modifying the system",
+    )
+    parser.add_argument(
+        "--skip-meta-purge",
+        action="store_true",
+        help="Disable init services only; do not purge ubuntu-desktop metas",
+    )
+    sub = parser.add_subparsers(dest="command")
+    sub.add_parser("apply", help="Apply disable-upstream-init (default)")
+    sub.add_parser("version", help="Print version")
+
+    args = parser.parse_args(argv)
+    if args.command == "version":
+        return _mod.cmd_version()
+
+    skip_purge = args.skip_meta_purge
+    if args.calamares_chroot:
+        skip_purge = False
+
+    if args.command in (None, "apply") or args.calamares_chroot:
+        return _mod.run_disable_upstream_init(
+            skip_meta_purge=skip_purge,
+            dry_run=args.dry_run,
+        )
+
+    parser.print_help()
+    return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

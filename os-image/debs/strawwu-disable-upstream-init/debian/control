@@ -1,0 +1,12 @@
+Package: strawwu-disable-upstream-init
+Version: __VERSION__
+Section: admin
+Priority: optional
+Architecture: all
+Depends: strawwu-initd,
+         python3
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU disable upstream cloud-init and gnome-initial-setup
+ Disables cloud-init and GNOME Initial Setup on live and installed
+ systems. Purges ubuntu-desktop/ubuntu-session metas during Calamares
+ chroot (W5-B4). strawwu-firstboot replaces upstream first-run UX.

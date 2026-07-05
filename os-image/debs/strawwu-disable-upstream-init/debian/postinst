@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+if [ "$1" = "configure" ] && [ -x /usr/bin/strawwu-disable-upstream-init ]; then
+    /usr/bin/strawwu-disable-upstream-init apply --skip-meta-purge 2>/dev/null || true
+fi

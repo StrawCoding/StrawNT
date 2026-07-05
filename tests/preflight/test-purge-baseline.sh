@@ -54,13 +54,32 @@ else
     fail "missing required calamares"
 fi
 
-for pkg in ubuntu-minimal ubuntu-desktop; do
+for pkg in ubuntu-minimal; do
     if has_rootfs && package_installed_in_rootfs "${pkg}"; then
         pass "retained ${pkg}"
     elif has_rootfs; then
         fail "missing required ${pkg} in rootfs"
     fi
 done
+
+TARGET_MARKER="${REPO_ROOT}/os-image/work/.target-setup-ok"
+if has_rootfs && package_installed_in_rootfs "ubuntu-desktop"; then
+    if [[ -f "${TARGET_MARKER}" ]]; then
+        warn "rootfs still has ubuntu-desktop — re-run chroot-install-target-setup (W5-B4)"
+    else
+        pass "rootfs has ubuntu-desktop (pre-W5-B4 transition)"
+    fi
+elif has_rootfs; then
+    pass "rootfs absent ubuntu-desktop"
+fi
+
+if has_rootfs && [[ -f "${TARGET_MARKER}" ]]; then
+    if package_installed_in_rootfs strawwu-desktop; then
+        pass "rootfs has strawwu-desktop meta"
+    else
+        warn "rootfs missing strawwu-desktop — re-run chroot-install-target-setup"
+    fi
+fi
 
 if has_rootfs; then
     if [[ -d "${ROOTFS}/snap" ]]; then

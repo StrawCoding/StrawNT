@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-desktop-baseline/v1",
   "wave": "W3-D1",
-  "version": "0.4.1.28",
+  "version": "0.4.1.29",
   "packages": {
     "strawwu-session": {
       "path": "os-image/debs/strawwu-session",
@@ -13,6 +13,7 @@
     "strawwu-desktop": {
       "path": "os-image/debs/strawwu-desktop",
       "replaces_ubuntu_desktop_wave": "W5-B4",
+      "replaces_ubuntu_desktop_done": true,
       "audit_wave": "W6-B5"
     }
   },

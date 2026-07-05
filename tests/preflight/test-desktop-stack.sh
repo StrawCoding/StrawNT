@@ -149,15 +149,25 @@ else
     fail "strawwu-desktop deb artifact missing"
 fi
 
-# --- squashfs context (W0 → W3 transition) ---
+# --- squashfs context (W5-B4: upstream desktop metas replaced) ---
 if has_squashfs; then
     if package_installed_in_squashfs "ubuntu-session"; then
-        pass "squashfs still has ubuntu-session (transition; W5-B4 replaces)"
+        if [[ -f "${REPO_ROOT}/os-image/work/.target-setup-ok" ]]; then
+            warn "squashfs still has ubuntu-session — re-run chroot-install-target-setup"
+        else
+            pass "squashfs still has ubuntu-session (pre-W5-B4 transition)"
+        fi
     else
-        warn "ubuntu-session not in squashfs"
+        pass "squashfs absent ubuntu-session (W5-B4)"
     fi
     if package_installed_in_squashfs "ubuntu-desktop"; then
-        pass "squashfs still has ubuntu-desktop (transition; W5-B4 replaces)"
+        if [[ -f "${REPO_ROOT}/os-image/work/.target-setup-ok" ]]; then
+            warn "squashfs still has ubuntu-desktop — re-run chroot-install-target-setup"
+        else
+            pass "squashfs still has ubuntu-desktop (pre-W5-B4 transition)"
+        fi
+    else
+        pass "squashfs absent ubuntu-desktop (W5-B4)"
     fi
     strawwu_deb_count="$(count_squashfs_packages '^strawwu-')"
     if [[ "${strawwu_deb_count}" -eq 0 ]]; then
@@ -193,6 +203,7 @@ data = {
         "strawwu-desktop": {
             "path": "os-image/debs/strawwu-desktop",
             "replaces_ubuntu_desktop_wave": "W5-B4",
+            "replaces_ubuntu_desktop_done": True,
             "audit_wave": "W6-B5",
         },
     },

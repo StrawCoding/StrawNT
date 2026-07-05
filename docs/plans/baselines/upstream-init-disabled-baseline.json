@@ -1,0 +1,35 @@
+{
+  "schema": "strawwu-upstream-init-disabled-baseline/v1",
+  "wave": "W5-B4",
+  "version": "0.4.1.29",
+  "package": "strawwu-disable-upstream-init",
+  "log_path": "/var/log/strawwu/disable-upstream-init.log",
+  "marker_path": "/var/lib/strawwu/setup/upstream-init-disabled.ok",
+  "error_code": "SWU-IN-004",
+  "cloud_init": {
+    "disabled_marker": "/etc/cloud/cloud-init.disabled",
+    "masked_units": [
+      "cloud-init.service",
+      "cloud-init-local.service",
+      "cloud-init.target"
+    ]
+  },
+  "gnome_initial_setup": {
+    "dconf_key": "org/gnome/InitialSetup has-completed-setup",
+    "masked_units": [
+      "gnome-initial-setup.service",
+      "gnome-initial-setup-first-login.service"
+    ]
+  },
+  "upstream_metas_purge": [
+    "ubuntu-desktop",
+    "ubuntu-desktop-minimal",
+    "ubuntu-session"
+  ],
+  "calamares": {
+    "shellprocess": "shellprocess_disable-upstream-init.conf",
+    "exec_order": "after target_identity, before install_marker"
+  },
+  "lifecycle_key": "lifecycle.upstream_init_disabled",
+  "manifest": "usr/share/strawwu/disable-upstream-init/disable-upstream-init-manifest.yaml"
+}

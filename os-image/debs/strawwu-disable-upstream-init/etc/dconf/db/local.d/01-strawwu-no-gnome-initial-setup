@@ -1,0 +1,3 @@
+# StrawWU: skip upstream GNOME Initial Setup (replaced by strawwu-firstboot).
+[org/gnome/InitialSetup]
+has-completed-setup=true
