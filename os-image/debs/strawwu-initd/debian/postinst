@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+
+LOG_DIR="/var/log/strawwu"
+STATE_DIR="/var/lib/strawwu/setup"
+
+install -d -m 0755 "${LOG_DIR}"
+install -d -m 0755 /var/lib/strawwu
+install -d -m 0755 "${STATE_DIR}"
+
+# Do not overwrite existing state on upgrade; init is explicit via strawwu-initd init.
+if [[ ! -f "${STATE_DIR}/state.json" ]]; then
+    if command -v strawwu-initd >/dev/null 2>&1; then
+        strawwu-initd init || true
+    fi
+fi
+
+echo "strawwu-initd: installed (setup state at ${STATE_DIR}/state.json)"

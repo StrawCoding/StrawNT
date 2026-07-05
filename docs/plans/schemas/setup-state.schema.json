@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://strawwu.local/schemas/setup-state.schema.json",
+  "title": "StrawWU Setup State",
+  "description": "Shared install/firstboot lifecycle state at /var/lib/strawwu/setup/state.json (managed by strawwu-initd).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "lifecycle", "flags"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["install", "target_setup", "boot_selfcheck", "firstboot"],
+      "properties": {
+        "install": {
+          "$ref": "#/$defs/install_phase"
+        },
+        "target_setup": {
+          "$ref": "#/$defs/target_setup_phase"
+        },
+        "boot_selfcheck": {
+          "$ref": "#/$defs/boot_selfcheck_phase"
+        },
+        "firstboot": {
+          "$ref": "#/$defs/firstboot_phase"
+        }
+      }
+    },
+    "timestamps": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "format": "date-time"
+      }
+    },
+    "flags": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["firstboot_required"],
+      "properties": {
+        "firstboot_required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "install_phase": {
+      "type": "string",
+      "enum": ["pending", "installing", "installed", "failed"]
+    },
+    "target_setup_phase": {
+      "type": "string",
+      "enum": ["pending", "running", "done", "failed", "skipped"]
+    },
+    "boot_selfcheck_phase": {
+      "type": "string",
+      "enum": ["pending", "running", "done", "failed"]
+    },
+    "firstboot_phase": {
+      "type": "string",
+      "enum": ["pending", "running", "done", "skipped", "failed"]
+    }
+  }
+}

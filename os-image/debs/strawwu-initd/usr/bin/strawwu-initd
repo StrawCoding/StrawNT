@@ -1,0 +1,198 @@
+#!/usr/bin/env python3
+"""StrawWU setup state CLI — shared state.json for install-init / target-setup / firstboot."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+LIB = Path(__file__).resolve().parent.parent / "lib" / "strawwu-initd"
+sys.path.insert(0, str(LIB))
+
+from state import (  # noqa: E402
+    get_nested,
+    init_state,
+    load_state,
+    migrate_state,
+    repair_state,
+    save_state,
+    set_nested,
+    state_path,
+    validate_state,
+)
+
+
+def parse_value(raw: str) -> object:
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        return raw
+
+
+def resolve_path(args: argparse.Namespace) -> Path | None:
+    return getattr(args, "state_file", None)
+
+
+def cmd_show(args: argparse.Namespace) -> int:
+    data = load_state(resolve_path(args))
+    if args.json:
+        print(json.dumps(data, indent=2, ensure_ascii=False))
+    else:
+        lifecycle = data.get("lifecycle", {})
+        print(f"schema_version: {data.get('schema_version')}")
+        print(f"updated_at: {data.get('updated_at')}")
+        for key, value in lifecycle.items():
+            print(f"lifecycle.{key}: {value}")
+        flags = data.get("flags", {})
+        if flags:
+            print(f"flags.firstboot_required: {flags.get('firstboot_required')}")
+    return 0
+
+
+def cmd_get(args: argparse.Namespace) -> int:
+    data = load_state(resolve_path(args))
+    value = get_nested(data, args.dot_path)
+    if args.json:
+        print(json.dumps(value, ensure_ascii=False))
+    else:
+        if isinstance(value, (dict, list)):
+            print(json.dumps(value, ensure_ascii=False))
+        else:
+            print(value)
+    return 0
+
+
+def cmd_set(args: argparse.Namespace) -> int:
+    path = resolve_path(args)
+    data = load_state(path)
+    set_nested(data, args.dot_path, parse_value(args.value))
+    save_state(data, path)
+    if args.json:
+        print(json.dumps(get_nested(data, args.dot_path), ensure_ascii=False))
+    else:
+        print(f"OK: {args.dot_path}={get_nested(data, args.dot_path)!r}")
+    return 0
+
+
+def cmd_validate(args: argparse.Namespace) -> int:
+    path = args.path or resolve_path(args) or state_path()
+    if not path.exists():
+        print(f"MISSING: {path}", file=sys.stderr)
+        return 1
+    try:
+        data = load_state(path)
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        print(f"INVALID: {exc}", file=sys.stderr)
+        return 1
+    errors = validate_state(data)
+    if errors:
+        for err in errors:
+            print(f"INVALID: {err}", file=sys.stderr)
+        return 1
+    print(f"OK: {path}")
+    return 0
+
+
+def cmd_init(args: argparse.Namespace) -> int:
+    path = resolve_path(args)
+    data = init_state(force=args.force, path=path)
+    if args.json:
+        print(json.dumps(data, indent=2, ensure_ascii=False))
+    else:
+        print(f"OK: initialized {path or state_path()}")
+    return 0
+
+
+def cmd_repair(args: argparse.Namespace) -> int:
+    path = resolve_path(args)
+    data = repair_state(path)
+    errors = validate_state(data)
+    if errors:
+        for err in errors:
+            print(f"INVALID: {err}", file=sys.stderr)
+        return 1
+    print(f"OK: repaired {path or state_path()}")
+    return 0
+
+
+def cmd_migrate(args: argparse.Namespace) -> int:
+    path = resolve_path(args)
+    try:
+        data = migrate_state(path, dry_run=args.dry_run)
+    except ValueError as exc:
+        print(f"INVALID: {exc}", file=sys.stderr)
+        return 1
+    if args.json:
+        print(json.dumps(data, indent=2, ensure_ascii=False))
+    else:
+        suffix = " (dry-run)" if args.dry_run else ""
+        print(f"OK: migrate{suffix} schema_version={data.get('schema_version')}")
+    return 0
+
+
+def cmd_version(_: argparse.Namespace) -> int:
+    print("strawwu-initd 0.5.0.0-target (setup-state schema 1.0)")
+    return 0
+
+
+HANDLERS = {
+    "version": cmd_version,
+    "init": cmd_init,
+    "show": cmd_show,
+    "get": cmd_get,
+    "set": cmd_set,
+    "validate": cmd_validate,
+    "repair": cmd_repair,
+    "migrate": cmd_migrate,
+}
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="Manage StrawWU shared setup state (/var/lib/strawwu/setup/state.json).",
+    )
+    parser.add_argument(
+        "--state-file",
+        type=Path,
+        dest="state_file",
+        help="Override state.json path (default: /var/lib/strawwu/setup/state.json)",
+    )
+    sub = parser.add_subparsers(dest="command")
+
+    for name in HANDLERS:
+        p = sub.add_parser(name)
+        if name == "show":
+            p.add_argument("--json", action="store_true")
+        elif name == "get":
+            p.add_argument("dot_path")
+            p.add_argument("--json", action="store_true")
+        elif name == "set":
+            p.add_argument("dot_path")
+            p.add_argument("value")
+            p.add_argument("--json", action="store_true")
+        elif name == "init":
+            p.add_argument("--force", action="store_true", help="Overwrite existing state")
+            p.add_argument("--json", action="store_true")
+        elif name == "validate":
+            p.add_argument("path", nargs="?", type=Path)
+        elif name == "migrate":
+            p.add_argument("--dry-run", action="store_true")
+            p.add_argument("--json", action="store_true")
+
+    return parser
+
+
+def main() -> int:
+    parser = build_parser()
+    args = parser.parse_args()
+    if not args.command:
+        parser.print_help()
+        return 0
+    handler = HANDLERS[args.command]
+    return handler(args)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

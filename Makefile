@@ -2,7 +2,7 @@
 	build-iso dev-iso release-iso repack-iso validate-rootfs boot-test-iso boot-test-dev-iso \
 	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
-	test-install-e2e test-wincompat 	test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-bug-reporter test-calamares-settings test-app-registry purge-ubuntu-telemetry \
+	test-install-e2e test-wincompat 	test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-init-tools test-bug-reporter test-calamares-settings test-app-registry purge-ubuntu-telemetry \
 	install-flatpak-setup install-bug-reporter install-calamares-settings nosnap-harden build-debs bump-version check-version-bump
 
 REPO_ROOT := $(abspath .)
@@ -42,6 +42,7 @@ help:
 	@echo "  test-purge-baseline           W1-B1 telemetry/pro/snap purge verification"
 	@echo "  test-flatpak                  W1-F1 flatpak + flathub remote verification"
 	@echo "  test-nosnap                   W1-F2 snapd absent + meta mask verification"
+	@echo "  test-init-tools               W2-N1 strawwu-initd shared setup state.json CLI"
 	@echo "  test-bug-reporter             W2-B2 strawwu-bug-reporter CLI/GTK/consent verification"
 	@echo "  test-calamares-settings       W2-I1 strawwu-calamares-settings deb (replaces ubuntu-common)"
 	@echo "  test-app-registry             W2-R1 strawwu-app-registry crate + CLI + schema"
@@ -58,6 +59,7 @@ preflight:
 	bash tests/preflight/test-flatpak.sh
 	bash tests/preflight/test-nosnap.sh
 	bash tests/preflight/test-initrd-overlays.sh
+	bash tests/preflight/test-init-tools.sh
 	bash tests/preflight/test-bug-reporter.sh
 	bash tests/preflight/test-calamares-settings.sh
 	bash tests/preflight/test-app-registry.sh
@@ -181,6 +183,9 @@ test-nosnap:
 
 test-initrd-overlays:
 	bash tests/preflight/test-initrd-overlays.sh
+
+test-init-tools:
+	bash tests/preflight/test-init-tools.sh
 
 test-bug-reporter:
 	bash tests/preflight/test-bug-reporter.sh

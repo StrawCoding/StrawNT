@@ -1,0 +1,11 @@
+Package: strawwu-initd
+Version: __VERSION__
+Section: admin
+Priority: optional
+Architecture: all
+Depends: python3
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU shared setup state CLI
+ Manages /var/lib/strawwu/setup/state.json for install-init,
+ target-setup, firstboot, and upgrade/recovery workflows.
+ Schema-versioned state with validate/repair/migrate commands.
