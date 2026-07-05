@@ -1,0 +1,8 @@
+schema: strawwu-wincompat-baseline/v1
+cli: /usr/bin/strawwu
+log_path: /var/log/strawwu/wincompat.log
+state_dir: /var/lib/strawwu/wincompat
+commands:
+  - status
+  - version
+  - help

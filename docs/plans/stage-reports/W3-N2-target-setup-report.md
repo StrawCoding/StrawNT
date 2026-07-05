@@ -6,7 +6,7 @@
 | 日期 | 2026-07-05 |
 | Worker | 階段 14/47（w3-n2-target-setup） |
 | 結果 | **待 Hermes mark**（worker 不自宣稱 PASS） |
-| Companion | `[worker-TICK]` 2026-07-05T05:03:44-0400 status=IN_PROGRESS → 終驗完成 |
+| Companion | `[worker-TICK]` 2026-07-05T05:18:44-0400 status=IN_PROGRESS → 終驗完成 |
 
 ## 目標
 
@@ -44,9 +44,9 @@ Calamares chroot hook：`strawwu-target-setup` 在安裝 exec 階段於 target c
 | boot-selfcheck | enable systemd unit（若存在） |
 | Live ISO 過渡 | chroot 腳本保留 `ubuntu-minimal`/`ubuntu-desktop-minimal`/`ubuntu-desktop` 至 W5-B4；重 purge  telemetry |
 
-## 驗收命令輸出（2026-07-05T05:04 UTC-4，worker 終驗）
+## 驗收命令輸出（2026-07-05T05:19 UTC-4，worker 終驗）
 
-### `make test-target-setup` — exit 0（~0.7s）
+### `make test-target-setup` — exit 0（~0.8s）
 
 Log: `/tmp/w3-n2-test-target-setup.log`
 
@@ -56,7 +56,7 @@ Log: `/tmp/w3-n2-test-target-setup.log`
 
 關鍵檢查項：6 項單元測試 PASS、`strawwu-target-setup_0.4.1.13_all.deb`（~9.6K）、Calamares hook 在 rootfs+squashfs、chroot marker 存在、desktop stack 已安裝。
 
-### `make preflight` — exit 0（~37s）
+### `make preflight` — exit 0（~36s）
 
 Log: `/tmp/w3-n2-preflight.log`
 
@@ -126,8 +126,10 @@ Version: 0.4.1.13
 
 | 時間 | 事件 |
 |------|------|
-| 2026-07-05T05:03:44-0400 | `[worker-TICK]` companion check IN_PROGRESS |
-| 2026-07-05T05:04:47-0400 | `[worker-DONE]` 終驗完成 — 待 Hermes mark PASS |
+| 2026-07-05T05:03:44-0400 | `[worker-TICK]` companion check IN_PROGRESS（前次 worker） |
+| 2026-07-05T05:04:47-0400 | `[worker-DONE]` 前次終驗完成 |
+| 2026-07-05T05:18:44-0400 | `[worker-TICK]` companion check IN_PROGRESS（本 worker） |
+| 2026-07-05T05:19:30-0400 | `[worker-DONE]` 本 worker 終驗完成 — 待 Hermes mark PASS |
 
 ## 下一步
 

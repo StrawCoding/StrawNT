@@ -1,0 +1,11 @@
+Package: strawwu-wincompat
+Version: __VERSION__
+Section: utils
+Priority: optional
+Architecture: amd64
+Depends: libc6 (>= 2.35)
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU Windows compatibility CLI (strawwu)
+ Provides the strawwu command-line tool for Windows app compatibility
+ on StrawWU. Wave W0 baseline: status, version, and launch stubs.
+ Logs to /var/log/strawwu/wincompat.log.
