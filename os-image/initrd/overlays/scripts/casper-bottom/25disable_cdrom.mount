@@ -1,0 +1,28 @@
+#!/bin/sh
+# StrawWU overlay — live-shutdown: keep /cdrom mounted through casper shutdown messaging.
+PREREQ=""
+
+prereqs() {
+	echo "$PREREQ"
+}
+
+case $1 in
+prereqs)
+	prereqs
+	exit 0
+	;;
+esac
+
+# Disable bounding mount points to sr0 device
+# As there is no way to make sr0 be active&plugged on cold boot
+# Thus systemd always tries to unmount cdrom.mount even before udev
+# coldplug got processed
+sed -i '/SYSTEMD_MOUNT_DEVICE_BOUND/d' \
+	/lib/udev/rules.d/60-cdrom_id.rules \
+	/root/lib/udev/rules.d/60-cdrom_id.rules 2>/dev/null || true
+
+# Correct udevadm settings
+[ -e /dev/sr0 ] && udevadm trigger /dev/sr0 2>/dev/null || true
+
+# Make cdrom.mount not unmount on shutdown before casper shows the RIM & Reboot message.
+ln -sf /dev/null /root/lib/systemd/system/cdrom.mount

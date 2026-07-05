@@ -1,5 +1,5 @@
 #!/bin/sh
-# Wait for QEMU/live optical media and preload fs modules before casper mountroot.
+# StrawWU overlay — wait for optical media and preload fs modules before casper mountroot.
 PREREQ=""
 
 prereqs() {

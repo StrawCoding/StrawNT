@@ -52,6 +52,7 @@ preflight:
 	bash tests/preflight/test-purge-baseline.sh
 	bash tests/preflight/test-flatpak.sh
 	bash tests/preflight/test-nosnap.sh
+	bash tests/preflight/test-initrd-overlays.sh
 
 preflight-dev-vm:
 	bash tests/preflight/test-dev-vm-ready.sh
@@ -91,7 +92,7 @@ release-iso: preflight
 
 repack-iso: preflight
 	@test -f os-image/work/.clone-ubuntu-base-ok || (echo "run make clone-ubuntu-base first" && exit 1)
-	sudo STRAWWU_VERSION=$(VERSION) STRAWWU_KERNEL_DEB="$${STRAWWU_KERNEL_DEB:-$(KERNEL_DEB)}" STRAWWU_SKIP_SQUASHFS=1 bash $(SCRIPTS)/build-iso.sh
+	sudo STRAWWU_ISO_MODE=dev-iso STRAWWU_VERSION=$(VERSION) STRAWWU_KERNEL_DEB="$${STRAWWU_KERNEL_DEB:-$(KERNEL_DEB)}" STRAWWU_SKIP_SQUASHFS=1 bash $(SCRIPTS)/build-iso.sh
 
 validate-rootfs:
 	@test -d os-image/work/rootfs/etc || (echo "run make clone-ubuntu-base first" && exit 1)
@@ -169,6 +170,9 @@ test-flatpak:
 
 test-nosnap:
 	bash tests/preflight/test-nosnap.sh
+
+test-initrd-overlays:
+	bash tests/preflight/test-initrd-overlays.sh
 
 nosnap-harden:
 	sudo bash $(SCRIPTS)/chroot-nosnap-harden.sh

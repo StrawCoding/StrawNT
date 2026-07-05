@@ -10,6 +10,7 @@ import tempfile
 from pathlib import Path
 
 PREFIX_PHASES = ("early", "early2", "early3")
+DEFAULT_OVERLAYS_ROOT = Path(__file__).resolve().parent.parent / "initrd/overlays"
 
 
 def align4(value: int) -> int:
@@ -233,20 +234,47 @@ def mirror_critical_modules_to_main(
             write_module_payload(src_ko, dest_zst)
 
 
-def inject_casper_premount_hooks(main_dir: Path, branding_root: Path) -> None:
-    hook_src = branding_root / "initrd/scripts/casper-premount"
-    if not hook_src.is_dir():
+def resolve_overlays_root(overlays_root: Path | None) -> Path | None:
+    if overlays_root is not None and overlays_root.is_dir() and (overlays_root / "scripts").is_dir():
+        return overlays_root
+    if DEFAULT_OVERLAYS_ROOT.is_dir() and (DEFAULT_OVERLAYS_ROOT / "scripts").is_dir():
+        return DEFAULT_OVERLAYS_ROOT
+    return None
+
+
+def ensure_hook_order(main_dir: Path, hook_dir: str, hook_names: list[str]) -> None:
+    order = main_dir / "scripts" / hook_dir / "ORDER"
+    existing = order.read_text() if order.is_file() else ""
+    prefix_lines: list[str] = []
+    for hook_name in hook_names:
+        needle = f"/scripts/{hook_dir}/{hook_name}"
+        if needle not in existing:
+            prefix_lines.append(f'{needle} "$@"')
+    if prefix_lines:
+        order.write_text("\n".join(prefix_lines + ([existing.rstrip()] if existing.strip() else [])) + "\n")
+
+
+def inject_initrd_overlays(main_dir: Path, overlays_root: Path | None) -> None:
+    root = resolve_overlays_root(overlays_root)
+    if root is None:
         return
-    inject_tree_into_dir(main_dir / "scripts/casper-premount", hook_src)
-    order = main_dir / "scripts/casper-premount/ORDER"
-    hook_name = "05strawwu-wait-live-media"
-    if order.is_file():
-        text = order.read_text()
-        needle = f'/scripts/casper-premount/{hook_name}'
-        if needle not in text:
-            order.write_text(f"{needle} \"$@\"\n{text}")
-    else:
-        order.write_text(f'/scripts/casper-premount/{hook_name} "$@"\n')
+    scripts_src = root / "scripts"
+    if not scripts_src.is_dir():
+        return
+    for hook_dir in sorted(p for p in scripts_src.iterdir() if p.is_dir()):
+        inject_tree_into_dir(main_dir / "scripts" / hook_dir.name, hook_dir)
+        strawwu_hooks = sorted(
+            p.name
+            for p in hook_dir.iterdir()
+            if p.is_file() and p.name.startswith(("05strawwu", "20iso_scan"))
+        )
+        if strawwu_hooks:
+            ensure_hook_order(main_dir, hook_dir.name, strawwu_hooks)
+
+
+def inject_casper_premount_hooks(main_dir: Path, branding_root: Path | None) -> None:
+    """Backward-compatible wrapper; overlays live under os-image/initrd/overlays/."""
+    inject_initrd_overlays(main_dir, None)
 
 
 def install_main_module_metadata(main_dir: Path, new_kver: str, modules_src: Path) -> None:
@@ -581,6 +609,7 @@ def refresh_preserved_main(
     modules_src: Path | None = None,
     new_kver: str = "",
     old_kver: str = "",
+    overlays_root: Path | None = None,
 ) -> Path:
     main_dir = scratch / "main-brand"
     decompress_main_zst(main_blob, main_dir, scratch)
@@ -588,9 +617,9 @@ def refresh_preserved_main(
         sync_main_modules_tree(main_dir, old_kver, new_kver, modules_src)
         mirror_critical_modules_to_main(main_dir, modules_src, new_kver)
         regenerate_main_module_deps(main_dir, new_kver)
+    inject_initrd_overlays(main_dir, overlays_root)
     if branding_root is not None and branding_root.is_dir():
         inject_plymouth_into_main(main_dir, branding_root)
-        inject_casper_premount_hooks(main_dir, branding_root)
         patch_casper_conf_in_initrd(main_dir)
     if modules_src is not None and new_kver and modules_src.is_dir():
         patch_casper_overlay_insmod(main_dir)
@@ -607,6 +636,7 @@ def repack_initrd_phases(
     new_kver: str = "",
     preserve_main: bool = False,
     branding_root: Path | None = None,
+    overlays_root: Path | None = None,
 ) -> None:
     main_blob: Path | None = None
     prefix_blobs: list[Path]
@@ -637,8 +667,11 @@ def repack_initrd_phases(
             _, main_blob = split_prefix_phases(initrd_src, prefix_dir)
         if main_blob is None or not main_blob.is_file():
             raise RuntimeError("preserve-main requested but upstream main.zst missing")
-        if (branding_root is not None and branding_root.is_dir()) or (
-            modules_src is not None and new_kver and modules_src.is_dir()
+        overlays_active = resolve_overlays_root(overlays_root) is not None
+        if (
+            overlays_active
+            or (branding_root is not None and branding_root.is_dir())
+            or (modules_src is not None and new_kver and modules_src.is_dir())
         ):
             main_blob = refresh_preserved_main(
                 main_blob,
@@ -647,6 +680,7 @@ def repack_initrd_phases(
                 modules_src,
                 new_kver,
                 old_kver,
+                overlays_root,
             )
         concat_initrd(prefix_blobs, main_blob, initrd_out)
         return
@@ -665,6 +699,7 @@ def cmd_repack_early3_only(args: argparse.Namespace) -> int:
     modules_src = Path(args.modules_src)
     new_kver = args.new_kver
     branding_root = Path(args.branding_root) if args.branding_root else None
+    overlays_root = Path(args.overlays_root) if args.overlays_root else None
 
     scratch.mkdir(parents=True, exist_ok=True)
     repack_initrd_phases(
@@ -676,6 +711,7 @@ def cmd_repack_early3_only(args: argparse.Namespace) -> int:
         new_kver,
         preserve_main=True,
         branding_root=branding_root,
+        overlays_root=overlays_root,
     )
     return 0
 
@@ -690,6 +726,7 @@ def cmd_repack_main_only(args: argparse.Namespace) -> int:
     modules_src = Path(args.modules_src) if args.modules_src else None
     new_kver = args.new_kver or ""
     branding_root = Path(args.branding_root) if args.branding_root else None
+    overlays_root = Path(args.overlays_root) if args.overlays_root else None
     preserve_main = bool(args.preserve_main) or (modules_src is not None and new_kver)
     repack_initrd_phases(
         initrd_src,
@@ -700,6 +737,7 @@ def cmd_repack_main_only(args: argparse.Namespace) -> int:
         new_kver,
         preserve_main=preserve_main,
         branding_root=branding_root,
+        overlays_root=overlays_root,
     )
     return 0
 
@@ -729,6 +767,7 @@ def main() -> int:
     p_repack.add_argument("--new-kver", default="")
     p_repack.add_argument("--preserve-main", action="store_true")
     p_repack.add_argument("--branding-root", default="")
+    p_repack.add_argument("--overlays-root", default="")
     p_repack.set_defaults(func=cmd_repack_main_only)
 
     p_early3 = sub.add_parser("repack-early3-only")
@@ -738,6 +777,7 @@ def main() -> int:
     p_early3.add_argument("--modules-src", required=True)
     p_early3.add_argument("--new-kver", required=True)
     p_early3.add_argument("--branding-root", default="")
+    p_early3.add_argument("--overlays-root", default="")
     p_early3.set_defaults(func=cmd_repack_early3_only)
 
     p_verify = sub.add_parser("verify")

@@ -205,9 +205,14 @@ if [[ -n "${CASPER_DIR}" && -d "${CASPER_DIR}" ]]; then
     now=$(date +%s)
     age_days=$(( (now - sq_mtime) / 86400 ))
 
-    if [[ "${sq_bytes}" -ge 2000000000 ]]; then
-      echo "PASS: minimal.squashfs ${sq_bytes} bytes (>= 2GB branded)"
-    elif [[ "${sq_bytes}" -le 1800000000 ]]; then
+    # zstd (dev-iso) branded images are ~2.3GB; xz (release-iso) compresses to ~1.2–1.5GB.
+    sq_min_branded=2000000000
+    if [[ "${ISO_MODE}" == "release-iso" ]]; then
+      sq_min_branded=1000000000
+    fi
+    if [[ "${sq_bytes}" -ge "${sq_min_branded}" ]]; then
+      echo "PASS: minimal.squashfs ${sq_bytes} bytes (>= ${sq_min_branded} branded, mode=${ISO_MODE})"
+    elif [[ "${sq_bytes}" -le 900000000 ]]; then
       if [[ "${STRICT}" == "1" ]]; then
         echo "FAIL: minimal.squashfs only ${sq_bytes} bytes — likely upstream 2025-02 old image (SKIP_SQUASHFS?)" >&2
         FAIL=1
@@ -215,7 +220,7 @@ if [[ -n "${CASPER_DIR}" && -d "${CASPER_DIR}" ]]; then
         warn "minimal.squashfs only ${sq_bytes} bytes — dev-iso may use smaller tree"
       fi
     else
-      warn "minimal.squashfs ${sq_bytes} bytes — borderline size"
+      warn "minimal.squashfs ${sq_bytes} bytes — borderline size (mode=${ISO_MODE})"
     fi
 
     if [[ "${age_days}" -le 7 ]]; then
@@ -325,7 +330,9 @@ while read -r _pid; do
     tr '\0' ' ' < "/proc/${_pid}/cmdline" >&2
     echo >&2
   fi
-done < <(pgrep -x qemu-system-x86_64 2>/dev/null || true)
+done <<EOF
+$(pgrep -x qemu-system-x86_64 2>/dev/null || true)
+EOF
 if [[ "${_stray_qemu}" -eq 1 ]]; then
   echo "FAIL: stray QEMU boot-test processes running — clean before verify" >&2
   FAIL=1

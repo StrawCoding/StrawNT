@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-05T01:19:41.973973",
+  "generated_at": "2026-07-05T01:25:04.273694",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 3,
-  "failed": 44,
+  "passed": 4,
+  "failed": 43,
   "all_pass": false,
   "stages": [
     {
@@ -23,8 +23,8 @@
     },
     {
       "id": "w1-f2-nosnap",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w1-s1-initrd",
