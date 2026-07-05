@@ -6,6 +6,7 @@ use thiserror::Error;
 
 use crate::desktop::{find_by_desktop, slug_from_desktop_basename};
 use crate::entry::{AppEntry, AppKind, AppRegistryFile, AppSource, ExecutionBackend, InstallState};
+use crate::scan::ScannedApp;
 use crate::paths::{default_log_path, default_registry_path, ensure_parent_dir};
 use crate::validate::validate_registry;
 
@@ -23,6 +24,15 @@ pub enum RegistryError {
     Protected(String),
     #[error("app already exists: {0}")]
     Duplicate(String),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum ScanUpsertAction {
+    Added,
+    Updated,
+    Reactivated,
+    Skipped,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
@@ -175,6 +185,69 @@ impl RegistryStore {
         )
     }
 
+    /// Skip scan upsert for launcher-tracked or protected Windows installer entries.
+    pub fn should_skip_scan_upsert(app: &AppEntry) -> bool {
+        if app.protected {
+            return true;
+        }
+        if app.source == AppSource::Launcher {
+            return true;
+        }
+        app.source == AppSource::Installer && app.kind == AppKind::Win32
+    }
+
+    /// Register or refresh an app discovered by Linux/Flatpak install hooks (W5-R4).
+    pub fn upsert_from_scan(
+        &mut self,
+        scanned: &ScannedApp,
+        dry_run: bool,
+    ) -> Result<ScanUpsertAction, RegistryError> {
+        if let Some(app) = self.data.find(&scanned.id) {
+            if Self::should_skip_scan_upsert(app) {
+                return Ok(ScanUpsertAction::Skipped);
+            }
+            let action = if app.install_state == InstallState::Removed {
+                ScanUpsertAction::Reactivated
+            } else {
+                ScanUpsertAction::Updated
+            };
+            if dry_run {
+                return Ok(action);
+            }
+            if let Some(app) = self.data.find_mut(&scanned.id) {
+                app.name = scanned.name.clone();
+                app.kind = scanned.kind;
+                app.source = scanned.source;
+                app.install_state = InstallState::Installed;
+                app.install_path = scanned.install_path.clone();
+                app.desktop_entry = scanned.desktop_entry.clone();
+                app.execution_backend = Some(ExecutionBackend::Native);
+                app.touch();
+            }
+            self.data.touch();
+            self.flush()?;
+            self.log_event("scan-upsert", &scanned.id);
+            return Ok(action);
+        }
+
+        if dry_run {
+            return Ok(ScanUpsertAction::Added);
+        }
+
+        self.register_new(
+            &scanned.id,
+            &scanned.name,
+            scanned.kind,
+            scanned.source,
+            scanned.install_path.clone(),
+            scanned.desktop_entry.clone(),
+            false,
+            Some(ExecutionBackend::Native),
+        )?;
+        self.log_event("scan-register", &scanned.id);
+        Ok(ScanUpsertAction::Added)
+    }
+
     /// Record a pending install initiated via `strawwu install` (W4-W1 stub).
     pub fn upsert_from_install(
         &mut self,
@@ -279,6 +352,7 @@ pub fn load_registry_file(path: &Path) -> Result<AppRegistryFile, RegistryError>
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::scan::ScannedApp;
     use tempfile::tempdir;
 
     #[test]
@@ -397,5 +471,53 @@ mod tests {
 
         store.remove_by_desktop("demo-app.desktop", false).unwrap();
         assert!(store.list_active().is_empty());
+    }
+
+    #[test]
+    fn upsert_from_scan_skips_launcher_entries() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("registry.json");
+        let mut store = RegistryStore::open_at(path).unwrap();
+        store
+            .upsert_from_launch(
+                "demo-app",
+                "Launcher Name",
+                AppKind::Win32,
+                Some("/opt/demo".into()),
+                None,
+            )
+            .unwrap();
+
+        let scanned = ScannedApp {
+            id: "demo-app".into(),
+            name: "Scanned Name".into(),
+            kind: AppKind::Linux,
+            source: AppSource::Manual,
+            install_path: None,
+            desktop_entry: None,
+        };
+        let action = store.upsert_from_scan(&scanned, false).unwrap();
+        assert_eq!(action, ScanUpsertAction::Skipped);
+        assert_eq!(store.get("demo-app").unwrap().name, "Launcher Name");
+    }
+
+    #[test]
+    fn upsert_from_scan_registers_flatpak() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("registry.json");
+        let mut store = RegistryStore::open_at(path).unwrap();
+        let scanned = ScannedApp {
+            id: "org.gnome.calculator".into(),
+            name: "Calculator".into(),
+            kind: AppKind::Flatpak,
+            source: AppSource::Flatpak,
+            install_path: Some("org.gnome.Calculator".into()),
+            desktop_entry: None,
+        };
+        let action = store.upsert_from_scan(&scanned, false).unwrap();
+        assert_eq!(action, ScanUpsertAction::Added);
+        let app = store.get("org.gnome.calculator").unwrap();
+        assert_eq!(app.kind, AppKind::Flatpak);
+        assert_eq!(app.source, AppSource::Flatpak);
     }
 }

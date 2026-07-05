@@ -3,6 +3,7 @@ pub mod desktop;
 pub mod entry;
 pub mod paths;
 pub mod registry;
+pub mod scan;
 pub mod validate;
 
 pub use entry::{
@@ -10,5 +11,8 @@ pub use entry::{
 };
 pub use desktop::{find_by_desktop, slug_from_desktop_basename};
 pub use paths::{default_log_path, default_registry_path};
-pub use registry::{load_registry_file, RegistryError, RegistryStore, RemovePreview};
+pub use registry::{
+    load_registry_file, RegistryError, RegistryStore, RemovePreview, ScanUpsertAction,
+};
+pub use scan::{scan_apps, ScanOptions, ScannedApp};
 pub use validate::validate_registry;

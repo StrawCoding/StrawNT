@@ -27,6 +27,13 @@ pub enum Command {
         json: bool,
     },
     Validate { path: Option<PathBuf> },
+    Scan {
+        linux: bool,
+        flatpak: bool,
+        all: bool,
+        dry_run: bool,
+        json: bool,
+    },
     Version,
     Help,
 }
@@ -38,6 +45,9 @@ pub fn parse_args(args: &[String]) -> Result<Command, String> {
 
     let mut json = false;
     let mut dry_run = false;
+    let mut scan_linux = false;
+    let mut scan_flatpak = false;
+    let mut scan_all = false;
     let mut positional = Vec::new();
     let mut i = 0;
 
@@ -45,6 +55,9 @@ pub fn parse_args(args: &[String]) -> Result<Command, String> {
         match args[i].as_str() {
             "--json" => json = true,
             "--dry-run" => dry_run = true,
+            "--linux" => scan_linux = true,
+            "--flatpak" => scan_flatpak = true,
+            "--all" => scan_all = true,
             other => positional.push(other.to_string()),
         }
         i += 1;
@@ -89,6 +102,18 @@ pub fn parse_args(args: &[String]) -> Result<Command, String> {
         "validate" => {
             let path = positional.get(1).map(PathBuf::from);
             Ok(Command::Validate { path })
+        }
+        "scan" => {
+            let linux = scan_linux || scan_all;
+            let flatpak = scan_flatpak || scan_all;
+            let all = scan_all || (!linux && !flatpak);
+            Ok(Command::Scan {
+                linux: if all { true } else { linux },
+                flatpak: if all { true } else { flatpak },
+                all,
+                dry_run,
+                json,
+            })
         }
         "--version" | "version" => Ok(Command::Version),
         "--help" | "help" => Ok(Command::Help),
@@ -260,6 +285,44 @@ mod tests {
                 assert!(json);
             }
             _ => panic!("expected RemoveByDesktop"),
+        }
+    }
+
+    #[test]
+    fn parse_scan_defaults_to_all() {
+        let cmd = parse_args(&args("scan --json")).unwrap();
+        match cmd {
+            Command::Scan {
+                linux,
+                flatpak,
+                all,
+                json,
+                ..
+            } => {
+                assert!(linux);
+                assert!(flatpak);
+                assert!(all);
+                assert!(json);
+            }
+            _ => panic!("expected Scan"),
+        }
+    }
+
+    #[test]
+    fn parse_scan_linux_only() {
+        let cmd = parse_args(&args("scan --linux")).unwrap();
+        match cmd {
+            Command::Scan {
+                linux,
+                flatpak,
+                all,
+                ..
+            } => {
+                assert!(linux);
+                assert!(!flatpak);
+                assert!(!all);
+            }
+            _ => panic!("expected Scan"),
         }
     }
 }

@@ -1,0 +1,13 @@
+#!/bin/sh
+# Flatpak trigger: register installed Flatpak apps into StrawWU app registry.
+set -eu
+
+if [ -n "${STRAWWU_SKIP_REGISTRY_SCAN:-}" ]; then
+    exit 0
+fi
+
+if [ ! -x /usr/bin/strawwu-registry-scan ]; then
+    exit 0
+fi
+
+/usr/bin/strawwu-registry-scan --flatpak --quiet 2>/dev/null || true

@@ -1,0 +1,13 @@
+#!/bin/bash
+# APT hook: scan Linux .desktop apps into StrawWU app registry after package changes.
+set -euo pipefail
+
+if [[ -n "${STRAWWU_SKIP_REGISTRY_SCAN:-}" ]]; then
+    exit 0
+fi
+
+if [[ ! -x /usr/bin/strawwu-registry-scan ]]; then
+    exit 0
+fi
+
+/usr/bin/strawwu-registry-scan --linux --quiet 2>/dev/null || true

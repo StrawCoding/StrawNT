@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+LOG_DIR="/var/log/strawwu"
+REGISTRY_DIR="/var/lib/strawwu"
+
+install -d -m 0755 "${LOG_DIR}"
+install -d -m 0755 "${REGISTRY_DIR}"
+
+if [[ -x /usr/bin/strawwu-registry-scan ]]; then
+    /usr/bin/strawwu-registry-scan --all --quiet 2>/dev/null || true
+fi
+
+echo "strawwu-registry-hooks: installed (APT + Flatpak scan hooks ready)"

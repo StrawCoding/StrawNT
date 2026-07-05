@@ -1,0 +1,10 @@
+strawwu-registry-hooks — install pipeline hooks for StrawWU App Registry
+
+Hooks:
+  - APT DPkg::Post-Invoke scans /usr/share/applications after package changes
+  - Flatpak trigger scans system Flatpak apps after install/update
+
+CLI:
+  strawwu-registry-scan [--linux] [--flatpak] [--all] [--dry-run]
+
+See docs/plans/strawwu-app-registry-plan.md

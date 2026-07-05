@@ -1,0 +1,21 @@
+{
+  "schema": "strawwu-registry-hooks-baseline/v1",
+  "wave": "W5-R4",
+  "version": "0.4.1.27",
+  "package": "strawwu-registry-hooks",
+  "registry_path": "/var/lib/strawwu/app-registry.json",
+  "registry_cli": "/usr/bin/strawwu-app-registry",
+  "scan_cli": "/usr/bin/strawwu-registry-scan",
+  "apt_hook": "etc/apt/apt.conf.d/99strawwu-registry-hooks",
+  "flatpak_trigger": "usr/share/flatpak/triggers/strawwu-registry-scan",
+  "manifest": "os-image/debs/strawwu-registry-hooks/usr/share/strawwu/registry-hooks/registry-hooks-manifest.yaml",
+  "scan_modes": [
+    "linux",
+    "flatpak"
+  ],
+  "registry_commands": [
+    "scan --linux",
+    "scan --flatpak",
+    "scan --all"
+  ]
+}

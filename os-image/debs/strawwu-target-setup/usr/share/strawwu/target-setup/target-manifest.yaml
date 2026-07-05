@@ -12,4 +12,5 @@ packages:
   - strawwu-firstboot
   - strawwu-install-init
   - strawwu-desktop-actions
+  - strawwu-registry-hooks
   - strawwu-desktop

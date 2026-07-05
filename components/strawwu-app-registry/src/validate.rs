@@ -25,6 +25,10 @@ pub fn validate_registry(registry: &AppRegistryFile) -> Result<(), Vec<String>> 
     }
 }
 
+pub fn validate_id_for_scan(id: &str) -> bool {
+    validate_id(id)
+}
+
 fn validate_id(id: &str) -> bool {
     let mut chars = id.chars();
     let Some(first) = chars.next() else {

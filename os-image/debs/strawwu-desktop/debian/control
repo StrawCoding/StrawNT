@@ -26,7 +26,8 @@ Recommends: firefox,
             file-roller,
             evince,
             gnome-calculator,
-            gnome-system-monitor
+            gnome-system-monitor,
+            strawwu-registry-hooks
 Maintainer: StrawCoding <apt@wastebase.xyz>
 Description: StrawWU desktop meta package
  Meta package for the StrawWU desktop environment. Replaces

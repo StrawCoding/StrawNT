@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+"""Thin wrapper around strawwu-app-registry scan for install pipeline hooks."""
+from __future__ import annotations
+
+import argparse
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+
+def registry_cli() -> Path:
+    override = os.environ.get("STRAWWU_APP_REGISTRY_CLI")
+    if override:
+        return Path(override)
+    installed = Path("/usr/bin/strawwu-app-registry")
+    if installed.is_file():
+        return installed
+    repo_dev = Path(__file__).resolve().parents[4] / "components/target/debug/strawwu-app-registry"
+    return repo_dev
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Scan Linux/Flatpak apps into StrawWU registry")
+    parser.add_argument("--linux", action="store_true", help="Scan Linux .desktop entries")
+    parser.add_argument("--flatpak", action="store_true", help="Scan Flatpak apps")
+    parser.add_argument("--all", action="store_true", help="Scan Linux and Flatpak (default)")
+    parser.add_argument("--dry-run", action="store_true", help="Preview without writing registry")
+    parser.add_argument("--json", action="store_true", help="JSON output")
+    parser.add_argument("--quiet", action="store_true", help="Suppress non-error output")
+    args = parser.parse_args()
+
+    scan_linux = args.linux or args.all
+    scan_flatpak = args.flatpak or args.all
+    if not scan_linux and not scan_flatpak:
+        scan_linux = True
+        scan_flatpak = True
+
+    cli = registry_cli()
+    if not cli.is_file():
+        print(f"strawwu-registry-scan: missing registry CLI: {cli}", file=sys.stderr)
+        return 1
+
+    cmd = [str(cli), "scan"]
+    if scan_linux:
+        cmd.append("--linux")
+    if scan_flatpak:
+        cmd.append("--flatpak")
+    if args.dry_run:
+        cmd.append("--dry-run")
+    if args.json:
+        cmd.append("--json")
+
+    env = os.environ.copy()
+    proc = subprocess.run(cmd, env=env, capture_output=args.quiet, text=True)
+    if proc.returncode != 0:
+        if args.quiet and proc.stderr:
+            print(proc.stderr, file=sys.stderr, end="")
+        return proc.returncode
+    if not args.quiet:
+        if proc.stdout:
+            print(proc.stdout, end="")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

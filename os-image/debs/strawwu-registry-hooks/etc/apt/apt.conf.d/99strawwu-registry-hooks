@@ -1,0 +1,2 @@
+// StrawWU: register Linux desktop apps after APT package changes.
+DPkg::Post-Invoke { "/usr/lib/strawwu-registry-hooks/apt-post-invoke"; };

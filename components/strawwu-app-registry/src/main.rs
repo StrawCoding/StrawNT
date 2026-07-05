@@ -3,7 +3,7 @@ use std::process;
 
 use strawwu_app_registry::cli::{self, Command};
 use strawwu_app_registry::{
-    default_registry_path, load_registry_file, RegistryError, RegistryStore,
+    default_registry_path, load_registry_file, RegistryError, RegistryStore, ScanOptions,
 };
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -61,6 +61,13 @@ fn run(cmd: Command) -> Result<(), i32> {
             json,
         } => cmd_remove_by_desktop(&desktop, dry_run, json),
         Command::Validate { path } => cmd_validate(path),
+        Command::Scan {
+            linux,
+            flatpak,
+            dry_run,
+            json,
+            ..
+        } => cmd_scan(linux, flatpak, dry_run, json),
     }
 }
 
@@ -208,6 +215,65 @@ fn cmd_validate(path: Option<PathBuf>) -> Result<(), i32> {
     }
 }
 
+fn cmd_scan(linux: bool, flatpak: bool, dry_run: bool, json: bool) -> Result<(), i32> {
+    let mut options = ScanOptions::default();
+    options.linux = linux;
+    options.flatpak = flatpak;
+    if linux {
+        options.linux_dirs = strawwu_app_registry::scan::default_linux_desktop_dirs();
+    }
+    options.flatpak_list_file = std::env::var("STRAWWU_FLATPAK_LIST_FILE")
+        .ok()
+        .map(PathBuf::from);
+
+    let discovered = strawwu_app_registry::scan_apps(&options);
+    let mut store = open_store()?;
+    let mut results = Vec::new();
+    let mut counts = std::collections::HashMap::new();
+
+    for app in &discovered {
+        let action = store
+            .upsert_from_scan(app, dry_run)
+            .map_err(|e| {
+                eprintln!("strawwu-app-registry: scan failed for {}: {e}", app.id);
+                exit_code(&e)
+            })?;
+        *counts.entry(format!("{:?}", action)).or_insert(0usize) += 1;
+        results.push(serde_json::json!({
+            "id": app.id,
+            "name": app.name,
+            "kind": app.kind,
+            "source": app.source,
+            "action": action,
+        }));
+    }
+
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&serde_json::json!({
+                "dry_run": dry_run,
+                "linux": linux,
+                "flatpak": flatpak,
+                "discovered": discovered.len(),
+                "counts": counts,
+                "results": results,
+            }))
+            .unwrap()
+        );
+    } else {
+        let prefix = if dry_run { "dry-run " } else { "" };
+        println!(
+            "strawwu-app-registry: {prefix}scan complete ({} discovered)",
+            discovered.len()
+        );
+        for (action, count) in &counts {
+            println!("  {action}: {count}");
+        }
+    }
+    Ok(())
+}
+
 fn open_store() -> Result<RegistryStore, i32> {
     RegistryStore::open().map_err(|e| {
         eprintln!("strawwu-app-registry: {e}");
@@ -243,6 +309,8 @@ COMMANDS:
     remove-by-desktop <path> [--dry-run] [--json]
                                       Resolve app from .desktop path and mark removed
     validate [path]                   Validate registry JSON (default: /var/lib/strawwu/app-registry.json)
+    scan [--linux] [--flatpak] [--all] [--dry-run] [--json]
+                                      Scan Linux .desktop / Flatpak apps into registry
     version                           Show version
     help                              Show this help
 

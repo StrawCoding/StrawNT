@@ -1,0 +1,11 @@
+Package: strawwu-registry-hooks
+Version: __VERSION__
+Section: admin
+Priority: optional
+Architecture: all
+Depends: python3,
+         strawwu-desktop-actions
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU install pipeline hooks for app registry
+ APT DPkg::Post-Invoke and Flatpak trigger scripts that scan Linux
+ desktop entries and Flatpak apps into /var/lib/strawwu/app-registry.json.
