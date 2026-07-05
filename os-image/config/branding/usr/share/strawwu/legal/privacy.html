@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrawWU 隱私權政策（草案）</title>
+  <style>
+    :root { --teal: #0d9488; --bg: #0f172a; --text: #e2e8f0; --muted: #94a3b8; }
+    body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; margin: 0; padding: 2rem; max-width: 48rem; }
+    h1 { color: var(--teal); font-size: 1.5rem; }
+    h2 { color: var(--teal); font-size: 1.1rem; margin-top: 1.5rem; }
+    p, li { color: var(--muted); }
+    strong { color: var(--text); }
+    .notice { border-left: 3px solid var(--teal); padding-left: 1rem; margin: 1rem 0; }
+    footer { margin-top: 2rem; font-size: 0.85rem; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <h1>StrawWU 隱私權政策（草案）</h1>
+  <p class="notice"><strong>版本：</strong>0.5 預覽草案 · 最後更新：2026-07-05</p>
+
+  <h2>1. 概述</h2>
+  <p>StrawWU 致力於保護您的隱私。本政策說明我們如何處理（以及<strong>不</strong>如何處理）您的資料。</p>
+
+  <h2>2. 預設不上傳與無遙測</h2>
+  <p><strong>StrawWU 預設不收集、不上傳任何使用統計或遙測資料。</strong>我們不會在背景傳送匿名分析、crash 報告或 Canonical/Ubuntu 遙測。W1 階段已移除 apport、whoopsie、ubuntu-report 等上游遙測元件。</p>
+  <ul>
+    <li>無預設 analytics 或 telemetry daemon</li>
+    <li>無自動 crash 上傳至第三方</li>
+    <li>使用統計（若未來提供）將為<strong>明確 opt-in</strong>，預設關閉</li>
+  </ul>
+
+  <h2>3. 問題回報（Bug Report）</h2>
+  <p>若您選擇使用「StrawWU 問題回報」：</p>
+  <ul>
+    <li>預設僅在<strong>本機</strong>建立 <code>.strawwu-bug</code> 診斷 bundle</li>
+    <li>上傳至 StrawWU 需您在對話框中<strong>明確勾選同意</strong>（預設未勾選）</li>
+    <li>收集內容：VERSION、kernel 資訊、過濾後的 journal/dmesg、<code>/var/log/strawwu/*.log</code>、App Registry 摘要</li>
+    <li>排除：/home 檔名、Wi-Fi 密碼、SSH 金鑰、登入 token 等敏感資料</li>
+    <li>上傳端保存上限 90 天；本機 bundle 由您自行刪除</li>
+  </ul>
+
+  <h2>4. 本機資料</h2>
+  <p>安裝與設定狀態儲存於 <code>/var/lib/strawwu/</code>；日誌位於 <code>/var/log/strawwu/</code>。這些資料不會自動離開您的裝置。</p>
+
+  <h2>5. 第三方應用程式</h2>
+  <p>透過 Flathub 安裝的應用程式由第三方維護，其隱私行為受各應用程式與 Flathub 政策約束，非 StrawWU 官方控制。</p>
+
+  <h2>6. 聯絡</h2>
+  <p>隱私相關問題請透過官方支援渠道（文件佔位，正式版前更新）。</p>
+
+  <footer>© StrawWU · 本文件為草案，正式版前可能修訂</footer>
+</body>
+</html>

@@ -4,7 +4,7 @@
 |---------|-------|
 | Wave | 2 |
 | 計畫 | `strawwu-security-trust-model.md` |
-| 狀態 | 待執行 |
+| 狀態 | 待 Hermes mark（worker 交付完成，preflight exit 0） |
 
 ## 目標
 

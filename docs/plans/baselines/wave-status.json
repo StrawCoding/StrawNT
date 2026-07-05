@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-05T03:12:38.887765",
+  "generated_at": "2026-07-05T03:40:16.486268",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 8,
-  "failed": 39,
+  "passed": 9,
+  "failed": 38,
   "all_pass": false,
   "stages": [
     {
@@ -48,8 +48,8 @@
     },
     {
       "id": "w2-n1-initd",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w2-trust-baseline",

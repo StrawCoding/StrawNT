@@ -1,0 +1,27 @@
+{
+  "schema": "strawwu-legal-baseline/v1",
+  "generated_at": "2026-07-05",
+  "version": "0.4.1.9",
+  "trademark": {
+    "ui_brand": "StrawWU",
+    "os_release_id": "ubuntu",
+    "forbidden_ui_patterns": [
+      "NAME=\"Ubuntu\"",
+      "PRETTY_NAME=\"Ubuntu",
+      "Welcome to Ubuntu",
+      "ubuntu.com"
+    ]
+  },
+  "legal_docs": {
+    "privacy_policy": "/usr/share/strawwu/legal/privacy.html",
+    "eula": "/usr/share/strawwu/legal/eula.html",
+    "status": "draft",
+    "no_default_telemetry": true,
+    "bug_consent_required": true
+  },
+  "wave2_gaps": [
+    "license-inventory.csv auto-generation (LEG1)",
+    "Calamares/GRUB/Plymouth compliance audit (LEG3)",
+    "release compliance gate CI (LEG4)"
+  ]
+}

@@ -2,7 +2,7 @@
 	build-iso dev-iso release-iso repack-iso validate-rootfs boot-test-iso boot-test-dev-iso \
 	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
-	test-install-e2e test-wincompat 	test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-init-tools test-bug-reporter test-calamares-settings test-app-registry purge-ubuntu-telemetry \
+	test-install-e2e test-wincompat 	test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-init-tools test-bug-reporter test-calamares-settings test-app-registry test-security-baseline test-observability test-legal-trademark purge-ubuntu-telemetry \
 	install-flatpak-setup install-bug-reporter install-calamares-settings nosnap-harden build-debs bump-version check-version-bump
 
 REPO_ROOT := $(abspath .)
@@ -46,6 +46,9 @@ help:
 	@echo "  test-bug-reporter             W2-B2 strawwu-bug-reporter CLI/GTK/consent verification"
 	@echo "  test-calamares-settings       W2-I1 strawwu-calamares-settings deb (replaces ubuntu-common)"
 	@echo "  test-app-registry             W2-R1 strawwu-app-registry crate + CLI + schema"
+	@echo "  test-security-baseline        W2-trust SEC2 bug-reporter privacy/consent + telemetry purge"
+	@echo "  test-observability            W2-trust OBS1 bug bundle schema + CLI"
+	@echo "  test-legal-trademark          W2-trust LEG2 privacy/EULA draft + trademark scan"
 	@echo "  purge-ubuntu-telemetry        chroot purge apport/whoopsie/ubuntu-pro/snapd (needs root)"
 	@echo "  install-flatpak-setup         chroot install flatpak + strawwu-flatpak-setup (needs root)"
 	@echo "  install-bug-reporter          chroot install strawwu-bug-reporter (needs root)"
@@ -63,6 +66,9 @@ preflight:
 	bash tests/preflight/test-bug-reporter.sh
 	bash tests/preflight/test-calamares-settings.sh
 	bash tests/preflight/test-app-registry.sh
+	bash tests/preflight/test-security-baseline.sh
+	bash tests/preflight/test-observability.sh
+	bash tests/preflight/test-legal-trademark.sh
 
 preflight-dev-vm:
 	bash tests/preflight/test-dev-vm-ready.sh
@@ -195,6 +201,15 @@ test-calamares-settings:
 
 test-app-registry:
 	bash tests/preflight/test-app-registry.sh
+
+test-security-baseline:
+	bash tests/preflight/test-security-baseline.sh
+
+test-observability:
+	bash tests/preflight/test-observability.sh
+
+test-legal-trademark:
+	bash tests/preflight/test-legal-trademark.sh
 
 install-calamares-settings:
 	sudo bash $(SCRIPTS)/chroot-install-calamares-settings.sh

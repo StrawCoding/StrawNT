@@ -1,0 +1,40 @@
+{
+  "schema": "strawwu-security-baseline/v1",
+  "generated_at": "2026-07-05",
+  "version": "0.4.1.9",
+  "telemetry": {
+    "default_upload": false,
+    "purged_packages": [
+      "apport",
+      "whoopsie",
+      "ubuntu-report",
+      "ubuntu-pro-client",
+      "snapd"
+    ],
+    "analytics_daemon": false
+  },
+  "bug_reporter": {
+    "package": "strawwu-bug-reporter",
+    "consent_required": true,
+    "auto_upload_default": false,
+    "privacy_filter": true,
+    "filtered_fields": [
+      "password",
+      "token",
+      "secret",
+      "ssh_keys",
+      "ssid",
+      "psk",
+      "home_paths"
+    ]
+  },
+  "secure_boot": {
+    "enforced": false,
+    "documented": true
+  },
+  "wave2_gaps": [
+    "GPG ISO/deb signing (SEC1, w7-re-manifest-gpg)",
+    "Registry protected list + polkit (SEC3)",
+    "compat session audit (SEC4)"
+  ]
+}
