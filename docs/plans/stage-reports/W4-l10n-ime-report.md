@@ -61,25 +61,23 @@ Makefile
 VERSION (0.4.1.20 → 0.4.1.21)
 ```
 
-## 驗收命令輸出（2026-07-05T07:16–07:17 UTC-4）
+## 驗收命令輸出
 
-### `make test-l10n-ime` — exit 0
+### 初次驗收（2026-07-05T07:16–07:17 UTC-4）
 
-Log: `/tmp/w4-l10n-test-l10n-ime.log`
+| 命令 | 結果 | Log |
+|------|------|-----|
+| `make test-l10n-ime` | exit 0 | `/tmp/w4-l10n-test-l10n-ime.log` |
+| `make preflight` | exit 0（~107s） | `/tmp/w4-l10n-preflight.log` |
 
-```
-=== W4-L10N l10n-ime preflight ===
-…（38 項 PASS）…
-=== W4-L10N l10n-ime done: PASS ===
-```
+### 本次 worker 複驗（2026-07-05T07:28–07:29 UTC-4）
 
-關鍵檢查：fcitx5-chewing/cangjie5/noto-cjk Depends、profile DefaultIM=chewing、desktop Depends strawwu-l10n-ime、無 ibus、calamares zh_TW 預設、6 單元測試 PASS、`strawwu-l10n-ime_0.4.1.21_all.deb`（1.9K）建置成功。
+| 命令 | 結果 | Log |
+|------|------|-----|
+| `make test-l10n-ime` | exit 0（38 項 PASS） | `/tmp/w4-l10n-test-l10n-ime.log` |
+| `make preflight` | exit 0（~44s） | `/tmp/w4-l10n-preflight.log` |
 
-### `make preflight` — exit 0（~45s）
-
-Log: `/tmp/w4-l10n-preflight.log`
-
-含 W0 baseline + W1–W3 全部階段 + W4-D2/D3/R2/F3/W1 + **W4-L10N l10n-ime** exit 0（最終行 `=== W4-L10N l10n-ime done: PASS ===`）。
+關鍵檢查：fcitx5-chewing/cangjie5/noto-cjk Depends、profile DefaultIM=chewing、desktop Depends strawwu-l10n-ime、無 ibus、calamares zh_TW 預設、6 單元測試 PASS、`strawwu-l10n-ime_0.4.1.21_all.deb`（1.9K）建置成功。preflight 最終行：`=== W4-L10N l10n-ime done: PASS ===`。
 
 ## 技術備註（治本）
 
@@ -125,6 +123,10 @@ Version: 0.4.1.21
 | 2026-07-05T07:16 UTC-4 | `make test-l10n-ime` exit 0（38 項 PASS） |
 | 2026-07-05T07:17 UTC-4 | `make preflight` exit 0（~107s，含 W4-L10N 最終 PASS） |
 | 2026-07-05T07:17 UTC-4 | `[worker-DONE]` 階段 21/47 終驗完成 — **待 Hermes mark PASS** |
+| 2026-07-05T07:27 UTC-4 | `[worker-TICK]` companion check status=IN_PROGRESS |
+| 2026-07-05T07:28 UTC-4 | `make test-l10n-ime` exit 0（38 項 PASS，複驗） |
+| 2026-07-05T07:29 UTC-4 | `make preflight` exit 0（~44s，含 W4-L10N 最終 PASS，複驗） |
+| 2026-07-05T07:29 UTC-4 | `[worker-DONE]` 階段 21/47 複驗完成 — **待 Hermes mark PASS** |
 
 ## 下一階段
 

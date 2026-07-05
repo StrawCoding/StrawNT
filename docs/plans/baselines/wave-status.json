@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-05T07:14:41.136851",
+  "generated_at": "2026-07-05T07:29:08.820920",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 20,
-  "failed": 27,
+  "passed": 21,
+  "failed": 26,
   "all_pass": false,
   "stages": [
     {
@@ -108,8 +108,8 @@
     },
     {
       "id": "w4-l10n-ime",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w5-n3-firstboot",
