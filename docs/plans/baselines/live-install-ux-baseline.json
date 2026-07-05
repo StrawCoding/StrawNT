@@ -1,0 +1,20 @@
+{
+  "schema": "strawwu-live-install-ux-baseline/v1",
+  "wave": "W3-I2",
+  "version": "0.4.1.11",
+  "desktop": {
+    "id": "strawwu-install.desktop",
+    "name_en": "Install StrawWU",
+    "name_zh_tw": "安裝 StrawWU",
+    "icon": "distributor-logo",
+    "exec": "sudo -E calamares -D6",
+    "hide_upstream": "calamares.desktop"
+  },
+  "finished": {
+    "conf_path": "os-image/debs/strawwu-calamares-settings/etc/calamares/modules/finished.conf",
+    "copy_path": "os-image/debs/strawwu-live-install-ux/usr/share/strawwu/installer/finished-copy.yaml",
+    "restartNowMode": "user-checked",
+    "notifyOnFinished": true
+  },
+  "package": "strawwu-live-install-ux"
+}

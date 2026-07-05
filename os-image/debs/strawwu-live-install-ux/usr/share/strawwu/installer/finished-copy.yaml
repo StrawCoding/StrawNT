@@ -1,0 +1,29 @@
+# StrawWU Calamares finished page copy (W3-I2)
+# Calamares renders success text from branding.versionedName + productName.
+# This file is the canonical zh_TW/en reference for UX review and preflight.
+schema: strawwu-finished-copy/v1
+wave: W3-I2
+
+success:
+  en: >-
+    All done. StrawWU has been installed on your computer.
+    You may now restart into your new system, or continue using the Live environment.
+  zh_TW: >-
+    全部完成。StrawWU 已安裝至您的電腦。
+    您可立即重新開機進入新系統，或繼續使用 Live 環境。
+
+restart_checkbox:
+  en: Restart now
+  zh_TW: 完成後立即重新開機
+
+failure:
+  en: >-
+    Installation did not complete. Check /var/log/installation.log or use
+    StrawWU Bug Reporter for help.
+  zh_TW: >-
+    安裝未完成。請查看 /var/log/installation.log，
+    或透過 StrawWU 問題回報取得協助。
+
+live_hint:
+  en: You can keep trying StrawWU from the Live session until you restart.
+  zh_TW: 重新開機前，您可繼續在 Live 環境中試用 StrawWU。

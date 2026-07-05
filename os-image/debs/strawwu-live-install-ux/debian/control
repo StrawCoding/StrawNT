@@ -1,0 +1,11 @@
+Package: strawwu-live-install-ux
+Version: __VERSION__
+Section: admin
+Priority: optional
+Architecture: all
+Depends: calamares, strawwu-calamares-settings
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU Live installer desktop entry and finished-page copy
+ Ships strawwu-install.desktop for the Live session app menu and
+ documents finished-page strings (finished-copy.yaml). Hides the
+ generic calamares.desktop launcher when installed.

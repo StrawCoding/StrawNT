@@ -1,0 +1,15 @@
+#!/bin/bash
+set -e
+
+CALAMARES_DESKTOP="/usr/share/applications/calamares.desktop"
+
+# Prefer strawwu-install.desktop in menus; hide upstream generic entry.
+if [[ -f "${CALAMARES_DESKTOP}" ]] && ! grep -q '^Hidden=true' "${CALAMARES_DESKTOP}"; then
+    sed -i '/^\[Desktop Entry\]/a Hidden=true' "${CALAMARES_DESKTOP}"
+fi
+
+if command -v update-desktop-database >/dev/null 2>&1; then
+    update-desktop-database /usr/share/applications 2>/dev/null || true
+fi
+
+echo "strawwu-live-install-ux: strawwu-install.desktop registered"

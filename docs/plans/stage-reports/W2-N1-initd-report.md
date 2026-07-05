@@ -32,7 +32,7 @@
 | repair | 備份損毀 state → 重新初始化（對齊 upgrade-recovery rescue 流程） |
 | 環境變數 | `STRAWWU_SETUP_STATE` · `STRAWWU_INITD_LOG` |
 
-## 驗收命令輸出（2026-07-05T03:16 UTC-4，worker 終驗）
+## 驗收命令輸出（2026-07-05T03:28 UTC-4，companion 終驗）
 
 ### `make test-init-tools` — exit 0（~1.1s）
 
@@ -90,6 +90,8 @@ Version: 0.4.1.8
 | 時間 | 事件 |
 |------|------|
 | 2026-07-05T03:16:30-0400 | `[worker-DONE]` stage ended — 待 Hermes mark PASS |
+| 2026-07-05T03:28:38-0400 | commit `f8009578f` feat(w2): strawwu-initd |
+| 2026-07-05T03:28:50-0400 | `[worker-TICK]` companion 重跑 test-init-tools + preflight — exit 0 |
 
 ## 下一步
 

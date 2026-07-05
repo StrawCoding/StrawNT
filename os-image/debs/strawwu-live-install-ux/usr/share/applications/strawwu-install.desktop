@@ -1,0 +1,18 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Install StrawWU
+Name[zh_TW]=安裝 StrawWU
+GenericName=StrawWU Installer
+GenericName[zh_TW]=StrawWU 安裝程式
+Comment=Install StrawWU to your computer from the Live environment
+Comment[zh_TW]=從 Live 環境將 StrawWU 安裝至您的電腦
+Keywords=calamares;strawwu;installer;install;
+TryExec=calamares
+Exec=sh -c "sudo -E calamares -D6"
+Icon=distributor-logo
+Terminal=false
+StartupNotify=true
+Categories=Qt;System;
+NotShowIn=LXQt;
+X-StrawWU-PrimaryInstaller=true
