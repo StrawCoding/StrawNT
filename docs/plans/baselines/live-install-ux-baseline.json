@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-live-install-ux-baseline/v1",
   "wave": "W3-I2",
-  "version": "0.4.1.21",
+  "version": "0.4.1.23",
   "desktop": {
     "id": "strawwu-install.desktop",
     "name_en": "Install StrawWU",

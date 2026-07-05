@@ -9,4 +9,5 @@ packages:
   - strawwu-bug-reporter
   - strawwu-flatpak-setup
   - strawwu-l10n-ime
+  - strawwu-firstboot
   - strawwu-desktop

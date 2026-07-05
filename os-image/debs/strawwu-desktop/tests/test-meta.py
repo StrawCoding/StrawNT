@@ -26,6 +26,7 @@ REQUIRED_DEPENDS = (
     "strawwu-initd",
     "strawwu-bug-reporter",
     "strawwu-flatpak-setup",
+    "strawwu-firstboot",
     "gdm3",
     "xorg",
 )

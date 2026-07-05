@@ -17,7 +17,8 @@ Depends: strawwu-session,
          xdg-desktop-portal-gnome,
          strawwu-initd,
          strawwu-bug-reporter,
-         strawwu-flatpak-setup
+         strawwu-flatpak-setup,
+         strawwu-firstboot
 Recommends: firefox,
             gnome-terminal,
             gnome-text-editor,

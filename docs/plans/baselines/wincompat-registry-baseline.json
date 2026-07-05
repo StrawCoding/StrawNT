@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-wincompat-registry-baseline/v1",
   "wave": "W4-W1",
-  "version": "0.4.1.21",
+  "version": "0.4.1.23",
   "launcher_crate": "strawwu-launcher",
   "registry_crate": "strawwu-app-registry",
   "registry_path": "/var/lib/strawwu/app-registry.json",

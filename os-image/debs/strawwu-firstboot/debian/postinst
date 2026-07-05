@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+LOG_DIR="/var/log/strawwu"
+PREFS_DIR="/var/lib/strawwu/setup"
+
+case "${1}" in
+    configure)
+        install -d -m 0755 "${LOG_DIR}"
+        install -d -m 0755 "${PREFS_DIR}"
+        ;;
+esac
+
+echo "strawwu-firstboot: GTK4 six-step wizard installed"
+
+exit 0

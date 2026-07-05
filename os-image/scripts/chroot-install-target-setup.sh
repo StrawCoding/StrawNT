@@ -56,7 +56,7 @@ build_debs() {
     local version="${STRAWWU_VERSION:-$(tr -d '[:space:]' < "${REPO_ROOT}/VERSION")}"
     local pkg
     for pkg in strawwu-initd strawwu-wincompat strawwu-shell strawwu-session strawwu-update-notifier strawwu-bug-reporter \
-        strawwu-flatpak-setup strawwu-l10n-ime strawwu-desktop strawwu-live-install-ux \
+        strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-desktop strawwu-live-install-ux \
         strawwu-target-setup strawwu-calamares-settings; do
         local build="${DEBS_ROOT}/${pkg}/build-deb.sh"
         [[ -x "${build}" ]] || die "missing build script: ${build}"
@@ -87,7 +87,7 @@ stage_debs() {
 
     local pkg deb
     for pkg in strawwu-initd strawwu-wincompat strawwu-shell strawwu-session strawwu-update-notifier strawwu-bug-reporter \
-        strawwu-flatpak-setup strawwu-l10n-ime strawwu-desktop; do
+        strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-desktop; do
         deb="$(latest_deb "${pkg}")"
         [[ -n "${deb}" && -f "${deb}" ]] || die "deb missing for ${pkg}"
         cp -f "${deb}" "${STAGED}/"
@@ -153,6 +153,9 @@ strawwu status | grep -qi status
 dpkg-query -W -f='${Status}' strawwu-wincompat 2>/dev/null | grep -q "ok installed"
 dpkg-query -W -f='${Status}' strawwu-desktop 2>/dev/null | grep -q "ok installed"
 dpkg-query -W -f='${Status}' strawwu-update-notifier 2>/dev/null | grep -q "ok installed"
+dpkg-query -W -f='${Status}' strawwu-firstboot 2>/dev/null | grep -q "ok installed"
+command -v strawwu-firstboot >/dev/null
+test -f /etc/xdg/autostart/strawwu-firstboot.desktop
 strawwu-initd get lifecycle.target_setup | grep -q done
 
 # Live ISO transition: keep upstream metas until W5-B4 (preflight purge baseline).
@@ -188,6 +191,7 @@ sync_squashfs() {
         "${ROOTFS_DIR}/usr/bin/strawwu-session" \
         "${ROOTFS_DIR}/usr/bin/strawwu-shell" \
         "${ROOTFS_DIR}/usr/bin/strawwu-update-notifier" \
+        "${ROOTFS_DIR}/usr/bin/strawwu-firstboot" \
         "${SQUASH_SRC}/usr/bin/" 2>/dev/null || true
     rsync -a \
         "${ROOTFS_DIR}/usr/share/strawwu/wincompat/" \
@@ -206,7 +210,21 @@ sync_squashfs() {
         "${SQUASH_SRC}/usr/share/xsessions/" 2>/dev/null || true
     rsync -a \
         "${ROOTFS_DIR}/usr/share/applications/strawwu-install.desktop" \
+        "${ROOTFS_DIR}/usr/share/applications/strawwu-firstboot.desktop" \
         "${SQUASH_SRC}/usr/share/applications/" 2>/dev/null || true
+    rsync -a \
+        "${ROOTFS_DIR}/usr/lib/strawwu-firstboot/" \
+        "${SQUASH_SRC}/usr/lib/strawwu-firstboot/" 2>/dev/null || true
+    rsync -a \
+        "${ROOTFS_DIR}/usr/share/strawwu/firstboot/" \
+        "${SQUASH_SRC}/usr/share/strawwu/firstboot/" 2>/dev/null || true
+    install -d "${SQUASH_SRC}/usr/share/strawwu/locale"
+    rsync -a \
+        "${ROOTFS_DIR}/usr/share/strawwu/locale/firstboot."*.yaml \
+        "${SQUASH_SRC}/usr/share/strawwu/locale/" 2>/dev/null || true
+    rsync -a \
+        "${ROOTFS_DIR}/etc/xdg/autostart/strawwu-firstboot.desktop" \
+        "${SQUASH_SRC}/etc/xdg/autostart/" 2>/dev/null || true
     rsync -a \
         "${ROOTFS_DIR}/etc/calamares/" \
         "${SQUASH_SRC}/etc/calamares/" 2>/dev/null || true

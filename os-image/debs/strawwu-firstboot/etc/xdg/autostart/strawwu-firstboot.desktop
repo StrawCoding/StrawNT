@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=StrawWU First Boot
+Comment=Post-install setup wizard (autostart once)
+Exec=strawwu-firstboot run --autostart
+Icon=strawwu
+Terminal=false
+Type=Application
+Categories=System;Settings;
+X-GNOME-Autostart-enabled=true
+NoDisplay=true
+StartupNotify=false

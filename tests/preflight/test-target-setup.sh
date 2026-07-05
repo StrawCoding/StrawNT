@@ -94,6 +94,12 @@ else
     fail "upgrade plan missing repair-only"
 fi
 
+if grep -q 'strawwu-firstboot' "${DEB_DIR}/usr/share/strawwu/target-setup/target-manifest.yaml"; then
+    pass "target-manifest includes strawwu-firstboot"
+else
+    fail "target-manifest missing strawwu-firstboot"
+fi
+
 if grep -q 'SWU-IN-002' "${DEB_DIR}/usr/lib/strawwu-target-setup/core.py"; then
     pass "core.py references SWU-IN-002"
 else

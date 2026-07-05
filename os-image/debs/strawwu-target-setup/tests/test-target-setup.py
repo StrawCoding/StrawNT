@@ -36,13 +36,16 @@ class TargetSetupTests(unittest.TestCase):
         self.assertIn("strawwu-shell", text)
         self.assertIn("strawwu-session", text)
         self.assertIn("strawwu-desktop", text)
+        self.assertIn("strawwu-firstboot", text)
 
     def test_load_manifest(self) -> None:
         mod = _load_core()
         pkgs = mod.load_manifest(MANIFEST)
         self.assertIn("strawwu-initd", pkgs)
         self.assertIn("strawwu-desktop", pkgs)
+        self.assertIn("strawwu-firstboot", pkgs)
         self.assertLess(pkgs.index("strawwu-initd"), pkgs.index("strawwu-desktop"))
+        self.assertLess(pkgs.index("strawwu-firstboot"), pkgs.index("strawwu-desktop"))
         self.assertLess(pkgs.index("strawwu-shell"), pkgs.index("strawwu-session"))
 
     def test_find_deb_file(self) -> None:

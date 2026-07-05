@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=StrawWU Setup
+Comment=Run the StrawWU first-boot setup wizard
+Exec=strawwu-firstboot run
+Icon=strawwu
+Terminal=false
+Type=Application
+Categories=System;Settings;
+StartupNotify=true

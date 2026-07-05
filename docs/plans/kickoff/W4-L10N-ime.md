@@ -4,7 +4,7 @@
 |---------|-------|
 | Wave | 4 |
 | 計畫 | `strawwu-localization-ime-plan.md` |
-| 狀態 | 待執行 |
+| 狀態 | PASS（Hermes 2026-07-05） |
 
 ## 目標
 

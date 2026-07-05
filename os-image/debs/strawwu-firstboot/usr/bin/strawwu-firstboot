@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+"""StrawWU first-boot GTK4 wizard — six-step post-install setup."""
+
+from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+
+LIB = Path(__file__).resolve().parent.parent / "lib" / "strawwu-firstboot"
+sys.path.insert(0, str(LIB))
+
+from core import (  # noqa: E402
+    ERROR_CRASH,
+    PKG_VERSION,
+    run_autostart,
+    run_dry_run,
+    run_wizard,
+    should_run,
+    status_text,
+)
+
+
+def cmd_version(_: argparse.Namespace) -> int:
+    print(f"strawwu-firstboot {PKG_VERSION}")
+    return 0
+
+
+def cmd_status(_: argparse.Namespace) -> int:
+    print(status_text(), end="")
+    return 0
+
+
+def cmd_run(args: argparse.Namespace) -> int:
+    if args.dry_run:
+        return run_dry_run()
+    if args.autostart and not should_run():
+        return 0
+    if args.autostart:
+        return run_autostart()
+    return run_wizard()
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="StrawWU GTK4 first-boot wizard (six steps).",
+    )
+    sub = parser.add_subparsers(dest="command")
+
+    sub.add_parser("version", help="Print package version")
+    sub.add_parser("status", help="Print firstboot state summary")
+
+    run_p = sub.add_parser("run", help="Run wizard (default command)")
+    run_p.add_argument("--autostart", action="store_true", help="Skip if already done")
+    run_p.add_argument("--dry-run", action="store_true", help="Simulate without GTK/state writes")
+
+    parser.add_argument("--autostart", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--dry-run", action="store_true", help=argparse.SUPPRESS)
+    return parser
+
+
+def main() -> int:
+    parser = build_parser()
+    args = parser.parse_args()
+    command = args.command or "run"
+    if command == "version":
+        return cmd_version(args)
+    if command == "status":
+        return cmd_status(args)
+    if command == "run":
+        return cmd_run(args)
+    parser.print_help()
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

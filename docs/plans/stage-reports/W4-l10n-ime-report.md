@@ -5,7 +5,8 @@
 | 版本 | 0.4.1.21 |
 | 日期 | 2026-07-05 |
 | Worker | 階段 21/47（w4-l10n-ime） |
-| 結果 | **待 Hermes mark** |
+| 結果 | **PASS**（Hermes mark 2026-07-05T07:29 UTC-4） |
+| Commit | `6f8e84fba` |
 
 ## 目標
 
@@ -127,7 +128,9 @@ Version: 0.4.1.21
 | 2026-07-05T07:28 UTC-4 | `make test-l10n-ime` exit 0（38 項 PASS，複驗） |
 | 2026-07-05T07:29 UTC-4 | `make preflight` exit 0（~44s，含 W4-L10N 最終 PASS，複驗） |
 | 2026-07-05T07:29 UTC-4 | `[worker-DONE]` 階段 21/47 複驗完成 — **待 Hermes mark PASS** |
+| 2026-07-05T07:29 UTC-4 | `[worker-PASS]` Hermes mark PASS v0.4.1.21 commit `6f8e84fba` → next=w5-n3-firstboot |
+| 2026-07-05T07:31 UTC-4 | Worker 終態複驗：`make test-l10n-ime` + `make preflight` exit 0 |
 
 ## 下一階段
 
-**w5-n3-firstboot**（Hermes mark PASS 後自動啟動，勿問使用者）。
+**w5-n3-firstboot**（已啟動，勿問使用者）。

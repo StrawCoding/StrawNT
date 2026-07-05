@@ -1,0 +1,32 @@
+{
+  "schema": "strawwu-firstboot-baseline/v1",
+  "wave": "W5-N3",
+  "version": "0.4.1.23",
+  "package": "strawwu-firstboot",
+  "log_path": "/var/log/strawwu/firstboot.log",
+  "prefs_path": "/var/lib/strawwu/setup/firstboot-prefs.json",
+  "error_codes": {
+    "crash": "SWU-FB-001",
+    "state_mismatch": "SWU-FB-003"
+  },
+  "steps": [
+    "welcome",
+    "language",
+    "privacy",
+    "flathub",
+    "desktop",
+    "finish"
+  ],
+  "manifest": "usr/share/strawwu/firstboot/firstboot-manifest.yaml",
+  "autostart": "etc/xdg/autostart/strawwu-firstboot.desktop",
+  "state_cli": "strawwu-initd",
+  "lifecycle_key": "lifecycle.firstboot",
+  "default_opt_in": {
+    "bug_upload": false,
+    "analytics": false
+  },
+  "supported_locales": [
+    "zh_TW.UTF-8",
+    "en_US.UTF-8"
+  ]
+}

@@ -1,0 +1,17 @@
+Package: strawwu-firstboot
+Version: __VERSION__
+Section: admin
+Priority: optional
+Architecture: all
+Depends: strawwu-initd,
+         python3,
+         python3-gi,
+         gir1.2-gtk-4.0,
+         gir1.2-adw-1,
+         libadwaita-1-0
+Recommends: xdg-utils
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU GTK4 first-boot setup wizard
+ Six-step libadwaita wizard after first login: welcome,
+ language, privacy, Flathub, desktop/Windows compat tour,
+ and finish. Writes lifecycle.firstboot via strawwu-initd.

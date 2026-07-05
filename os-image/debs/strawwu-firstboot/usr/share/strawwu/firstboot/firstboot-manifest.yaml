@@ -1,0 +1,23 @@
+schema: strawwu-firstboot-manifest/v1
+# GTK4 six-step wizard shown after first login when flags.firstboot_required is true.
+steps:
+  - welcome
+  - language
+  - privacy
+  - flathub
+  - desktop
+  - finish
+log_path: /var/log/strawwu/firstboot.log
+prefs_path: /var/lib/strawwu/setup/firstboot-prefs.json
+error_codes:
+  crash: SWU-FB-001
+  state_mismatch: SWU-FB-003
+legal:
+  privacy: /usr/share/strawwu/legal/privacy.html
+  eula: /usr/share/strawwu/legal/eula.html
+  third_party: /usr/share/strawwu/legal/third-party.html
+locale_policy: /usr/share/strawwu/l10n-ime/locale-policy.yaml
+supported_locales:
+  - zh_TW.UTF-8
+  - en_US.UTF-8
+default_locale: zh_TW.UTF-8
