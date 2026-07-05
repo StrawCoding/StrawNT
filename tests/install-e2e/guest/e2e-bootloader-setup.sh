@@ -6,6 +6,30 @@ set -e
 ROOT="/tmp/calamares-root"
 DEV="/dev/vda"
 
+# Partition shellprocess creates ${DEV}1 (ESP) and ${DEV}2 (root). Ensure both
+# stay mounted through initramfs — UEFI grub-install needs ESP.
+ensure_target_mounts() {
+    local root_part="${DEV}3"
+    local efi_part="${DEV}1"
+    mkdir -p "$ROOT"
+    if ! mountpoint -q "$ROOT" 2>/dev/null; then
+        mount "${root_part}" "$ROOT" || {
+            echo "ERROR: cannot mount ${root_part} on $ROOT" >&2
+            exit 1
+        }
+        echo "Remounted ${root_part} on $ROOT"
+    fi
+    mkdir -p "$ROOT/boot/efi"
+    if ! mountpoint -q "$ROOT/boot/efi" 2>/dev/null; then
+        mount "${efi_part}" "$ROOT/boot/efi" || {
+            echo "ERROR: cannot mount ESP ${efi_part} on $ROOT/boot/efi" >&2
+            exit 1
+        }
+        echo "Mounted ESP ${efi_part} on $ROOT/boot/efi"
+    fi
+}
+ensure_target_mounts
+
 # Detect kernel version from installed modules
 KVER=$(ls "$ROOT/lib/modules/" 2>/dev/null | sort -V | tail -1)
 if [ -z "$KVER" ]; then
@@ -109,8 +133,50 @@ ln -sf /etc/systemd/system/strawwu-firstboot-e2e.service \
 # Generate GRUB config
 chroot "$ROOT" update-grub 2>&1 || chroot "$ROOT" grub-mkconfig -o /boot/grub/grub.cfg 2>&1 || true
 
-# Install GRUB to MBR
+# Install GRUB to MBR (BIOS boot)
 grub-install --target=i386-pc --boot-directory="$ROOT/boot" --recheck --force "$DEV"
+
+# UEFI boot: install GRUB to ESP (uses live-system grub-efi; no chroot apt/network).
+if mountpoint -q "$ROOT/boot/efi" 2>/dev/null; then
+    if [ ! -d "$ROOT/boot/grub/x86_64-efi" ] && [ -d /usr/lib/grub/x86_64-efi ]; then
+        mkdir -p "$ROOT/boot/grub/x86_64-efi"
+        cp -a /usr/lib/grub/x86_64-efi/. "$ROOT/boot/grub/x86_64-efi/" 2>/dev/null || true
+    fi
+    if ! grub-install --target=x86_64-efi \
+        --efi-directory="$ROOT/boot/efi" \
+        --boot-directory="$ROOT/boot" \
+        --no-nvram \
+        --recheck --force 2>&1; then
+        echo "ERROR: grub-install x86_64-efi failed" >&2
+        exit 1
+    fi
+    # OVMF fallback when NVRAM has no Boot#### entry (QEMU installed-boot test).
+    mkdir -p "$ROOT/boot/efi/EFI/BOOT"
+    for candidate in \
+        "$ROOT/boot/efi/EFI/StrawWU/grubx64.efi" \
+        "$ROOT/boot/efi/EFI/strawwu/grubx64.efi" \
+        "$ROOT/boot/efi/EFI/ubuntu/grubx64.efi" \
+        "$ROOT/boot/efi/EFI/BOOT/grubx64.efi"; do
+        if [ -f "$candidate" ]; then
+            cp -f "$candidate" "$ROOT/boot/efi/EFI/BOOT/BOOTX64.EFI"
+            echo "UEFI fallback BOOTX64.EFI from $(basename "$(dirname "$candidate")")"
+            break
+        fi
+    done
+    if [ ! -f "$ROOT/boot/efi/EFI/BOOT/BOOTX64.EFI" ]; then
+        echo "ERROR: BOOTX64.EFI fallback missing on ESP" >&2
+        exit 1
+    fi
+    # Removable-media UEFI path loads EFI/BOOT/grub.cfg (not EFI/strawwu/grub.cfg).
+    if [ -f "$ROOT/boot/efi/EFI/strawwu/grub.cfg" ]; then
+        cp -f "$ROOT/boot/efi/EFI/strawwu/grub.cfg" "$ROOT/boot/efi/EFI/BOOT/grub.cfg"
+        echo "UEFI fallback grub.cfg installed at EFI/BOOT/grub.cfg"
+    fi
+    echo "UEFI GRUB installed on ESP"
+else
+    echo "ERROR: $ROOT/boot/efi not mounted — cannot install UEFI GRUB" >&2
+    exit 1
+fi
 
 sync
 echo "Bootloader setup complete"

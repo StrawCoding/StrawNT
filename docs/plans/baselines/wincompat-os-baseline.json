@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-wincompat-os-baseline/v1",
   "wave": "W3-W0",
-  "version": "0.4.1.33",
+  "version": "0.4.1.34",
   "package": "strawwu-wincompat",
   "cli_path": "/usr/bin/strawwu",
   "log_path": "/var/log/strawwu/wincompat.log",

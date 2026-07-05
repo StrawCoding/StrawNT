@@ -1,0 +1,16 @@
+{
+  "schema": "strawwu-installed-boot-baseline/v1",
+  "wave": "W6-I4",
+  "version": "0.4.1.34",
+  "boot_marker": "STRAWWU_BOOT_OK",
+  "runner": "tests/install-e2e/run-installed-boot.sh",
+  "result_json": "tests/install-e2e/output/installed-boot-result.json",
+  "modes": [
+    "bios",
+    "uefi"
+  ],
+  "depends_on": [
+    "validate-calamares-preflight",
+    "validate-partition-probe"
+  ]
+}

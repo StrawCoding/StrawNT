@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-05T11:21:00.294130",
+  "generated_at": "2026-07-05T15:32:55.444424",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 28,
-  "failed": 19,
+  "passed": 30,
+  "failed": 17,
   "all_pass": false,
   "stages": [
     {
@@ -148,13 +148,13 @@
     },
     {
       "id": "w5-grt-session",
-      "status": "IN_PROGRESS",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w6-n5-install-e2e",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w6-i4-installed-boot",

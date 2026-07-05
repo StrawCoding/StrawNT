@@ -140,6 +140,113 @@ resolve_iso() {
     echo "${iso}"
 }
 
+find_ovmf_code() {
+    for p in \
+        /usr/share/OVMF/OVMF_CODE_4M.fd \
+        /usr/share/OVMF/OVMF_CODE.fd \
+        /usr/share/ovmf/OVMF_CODE.fd; do
+        if [[ -f "${p}" ]]; then
+            echo "${p}"
+            return 0
+        fi
+    done
+    die "OVMF firmware not found (install ovmf package)"
+}
+
+find_ovmf_vars() {
+    for p in \
+        /usr/share/OVMF/OVMF_VARS_4M.fd \
+        /usr/share/OVMF/OVMF_VARS.fd \
+        /usr/share/ovmf/OVMF_VARS.fd; do
+        if [[ -f "${p}" ]]; then
+            echo "${p}"
+            return 0
+        fi
+    done
+    die "OVMF vars not found (install ovmf package)"
+}
+
+# Boot installed disk image; sets INSTALLED_BOOT_RESULT=PASS|FAIL and returns 0/1.
+run_installed_disk_boot() {
+    local mode="$1" disk_img="$2" boot_log="$3"
+    local timeout="${4:-${STRAWWU_INSTALLED_BOOT_TIMEOUT:-900}}"
+    local marker="${5:-${MARKER_BOOT}}"
+    local extra_args=() ovmf_vars_tmp=""
+
+    rm -f "${boot_log}"
+    : > "${boot_log}"
+
+    case "${mode}" in
+        bios)
+            extra_args=(-machine pc,accel=kvm:tcg -boot c)
+            load_qemu_disk_args "${disk_img}"
+            extra_args+=("${QEMU_DISK_ARGS[@]}")
+            ;;
+        uefi)
+            local ovmf ovmf_vars
+            ovmf="$(find_ovmf_code)"
+            ovmf_vars="$(find_ovmf_vars)"
+            ovmf_vars_tmp="$(mktemp)"
+            cp "${ovmf_vars}" "${ovmf_vars_tmp}"
+            extra_args=(
+                -machine q35,accel=kvm:tcg
+                -drive "if=pflash,format=raw,readonly=on,file=${ovmf}"
+                -drive "if=pflash,format=raw,file=${ovmf_vars_tmp}"
+            )
+            if [[ "${DISK_IF}" == "scsi" ]]; then
+                extra_args+=(
+                    -device virtio-scsi-pci,id=scsi0
+                    -drive "file=${disk_img},format=raw,if=none,id=bootdisk0"
+                    -device scsi-hd,drive=bootdisk0,bootindex=1
+                )
+            else
+                extra_args+=(
+                    -drive "file=${disk_img},format=raw,if=none,id=bootdisk0"
+                    -device virtio-blk-pci,drive=bootdisk0,bootindex=1
+                )
+            fi
+            ;;
+        *)
+            die "unknown installed boot mode: ${mode}"
+            ;;
+    esac
+
+    log "installed boot ${mode} (timeout ${timeout}s, marker ${marker})"
+    qemu-system-x86_64 \
+        -m 3072 -smp 2 -no-reboot \
+        -serial "file:${boot_log}" \
+        -display none \
+        -netdev user,id=net0 -device virtio-net-pci,netdev=net0 \
+        "${extra_args[@]}" \
+        >>"${boot_log}.qemu" 2>&1 &
+    local qemu_pid=$!
+
+    local waited=0 boot_ok=0
+    while [[ "${waited}" -lt "${timeout}" ]]; do
+        if grep -aq "${marker}" "${boot_log}" 2>/dev/null; then
+            boot_ok=1
+            break
+        fi
+        kill -0 "${qemu_pid}" 2>/dev/null || break
+        sleep 5
+        waited=$((waited + 5))
+    done
+
+    kill "${qemu_pid}" 2>/dev/null || true
+    wait "${qemu_pid}" 2>/dev/null || true
+    [[ -n "${ovmf_vars_tmp}" ]] && rm -f "${ovmf_vars_tmp}"
+
+    if [[ "${boot_ok}" -eq 1 ]]; then
+        INSTALLED_BOOT_RESULT=PASS
+        log "installed boot ${mode}: PASS (${marker} after ${waited}s)"
+        return 0
+    fi
+    INSTALLED_BOOT_RESULT=FAIL
+    warn "installed boot ${mode}: FAIL (waited=${waited}s)"
+    warn "serial tail: $(tail -8 "${boot_log}" 2>/dev/null | tr '\n' '|')"
+    return 1
+}
+
 write_e2e_result() {
     local status="$1" reason="${2:-}" json="${OUT_DIR}/e2e-result.json"
     shift 2
