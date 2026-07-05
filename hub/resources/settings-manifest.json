@@ -1,6 +1,6 @@
 {
   "schema": "strawwu-hub-settings/v1",
-  "wave": "W4-D3",
+  "wave": "W4-R2",
   "role": "system-settings-center",
   "desktop": {
     "categories": ["Settings", "System"],
@@ -10,6 +10,7 @@
     { "id": "status", "group": "system" },
     { "id": "logs", "group": "system" },
     { "id": "updates", "group": "system" },
+    { "id": "apps", "group": "applications" },
     { "id": "language", "group": "personalization" },
     { "id": "wincompat", "group": "compatibility" },
     { "id": "system", "group": "shortcuts" },
@@ -27,6 +28,12 @@
   "compat_matrix": {
     "installed": "/usr/share/strawwu/compat-matrix.json",
     "dev": "components/tests/wincompat/output/compat-matrix.json"
+  },
+  "app_registry": {
+    "installed": "/var/lib/strawwu/app-registry.json",
+    "dev": "components/strawwu-app-registry/tests/fixtures/sample-registry.json",
+    "cli": "strawwu-app-registry",
+    "cli_dev": "components/target/debug/strawwu-app-registry"
   },
   "system_shortcuts": [
     { "id": "wifi", "desktop": "gnome-wifi-panel.desktop" },

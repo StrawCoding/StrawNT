@@ -21,6 +21,7 @@ describe('Hub directory structure', () => {
     'resources/settings-manifest.json',
     'src/common/settings-paths.js',
     'src/main/settings-service.js',
+    'src/main/app-registry-service.js',
   ];
 
   for (const file of requiredFiles) {

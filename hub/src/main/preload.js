@@ -15,6 +15,9 @@ const IPC_CHANNELS = {
   OPEN_LEGAL: 'settings:open-legal',
   LAUNCH_BUG_REPORT: 'settings:launch-bug-report',
   OPEN_DESKTOP_SHORTCUT: 'settings:open-desktop-shortcut',
+  GET_APPS: 'apps:get-list',
+  PREVIEW_REMOVE_APP: 'apps:preview-remove',
+  REMOVE_APP: 'apps:remove',
 };
 
 contextBridge.exposeInMainWorld('strawwuHub', {
@@ -30,6 +33,9 @@ contextBridge.exposeInMainWorld('strawwuHub', {
   openLegal: (docId) => ipcRenderer.invoke(IPC_CHANNELS.OPEN_LEGAL, docId),
   launchBugReport: () => ipcRenderer.invoke(IPC_CHANNELS.LAUNCH_BUG_REPORT),
   openDesktopShortcut: (desktop) => ipcRenderer.invoke(IPC_CHANNELS.OPEN_DESKTOP_SHORTCUT, desktop),
+  getApps: () => ipcRenderer.invoke(IPC_CHANNELS.GET_APPS),
+  previewRemoveApp: (id) => ipcRenderer.invoke(IPC_CHANNELS.PREVIEW_REMOVE_APP, id),
+  removeApp: (id) => ipcRenderer.invoke(IPC_CHANNELS.REMOVE_APP, id),
 
   onStatusUpdate: (callback) => {
     const handler = (_event, data) => callback(data);

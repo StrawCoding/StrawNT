@@ -22,6 +22,9 @@ module.exports = {
     OPEN_LEGAL: 'settings:open-legal',
     LAUNCH_BUG_REPORT: 'settings:launch-bug-report',
     OPEN_DESKTOP_SHORTCUT: 'settings:open-desktop-shortcut',
+    GET_APPS: 'apps:get-list',
+    PREVIEW_REMOVE_APP: 'apps:preview-remove',
+    REMOVE_APP: 'apps:remove',
   },
 
   COLORS: {

@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain, nativeTheme } = require('electron');
 const path = require('path');
 const RuntimeClient = require('./runtime-client');
 const settingsService = require('./settings-service');
+const appRegistryService = require('./app-registry-service');
 const i18n = require('../common/i18n');
 const { IPC_CHANNELS, UPDATE_CHANNELS } = require('../common/constants');
 
@@ -113,6 +114,11 @@ function setupIpcHandlers() {
   ipcMain.handle(IPC_CHANNELS.OPEN_DESKTOP_SHORTCUT, async (_event, desktopFile) =>
     settingsService.openDesktopShortcut(desktopFile),
   );
+  ipcMain.handle(IPC_CHANNELS.GET_APPS, async () => appRegistryService.listApps());
+  ipcMain.handle(IPC_CHANNELS.PREVIEW_REMOVE_APP, async (_event, id) =>
+    appRegistryService.previewRemoveApp(id),
+  );
+  ipcMain.handle(IPC_CHANNELS.REMOVE_APP, async (_event, id) => appRegistryService.removeApp(id));
 }
 
 app.whenReady().then(() => {

@@ -13,6 +13,16 @@ const DEV_COMPAT = path.join(REPO_ROOT, 'components/tests/wincompat/output/compa
 const VERSION_FILE = path.join(REPO_ROOT, 'VERSION');
 const OS_RELEASE = '/etc/os-release';
 
+const INSTALLED_APP_REGISTRY = '/var/lib/strawwu/app-registry.json';
+const DEV_APP_REGISTRY = path.join(
+  REPO_ROOT,
+  'components/strawwu-app-registry/tests/fixtures/sample-registry.json',
+);
+const DEV_APP_REGISTRY_CLI = path.join(
+  REPO_ROOT,
+  'components/target/debug/strawwu-app-registry',
+);
+
 function firstExisting(...candidates) {
   for (const candidate of candidates) {
     if (candidate && fs.existsSync(candidate)) {
@@ -59,12 +69,31 @@ function readOsPrettyName() {
   return match ? match[1] : 'StrawWU';
 }
 
+function resolveAppRegistry() {
+  if (process.env.STRAWWU_APP_REGISTRY) {
+    return process.env.STRAWWU_APP_REGISTRY;
+  }
+  return firstExisting(INSTALLED_APP_REGISTRY, DEV_APP_REGISTRY);
+}
+
+function resolveAppRegistryCli() {
+  if (process.env.STRAWWU_APP_REGISTRY_CLI && fs.existsSync(process.env.STRAWWU_APP_REGISTRY_CLI)) {
+    return process.env.STRAWWU_APP_REGISTRY_CLI;
+  }
+  if (fs.existsSync(DEV_APP_REGISTRY_CLI)) {
+    return DEV_APP_REGISTRY_CLI;
+  }
+  return 'strawwu-app-registry';
+}
+
 module.exports = {
   HUB_ROOT,
   REPO_ROOT,
   resolveLegalDir,
   resolveLegalDoc,
   resolveCompatMatrix,
+  resolveAppRegistry,
+  resolveAppRegistryCli,
   readVersion,
   readOsPrettyName,
 };

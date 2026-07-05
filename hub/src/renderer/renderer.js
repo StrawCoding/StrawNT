@@ -12,11 +12,17 @@ const $wincompatStatus = document.getElementById('wincompat-status');
 const $wincompatGrades = document.getElementById('wincompat-grades');
 const $systemShortcuts = document.getElementById('system-shortcuts');
 const $aboutInfo = document.getElementById('about-info');
+const $appsList = document.getElementById('apps-list');
+const $appsSearch = document.getElementById('apps-search');
+const $appsKindFilter = document.getElementById('apps-kind-filter');
+const $appsMeta = document.getElementById('apps-meta');
+const $appsStatus = document.getElementById('apps-status');
 
 let currentLogs = [];
 let currentTranslations = {};
 let availableLocales = [];
 let currentLocale = 'en';
+let currentApps = [];
 
 // --- i18n ---
 async function initI18n() {
@@ -333,6 +339,125 @@ document.getElementById('btn-open-eula').addEventListener('click', () => strawwu
 document.getElementById('btn-open-third-party').addEventListener('click', () => strawwuHub.openLegal('third_party'));
 document.getElementById('btn-bug-report').addEventListener('click', () => strawwuHub.launchBugReport());
 
+// --- Apps (App Registry) ---
+const KIND_LABELS = {
+  win32: 'apps.kind.win32',
+  linux: 'apps.kind.linux',
+  flatpak: 'apps.kind.flatpak',
+  native: 'apps.kind.native',
+};
+
+function kindBadgeClass(kind) {
+  if (kind === 'win32') return 'app-kind-win32';
+  if (kind === 'flatpak') return 'app-kind-flatpak';
+  if (kind === 'native') return 'app-kind-native';
+  return 'app-kind-linux';
+}
+
+function renderApps(apps) {
+  const search = ($appsSearch?.value || '').toLowerCase();
+  const kindFilter = $appsKindFilter?.value || '';
+
+  const filtered = apps.filter((app) => {
+    if (kindFilter && app.kind !== kindFilter) return false;
+    if (!search) return true;
+    return (
+      app.id.toLowerCase().includes(search) ||
+      app.name.toLowerCase().includes(search) ||
+      (app.install_path || '').toLowerCase().includes(search)
+    );
+  });
+
+  if (!filtered.length) {
+    $appsList.innerHTML = `<p class="muted-text">${t('apps.empty')}</p>`;
+    return;
+  }
+
+  $appsList.innerHTML = filtered
+    .map(
+      (app) => `
+    <div class="app-card" data-app-id="${escapeHtml(app.id)}">
+      <div class="app-card-header">
+        <div>
+          <div class="app-name">${escapeHtml(app.name)}</div>
+          <div class="app-id">${escapeHtml(app.id)}</div>
+        </div>
+        <div class="app-badges">
+          <span class="app-kind-badge ${kindBadgeClass(app.kind)}">${t(KIND_LABELS[app.kind] || app.kind)}</span>
+          ${app.protected ? `<span class="app-protected-badge">${t('apps.protected')}</span>` : ''}
+        </div>
+      </div>
+      <div class="app-meta">
+        <span>${t('apps.source')}: ${escapeHtml(app.source || '—')}</span>
+        <span>${t('apps.backend')}: ${escapeHtml(app.execution_backend || 'native')}</span>
+        <span>${t('apps.state')}: ${escapeHtml(app.install_state || 'installed')}</span>
+      </div>
+      ${
+        app.install_path
+          ? `<div class="app-path">${escapeHtml(app.install_path)}</div>`
+          : ''
+      }
+      <div class="app-actions">
+        ${
+          app.protected
+            ? `<button class="btn btn-secondary" disabled>${t('apps.remove')}</button>`
+            : `<button class="btn btn-secondary btn-remove-app" data-app-id="${escapeHtml(app.id)}" data-app-name="${escapeHtml(app.name)}">${t('apps.remove')}</button>`
+        }
+      </div>
+    </div>
+  `,
+    )
+    .join('');
+
+  $appsList.querySelectorAll('.btn-remove-app').forEach((btn) => {
+    btn.addEventListener('click', () => confirmRemoveApp(btn.dataset.appId, btn.dataset.appName));
+  });
+}
+
+async function refreshApps() {
+  const data = await strawwuHub.getApps();
+  if (!data) return;
+  currentApps = data.apps || [];
+  const metaParts = [t('apps.count', { count: currentApps.length })];
+  if (data.mock) metaParts.push(t('apps.dev_fixture'));
+  if (!data.cliAvailable) metaParts.push(t('apps.cli_unavailable'));
+  $appsMeta.textContent = metaParts.join(' · ');
+  renderApps(currentApps);
+}
+
+async function confirmRemoveApp(id, name) {
+  if (!window.confirm(t('apps.remove_confirm', { name }))) return;
+  $appsStatus.textContent = '';
+  try {
+    await strawwuHub.previewRemoveApp(id);
+    await strawwuHub.removeApp(id);
+    $appsStatus.textContent = t('apps.removed', { name });
+    await refreshApps();
+    setTimeout(() => {
+      $appsStatus.textContent = '';
+    }, 3000);
+  } catch (err) {
+    if (err?.message?.includes('protected') || err?.message?.includes('Protected')) {
+      $appsStatus.textContent = t('apps.remove_protected');
+    } else {
+      $appsStatus.textContent = t('apps.remove_failed', { name });
+    }
+    $appsStatus.classList.add('status-error');
+    setTimeout(() => {
+      $appsStatus.textContent = '';
+      $appsStatus.classList.remove('status-error');
+    }, 4000);
+  }
+}
+
+if ($appsSearch) {
+  $appsSearch.addEventListener('input', () => renderApps(currentApps));
+}
+if ($appsKindFilter) {
+  $appsKindFilter.addEventListener('change', () => renderApps(currentApps));
+}
+document.getElementById('btn-refresh-apps')?.addEventListener('click', refreshApps);
+
 // --- Live Updates ---
 strawwuHub.onStatusUpdate((data) => {
   if (data) renderStatus(data);
@@ -361,6 +486,7 @@ initI18n().then(() => {
   refreshWinCompat();
   renderSystemShortcuts();
   renderAbout();
+  refreshApps();
 });
 
 setInterval(refreshStatus, 10000);

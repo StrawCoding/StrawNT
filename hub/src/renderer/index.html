@@ -33,6 +33,10 @@
         <span class="nav-icon">⟳</span>
         <span data-i18n="nav.updates">Update Channel</span>
       </button>
+      <button class="nav-btn" data-tab="apps">
+        <span class="nav-icon">▦</span>
+        <span data-i18n="nav.apps">Applications</span>
+      </button>
       <button class="nav-btn" data-tab="wincompat">
         <span class="nav-icon">⊞</span>
         <span data-i18n="nav.wincompat">Windows Compat</span>
@@ -115,6 +119,26 @@
           </label>
         </div>
         <div id="channel-status" class="channel-status"></div>
+      </section>
+
+      <!-- Apps Panel -->
+      <section id="tab-apps" class="tab-panel">
+        <h2 data-i18n="apps.title">Installed Applications</h2>
+        <p class="muted-text" data-i18n="apps.description">Applications registered with StrawWU. Protected system apps cannot be removed from here.</p>
+        <div class="apps-toolbar">
+          <input type="text" id="apps-search" class="language-search-input" data-i18n-placeholder="apps.search" placeholder="Search applications...">
+          <select id="apps-kind-filter">
+            <option value="" data-i18n="apps.filter_all">All types</option>
+            <option value="win32">Windows (win32)</option>
+            <option value="linux">Linux</option>
+            <option value="flatpak">Flatpak</option>
+            <option value="native">Native</option>
+          </select>
+          <button id="btn-refresh-apps" class="btn btn-secondary" data-i18n="apps.refresh">Refresh</button>
+        </div>
+        <div id="apps-meta" class="apps-meta muted-text"></div>
+        <div id="apps-list" class="apps-list"></div>
+        <div id="apps-status" class="channel-status"></div>
       </section>
 
       <!-- Language Panel -->

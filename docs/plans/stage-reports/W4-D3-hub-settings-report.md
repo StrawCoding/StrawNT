@@ -5,7 +5,7 @@
 | 版本 | 0.4.1.17 |
 | 日期 | 2026-07-05 |
 | Worker | 階段 17/47（w4-d3-hub-settings） |
-| 結果 | **待 Hermes mark**（worker 不自宣稱 PASS） |
+| 結果 | **Hermes mark PASS**（2026-07-05T06:09:33-0400） |
 
 ## 目標
 
@@ -117,10 +117,20 @@ Version: 0.4.1.17
 | 2026-07-05T06:00:00-0400 | `[worker-DONE]` test-hub + test-hub-settings + preflight exit 0 — 待 Hermes mark PASS |
 | 2026-07-05T06:07:20-0400 | `[worker-TICK]` companion periodic check status=IN_PROGRESS |
 | 2026-07-05T06:08:00-0400 | `[worker-VERIFY]` companion re-run test-hub + test-hub-settings + preflight exit 0 — 待 Hermes mark PASS |
+| 2026-07-05T06:09:33-0400 | `[worker-PASS]` Hermes mark PASS → next=w4-r2-apps-page |
+| 2026-07-05T06:10:00-0400 | `[worker-VERIFY]` 本 worker 重跑 test-hub + test-hub-settings + preflight exit 0（確認 PASS 狀態） |
+
+## 重驗輸出（2026-07-05T06:10 UTC-4）
+
+| 命令 | 結果 | Log |
+|------|------|-----|
+| `make -C components test-hub` | exit 0，47/47 pass | `/tmp/w4-d3-test-hub-rerun.log` |
+| `make test-hub-settings` | exit 0 | `/tmp/w4-d3-test-hub-settings-rerun.log` |
+| `make preflight` | exit 0（~105s） | `/tmp/w4-d3-preflight-rerun.log` |
 
 ## 下一步
 
-**w4-r2-apps-page**（Hermes mark PASS 後自動啟動，勿問使用者）。
+**w4-r2-apps-page**（已由 Hermes 啟動下一階段）。
 
 ## 建議 Hermes 驗收
 

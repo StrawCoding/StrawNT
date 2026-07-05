@@ -727,3 +727,132 @@ body {
   max-width: 640px;
 }
 
+/* Apps panel — W4-R2 */
+.apps-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.apps-toolbar select {
+  padding: 10px 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 13px;
+}
+
+.apps-meta {
+  margin-bottom: 12px;
+  font-size: 12px;
+}
+
+.apps-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 12px;
+  max-height: calc(100vh - 320px);
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.app-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.app-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.app-name {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.app-id {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  margin-top: 4px;
+}
+
+.app-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.app-kind-badge,
+.app-protected-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.app-kind-win32 {
+  background: rgba(96, 165, 250, 0.15);
+  color: var(--bridge-blue);
+}
+
+.app-kind-flatpak {
+  background: rgba(212, 168, 83, 0.15);
+  color: var(--straw-gold);
+}
+
+.app-kind-native {
+  background: rgba(20, 184, 166, 0.15);
+  color: var(--teal);
+}
+
+.app-kind-linux {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--success);
+}
+
+.app-protected-badge {
+  background: var(--bg-elevated);
+  color: var(--muted);
+}
+
+.app-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+
+.app-path {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  word-break: break-all;
+}
+
+.app-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+}
+
+.channel-status.status-error {
+  color: var(--error);
+}
+
