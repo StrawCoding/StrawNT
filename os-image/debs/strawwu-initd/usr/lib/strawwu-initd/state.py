@@ -17,6 +17,8 @@ DEFAULT_LOG_PATH = Path("/var/log/strawwu/initd.log")
 LIFECYCLE_DEFAULTS = {
     "install": "pending",
     "target_setup": "pending",
+    "target_identity": "pending",
+    "upstream_init_disabled": "pending",
     "boot_selfcheck": "pending",
     "firstboot": "pending",
 }
@@ -24,6 +26,8 @@ LIFECYCLE_DEFAULTS = {
 LIFECYCLE_ENUMS = {
     "install": {"pending", "installing", "installed", "failed"},
     "target_setup": {"pending", "running", "done", "failed", "skipped"},
+    "target_identity": {"pending", "running", "done", "failed", "skipped"},
+    "upstream_init_disabled": {"pending", "running", "done", "failed", "skipped"},
     "boot_selfcheck": {"pending", "running", "done", "failed"},
     "firstboot": {"pending", "running", "done", "skipped", "failed"},
 }
@@ -73,6 +77,14 @@ def ensure_parent(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
 
 
+def ensure_lifecycle_defaults(data: dict[str, Any]) -> None:
+    lifecycle = data.setdefault("lifecycle", {})
+    if not isinstance(lifecycle, dict):
+        raise ValueError("lifecycle must be an object")
+    for phase, default in LIFECYCLE_DEFAULTS.items():
+        lifecycle.setdefault(phase, default)
+
+
 def load_state(path: Path | None = None) -> dict[str, Any]:
     target = path or state_path()
     if not target.exists():
@@ -81,6 +93,7 @@ def load_state(path: Path | None = None) -> dict[str, Any]:
         data = json.load(fh)
     if not isinstance(data, dict):
         raise ValueError("state root must be an object")
+    ensure_lifecycle_defaults(data)
     return data
 
 
@@ -151,7 +164,7 @@ def validate_state(data: dict[str, Any]) -> list[str]:
         return errors
 
     for phase, allowed in LIFECYCLE_ENUMS.items():
-        value = lifecycle.get(phase)
+        value = lifecycle.get(phase, LIFECYCLE_DEFAULTS.get(phase))
         if value not in allowed:
             errors.append(f"lifecycle.{phase} invalid: {value!r}")
 

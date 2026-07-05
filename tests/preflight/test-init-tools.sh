@@ -192,7 +192,14 @@ import json, sys
 from pathlib import Path
 data = json.loads(Path(sys.argv[1]).read_text())
 assert data["schema_version"] == "1.0"
-assert set(data["lifecycle"]) == {"install", "target_setup", "boot_selfcheck", "firstboot"}
+assert set(data["lifecycle"]) == {
+    "install",
+    "target_setup",
+    "target_identity",
+    "upstream_init_disabled",
+    "boot_selfcheck",
+    "firstboot",
+}
 assert data["flags"]["firstboot_required"] is True
 print("lifecycle shape OK")
 PY

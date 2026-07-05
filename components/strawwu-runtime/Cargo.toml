@@ -11,5 +11,6 @@ serde_json = "1"
 thiserror = "2"
 strawwu-bridge = { path = "../strawwu-bridge" }
 strawwu-nt = { path = "../strawwu-nt" }
+strawwu-graphics = { path = "../strawwu-graphics" }
 
 [dev-dependencies]

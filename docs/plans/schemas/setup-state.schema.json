@@ -18,13 +18,26 @@
     "lifecycle": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["install", "target_setup", "boot_selfcheck", "firstboot"],
+      "required": [
+        "install",
+        "target_setup",
+        "target_identity",
+        "upstream_init_disabled",
+        "boot_selfcheck",
+        "firstboot"
+      ],
       "properties": {
         "install": {
           "$ref": "#/$defs/install_phase"
         },
         "target_setup": {
           "$ref": "#/$defs/target_setup_phase"
+        },
+        "target_identity": {
+          "$ref": "#/$defs/target_identity_phase"
+        },
+        "upstream_init_disabled": {
+          "$ref": "#/$defs/upstream_init_disabled_phase"
         },
         "boot_selfcheck": {
           "$ref": "#/$defs/boot_selfcheck_phase"
@@ -62,6 +75,14 @@
       "enum": ["pending", "installing", "installed", "failed"]
     },
     "target_setup_phase": {
+      "type": "string",
+      "enum": ["pending", "running", "done", "failed", "skipped"]
+    },
+    "target_identity_phase": {
+      "type": "string",
+      "enum": ["pending", "running", "done", "failed", "skipped"]
+    },
+    "upstream_init_disabled_phase": {
       "type": "string",
       "enum": ["pending", "running", "done", "failed", "skipped"]
     },

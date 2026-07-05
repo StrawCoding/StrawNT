@@ -76,6 +76,7 @@ pub fn register_launch(
     binary: &Path,
     format: BinaryFormat,
     backend: Option<&str>,
+    desktop_entry: Option<String>,
 ) -> Result<String, RegistryError> {
     let id = derive_app_id(binary);
     let name = derive_app_name(binary);
@@ -84,7 +85,7 @@ pub fn register_launch(
     let backend = backend_from_str(backend);
 
     let mut store = RegistryStore::open_at(default_registry_path())?;
-    store.upsert_from_launch(&id, &name, kind, install_path, backend)?;
+    store.upsert_from_launch(&id, &name, kind, install_path, backend, desktop_entry)?;
     Ok(id)
 }
 
@@ -191,7 +192,7 @@ mod tests {
         let _env = RegistryEnvGuard::new(&registry, &log);
 
         let binary = dir.path().join("demo-app.exe");
-        let id = register_launch(&binary, BinaryFormat::PE, Some("native")).unwrap();
+        let id = register_launch(&binary, BinaryFormat::PE, Some("native"), None).unwrap();
         assert_eq!(id, "demo-app");
 
         let store = RegistryStore::open_at(registry.clone()).unwrap();
@@ -200,7 +201,7 @@ mod tests {
         assert_eq!(app.kind, AppKind::Win32);
         assert_eq!(app.source, strawwu_app_registry::AppSource::Launcher);
 
-        let id2 = register_launch(&binary, BinaryFormat::PE, Some("container")).unwrap();
+        let id2 = register_launch(&binary, BinaryFormat::PE, Some("container"), None).unwrap();
         assert_eq!(id2, "demo-app");
         let store = RegistryStore::open_at(registry).unwrap();
         let app = store.get("demo-app").expect("upserted");

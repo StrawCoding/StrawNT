@@ -369,6 +369,7 @@ dependencies = [
  "serde_json",
  "strawwu-app-registry",
  "strawwu-bridge",
+ "strawwu-nt",
  "strawwu-runtime",
  "tempfile",
  "thiserror",
@@ -391,6 +392,7 @@ dependencies = [
  "serde",
  "serde_json",
  "strawwu-bridge",
+ "strawwu-graphics",
  "strawwu-nt",
  "thiserror",
 ]

@@ -121,7 +121,13 @@ if has_rootfs; then
 
     for pkg in ubuntu-desktop ubuntu-desktop-minimal; do
         if package_installed_in_rootfs "${pkg}"; then
-            pass "rootfs retained ${pkg}"
+            if [[ -f "${NOSNAP_MARKER}" ]] && [[ -f "${REPO_ROOT}/os-image/work/.target-setup-ok" ]]; then
+                warn "rootfs still has ${pkg} — re-run chroot-install-target-setup (W5-B4)"
+            else
+                pass "rootfs retained ${pkg}"
+            fi
+        elif [[ -f "${REPO_ROOT}/os-image/work/.target-setup-ok" ]]; then
+            pass "rootfs absent ${pkg} (W5-B4 upstream meta purged)"
         else
             fail "rootfs missing required ${pkg}"
         fi

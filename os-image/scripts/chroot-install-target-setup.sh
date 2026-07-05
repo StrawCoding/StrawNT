@@ -84,6 +84,7 @@ latest_deb() {
 stage_debs() {
     local version="${STRAWWU_VERSION:-$(tr -d '[:space:]' < "${REPO_ROOT}/VERSION")}"
     install -d -m 0755 "${STAGED}"
+    rm -f "${STAGED}"/*.deb
 
     local pkg deb
     for pkg in strawwu-initd strawwu-wincompat strawwu-shell strawwu-session strawwu-update-notifier strawwu-bug-reporter \
@@ -130,7 +131,8 @@ if [[ ${#missing[@]} -gt 0 ]]; then
 fi
 
 # initd must exist before target-setup (Depends).
-dpkg -i /usr/share/strawwu/target-setup/staged-debs/strawwu-initd_*.deb
+initd_deb="$(ls -1t /usr/share/strawwu/target-setup/staged-debs/strawwu-initd_*.deb | head -1)"
+dpkg -i "${initd_deb}"
 dpkg -i /tmp/strawwu-target-setup.deb
 rm -f /tmp/strawwu-target-setup.deb
 

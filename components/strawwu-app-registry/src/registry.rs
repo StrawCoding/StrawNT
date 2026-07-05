@@ -158,6 +158,7 @@ impl RegistryStore {
         kind: AppKind,
         install_path: Option<String>,
         backend: Option<ExecutionBackend>,
+        desktop_entry: Option<String>,
     ) -> Result<&AppEntry, RegistryError> {
         if let Some(app) = self.data.find_mut(id) {
             app.name = name.to_string();
@@ -166,6 +167,9 @@ impl RegistryStore {
             app.install_state = InstallState::Installed;
             app.install_path = install_path;
             app.execution_backend = backend.or(Some(ExecutionBackend::Native));
+            if desktop_entry.is_some() {
+                app.desktop_entry = desktop_entry;
+            }
             app.touch();
             self.data.touch();
             self.flush()?;
@@ -179,7 +183,7 @@ impl RegistryStore {
             kind,
             AppSource::Launcher,
             install_path,
-            None,
+            desktop_entry,
             false,
             backend,
         )
@@ -428,6 +432,7 @@ mod tests {
                 AppKind::Win32,
                 Some("/opt/demo".into()),
                 None,
+                None,
             )
             .unwrap();
         store
@@ -437,6 +442,7 @@ mod tests {
                 AppKind::Win32,
                 Some("/opt/demo2".into()),
                 Some(ExecutionBackend::Container),
+                None,
             )
             .unwrap();
 
@@ -484,6 +490,7 @@ mod tests {
                 "Launcher Name",
                 AppKind::Win32,
                 Some("/opt/demo".into()),
+                None,
                 None,
             )
             .unwrap();

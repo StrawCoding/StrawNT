@@ -58,6 +58,12 @@ class StateTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             set_nested(data, "lifecycle.install", "bogus")
 
+    def test_target_identity_and_upstream_init_lifecycle(self) -> None:
+        data = default_state()
+        set_nested(data, "lifecycle.target_identity", "done")
+        set_nested(data, "lifecycle.upstream_init_disabled", "done")
+        self.assertEqual([], validate_state(data))
+
     def test_repair_corrupt_json(self) -> None:
         self.state_file.parent.mkdir(parents=True, exist_ok=True)
         self.state_file.write_text("{not json", encoding="utf-8")

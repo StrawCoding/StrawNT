@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-05T09:38:15.275149",
+  "generated_at": "2026-07-05T10:27:03.154205",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 26,
-  "failed": 21,
+  "passed": 27,
+  "failed": 20,
   "all_pass": false,
   "stages": [
     {
@@ -138,12 +138,12 @@
     },
     {
       "id": "w5-b4-disable-upstream-init",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w5-w4-wincompat-gui",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "pass": false
     },
     {

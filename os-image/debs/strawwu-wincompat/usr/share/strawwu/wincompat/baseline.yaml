@@ -4,6 +4,12 @@ log_path: /var/log/strawwu/wincompat.log
 state_dir: /var/lib/strawwu/wincompat
 registry_path: /var/lib/strawwu/app-registry.json
 execution_backend_default: native
+desktop_dir_default: ~/.local/share/applications
+gui_smoke:
+  enabled: true
+  compositor: mutter
+  display_backend_default: wayland
+  log_event: gui_smoke
 commands:
   - status
   - version
