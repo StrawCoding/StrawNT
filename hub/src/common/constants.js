@@ -25,6 +25,9 @@ module.exports = {
     GET_APPS: 'apps:get-list',
     PREVIEW_REMOVE_APP: 'apps:preview-remove',
     REMOVE_APP: 'apps:remove',
+    SEARCH_FLATHUB: 'flathub:search',
+    GET_FLATHUB_STATUS: 'flathub:get-status',
+    INSTALL_FLATHUB: 'flathub:install',
   },
 
   COLORS: {

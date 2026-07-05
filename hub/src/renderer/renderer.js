@@ -17,12 +17,18 @@ const $appsSearch = document.getElementById('apps-search');
 const $appsKindFilter = document.getElementById('apps-kind-filter');
 const $appsMeta = document.getElementById('apps-meta');
 const $appsStatus = document.getElementById('apps-status');
+const $flathubList = document.getElementById('flathub-list');
+const $flathubSearch = document.getElementById('flathub-search');
+const $flathubMeta = document.getElementById('flathub-meta');
+const $flathubStatus = document.getElementById('flathub-status');
 
 let currentLogs = [];
 let currentTranslations = {};
 let availableLocales = [];
 let currentLocale = 'en';
 let currentApps = [];
+let currentFlathubApps = [];
+let flathubInstalled = new Set();
 
 // --- i18n ---
 async function initI18n() {
@@ -458,6 +464,121 @@ if ($appsKindFilter) {
 }
 document.getElementById('btn-refresh-apps')?.addEventListener('click', refreshApps);
 
+// --- Flathub browse/install ---
+function renderFlathubApps(apps) {
+  if (!apps.length) {
+    $flathubList.innerHTML = `<p class="muted-text">${t('flathub.empty')}</p>`;
+    return;
+  }
+
+  $flathubList.innerHTML = apps
+    .map(
+      (app) => {
+        const installed = flathubInstalled.has(app.appId);
+        return `
+    <div class="flathub-card" data-app-id="${escapeHtml(app.appId)}">
+      <div class="flathub-card-header">
+        ${
+          app.icon
+            ? `<img class="flathub-icon" src="${escapeHtml(app.icon)}" alt="" loading="lazy">`
+            : '<div class="flathub-icon flathub-icon-placeholder">⬡</div>'
+        }
+        <div class="flathub-card-info">
+          <div class="app-name">${escapeHtml(app.name)}</div>
+          <div class="app-id">${escapeHtml(app.appId)}</div>
+          ${app.verified ? `<span class="flathub-verified">${t('flathub.verified')}</span>` : ''}
+        </div>
+      </div>
+      <p class="flathub-summary">${escapeHtml(app.summary || '')}</p>
+      <div class="flathub-meta-row">
+        ${app.developer ? `<span>${escapeHtml(app.developer)}</span>` : ''}
+        ${app.license ? `<span>${escapeHtml(app.license)}</span>` : ''}
+      </div>
+      <div class="app-actions">
+        ${
+          installed
+            ? `<button class="btn btn-secondary" disabled>${t('flathub.installed')}</button>`
+            : `<button class="btn btn-primary btn-install-flathub" data-app-id="${escapeHtml(app.appId)}" data-app-name="${escapeHtml(app.name)}">${t('flathub.install')}</button>`
+        }
+      </div>
+    </div>
+  `;
+      },
+    )
+    .join('');
+
+  $flathubList.querySelectorAll('.btn-install-flathub').forEach((btn) => {
+    btn.addEventListener('click', () => installFlathubApp(btn.dataset.appId, btn.dataset.appName, btn));
+  });
+}
+
+async function refreshFlathubStatus() {
+  const status = await strawwuHub.getFlathubStatus();
+  if (status) {
+    flathubInstalled = new Set(status.installed || []);
+  }
+}
+
+async function refreshFlathubCatalog() {
+  $flathubStatus.textContent = '';
+  const query = $flathubSearch?.value || '';
+  try {
+    const data = await strawwuHub.searchFlathub(query);
+    currentFlathubApps = data.apps || [];
+    const metaParts = [t('flathub.count', { count: currentFlathubApps.length })];
+    if (data.mock) metaParts.push(t('flathub.dev_fixture'));
+    if (data.source === 'fixture-fallback') metaParts.push(t('flathub.api_fallback'));
+    $flathubMeta.textContent = metaParts.join(' · ');
+    renderFlathubApps(currentFlathubApps);
+  } catch {
+    $flathubList.innerHTML = `<p class="muted-text">${t('flathub.load_failed')}</p>`;
+  }
+}
+
+async function installFlathubApp(appId, name, btn) {
+  if (!window.confirm(t('flathub.install_confirm', { name }))) return;
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = t('flathub.installing');
+  }
+  $flathubStatus.textContent = '';
+  try {
+    const result = await strawwuHub.installFlathub(appId);
+    if (result.mock) {
+      $flathubStatus.textContent = t('flathub.install_mock', { name });
+    } else if (result.alreadyInstalled) {
+      $flathubStatus.textContent = t('flathub.already_installed', { name });
+    } else {
+      $flathubStatus.textContent = t('flathub.installed_success', { name });
+    }
+    flathubInstalled.add(appId);
+    renderFlathubApps(currentFlathubApps);
+    setTimeout(() => {
+      $flathubStatus.textContent = '';
+    }, 4000);
+  } catch {
+    $flathubStatus.textContent = t('flathub.install_failed', { name });
+    $flathubStatus.classList.add('status-error');
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = t('flathub.install');
+    }
+    setTimeout(() => {
+      $flathubStatus.textContent = '';
+      $flathubStatus.classList.remove('status-error');
+    }, 4000);
+  }
+}
+
+if ($flathubSearch) {
+  let flathubSearchTimer = null;
+  $flathubSearch.addEventListener('input', () => {
+    clearTimeout(flathubSearchTimer);
+    flathubSearchTimer = setTimeout(refreshFlathubCatalog, 300);
+  });
+}
+document.getElementById('btn-refresh-flathub')?.addEventListener('click', refreshFlathubCatalog);
+
 // --- Live Updates ---
 strawwuHub.onStatusUpdate((data) => {
   if (data) renderStatus(data);
@@ -487,6 +608,7 @@ initI18n().then(() => {
   renderSystemShortcuts();
   renderAbout();
   refreshApps();
+  refreshFlathubStatus().then(refreshFlathubCatalog);
 });
 
 setInterval(refreshStatus, 10000);

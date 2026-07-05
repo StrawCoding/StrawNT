@@ -1,6 +1,6 @@
 {
   "schema": "strawwu-hub-settings/v1",
-  "wave": "W4-R2",
+  "wave": "W4-F3",
   "role": "system-settings-center",
   "desktop": {
     "categories": ["Settings", "System"],
@@ -11,6 +11,7 @@
     { "id": "logs", "group": "system" },
     { "id": "updates", "group": "system" },
     { "id": "apps", "group": "applications" },
+    { "id": "flathub", "group": "applications" },
     { "id": "language", "group": "personalization" },
     { "id": "wincompat", "group": "compatibility" },
     { "id": "system", "group": "shortcuts" },
@@ -34,6 +35,12 @@
     "dev": "components/strawwu-app-registry/tests/fixtures/sample-registry.json",
     "cli": "strawwu-app-registry",
     "cli_dev": "components/target/debug/strawwu-app-registry"
+  },
+  "flathub": {
+    "remote": "flathub",
+    "api": "https://flathub.org/api/v2",
+    "flatpak_cli": "/usr/bin/flatpak",
+    "fixture": "hub/tests/fixtures/flathub-catalog.json"
   },
   "system_shortcuts": [
     { "id": "wifi", "desktop": "gnome-wifi-panel.desktop" },

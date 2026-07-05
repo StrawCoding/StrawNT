@@ -1,0 +1,23 @@
+{
+  "schema": "strawwu-hub-flathub-baseline/v1",
+  "wave": "W4-F3",
+  "version": "0.4.1.19",
+  "package": "strawwu-hub",
+  "panel": "flathub",
+  "remote": "flathub",
+  "api": "https://flathub.org/api/v2",
+  "flatpak_cli": "/usr/bin/flatpak",
+  "fixture": "hub/tests/fixtures/flathub-catalog.json",
+  "ipc_channels": [
+    "flathub:search",
+    "flathub:get-status",
+    "flathub:install"
+  ],
+  "manifest": "hub/resources/settings-manifest.json",
+  "i18n_keys": [
+    "nav.flathub",
+    "flathub.title",
+    "flathub.install",
+    "flathub.disclaimer"
+  ]
+}

@@ -18,6 +18,9 @@ const IPC_CHANNELS = {
   GET_APPS: 'apps:get-list',
   PREVIEW_REMOVE_APP: 'apps:preview-remove',
   REMOVE_APP: 'apps:remove',
+  SEARCH_FLATHUB: 'flathub:search',
+  GET_FLATHUB_STATUS: 'flathub:get-status',
+  INSTALL_FLATHUB: 'flathub:install',
 };
 
 contextBridge.exposeInMainWorld('strawwuHub', {
@@ -36,6 +39,9 @@ contextBridge.exposeInMainWorld('strawwuHub', {
   getApps: () => ipcRenderer.invoke(IPC_CHANNELS.GET_APPS),
   previewRemoveApp: (id) => ipcRenderer.invoke(IPC_CHANNELS.PREVIEW_REMOVE_APP, id),
   removeApp: (id) => ipcRenderer.invoke(IPC_CHANNELS.REMOVE_APP, id),
+  searchFlathub: (query) => ipcRenderer.invoke(IPC_CHANNELS.SEARCH_FLATHUB, query),
+  getFlathubStatus: () => ipcRenderer.invoke(IPC_CHANNELS.GET_FLATHUB_STATUS),
+  installFlathub: (appId) => ipcRenderer.invoke(IPC_CHANNELS.INSTALL_FLATHUB, appId),
 
   onStatusUpdate: (callback) => {
     const handler = (_event, data) => callback(data);

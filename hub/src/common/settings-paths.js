@@ -23,6 +23,11 @@ const DEV_APP_REGISTRY_CLI = path.join(
   'components/target/debug/strawwu-app-registry',
 );
 
+const INSTALLED_FLATPAK = '/usr/bin/flatpak';
+const DEV_FLATHUB_FIXTURE = path.join(HUB_ROOT, 'tests/fixtures/flathub-catalog.json');
+const FLATHUB_API = 'https://flathub.org/api/v2';
+const FLATHUB_REMOTE = 'flathub';
+
 function firstExisting(...candidates) {
   for (const candidate of candidates) {
     if (candidate && fs.existsSync(candidate)) {
@@ -86,14 +91,32 @@ function resolveAppRegistryCli() {
   return 'strawwu-app-registry';
 }
 
+function resolveFlatpakCli() {
+  if (process.env.STRAWWU_FLATPAK && fs.existsSync(process.env.STRAWWU_FLATPAK)) {
+    return process.env.STRAWWU_FLATPAK;
+  }
+  return firstExisting(INSTALLED_FLATPAK);
+}
+
+function resolveFlathubFixture() {
+  if (process.env.STRAWWU_FLATHUB_FIXTURE_PATH) {
+    return process.env.STRAWWU_FLATHUB_FIXTURE_PATH;
+  }
+  return firstExisting(DEV_FLATHUB_FIXTURE);
+}
+
 module.exports = {
   HUB_ROOT,
   REPO_ROOT,
+  FLATHUB_API,
+  FLATHUB_REMOTE,
   resolveLegalDir,
   resolveLegalDoc,
   resolveCompatMatrix,
   resolveAppRegistry,
   resolveAppRegistryCli,
+  resolveFlatpakCli,
+  resolveFlathubFixture,
   readVersion,
   readOsPrettyName,
 };

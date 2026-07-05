@@ -3,6 +3,7 @@ const path = require('path');
 const RuntimeClient = require('./runtime-client');
 const settingsService = require('./settings-service');
 const appRegistryService = require('./app-registry-service');
+const flathubService = require('./flathub-service');
 const i18n = require('../common/i18n');
 const { IPC_CHANNELS, UPDATE_CHANNELS } = require('../common/constants');
 
@@ -119,6 +120,13 @@ function setupIpcHandlers() {
     appRegistryService.previewRemoveApp(id),
   );
   ipcMain.handle(IPC_CHANNELS.REMOVE_APP, async (_event, id) => appRegistryService.removeApp(id));
+  ipcMain.handle(IPC_CHANNELS.SEARCH_FLATHUB, async (_event, query) =>
+    flathubService.searchCatalog(query),
+  );
+  ipcMain.handle(IPC_CHANNELS.GET_FLATHUB_STATUS, async () => flathubService.getFlathubStatus());
+  ipcMain.handle(IPC_CHANNELS.INSTALL_FLATHUB, async (_event, appId) =>
+    flathubService.installApp(appId),
+  );
 }
 
 app.whenReady().then(() => {

@@ -22,6 +22,7 @@ describe('Hub directory structure', () => {
     'src/common/settings-paths.js',
     'src/main/settings-service.js',
     'src/main/app-registry-service.js',
+    'src/main/flathub-service.js',
   ];
 
   for (const file of requiredFiles) {

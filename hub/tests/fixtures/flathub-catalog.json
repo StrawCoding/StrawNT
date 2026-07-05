@@ -1,0 +1,42 @@
+{
+  "schema": "strawwu-flathub-catalog-fixture/v1",
+  "remote": "flathub",
+  "apps": [
+    {
+      "app_id": "org.mozilla.firefox",
+      "name": "Firefox",
+      "summary": "Fast, Private & Safe Web Browser",
+      "icon": "https://dl.flathub.org/media/icons/128x128/org.mozilla.firefox.png",
+      "developer_name": "Mozilla",
+      "project_license": "MPL-2.0",
+      "verification_verified": true
+    },
+    {
+      "app_id": "org.gnome.TextEditor",
+      "name": "Text Editor",
+      "summary": "Edit text files",
+      "icon": "https://dl.flathub.org/media/org/gnome/TextEditor/128x128/org.gnome.TextEditor.png",
+      "developer_name": "GNOME",
+      "project_license": "GPL-3.0-or-later",
+      "verification_verified": true
+    },
+    {
+      "app_id": "org.libreoffice.LibreOffice",
+      "name": "LibreOffice",
+      "summary": "Powerful office suite",
+      "icon": "https://dl.flathub.org/media/org/libreoffice/LibreOffice/128x128/org.libreoffice.LibreOffice.png",
+      "developer_name": "The Document Foundation",
+      "project_license": "MPL-2.0",
+      "verification_verified": true
+    },
+    {
+      "app_id": "com.spotify.Client",
+      "name": "Spotify",
+      "summary": "Online music streaming service",
+      "icon": "https://dl.flathub.org/media/com/spotify/Client/128x128/com.spotify.Client.png",
+      "developer_name": "Spotify",
+      "project_license": "LicenseRef-proprietary",
+      "verification_verified": true
+    }
+  ]
+}

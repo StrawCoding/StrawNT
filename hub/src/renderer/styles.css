@@ -856,3 +856,97 @@ body {
   color: var(--error);
 }
 
+/* Flathub panel (W4-F3) */
+.flathub-disclaimer {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-left: 3px solid var(--straw-gold);
+  background: rgba(212, 168, 83, 0.08);
+  font-size: 12px;
+}
+
+.flathub-toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.flathub-toolbar .language-search-input {
+  flex: 1;
+}
+
+.flathub-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+  max-height: calc(100vh - 360px);
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.flathub-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.flathub-card-header {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.flathub-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius);
+  flex-shrink: 0;
+  object-fit: contain;
+  background: var(--bg-elevated);
+}
+
+.flathub-icon-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: var(--straw-gold);
+}
+
+.flathub-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.flathub-verified {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--success);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.flathub-summary {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.flathub-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+

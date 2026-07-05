@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' https://dl.flathub.org https://flathub.org data:">
   <title>StrawWU Hub</title>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -36,6 +36,10 @@
       <button class="nav-btn" data-tab="apps">
         <span class="nav-icon">▦</span>
         <span data-i18n="nav.apps">Applications</span>
+      </button>
+      <button class="nav-btn" data-tab="flathub">
+        <span class="nav-icon">⬡</span>
+        <span data-i18n="nav.flathub">Flathub</span>
       </button>
       <button class="nav-btn" data-tab="wincompat">
         <span class="nav-icon">⊞</span>
@@ -139,6 +143,20 @@
         <div id="apps-meta" class="apps-meta muted-text"></div>
         <div id="apps-list" class="apps-list"></div>
         <div id="apps-status" class="channel-status"></div>
+      </section>
+
+      <!-- Flathub Panel -->
+      <section id="tab-flathub" class="tab-panel">
+        <h2 data-i18n="flathub.title">Flathub Store</h2>
+        <p class="muted-text" data-i18n="flathub.description">Browse and install applications from Flathub. Third-party apps are maintained by their publishers, not StrawWU.</p>
+        <p class="flathub-disclaimer muted-text" data-i18n="flathub.disclaimer">Applications are provided by Flathub third-party maintainers, not officially by StrawWU.</p>
+        <div class="flathub-toolbar">
+          <input type="text" id="flathub-search" class="language-search-input" data-i18n-placeholder="flathub.search" placeholder="Search Flathub...">
+          <button id="btn-refresh-flathub" class="btn btn-secondary" data-i18n="flathub.refresh">Refresh</button>
+        </div>
+        <div id="flathub-meta" class="apps-meta muted-text"></div>
+        <div id="flathub-list" class="flathub-list"></div>
+        <div id="flathub-status" class="channel-status"></div>
       </section>
 
       <!-- Language Panel -->
