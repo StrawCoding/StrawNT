@@ -5,7 +5,7 @@
 | 版本 | 0.4.1.2 |
 | 日期 | 2026-07-05 |
 | Worker | 階段 3/47（w1-f1-flathub） |
-| 結果 | **待 Hermes mark**（worker 不自宣稱 PASS） |
+| 結果 | **Hermes mark PASS**（2026-07-05T01:19:42-0400 → next=w1-f2-nosnap） |
 
 ## 交付物
 
@@ -18,7 +18,7 @@
 | Makefile | `test-flatpak`、`install-flatpak-setup`；`preflight` 含 flatpak |
 | 共用函式 | `tests/preflight/lib/common.sh`（`_dpkg_pkg_installed` 修 pipefail SIGPIPE） |
 
-## 驗收命令輸出（2026-07-05T01:15 UTC-4，worker 階段 3/47 重跑）
+## 驗收命令輸出（2026-07-05T01:19 UTC-4，Hermes PASS 後 worker 重跑確認）
 
 ### `make test-flatpak` — exit 0
 
@@ -42,13 +42,13 @@ PASS: squashfs snapd absent
 === W1-F1 flatpak done: PASS ===
 ```
 
-Log: `/tmp/w1-f1-test-flatpak.log`
+Log: `/tmp/w1-f1-test-flatpak-rerun.log`
 
 ### `make preflight` — exit 0
 
 含 `test-ubuntu-clone.sh`、`test-branding.sh`、`test-purge-baseline.sh`、`test-flatpak.sh` 全部 PASS。
 
-Log: `/tmp/w1-f1-preflight.log`
+Log: `/tmp/w1-f1-preflight-rerun.log`
 
 ### chroot 安裝（前置 session 已完成）
 
@@ -94,13 +94,9 @@ Log: `/tmp/w1-f1-preflight.log`
 - `Makefile`
 - `VERSION`（0.4.1.2）
 
-## 建議 Hermes 驗收
+## Hermes 驗收
 
-```bash
-cd /mnt/data/code/project/StrawCoding/StrawWU
-make test-flatpak
-make preflight
-```
+Hermes 已 mark PASS（2026-07-05T01:19:42-0400）。Worker 重跑 `make test-flatpak`、`make preflight` 均 exit 0。
 
 ## 建議 commit message
 
@@ -114,4 +110,4 @@ Tests: make test-flatpak PASS; make preflight PASS
 
 ## 下一步
 
-Hermes mark PASS → 自動啟動 **W1-F2-nosnap**（依 kickoff 鎖序）。
+**W1-F2-nosnap**（Hermes 已觸發 next stage）。

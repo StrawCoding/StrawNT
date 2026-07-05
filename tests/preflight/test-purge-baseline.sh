@@ -62,12 +62,16 @@ for pkg in ubuntu-minimal ubuntu-desktop; do
     fi
 done
 
-if has_rootfs && [[ -d "${ROOTFS}/snap" ]]; then
-    snap_count="$(find "${ROOTFS}/snap" -mindepth 1 -maxdepth 1 ! -name README 2>/dev/null | wc -l || echo 0)"
-    if [[ "${snap_count}" -gt 0 ]]; then
-        fail "rootfs /snap still has ${snap_count} snap content dirs"
+if has_rootfs; then
+    if [[ -d "${ROOTFS}/snap" ]]; then
+        snap_count="$(find "${ROOTFS}/snap" -mindepth 1 -maxdepth 1 ! -name README 2>/dev/null | wc -l || echo 0)"
+        if [[ "${snap_count}" -gt 0 ]]; then
+            fail "rootfs /snap still has ${snap_count} snap content dirs"
+        else
+            pass "rootfs /snap empty or stub only"
+        fi
     else
-        pass "rootfs /snap empty or stub only"
+        pass "rootfs /snap absent (acceptable pre-F2 or post-purge)"
     fi
 fi
 

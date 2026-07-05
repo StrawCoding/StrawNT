@@ -48,6 +48,8 @@ isos = [x for x in isos if x.strip()]
 repo_path = Path(repo)
 squashfs_status = repo_path / "os-image/work/squashfs-root/var/lib/dpkg/status"
 purge_marker = repo_path / "os-image/work/.purge-ubuntu-telemetry-ok"
+nosnap_marker = repo_path / "os-image/work/.nosnap-harden-ok"
+nosnap_audit = repo_path / "docs/plans/baselines/nosnap-audit.json"
 purge_targets = [
     "apport", "apport-core-dump-handler", "whoopsie", "ubuntu-report",
     "ubuntu-pro-client", "ubuntu-pro-client-l10n", "ubuntu-advantage-desktop-daemon",
@@ -76,6 +78,12 @@ data = {
         "targets_removed": purge_targets,
         "telemetry_packages_present": [p for p in purge_targets if p in ubuntu],
     },
+    "nosnap": {
+        "wave": "W1-F2",
+        "completed": nosnap_marker.is_file(),
+        "audit_json": str(nosnap_audit.relative_to(repo_path)) if nosnap_audit.is_file() else None,
+        "snapd_forbidden": ["snapd", "snap-confine"],
+    },
     "artifacts": {
         "iso_files": isos,
         "latest_iso": isos[-1] if isos else None,
@@ -99,6 +107,9 @@ data = {
 if purge_marker.is_file():
     data["wave0_gaps"] = [g for g in data["wave0_gaps"] if "purge" not in g.lower()]
     data["wave0_gaps"].append("W1-B1 purge complete — snap transition apps removed (Flathub in F1)")
+if nosnap_marker.is_file():
+    data["wave0_gaps"] = [g for g in data["wave0_gaps"] if "nosnap" not in g.lower() and "snap meta" not in g.lower()]
+    data["wave0_gaps"].append("W1-F2 nosnap complete — snapd masked, desktop meta Recommends documented")
 Path(out).parent.mkdir(parents=True, exist_ok=True)
 Path(out).write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 PY

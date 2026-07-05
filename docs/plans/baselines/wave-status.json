@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-05T01:06:30.789177",
+  "generated_at": "2026-07-05T01:19:41.973973",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 2,
-  "failed": 45,
+  "passed": 3,
+  "failed": 44,
   "all_pass": false,
   "stages": [
     {
@@ -18,8 +18,8 @@
     },
     {
       "id": "w1-f1-flathub",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w1-f2-nosnap",
