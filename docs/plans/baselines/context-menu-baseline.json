@@ -1,0 +1,23 @@
+{
+  "schema": "strawwu-desktop-context-menu-baseline/v1",
+  "wave": "W5-D4",
+  "version": "0.4.1.26",
+  "package": "strawwu-desktop-actions",
+  "registry_path": "/var/lib/strawwu/app-registry.json",
+  "registry_cli": "/usr/bin/strawwu-app-registry",
+  "remove_cli": "/usr/bin/strawwu-desktop-remove",
+  "nautilus_script": "/usr/share/nautilus/scripts/Remove from StrawWU",
+  "desktop_action_id": "RemoveFromStrawWU",
+  "favorites_schema": "org.gnome.shell",
+  "favorites_key": "favorite-apps",
+  "manifest": "os-image/debs/strawwu-desktop-actions/usr/share/strawwu/desktop-actions/desktop-actions-manifest.yaml",
+  "i18n_keys": [
+    "remove_label",
+    "remove_confirm",
+    "protected_error"
+  ],
+  "registry_commands": [
+    "remove-by-desktop",
+    "register --desktop-entry"
+  ]
+}

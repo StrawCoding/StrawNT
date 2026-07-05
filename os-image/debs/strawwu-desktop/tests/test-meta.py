@@ -23,6 +23,7 @@ REQUIRED_DEPENDS = (
     "strawwu-session",
     "strawwu-shell",
     "strawwu-l10n-ime",
+    "strawwu-desktop-actions",
     "strawwu-initd",
     "strawwu-bug-reporter",
     "strawwu-flatpak-setup",

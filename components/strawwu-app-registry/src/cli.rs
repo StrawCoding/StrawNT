@@ -12,11 +12,17 @@ pub enum Command {
         kind: AppKind,
         source: AppSource,
         install_path: Option<String>,
+        desktop_entry: Option<String>,
         protected: bool,
         backend: Option<ExecutionBackend>,
     },
     Remove {
         id: String,
+        dry_run: bool,
+        json: bool,
+    },
+    RemoveByDesktop {
+        desktop: String,
         dry_run: bool,
         json: bool,
     },
@@ -70,6 +76,16 @@ pub fn parse_args(args: &[String]) -> Result<Command, String> {
                 json,
             })
         }
+        "remove-by-desktop" => {
+            if positional.len() < 2 {
+                return Err("remove-by-desktop requires a .desktop path".into());
+            }
+            Ok(Command::RemoveByDesktop {
+                desktop: positional[1..].join(" "),
+                dry_run,
+                json,
+            })
+        }
         "validate" => {
             let path = positional.get(1).map(PathBuf::from);
             Ok(Command::Validate { path })
@@ -86,6 +102,7 @@ fn parse_register(args: &[String]) -> Result<Command, String> {
     let mut kind = AppKind::Win32;
     let mut source = AppSource::Installer;
     let mut install_path = None;
+    let mut desktop_entry = None;
     let mut protected = false;
     let mut backend = None;
 
@@ -112,6 +129,10 @@ fn parse_register(args: &[String]) -> Result<Command, String> {
                 i += 1;
                 install_path = Some(next_value(args, &mut i, "--install-path")?);
             }
+            "--desktop-entry" => {
+                i += 1;
+                desktop_entry = Some(next_value(args, &mut i, "--desktop-entry")?);
+            }
             "--protected" => protected = true,
             "--backend" => {
                 i += 1;
@@ -128,6 +149,7 @@ fn parse_register(args: &[String]) -> Result<Command, String> {
         kind,
         source,
         install_path,
+        desktop_entry,
         protected,
         backend,
     })
@@ -192,20 +214,22 @@ mod tests {
         ))
         .unwrap();
         match cmd {
-            Command::Register {
-                id,
-                name,
-                kind,
-                source,
-                install_path,
-                ..
-            } => {
-                assert_eq!(id, "demo");
-                assert_eq!(name, "Demo");
-                assert_eq!(kind, AppKind::Win32);
-                assert_eq!(source, AppSource::Installer);
-                assert_eq!(install_path.as_deref(), Some("/opt/demo"));
-            }
+        Command::Register {
+            id,
+            name,
+            kind,
+            source,
+            install_path,
+            desktop_entry,
+            ..
+        } => {
+            assert_eq!(id, "demo");
+            assert_eq!(name, "Demo");
+            assert_eq!(kind, AppKind::Win32);
+            assert_eq!(source, AppSource::Installer);
+            assert_eq!(install_path.as_deref(), Some("/opt/demo"));
+            assert_eq!(desktop_entry, None);
+        }
             _ => panic!("expected Register"),
         }
     }
@@ -219,6 +243,23 @@ mod tests {
                 assert!(dry_run);
             }
             _ => panic!("expected Remove"),
+        }
+    }
+
+    #[test]
+    fn parse_remove_by_desktop() {
+        let cmd = parse_args(&args("remove-by-desktop /tmp/foo.desktop --dry-run --json")).unwrap();
+        match cmd {
+            Command::RemoveByDesktop {
+                desktop,
+                dry_run,
+                json,
+            } => {
+                assert_eq!(desktop, "/tmp/foo.desktop");
+                assert!(dry_run);
+                assert!(json);
+            }
+            _ => panic!("expected RemoveByDesktop"),
         }
     }
 }

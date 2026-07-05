@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+NAUTILUS_SCRIPT="/usr/share/nautilus/scripts/Remove from StrawWU"
+if [ -f "${NAUTILUS_SCRIPT}" ]; then
+    chmod 755 "${NAUTILUS_SCRIPT}"
+fi
+
+if [ -x /usr/bin/strawwu-desktop-remove ]; then
+    chmod 755 /usr/bin/strawwu-desktop-remove
+fi
+
+echo "strawwu-desktop-actions: desktop remove + favorites sync installed"

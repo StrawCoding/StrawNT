@@ -1,0 +1,5 @@
+remove_label: 從 StrawWU 移除
+remove_confirm: 確定要從 StrawWU 移除「{name}」嗎？這會在登錄表標記為已移除。
+protected_error: 「{name}」為受保護應用程式，無法移除。
+not_registered: 此捷徑未連結至 StrawWU 應用程式。
+favorites_synced: 已從我的最愛移除。

@@ -2,7 +2,7 @@
 	build-iso dev-iso release-iso repack-iso validate-rootfs boot-test-iso boot-test-dev-iso \
 	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
-	test-install-e2e test-wincompat test-wincompat-os test-wincompat-registry test-strawwu-shell test-hub test-hub-settings test-apps-page test-flathub-hub test-l10n-ime test-firstboot test-finished-meta test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-init-tools test-bug-reporter test-calamares-settings test-app-registry test-security-baseline test-observability test-legal-trademark test-desktop-stack test-live-install-ux test-update-notifier test-target-setup purge-ubuntu-telemetry \
+	test-install-e2e test-wincompat test-wincompat-os test-wincompat-registry test-strawwu-shell test-hub test-hub-settings test-apps-page test-flathub-hub test-l10n-ime test-firstboot test-finished-meta test-context-menu test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-init-tools test-bug-reporter test-calamares-settings test-app-registry test-security-baseline test-observability test-legal-trademark test-desktop-stack test-live-install-ux test-update-notifier test-target-setup purge-ubuntu-telemetry \
 	install-flatpak-setup install-bug-reporter install-calamares-settings install-update-notifier install-target-setup install-firstboot install-wincompat nosnap-harden build-debs bump-version check-version-bump
 
 REPO_ROOT := $(abspath .)
@@ -62,6 +62,7 @@ help:
 	@echo "  test-l10n-ime                 W4-L10N fcitx5 + zh_TW localization"
 	@echo "  test-firstboot                W5-N3 strawwu-firstboot GTK4 six-step wizard"
 	@echo "  test-finished-meta            W5-N4 install-init meta + Calamares finished zh_TW"
+	@echo "  test-context-menu             W5-D4 desktop remove context menu + favorites sync"
 	@echo "  purge-ubuntu-telemetry        chroot purge apport/whoopsie/ubuntu-pro/snapd (needs root)"
 	@echo "  install-flatpak-setup         chroot install flatpak + strawwu-flatpak-setup (needs root)"
 	@echo "  install-bug-reporter          chroot install strawwu-bug-reporter (needs root)"
@@ -99,6 +100,7 @@ preflight:
 	bash tests/preflight/test-l10n-ime.sh
 	bash tests/preflight/test-firstboot.sh
 	bash tests/preflight/test-finished-meta.sh
+	bash tests/preflight/test-context-menu.sh
 
 preflight-dev-vm:
 	bash tests/preflight/test-dev-vm-ready.sh
@@ -282,6 +284,9 @@ test-firstboot:
 
 test-finished-meta:
 	bash tests/preflight/test-finished-meta.sh
+
+test-context-menu:
+	bash tests/preflight/test-context-menu.sh
 
 install-calamares-settings:
 	sudo bash $(SCRIPTS)/chroot-install-calamares-settings.sh

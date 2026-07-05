@@ -41,10 +41,25 @@ fn run(cmd: Command) -> Result<(), i32> {
             kind,
             source,
             install_path,
+            desktop_entry,
             protected,
             backend,
-        } => cmd_register(id, name, kind, source, install_path, protected, backend),
+        } => cmd_register(
+            id,
+            name,
+            kind,
+            source,
+            install_path,
+            desktop_entry,
+            protected,
+            backend,
+        ),
         Command::Remove { id, dry_run, json } => cmd_remove(&id, dry_run, json),
+        Command::RemoveByDesktop {
+            desktop,
+            dry_run,
+            json,
+        } => cmd_remove_by_desktop(&desktop, dry_run, json),
         Command::Validate { path } => cmd_validate(path),
     }
 }
@@ -100,12 +115,13 @@ fn cmd_register(
     kind: strawwu_app_registry::AppKind,
     source: strawwu_app_registry::AppSource,
     install_path: Option<String>,
+    desktop_entry: Option<String>,
     protected: bool,
     backend: Option<strawwu_app_registry::ExecutionBackend>,
 ) -> Result<(), i32> {
     let mut store = open_store()?;
     match store.register_new(
-        &id, &name, kind, source, install_path, protected, backend,
+        &id, &name, kind, source, install_path, desktop_entry, protected, backend,
     ) {
         Ok(app) => {
             println!(
@@ -136,6 +152,32 @@ fn cmd_remove(id: &str, dry_run: bool, json: bool) -> Result<(), i32> {
         }
         Err(e) => {
             eprintln!("strawwu-app-registry: remove failed: {e}");
+            Err(exit_code(&e))
+        }
+    }
+}
+
+fn cmd_remove_by_desktop(desktop: &str, dry_run: bool, json: bool) -> Result<(), i32> {
+    let mut store = open_store()?;
+    match store.remove_by_desktop(desktop, dry_run) {
+        Ok(preview) => {
+            if json {
+                println!("{}", serde_json::to_string_pretty(&preview).unwrap());
+            } else if dry_run {
+                println!(
+                    "strawwu-app-registry: dry-run remove {} via desktop ({})",
+                    preview.id, preview.name
+                );
+            } else {
+                println!(
+                    "strawwu-app-registry: removed {} via desktop ({})",
+                    preview.id, preview.name
+                );
+            }
+            Ok(())
+        }
+        Err(e) => {
+            eprintln!("strawwu-app-registry: remove-by-desktop failed: {e}");
             Err(exit_code(&e))
         }
     }
@@ -195,8 +237,11 @@ COMMANDS:
     show <id> [--json]                Show one app entry
     register --id <id> --name <name> [--kind win32|linux|flatpak|native]
              [--source installer|launcher|flatpak|seed|manual]
-             [--install-path <path>] [--protected] [--backend native|container|microvm]
+             [--install-path <path>] [--desktop-entry <path>] [--protected]
+             [--backend native|container|microvm]
     remove <id> [--dry-run] [--json]  Mark app removed (protected apps rejected)
+    remove-by-desktop <path> [--dry-run] [--json]
+                                      Resolve app from .desktop path and mark removed
     validate [path]                   Validate registry JSON (default: /var/lib/strawwu/app-registry.json)
     version                           Show version
     help                              Show this help

@@ -1,0 +1,18 @@
+schema: strawwu-desktop-actions-manifest/v1
+wave: W5-D4
+registry_path: /var/lib/strawwu/app-registry.json
+registry_cli: /usr/bin/strawwu-app-registry
+remove_cli: /usr/bin/strawwu-desktop-remove
+nautilus_script: /usr/share/nautilus/scripts/Remove from StrawWU
+desktop_action:
+  id: RemoveFromStrawWU
+  exec: strawwu-desktop-remove --desktop %f
+  x_key: X-StrawWU-App-Id
+favorites:
+  schema: org.gnome.shell
+  key: favorite-apps
+  sync_on_remove: true
+  sync_on_register: true
+i18n:
+  en: /usr/share/strawwu/desktop-actions/locale/desktop-actions.en.yaml
+  zh_TW: /usr/share/strawwu/desktop-actions/locale/desktop-actions.zh_TW.yaml

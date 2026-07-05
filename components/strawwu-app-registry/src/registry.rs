@@ -4,6 +4,7 @@ use std::path::{Path, PathBuf};
 
 use thiserror::Error;
 
+use crate::desktop::{find_by_desktop, slug_from_desktop_basename};
 use crate::entry::{AppEntry, AppKind, AppRegistryFile, AppSource, ExecutionBackend, InstallState};
 use crate::paths::{default_log_path, default_registry_path, ensure_parent_dir};
 use crate::validate::validate_registry;
@@ -108,15 +109,35 @@ impl RegistryStore {
         kind: AppKind,
         source: AppSource,
         install_path: Option<String>,
+        desktop_entry: Option<String>,
         protected: bool,
         backend: Option<ExecutionBackend>,
     ) -> Result<&AppEntry, RegistryError> {
         let mut entry = AppEntry::new(id, name, kind, source);
         entry.install_path = install_path;
+        entry.desktop_entry = desktop_entry;
         entry.protected = protected;
         entry.execution_backend = backend.or(Some(ExecutionBackend::Native));
         self.register(entry)?;
         Ok(self.data.find(id).expect("just inserted"))
+    }
+
+    pub fn find_by_desktop_path(&self, raw: &str) -> Option<&AppEntry> {
+        find_by_desktop(&self.data, raw)
+    }
+
+    pub fn resolve_id_for_desktop(&self, raw: &str) -> Option<String> {
+        if let Some(app) = self.find_by_desktop_path(raw) {
+            return Some(app.id.clone());
+        }
+        slug_from_desktop_basename(std::path::Path::new(raw))
+    }
+
+    pub fn remove_by_desktop(&mut self, raw: &str, dry_run: bool) -> Result<RemovePreview, RegistryError> {
+        let id = self
+            .resolve_id_for_desktop(raw)
+            .ok_or_else(|| RegistryError::NotFound(raw.to_string()))?;
+        self.remove(&id, dry_run)
     }
 
     /// Register or refresh an app launched via `strawwu run` (W4-W1).
@@ -148,6 +169,7 @@ impl RegistryStore {
             kind,
             AppSource::Launcher,
             install_path,
+            None,
             false,
             backend,
         )
@@ -278,6 +300,7 @@ mod tests {
                 AppKind::Win32,
                 AppSource::Installer,
                 Some("/opt/strawwu/apps/demo".into()),
+                None,
                 false,
                 None,
             )
@@ -304,6 +327,7 @@ mod tests {
                 "System",
                 AppKind::Native,
                 AppSource::Seed,
+                None,
                 None,
                 true,
                 None,
@@ -347,5 +371,31 @@ mod tests {
         assert_eq!(app.install_path.as_deref(), Some("/opt/demo2"));
         assert_eq!(app.source, AppSource::Launcher);
         assert_eq!(app.execution_backend, Some(ExecutionBackend::Container));
+    }
+
+    #[test]
+    fn remove_by_desktop_resolves_entry() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("registry.json");
+        let mut store = RegistryStore::open_at(path).unwrap();
+        store
+            .register_new(
+                "demo-app",
+                "Demo App",
+                AppKind::Win32,
+                AppSource::Manual,
+                None,
+                Some("/tmp/demo-app.desktop".into()),
+                false,
+                None,
+            )
+            .unwrap();
+
+        let preview = store.remove_by_desktop("/tmp/demo-app.desktop", true).unwrap();
+        assert_eq!(preview.id, "demo-app");
+        assert_eq!(store.list_active().len(), 1);
+
+        store.remove_by_desktop("demo-app.desktop", false).unwrap();
+        assert!(store.list_active().is_empty());
     }
 }

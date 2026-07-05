@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-05T07:45:46.654034",
+  "generated_at": "2026-07-05T08:24:13.094093",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 22,
-  "failed": 25,
+  "passed": 23,
+  "failed": 24,
   "all_pass": false,
   "stages": [
     {
@@ -118,12 +118,12 @@
     },
     {
       "id": "w5-n4-finished-meta",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w5-d4-context-menu",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "pass": false
     },
     {

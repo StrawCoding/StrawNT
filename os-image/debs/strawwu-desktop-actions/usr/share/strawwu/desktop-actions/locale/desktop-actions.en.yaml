@@ -1,0 +1,5 @@
+remove_label: Remove from StrawWU
+remove_confirm: Remove "{name}" from StrawWU? This marks the app as removed in the registry.
+protected_error: "{name}" is protected and cannot be removed.
+not_registered: No StrawWU app is linked to this shortcut.
+favorites_synced: Removed from favorites.

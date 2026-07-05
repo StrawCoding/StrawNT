@@ -1,0 +1,8 @@
+#!/bin/bash
+# Nautilus script — Remove from StrawWU (W5-D4).
+set -euo pipefail
+
+while IFS= read -r file; do
+    [[ -n "${file}" ]] || continue
+    strawwu-desktop-remove --desktop "${file}" || true
+done

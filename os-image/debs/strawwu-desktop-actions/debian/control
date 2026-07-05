@@ -1,0 +1,13 @@
+Package: strawwu-desktop-actions
+Version: __VERSION__
+Section: admin
+Priority: optional
+Architecture: all
+Depends: python3,
+         gsettings-desktop-schemas
+Recommends: nautilus
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU desktop context menu remove + favorites sync
+ Nautilus right-click "Remove from StrawWU", Desktop Action injection,
+ and GNOME favorites sync for app-registry entries. Ships
+ strawwu-app-registry CLI for target installs.

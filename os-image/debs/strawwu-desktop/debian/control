@@ -6,6 +6,7 @@ Architecture: amd64
 Depends: strawwu-session,
          strawwu-shell,
          strawwu-l10n-ime,
+         strawwu-desktop-actions,
          gdm3,
          gnome-control-center,
          gnome-settings-daemon,

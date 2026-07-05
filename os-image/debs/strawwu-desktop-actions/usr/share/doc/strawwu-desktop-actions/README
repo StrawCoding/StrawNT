@@ -1,0 +1,7 @@
+strawwu-desktop-actions — desktop context menu remove + favorites sync
+
+Right-click a .desktop shortcut in Nautilus and choose "Remove from StrawWU"
+to mark the app removed in /var/lib/strawwu/app-registry.json and drop it
+from GNOME shell favorites.
+
+See docs/plans/strawwu-app-registry-plan.md
