@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+
+FLATHUB_URL="https://dl.flathub.org/repo/flathub.flatpakrepo"
+
+if ! command -v flatpak >/dev/null 2>&1; then
+    echo "strawwu-flatpak-setup: flatpak CLI missing — aborting postinst" >&2
+    exit 1
+fi
+
+flatpak remote-add --if-not-exists --system flathub "${FLATHUB_URL}"
+
+if flatpak remotes --system 2>/dev/null | awk '{print $1}' | grep -qx flathub; then
+    echo "strawwu-flatpak-setup: flathub system remote registered"
+else
+    echo "strawwu-flatpak-setup: flathub remote not visible after add" >&2
+    exit 1
+fi

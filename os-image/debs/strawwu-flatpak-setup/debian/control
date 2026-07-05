@@ -1,0 +1,10 @@
+Package: strawwu-flatpak-setup
+Version: __VERSION__
+Section: admin
+Priority: optional
+Architecture: all
+Depends: flatpak
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU Flatpak / Flathub baseline setup
+ Registers Flathub as the default system-wide Flatpak remote
+ for StrawWU. Does not pre-install runtimes or applications.

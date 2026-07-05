@@ -59,10 +59,22 @@ list_squashfs_packages() {
     fi
 }
 
+_dpkg_pkg_installed() {
+    local pkg="$1"
+    local list_fn="$2"
+    local tmp
+    tmp="$(mktemp)"
+    "${list_fn}" > "${tmp}"
+    grep -qxF "${pkg}" "${tmp}"
+    local rc=$?
+    rm -f "${tmp}"
+    return "${rc}"
+}
+
 package_installed_in_squashfs() {
     local pkg="$1"
     has_squashfs || return 1
-    list_squashfs_packages | grep -qx "${pkg}"
+    _dpkg_pkg_installed "${pkg}" list_squashfs_packages
 }
 
 list_rootfs_packages() {
@@ -74,7 +86,7 @@ list_rootfs_packages() {
 package_installed_in_rootfs() {
     local pkg="$1"
     has_rootfs || return 1
-    list_rootfs_packages | grep -qx "${pkg}"
+    _dpkg_pkg_installed "${pkg}" list_rootfs_packages
 }
 
 package_installed_in_filesystem() {

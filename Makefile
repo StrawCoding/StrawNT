@@ -2,8 +2,8 @@
 	build-iso dev-iso release-iso repack-iso validate-rootfs boot-test-iso boot-test-dev-iso \
 	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
-	test-install-e2e test-wincompat test-wave0-baseline test-wave-all-pass test-purge-baseline purge-ubuntu-telemetry \
-	build-debs bump-version check-version-bump
+	test-install-e2e test-wincompat 	test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak purge-ubuntu-telemetry \
+	install-flatpak-setup build-debs bump-version check-version-bump
 
 REPO_ROOT := $(abspath .)
 SCRIPTS   := os-image/scripts
@@ -40,12 +40,15 @@ help:
 	@echo "  test-wave0-baseline           Wave 0 preflight baselines (12 scripts + JSON)"
 	@echo "  test-wave-all-pass            Verify all 47 wave stages PASS (MVP closeout gate)"
 	@echo "  test-purge-baseline           W1-B1 telemetry/pro/snap purge verification"
+	@echo "  test-flatpak                  W1-F1 flatpak + flathub remote verification"
 	@echo "  purge-ubuntu-telemetry        chroot purge apport/whoopsie/ubuntu-pro/snapd (needs root)"
+	@echo "  install-flatpak-setup         chroot install flatpak + strawwu-flatpak-setup (needs root)"
 
 preflight:
 	bash tests/preflight/test-ubuntu-clone.sh
 	bash tests/preflight/test-branding.sh
 	bash tests/preflight/test-purge-baseline.sh
+	bash tests/preflight/test-flatpak.sh
 
 preflight-dev-vm:
 	bash tests/preflight/test-dev-vm-ready.sh
@@ -157,6 +160,12 @@ test-wave-all-pass:
 
 test-purge-baseline:
 	bash tests/preflight/test-purge-baseline.sh
+
+test-flatpak:
+	bash tests/preflight/test-flatpak.sh
+
+install-flatpak-setup:
+	sudo bash $(SCRIPTS)/chroot-install-flatpak-setup.sh
 
 purge-ubuntu-telemetry:
 	sudo bash $(SCRIPTS)/chroot-purge-ubuntu-telemetry.sh

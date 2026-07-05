@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-04T14:48:50.892210",
+  "generated_at": "2026-07-05T01:06:30.789177",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 1,
-  "failed": 46,
+  "passed": 2,
+  "failed": 45,
   "all_pass": false,
   "stages": [
     {
@@ -13,8 +13,8 @@
     },
     {
       "id": "w1-b1-purge",
-      "status": "IN_PROGRESS",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w1-f1-flathub",
