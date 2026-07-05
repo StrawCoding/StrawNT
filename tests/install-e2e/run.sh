@@ -63,12 +63,12 @@ main() {
     prepare_blank_disk "${DISK_IMG}"
     : > "${LIVE_LOG}"
 
-    mapfile -t disk_args < <(qemu_disk_args "${DISK_IMG}")
+    load_qemu_disk_args "${DISK_IMG}"
 
     qemu-system-x86_64 \
         -m 3072 -smp 2 -no-reboot -machine accel=kvm:tcg -cpu max \
         -cdrom "${ISO}" \
-        "${disk_args[@]}" \
+        "${QEMU_DISK_ARGS[@]}" \
         -boot d \
         -serial "file:${LIVE_LOG}" \
         -display none \
@@ -118,9 +118,11 @@ main() {
     local boot_log="${LOG_DIR}/installed-boot.log"
     : > "${boot_log}"
 
+    load_qemu_disk_args "${DISK_IMG}"
+
     qemu-system-x86_64 \
         -m 3072 -smp 2 -no-reboot -machine accel=kvm:tcg \
-        "${disk_args[@]}" \
+        "${QEMU_DISK_ARGS[@]}" \
         -boot c \
         -serial "file:${boot_log}" \
         -display none \

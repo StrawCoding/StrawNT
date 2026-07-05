@@ -1,0 +1,15 @@
+{
+  "schema": "strawwu-install-firstboot-e2e-baseline/v1",
+  "wave": "W6-N5",
+  "version": "0.4.1.33",
+  "firstboot_marker": "FIRSTBOOT_OK",
+  "runner": "tests/install-e2e/run-firstboot-e2e.sh",
+  "overlay_sync": "tests/install-e2e/sync-firstboot-overlay.sh",
+  "result_json": "tests/install-e2e/output/firstboot-e2e-result.json",
+  "boot_service": "strawwu-firstboot-e2e.service",
+  "cli_flag": "--e2e",
+  "depends_on": [
+    "validate-calamares-preflight",
+    "validate-partition-probe"
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-hub-settings-baseline/v1",
   "wave": "W4-D3",
-  "version": "0.4.1.32",
+  "version": "0.4.1.33",
   "package": "strawwu-hub",
   "role": "system-settings-center",
   "desktop_categories": [

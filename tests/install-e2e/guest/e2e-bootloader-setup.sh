@@ -63,7 +63,9 @@ GRUBCFG
 cat > "$ROOT/etc/systemd/system/strawwu-boot-marker.service" <<'SVC'
 [Unit]
 Description=StrawWU E2E Boot Marker
-After=multi-user.target
+DefaultDependencies=no
+After=local-fs.target sysinit.target
+Before=multi-user.target
 
 [Service]
 Type=oneshot
@@ -76,6 +78,33 @@ SVC
 mkdir -p "$ROOT/etc/systemd/system/multi-user.target.wants"
 ln -sf /etc/systemd/system/strawwu-boot-marker.service \
     "$ROOT/etc/systemd/system/multi-user.target.wants/strawwu-boot-marker.service"
+
+# Firstboot E2E: headless completion + serial FIRSTBOOT_OK (runs after multi-user, no cycle).
+OVERLAY="/mnt/strawwu-e2e/firstboot-e2e-overlay"
+if [ -d "$OVERLAY/usr/lib/strawwu-firstboot" ]; then
+    mkdir -p "$ROOT/usr/lib/strawwu-firstboot" "$ROOT/usr/bin"
+    cp -f "$OVERLAY/usr/lib/strawwu-firstboot/"*.py "$ROOT/usr/lib/strawwu-firstboot/" 2>/dev/null || true
+    cp -f "$OVERLAY/usr/bin/strawwu-firstboot" "$ROOT/usr/bin/strawwu-firstboot" 2>/dev/null || true
+    chmod 755 "$ROOT/usr/bin/strawwu-firstboot" 2>/dev/null || true
+    echo "Firstboot E2E overlay applied from 9p guest share"
+fi
+
+cat > "$ROOT/etc/systemd/system/strawwu-firstboot-e2e.service" <<'FBsvc'
+[Unit]
+Description=StrawWU firstboot E2E (headless)
+After=multi-user.target strawwu-boot-marker.service
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/sh -c 'command -v strawwu-initd >/dev/null && strawwu-initd init || true'
+ExecStart=/usr/bin/strawwu-firstboot run --e2e
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+FBsvc
+ln -sf /etc/systemd/system/strawwu-firstboot-e2e.service \
+    "$ROOT/etc/systemd/system/multi-user.target.wants/strawwu-firstboot-e2e.service"
 
 # Generate GRUB config
 chroot "$ROOT" update-grub 2>&1 || chroot "$ROOT" grub-mkconfig -o /boot/grub/grub.cfg 2>&1 || true

@@ -28,13 +28,13 @@ main() {
     local serial_port waited=0 status="FAIL" reason=""
     serial_port="$(find_free_tcp_port)"
 
-    mapfile -t disk_args < <(qemu_disk_args "${DISK_IMG}")
+    load_qemu_disk_args "${DISK_IMG}"
 
     qemu_pid=""
     qemu-system-x86_64 \
         -m 2048 -smp 2 -no-reboot -machine accel=kvm:tcg -cpu max \
         -cdrom "${ISO}" \
-        "${disk_args[@]}" \
+        "${QEMU_DISK_ARGS[@]}" \
         -boot d \
         -serial "file:${PROBE_LOG}" \
         -display none \

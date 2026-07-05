@@ -136,6 +136,24 @@ class FirstbootTests(unittest.TestCase):
         self.assertEqual(0, proc.returncode, proc.stderr)
         self.assertIn("dry-run", proc.stdout)
 
+    def test_run_e2e_writes_state(self) -> None:
+        if not INITD_CLI.exists():
+            self.skipTest("strawwu-initd CLI not present")
+        os.environ["PATH"] = f"{INITD_CLI.parent}:{os.environ.get('PATH', '')}"
+        subprocess.run([str(INITD_CLI), "init"], check=True)
+        rc = self.core.run_e2e()
+        self.assertEqual(0, rc)
+        proc = subprocess.run(
+            [str(INITD_CLI), "get", "lifecycle.firstboot"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        self.assertEqual("done", proc.stdout.strip())
+
+    def test_e2e_marker_constant(self) -> None:
+        self.assertEqual("FIRSTBOOT_OK", self.core.E2E_MARKER)
+
 
 if __name__ == "__main__":
     unittest.main()

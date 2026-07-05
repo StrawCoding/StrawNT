@@ -7,7 +7,7 @@ E2E_DIR="${REPO_ROOT}/tests/install-e2e"
 OUT_DIR="${E2E_DIR}/output"
 LOG_DIR="${OUT_DIR}/logs"
 GUEST_SHARE="${E2E_DIR}/guest"
-VERSION="${STRAWWU_VERSION:-0.3.0.0}"
+VERSION="${STRAWWU_VERSION:-$(tr -d '[:space:]' < "${REPO_ROOT}/VERSION" 2>/dev/null || echo 0.4.0.0)}"
 ISO_PATH="${STRAWWU_ISO_PATH:-${REPO_ROOT}/os-image/output/StrawWU-${VERSION}-amd64.iso}"
 
 DISK_IF="${STRAWWU_E2E_DISK_IF:-virtio}"
@@ -15,6 +15,7 @@ DISK_SIZE="${STRAWWU_E2E_DISK_SIZE:-8G}"
 MARKER_DESKTOP="${STRAWWU_E2E_DESKTOP_MARKER:-STRAWWU-DESKTOP-OK}"
 MARKER_BOOT="${STRAWWU_E2E_BOOT_MARKER:-STRAWWU_BOOT_OK}"
 MARKER_INSTALL="${STRAWWU_E2E_INSTALL_MARKER:-STRAWWU-CALAMARES-INSTALL-OK}"
+MARKER_FIRSTBOOT="${STRAWWU_E2E_FIRSTBOOT_MARKER:-FIRSTBOOT_OK}"
 
 log() { echo "==> $*" >&2; }
 warn() { echo "WARNING: $*" >&2; }
@@ -58,6 +59,21 @@ qemu_disk_args() {
             -device scsi-hd,drive=e2edisk0
     else
         printf '%s\n' -drive "file=${img},format=raw,if=virtio"
+    fi
+}
+
+# Populate QEMU_DISK_ARGS without process substitution (some CI shells lack /dev/fd).
+load_qemu_disk_args() {
+    local img="$1"
+    QEMU_DISK_ARGS=()
+    if [[ "${DISK_IF}" == "scsi" ]]; then
+        QEMU_DISK_ARGS=(
+            -device virtio-scsi-pci,id=scsi0
+            -drive "file=${img},format=raw,if=none,id=e2edisk0"
+            -device scsi-hd,drive=e2edisk0
+        )
+    else
+        QEMU_DISK_ARGS=(-drive "file=${img},format=raw,if=virtio")
     fi
 }
 

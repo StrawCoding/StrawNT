@@ -129,6 +129,19 @@ else
     fail "autostart desktop missing --autostart"
 fi
 
+if grep -q 'run_e2e' "${DEB_DIR}/usr/lib/strawwu-firstboot/core.py" \
+    && grep -q 'FIRSTBOOT_OK' "${DEB_DIR}/usr/lib/strawwu-firstboot/core.py"; then
+    pass "core.py E2E marker + run_e2e"
+else
+    fail "core.py missing E2E marker or run_e2e"
+fi
+
+if grep -q '\-\-e2e' "${DEB_DIR}/usr/bin/strawwu-firstboot"; then
+    pass "CLI supports --e2e"
+else
+    fail "CLI missing --e2e flag"
+fi
+
 if python3 "${UNIT_TEST}"; then
     pass "firstboot unit tests"
 else
