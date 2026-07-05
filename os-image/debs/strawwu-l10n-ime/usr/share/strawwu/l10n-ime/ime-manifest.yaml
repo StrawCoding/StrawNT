@@ -1,0 +1,15 @@
+schema: strawwu-ime-manifest/v1
+framework: fcitx5
+default_engine: chewing
+engines:
+  - id: chewing
+    label: 注音
+    package: fcitx5-chewing
+  - id: cangjie5
+    label: 倉頡五代
+    package: fcitx5-table-cangjie5
+environment:
+  GTK_IM_MODULE: fcitx
+  QT_IM_MODULE: fcitx
+  XMODIFIERS: "@im=fcitx"
+  SDL_IM_MODULE: fcitx

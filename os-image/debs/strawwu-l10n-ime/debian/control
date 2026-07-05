@@ -1,0 +1,23 @@
+Package: strawwu-l10n-ime
+Version: __VERSION__
+Section: localization
+Priority: optional
+Architecture: all
+Depends: fcitx5,
+         fcitx5-chewing,
+         fcitx5-table-cangjie5,
+         fcitx5-frontend-gtk3,
+         fcitx5-frontend-gtk4,
+         fcitx5-frontend-qt5,
+         fcitx5-frontend-qt6,
+         fcitx5-module-wayland,
+         fonts-noto-cjk,
+         im-config,
+         locales
+Recommends: fcitx5-config-qt,
+            language-pack-zh-hant,
+            language-pack-gnome-zh-hant
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU Traditional Chinese localization and IME stack
+ Ships fcitx5 with Chewing (Bopomofo) and Cangjie5, Noto Sans CJK fonts,
+ GTK/Qt/Wayland frontends, and system IME environment defaults for zh_TW.

@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+
+case "${1}" in
+    configure)
+        if command -v im-config >/dev/null 2>&1; then
+            im-config -n fcitx5 2>/dev/null || true
+        fi
+        ;;
+esac
+
+echo "strawwu-l10n-ime: fcitx5 + zh_TW locale defaults installed"
+
+exit 0

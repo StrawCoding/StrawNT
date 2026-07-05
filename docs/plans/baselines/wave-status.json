@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-05T06:42:17.335068",
+  "generated_at": "2026-07-05T07:14:41.136851",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 19,
-  "failed": 28,
+  "passed": 20,
+  "failed": 27,
   "all_pass": false,
   "stages": [
     {
@@ -103,8 +103,8 @@
     },
     {
       "id": "w4-w1-registry-launcher",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w4-l10n-ime",

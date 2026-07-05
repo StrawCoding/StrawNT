@@ -1,0 +1,13 @@
+schema: strawwu-l10n-policy/v1
+default_locale: zh_TW.UTF-8
+supported_locales:
+  - zh_TW.UTF-8
+  - en_US.UTF-8
+input_method:
+  framework: fcitx5
+  default_engine: chewing
+  engines:
+    - chewing
+    - cangjie5
+fonts:
+  - fonts-noto-cjk

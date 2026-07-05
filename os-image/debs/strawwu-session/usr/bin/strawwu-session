@@ -6,6 +6,11 @@ set -e
 export GNOME_SHELL_SESSION_MODE=strawwu
 export XDG_CURRENT_DESKTOP=StrawWU:GNOME
 
+export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=fcitx
+export XMODIFIERS=@im=fcitx
+export SDL_IM_MODULE=fcitx
+
 if [ -f /var/lib/strawwu/setup/state.json ] && command -v strawwu-initd >/dev/null 2>&1; then
     strawwu-initd set lifecycle.boot_selfcheck done 2>/dev/null || true
 fi

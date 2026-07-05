@@ -8,4 +8,5 @@ packages:
   - strawwu-update-notifier
   - strawwu-bug-reporter
   - strawwu-flatpak-setup
+  - strawwu-l10n-ime
   - strawwu-desktop

@@ -5,6 +5,7 @@ Priority: optional
 Architecture: amd64
 Depends: strawwu-session,
          strawwu-shell,
+         strawwu-l10n-ime,
          gdm3,
          gnome-control-center,
          gnome-settings-daemon,
@@ -23,9 +24,7 @@ Recommends: firefox,
             file-roller,
             evince,
             gnome-calculator,
-            gnome-system-monitor,
-            ibus,
-            im-config
+            gnome-system-monitor
 Maintainer: StrawCoding <apt@wastebase.xyz>
 Description: StrawWU desktop meta package
  Meta package for the StrawWU desktop environment. Replaces

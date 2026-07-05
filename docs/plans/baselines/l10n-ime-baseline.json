@@ -1,0 +1,28 @@
+{
+  "schema": "strawwu-l10n-ime-baseline/v1",
+  "wave": "W4-L10N",
+  "version": "0.4.1.21",
+  "package": "strawwu-l10n-ime",
+  "framework": "fcitx5",
+  "default_engine": "chewing",
+  "engines": [
+    "chewing",
+    "cangjie5"
+  ],
+  "default_locale": "zh_TW.UTF-8",
+  "supported_locales": [
+    "zh_TW.UTF-8",
+    "en_US.UTF-8"
+  ],
+  "fonts": [
+    "fonts-noto-cjk"
+  ],
+  "manifest": "usr/share/strawwu/l10n-ime/ime-manifest.yaml",
+  "locale_policy": "usr/share/strawwu/l10n-ime/locale-policy.yaml",
+  "environment": {
+    "GTK_IM_MODULE": "fcitx",
+    "QT_IM_MODULE": "fcitx",
+    "XMODIFIERS": "@im=fcitx"
+  },
+  "replaces_ibus": true
+}
