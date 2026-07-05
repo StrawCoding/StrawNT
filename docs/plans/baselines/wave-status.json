@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-05T05:21:33.339900",
+  "generated_at": "2026-07-05T05:36:09.110352",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 14,
-  "failed": 33,
+  "passed": 15,
+  "failed": 32,
   "all_pass": false,
   "stages": [
     {
@@ -78,8 +78,8 @@
     },
     {
       "id": "w3-w0-wincompat-baseline",
-      "status": "IN_PROGRESS",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w4-d2-strawwu-shell",
