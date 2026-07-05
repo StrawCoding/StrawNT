@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+"""StrawWU target setup CLI — Calamares chroot hook and rescue repair."""
+from __future__ import annotations
+
+import argparse
+import importlib.util
+import sys
+from pathlib import Path
+
+_CORE = Path(__file__).resolve().parent.parent / "lib" / "strawwu-target-setup" / "core.py"
+_spec = importlib.util.spec_from_file_location("strawwu_target_setup_core", _CORE)
+_mod = importlib.util.module_from_spec(_spec)
+assert _spec.loader is not None
+_spec.loader.exec_module(_mod)
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="strawwu-target-setup",
+        description="Configure installed StrawWU target (Calamares chroot hook).",
+    )
+    parser.add_argument(
+        "--repair-only",
+        action="store_true",
+        help="Rescue mode: repair state and reinstall staged debs",
+    )
+    parser.add_argument(
+        "--calamares-chroot",
+        action="store_true",
+        help="Invoked by Calamares shellprocess inside target chroot",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Log actions without modifying the system",
+    )
+    sub = parser.add_subparsers(dest="command")
+    sub.add_parser("run", help="Run full target setup (default)")
+    sub.add_parser("version", help="Print version")
+
+    args = parser.parse_args(argv)
+    if args.command == "version":
+        return _mod.cmd_version()
+
+    if args.command not in (None, "run") and not args.calamares_chroot:
+        parser.print_help()
+        return 2
+
+    return _mod.run_target_setup(repair_only=args.repair_only, dry_run=args.dry_run)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

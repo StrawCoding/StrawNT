@@ -1,0 +1,11 @@
+Package: strawwu-target-setup
+Version: __VERSION__
+Section: admin
+Priority: optional
+Architecture: all
+Depends: strawwu-initd, python3
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU Calamares target chroot setup hook
+ Runs post-install configuration inside the Calamares chroot:
+ initializes setup state, installs staged StrawWU debs, and
+ records lifecycle.target_setup. Supports --repair-only for rescue.

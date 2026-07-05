@@ -1,6 +1,6 @@
 {
   "name": "strawwu-hub",
-  "version": "0.4.1.12",
+  "version": "0.4.1.13",
   "description": "StrawWU Desktop Control Center — subsystem status, logs, and update channel management",
   "main": "src/main/main.js",
   "scripts": {

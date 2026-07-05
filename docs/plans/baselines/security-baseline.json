@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-security-baseline/v1",
   "generated_at": "2026-07-05",
-  "version": "0.4.1.12",
+  "version": "0.4.1.13",
   "telemetry": {
     "default_upload": false,
     "purged_packages": [

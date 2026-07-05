@@ -1,0 +1,9 @@
+schema: strawwu-target-manifest/v1
+# Ordered deb installs during Calamares chroot (staged-debs/*.deb).
+packages:
+  - strawwu-initd
+  - strawwu-session
+  - strawwu-update-notifier
+  - strawwu-bug-reporter
+  - strawwu-flatpak-setup
+  - strawwu-desktop

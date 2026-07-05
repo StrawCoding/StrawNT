@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+LOG_DIR="/var/log/strawwu"
+STAGED="/usr/share/strawwu/target-setup/staged-debs"
+
+install -d -m 0755 "${LOG_DIR}"
+install -d -m 0755 "${STAGED}"
+
+echo "strawwu-target-setup: installed (Calamares chroot hook ready)"
+
+exit 0
