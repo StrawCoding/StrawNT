@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-update-notifier-baseline/v1",
   "wave": "W3-B3",
-  "version": "0.4.1.23",
+  "version": "0.4.1.25",
   "package": "strawwu-update-notifier",
   "replaces": "update-notifier",
   "log_path": "/var/log/strawwu/update.log",

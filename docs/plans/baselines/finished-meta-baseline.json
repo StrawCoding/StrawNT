@@ -1,0 +1,25 @@
+{
+  "schema": "strawwu-finished-meta-baseline/v1",
+  "wave": "W5-N4",
+  "version": "0.4.1.25",
+  "package": "strawwu-install-init",
+  "depends": [
+    "strawwu-initd",
+    "strawwu-target-setup",
+    "strawwu-firstboot"
+  ],
+  "manifest": "usr/share/strawwu/install-init/install-init-manifest.yaml",
+  "target_manifest_entry": "strawwu-install-init",
+  "calamares": {
+    "finished_conf": "etc/calamares/modules/finished.conf",
+    "lang_qm": "usr/share/calamares/lang/calamares_zh_TW.qm",
+    "lang_ts": "usr/share/calamares/lang/calamares_zh_TW.ts",
+    "finished_copy": "usr/share/strawwu/installer/finished-copy.yaml"
+  },
+  "firstboot_l10n": "usr/share/strawwu/locale/firstboot.zh_TW.yaml",
+  "lifecycle": [
+    "initd",
+    "target_setup",
+    "firstboot"
+  ]
+}

@@ -1,0 +1,11 @@
+strawwu-install-init — Install initialization meta package (W5-N4)
+
+Pulls in the StrawWU install-init lifecycle chain:
+
+  strawwu-initd          shared /var/lib/strawwu/setup/state.json
+  strawwu-target-setup   Calamares chroot hook (lifecycle.target_setup)
+  strawwu-firstboot      GTK4 post-login wizard (lifecycle.firstboot)
+
+Calamares finished-page zh_TW strings ship in strawwu-calamares-settings
+(/usr/share/calamares/lang/calamares_zh_TW.qm). Firstboot UI uses YAML
+locale files under strawwu-firstboot (not gettext .qm).

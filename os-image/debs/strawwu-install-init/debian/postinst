@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+case "${1}" in
+    configure)
+        ;;
+esac
+
+echo "strawwu-install-init: finished + target meta installed"
+
+exit 0

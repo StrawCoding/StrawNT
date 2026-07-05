@@ -17,6 +17,19 @@ sed "s/__VERSION__/${VERSION}/" "${SCRIPT_DIR}/debian/control" > "${PKG_DIR}/DEB
 
 cp -a "${SCRIPT_DIR}/etc" "${SCRIPT_DIR}/usr" "${PKG_DIR}/"
 
+LANG_TS="${PKG_DIR}/usr/share/calamares/lang/calamares_zh_TW.ts"
+LANG_QM="${PKG_DIR}/usr/share/calamares/lang/calamares_zh_TW.qm"
+if [[ -f "${LANG_TS}" ]]; then
+    if command -v lrelease >/dev/null 2>&1; then
+        lrelease "${LANG_TS}" -qm "${LANG_QM}"
+    elif command -v lrelease-qt5 >/dev/null 2>&1; then
+        lrelease-qt5 "${LANG_TS}" -qm "${LANG_QM}"
+    else
+        echo "ERROR: lrelease required to build calamares_zh_TW.qm" >&2
+        exit 1
+    fi
+fi
+
 mkdir -p "${PKG_DIR}/usr/share/doc/strawwu-calamares-settings"
 cat > "${PKG_DIR}/usr/share/doc/strawwu-calamares-settings/copyright" <<'EOF'
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/

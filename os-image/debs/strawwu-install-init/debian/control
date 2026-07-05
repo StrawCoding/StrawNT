@@ -1,0 +1,13 @@
+Package: strawwu-install-init
+Version: __VERSION__
+Section: metapackages
+Priority: optional
+Architecture: all
+Depends: strawwu-initd,
+         strawwu-target-setup,
+         strawwu-firstboot
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU install-init meta (finished + target lifecycle)
+ Meta package tying Calamares finished-page UX and target chroot setup
+ (initd, target-setup, firstboot). Calamares zh_TW finished strings ship
+ in strawwu-calamares-settings (calamares_zh_TW.qm).

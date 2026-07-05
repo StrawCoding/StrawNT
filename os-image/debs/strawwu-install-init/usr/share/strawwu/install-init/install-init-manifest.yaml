@@ -1,0 +1,42 @@
+schema: strawwu-install-init-manifest/v1
+wave: W5-N4
+description: >-
+  Install-init four-pack meta: Calamares finished UX + target chroot lifecycle.
+  Calamares exec order: packages → shellprocess@target_setup → install_marker → finished.
+
+packages:
+  meta:
+    - strawwu-install-init
+  live:
+    - strawwu-calamares-settings
+    - strawwu-live-install-ux
+  target_chroot:
+    - strawwu-initd
+    - strawwu-target-setup
+    - strawwu-wincompat
+    - strawwu-shell
+    - strawwu-session
+    - strawwu-update-notifier
+    - strawwu-bug-reporter
+    - strawwu-flatpak-setup
+    - strawwu-l10n-ime
+    - strawwu-firstboot
+    - strawwu-desktop
+  state_cli: strawwu-initd
+
+lifecycle:
+  install: installed
+  target_setup: done
+  boot_selfcheck: pending
+  firstboot: pending
+
+l10n:
+  calamares_qm: /usr/share/calamares/lang/calamares_zh_TW.qm
+  calamares_ts: /usr/share/calamares/lang/calamares_zh_TW.ts
+  branding_qm: /usr/share/calamares/branding/strawwu/lang/calamares-strawwu_zh_TW.qm
+  firstboot_yaml: /usr/share/strawwu/locale/firstboot.zh_TW.yaml
+  finished_copy: /usr/share/strawwu/installer/finished-copy.yaml
+
+finished:
+  conf: /etc/calamares/modules/finished.conf
+  copy_ref: /usr/share/strawwu/installer/finished-copy.yaml

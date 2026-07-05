@@ -4,6 +4,7 @@ Section: admin
 Priority: optional
 Architecture: all
 Depends: calamares, strawwu-calamares-settings
+Recommends: strawwu-install-init
 Maintainer: StrawCoding <apt@wastebase.xyz>
 Description: StrawWU Live installer desktop entry and finished-page copy
  Ships strawwu-install.desktop for the Live session app menu and

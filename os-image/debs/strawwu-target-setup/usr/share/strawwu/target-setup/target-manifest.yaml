@@ -10,4 +10,5 @@ packages:
   - strawwu-flatpak-setup
   - strawwu-l10n-ime
   - strawwu-firstboot
+  - strawwu-install-init
   - strawwu-desktop

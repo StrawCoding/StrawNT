@@ -1,4 +1,4 @@
-/* StrawWU Calamares install slideshow */
+/* StrawWU Calamares install slideshow (W5-N4: qsTr branding l10n) */
 import QtQuick 2.0;
 import calamares.slideshow 1.0;
 
@@ -49,13 +49,13 @@ Presentation {
                 anchors.centerIn: parent
                 spacing: 16
                 Text {
-                    text: "StrawWU 安裝程式"
+                    text: qsTr("StrawWU Installer")
                     color: "#e8e8f0"
                     font.pixelSize: 28
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
                 Text {
-                    text: "正在準備您的系統，請稍候…"
+                    text: qsTr("Preparing your system, please wait…")
                     color: "#9aa3b8"
                     font.pixelSize: 16
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -72,7 +72,12 @@ Presentation {
                 anchors.centerIn: parent
                 spacing: 12
                 Repeater {
-                    model: ["硬體偵測", "分割區配置", "系統檔案複製", "開機載入器"]
+                    model: [
+                        qsTr("Hardware detection"),
+                        qsTr("Partition layout"),
+                        qsTr("System file copy"),
+                        qsTr("Bootloader setup")
+                    ]
                     Text {
                         text: "• " + modelData
                         color: "#14b8a6"

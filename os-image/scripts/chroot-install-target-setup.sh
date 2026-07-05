@@ -56,7 +56,7 @@ build_debs() {
     local version="${STRAWWU_VERSION:-$(tr -d '[:space:]' < "${REPO_ROOT}/VERSION")}"
     local pkg
     for pkg in strawwu-initd strawwu-wincompat strawwu-shell strawwu-session strawwu-update-notifier strawwu-bug-reporter \
-        strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-desktop strawwu-live-install-ux \
+        strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-install-init strawwu-desktop strawwu-live-install-ux \
         strawwu-target-setup strawwu-calamares-settings; do
         local build="${DEBS_ROOT}/${pkg}/build-deb.sh"
         [[ -x "${build}" ]] || die "missing build script: ${build}"
@@ -105,6 +105,10 @@ stage_debs() {
     deb="$(latest_deb strawwu-calamares-settings)"
     [[ -n "${deb}" && -f "${deb}" ]] || die "strawwu-calamares-settings .deb not found"
     cp -f "${deb}" "${ROOTFS_DIR}/tmp/strawwu-calamares-settings.deb"
+
+    deb="$(latest_deb strawwu-install-init)"
+    [[ -n "${deb}" && -f "${deb}" ]] || die "strawwu-install-init .deb not found"
+    cp -f "${deb}" "${ROOTFS_DIR}/tmp/strawwu-install-init.deb"
 }
 
 install_in_chroot() {
@@ -135,12 +139,17 @@ dpkg -i /tmp/strawwu-live-install-ux.deb || apt-get install -f -y
 rm -f /tmp/strawwu-live-install-ux.deb
 dpkg -i /tmp/strawwu-calamares-settings.deb || apt-get install -f -y
 rm -f /tmp/strawwu-calamares-settings.deb
+dpkg -i /tmp/strawwu-install-init.deb || apt-get install -f -y
+rm -f /tmp/strawwu-install-init.deb
 
 command -v strawwu-target-setup >/dev/null
 command -v strawwu-initd >/dev/null
 test -f /usr/share/strawwu/target-setup/target-manifest.yaml
 test -d /usr/share/strawwu/target-setup/staged-debs
 test -f /etc/calamares/modules/shellprocess_target-setup.conf
+test -f /usr/share/calamares/lang/calamares_zh_TW.qm
+test -f /usr/share/calamares/branding/strawwu/lang/calamares-strawwu_zh_TW.qm
+test -f /usr/share/strawwu/install-init/install-init-manifest.yaml
 
 # Simulate Calamares chroot target setup on live rootfs.
 STRAWWU_TARGET_DEB_DIR=/usr/share/strawwu/target-setup/staged-debs \
@@ -228,6 +237,16 @@ sync_squashfs() {
     rsync -a \
         "${ROOTFS_DIR}/etc/calamares/" \
         "${SQUASH_SRC}/etc/calamares/" 2>/dev/null || true
+    rsync -a \
+        "${ROOTFS_DIR}/usr/share/calamares/lang/" \
+        "${SQUASH_SRC}/usr/share/calamares/lang/" 2>/dev/null || true
+    install -d "${SQUASH_SRC}/usr/share/calamares/branding/strawwu/lang"
+    rsync -a \
+        "${ROOTFS_DIR}/usr/share/calamares/branding/strawwu/lang/" \
+        "${SQUASH_SRC}/usr/share/calamares/branding/strawwu/lang/" 2>/dev/null || true
+    rsync -a \
+        "${ROOTFS_DIR}/usr/share/strawwu/install-init/" \
+        "${SQUASH_SRC}/usr/share/strawwu/install-init/" 2>/dev/null || true
     rsync -a \
         "${ROOTFS_DIR}/usr/share/gnome-shell/modes/strawwu.json" \
         "${SQUASH_SRC}/usr/share/gnome-shell/modes/" 2>/dev/null || true
