@@ -2,7 +2,7 @@
 	build-iso dev-iso release-iso repack-iso validate-rootfs boot-test-iso boot-test-dev-iso \
 	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
-	test-install-e2e test-install-firstboot-e2e test-installed-boot test-target-flathub test-wincompat test-wincompat-os test-wincompat-registry test-wincompat-gui test-wincompat-e2e test-hw-live-usb test-hw-matrix test-user-docs test-handbook test-release-manifest test-apt-repo test-ci-baseline test-ci-nightly test-perf-baseline test-perf-legal-gate test-strawwu-shell test-hub test-hub-settings test-apps-page test-flathub-hub test-l10n-ime test-firstboot test-finished-meta test-context-menu test-registry-hooks test-deep-uninstall test-initramfs-hooks test-target-identity test-greeter-session test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-initrd-overlays test-initrd-core test-initrd-bottom test-init-tools test-bug-reporter test-calamares-settings test-app-registry test-security-baseline test-observability test-legal-trademark test-desktop-stack test-live-install-ux test-update-notifier test-target-setup test-meta-audit purge-ubuntu-telemetry \
+	test-install-e2e test-install-firstboot-e2e test-installed-boot test-target-flathub test-wincompat test-wincompat-os test-wincompat-registry test-wincompat-gui test-wincompat-e2e test-hw-live-usb test-hw-matrix test-user-docs test-handbook test-mvp-closeout test-release-manifest test-apt-repo test-ci-baseline test-ci-nightly test-perf-baseline test-perf-legal-gate test-strawwu-shell test-hub test-hub-settings test-apps-page test-flathub-hub test-l10n-ime test-firstboot test-finished-meta test-context-menu test-registry-hooks test-deep-uninstall test-initramfs-hooks test-target-identity test-greeter-session test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-initrd-overlays test-initrd-core test-initrd-bottom test-init-tools test-bug-reporter test-calamares-settings test-app-registry test-security-baseline test-observability test-legal-trademark test-desktop-stack test-live-install-ux test-update-notifier test-target-setup test-meta-audit purge-ubuntu-telemetry \
 	install-flatpak-setup install-bug-reporter install-calamares-settings install-update-notifier install-target-setup install-firstboot install-wincompat nosnap-harden build-debs bump-version check-version-bump generate-release-manifest release-sign publish-debs
 
 REPO_ROOT := $(abspath .)
@@ -83,6 +83,7 @@ help:
 	@echo "  test-hw-matrix                W8-HW-MATRIX GPU/Wi-Fi/suspend/HiDPI matrix"
 	@echo "  test-user-docs                W6-DOC1 install/rescue user guides + HTML"
 	@echo "  test-handbook                 W8-DOC user+admin handbook + DOC2/DOC3 HTML"
+	@echo "  test-mvp-closeout             W8-MVP closeout DoD + HTML + wave evidence"
 	@echo "  test-release-manifest         W7-RE1+RE2 release-manifest + GPG signing"
 	@echo "  test-apt-repo                 W7-RE3+RE4 APT repo + strawwu-keyring"
 	@echo "  test-ci-baseline              W7-CI0 CI pipeline inventory + ci-baseline.json"
@@ -159,6 +160,7 @@ preflight:
 	bash tests/preflight/test-hw-live-usb.sh
 	bash tests/preflight/test-user-docs.sh
 	bash tests/preflight/test-handbook.sh
+	bash tests/preflight/test-mvp-closeout.sh
 	bash tests/preflight/test-release-manifest.sh
 	bash tests/preflight/test-apt-repo.sh
 	bash tests/preflight/test-ci-nightly.sh
@@ -421,6 +423,9 @@ test-user-docs:
 
 test-handbook:
 	python3 tests/handbook/validate-handbook.py
+
+test-mvp-closeout:
+	python3 tests/mvp-closeout/validate-mvp-closeout.py
 
 test-strawwu-shell:
 	bash tests/preflight/test-strawwu-shell.sh

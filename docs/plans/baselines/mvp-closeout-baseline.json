@@ -1,0 +1,21 @@
+{
+  "schema": "strawwu-mvp-closeout-baseline/v1",
+  "wave": "W8-MVP-closeout",
+  "version": "0.5.0.9",
+  "target_mvp": "0.5.0.0",
+  "wave_stages": 47,
+  "dod_markdown": "docs/plans/mvp-closeout/mvp-dod.md",
+  "html": "docs/plans/mvp-closeout/html/mvp-closeout-report.html",
+  "validate": "tests/mvp-closeout/validate-mvp-closeout.py",
+  "render": "tests/mvp-closeout/render-html.py",
+  "preflight": "tests/preflight/test-mvp-closeout.sh",
+  "stage_report": "docs/plans/stage-reports/W8-MVP-closeout-report.md",
+  "wave_status": "docs/plans/baselines/wave-status.json",
+  "gates": [
+    "make test-mvp-closeout",
+    "make test-wave-all-pass",
+    "make preflight"
+  ],
+  "dod": "PRD v0.5 MVP §5 + wave 47 stage evidence + HTML hermes-deliver",
+  "post_mvp_next": "u26-m1-base-clone"
+}

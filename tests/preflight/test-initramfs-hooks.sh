@@ -128,25 +128,28 @@ else
     fail "initramfs-hooks deb artifact missing"
 fi
 
-if dpkg-deb -c "${deb}" | grep -q 'etc/initramfs-tools/conf.d/strawwu-disk-boot'; then
+# Cache listing once — repeated dpkg-deb | grep -q trips pipefail on SIGPIPE.
+deb_listing="$(dpkg-deb -c "${deb}" 2>/dev/null || true)"
+
+if grep -q 'etc/initramfs-tools/conf.d/strawwu-disk-boot' <<<"${deb_listing}"; then
     pass "deb contains strawwu-disk-boot conf.d"
 else
     fail "deb missing strawwu-disk-boot conf.d"
 fi
 
-if dpkg-deb -c "${deb}" | grep -q 'usr/bin/strawwu-initramfs-hooks'; then
+if grep -q 'usr/bin/strawwu-initramfs-hooks' <<<"${deb_listing}"; then
     pass "deb contains strawwu-initramfs-hooks CLI"
 else
     fail "deb missing CLI"
 fi
 
-if dpkg-deb -c "${deb}" | grep -q 'usr/share/strawwu/initramfs-hooks/initramfs-hooks-manifest.yaml'; then
+if grep -q 'usr/share/strawwu/initramfs-hooks/initramfs-hooks-manifest.yaml' <<<"${deb_listing}"; then
     pass "deb contains initramfs-hooks manifest"
 else
     fail "deb missing manifest"
 fi
 
-if ! dpkg-deb -c "${deb}" | grep -q 'hooks/casper'; then
+if ! grep -q 'hooks/casper' <<<"${deb_listing}"; then
     pass "deb does not ship casper hook (strip-only)"
 else
     fail "deb must not ship upstream casper hook"

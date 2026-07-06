@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-06T03:50:42.038481",
+  "generated_at": "2026-07-06T04:40:53.354107",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 45,
-  "failed": 2,
+  "passed": 46,
+  "failed": 1,
   "all_pass": false,
   "stages": [
     {
@@ -233,12 +233,12 @@
     },
     {
       "id": "w8-doc-handbook",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w8-mvp-closeout",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "pass": false
     }
   ]
