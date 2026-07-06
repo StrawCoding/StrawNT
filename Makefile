@@ -2,7 +2,7 @@
 	build-iso dev-iso release-iso repack-iso validate-rootfs boot-test-iso boot-test-dev-iso \
 	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
-	test-install-e2e test-install-firstboot-e2e test-installed-boot test-target-flathub test-wincompat test-wincompat-os test-wincompat-registry test-wincompat-gui test-wincompat-e2e test-hw-live-usb test-user-docs test-release-manifest test-apt-repo test-strawwu-shell test-hub test-hub-settings test-apps-page test-flathub-hub test-l10n-ime test-firstboot test-finished-meta test-context-menu test-registry-hooks test-deep-uninstall test-target-identity test-greeter-session test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-init-tools test-bug-reporter test-calamares-settings test-app-registry test-security-baseline test-observability test-legal-trademark test-desktop-stack test-live-install-ux test-update-notifier test-target-setup test-meta-audit purge-ubuntu-telemetry \
+	test-install-e2e test-install-firstboot-e2e test-installed-boot test-target-flathub test-wincompat test-wincompat-os test-wincompat-registry test-wincompat-gui test-wincompat-e2e test-hw-live-usb test-user-docs test-release-manifest test-apt-repo test-ci-baseline test-ci-nightly test-strawwu-shell test-hub test-hub-settings test-apps-page test-flathub-hub test-l10n-ime test-firstboot test-finished-meta test-context-menu test-registry-hooks test-deep-uninstall test-target-identity test-greeter-session test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-init-tools test-bug-reporter test-calamares-settings test-app-registry test-security-baseline test-observability test-legal-trademark test-desktop-stack test-live-install-ux test-update-notifier test-target-setup test-meta-audit purge-ubuntu-telemetry \
 	install-flatpak-setup install-bug-reporter install-calamares-settings install-update-notifier install-target-setup install-firstboot install-wincompat nosnap-harden build-debs bump-version check-version-bump generate-release-manifest release-sign publish-debs
 
 REPO_ROOT := $(abspath .)
@@ -65,6 +65,8 @@ help:
 	@echo "  test-user-docs                W6-DOC1 install/rescue user guides + HTML"
 	@echo "  test-release-manifest         W7-RE1+RE2 release-manifest + GPG signing"
 	@echo "  test-apt-repo                 W7-RE3+RE4 APT repo + strawwu-keyring"
+	@echo "  test-ci-baseline              W7-CI0 CI pipeline inventory + ci-baseline.json"
+	@echo "  test-ci-nightly               W7-CI2+CI3+CI4 nightly + PR gate + self-hosted"
 	@echo "  generate-release-manifest     Build os-image/output/release-manifest.json"
 	@echo "  release-sign                  SHA256SUMS + detached GPG for release ISO"
 	@echo "  publish-debs                  Build signed APT repo from strawwu .debs"
@@ -133,6 +135,7 @@ preflight:
 	bash tests/preflight/test-user-docs.sh
 	bash tests/preflight/test-release-manifest.sh
 	bash tests/preflight/test-apt-repo.sh
+	bash tests/preflight/test-ci-nightly.sh
 
 preflight-dev-vm:
 	bash tests/preflight/test-dev-vm-ready.sh
@@ -374,6 +377,12 @@ test-release-manifest:
 
 test-apt-repo:
 	bash tests/preflight/test-apt-repo.sh
+
+test-ci-baseline:
+	bash tests/preflight/test-ci-baseline.sh
+
+test-ci-nightly:
+	bash tests/preflight/test-ci-nightly.sh
 
 generate-release-manifest:
 	bash scripts/generate-release-manifest.sh

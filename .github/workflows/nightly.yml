@@ -1,0 +1,67 @@
+name: Nightly
+
+on:
+  schedule:
+    # 03:00 UTC daily — aligns with RE nightly channel (dev-iso, SHA256 only)
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: strawwu-nightly
+  cancel-in-progress: false
+
+jobs:
+  nightly-build:
+    runs-on: self-hosted
+    env:
+      STRAWWU_WORK_DIR: /opt/strawwu-build/work
+      STRAWWU_RELEASE_CHANNEL: nightly
+      STRAWWU_RELEASE_SIGN_MODE: skip
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse version
+        id: ver
+        run: |
+          VERSION=$(tr -d '[:space:]' < VERSION)
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "iso_name=StrawWU-${VERSION}-amd64.iso" >> "$GITHUB_OUTPUT"
+
+      - name: Preflight gate
+        run: make preflight
+
+      - name: Prepare Ubuntu base rootfs
+        run: make clone-ubuntu-base
+
+      - name: Swap kernel
+        run: make swap-kernel
+
+      - name: Build dev ISO (nightly channel)
+        run: make dev-iso
+
+      - name: ISO integrity gate
+        env:
+          STRAWWU_ISO_MODE: dev-iso
+        run: make preflight-iso-before-boot
+
+      - name: Generate SHA256SUMS
+        working-directory: os-image/output
+        run: |
+          sha256sum "${{ steps.ver.outputs.iso_name }}" > SHA256SUMS
+          cat SHA256SUMS
+
+      - name: Generate nightly manifest draft
+        env:
+          STRAWWU_RELEASE_CHANNEL: nightly
+        run: make generate-release-manifest
+
+      - name: Upload nightly artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: strawwu-nightly-${{ steps.ver.outputs.version }}-${{ github.run_number }}
+          path: |
+            os-image/output/StrawWU-*.iso
+            os-image/output/SHA256SUMS
+            os-image/output/release-manifest.json
+          retention-days: 30
+          if-no-files-found: error

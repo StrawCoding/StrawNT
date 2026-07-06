@@ -1,0 +1,89 @@
+{
+  "schema": "strawwu-ci-baseline/v1",
+  "wave": "W7-CI2+CI3+CI4",
+  "version": "0.5.0.2",
+  "plan": "docs/plans/strawwu-ci-build-plan.md",
+  "workflows": {
+    "ci": ".github/workflows/ci.yml",
+    "nightly": ".github/workflows/nightly.yml",
+    "release": ".github/workflows/release.yml"
+  },
+  "make_targets": [
+    "preflight",
+    "dev-iso",
+    "release-iso",
+    "test-wincompat",
+    "validate-calamares-preflight",
+    "test-ci-baseline",
+    "test-ci-nightly",
+    "generate-release-manifest",
+    "release-sign"
+  ],
+  "phases": {
+    "CI0": {
+      "status": "complete",
+      "artifact": "ci-baseline.json"
+    },
+    "CI1": {
+      "status": "deferred",
+      "note": "rootfs reproducibility hash gate"
+    },
+    "CI2": {
+      "status": "complete",
+      "trigger": "cron 03:00 UTC main",
+      "workflow": "nightly.yml",
+      "iso_mode": "dev-iso",
+      "signed": "sha256",
+      "artifact_retention_days": 30
+    },
+    "CI3": {
+      "status": "complete",
+      "workflow": "ci.yml",
+      "pr_gate": [
+        "preflight",
+        "test-wincompat",
+        "validate-calamares-preflight",
+        "check-version-bump"
+      ]
+    },
+    "CI4": {
+      "status": "complete",
+      "runner": "self-hosted",
+      "workflows": [
+        "nightly.yml",
+        "release.yml"
+      ],
+      "gpg_import": "scripts/ci-import-gpg.sh",
+      "secrets": [
+        "STRAWWU_GPG_PRIVATE_KEY",
+        "STRAWWU_GPG_KEY_ID",
+        "APT_DISPATCH_TOKEN"
+      ]
+    }
+  },
+  "workflow_files": [
+    "ci.yml",
+    "nightly.yml",
+    "release.yml"
+  ],
+  "scripts": {
+    "ci_import_gpg": "scripts/ci-import-gpg.sh",
+    "release_sign": "scripts/release-sign.sh",
+    "manifest_generator": "scripts/generate-release-manifest.sh"
+  },
+  "wave0_gaps": [
+    "CI1 rootfs reproducibility hash gate",
+    "production archive signing key deployment on runner",
+    "kernel-build.yml self-hosted workflow (Phase 2 Q6)"
+  ],
+  "gaps_closed": [
+    "CI2 nightly pipeline (cron → dev-iso → SHA256 → manifest draft)",
+    "CI3 PR gate (preflight + wincompat + calamares + version bump)",
+    "CI4 self-hosted runner wiring (nightly + release + GPG secrets)"
+  ],
+  "deferred": [
+    "CI1 rootfs reproducibility hash gate",
+    "production archive signing key deployment on runner",
+    "kernel-build.yml self-hosted workflow (Phase 2 Q6)"
+  ]
+}

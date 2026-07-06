@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  phase0:
+  preflight:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,3 +22,19 @@ jobs:
           fetch-depth: 0
       - name: Require VERSION bump when sources change
         run: bash scripts/check-version-bump.sh
+
+  wincompat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Wincompat component tests
+        run: make test-wincompat
+
+  calamares:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Calamares static preflight gate
+        run: make validate-calamares-preflight

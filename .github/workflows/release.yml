@@ -61,6 +61,12 @@ jobs:
       - name: Preflight checks
         run: make preflight
 
+      - name: Import release GPG key
+        env:
+          STRAWWU_GPG_PRIVATE_KEY: ${{ secrets.STRAWWU_GPG_PRIVATE_KEY }}
+          STRAWWU_GPG_KEY_ID: ${{ secrets.STRAWWU_GPG_KEY_ID }}
+        run: bash scripts/ci-import-gpg.sh
+
       - name: Prepare Ubuntu base rootfs
         run: make clone-ubuntu-base
 
@@ -73,9 +79,17 @@ jobs:
       - name: ISO integrity gate
         run: make preflight-iso-before-boot
 
-      - name: Generate SHA256SUMS
-        working-directory: os-image/output
-        run: sha256sum ${{ steps.ver.outputs.iso_name }} > SHA256SUMS
+      - name: Generate SHA256SUMS and GPG signatures
+        env:
+          STRAWWU_GPG_PRIVATE_KEY: ${{ secrets.STRAWWU_GPG_PRIVATE_KEY }}
+          STRAWWU_GPG_KEY_ID: ${{ secrets.STRAWWU_GPG_KEY_ID }}
+          STRAWWU_RELEASE_SIGN_MODE: auto
+        run: make release-sign
+
+      - name: Generate release manifest
+        env:
+          STRAWWU_RELEASE_CHANNEL: stable
+        run: make generate-release-manifest
 
       - name: Generate release notes
         id: notes

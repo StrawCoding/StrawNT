@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-apt-repo-baseline/v1",
   "wave": "W7-RE3+RE4",
-  "version": "0.5.0.1",
+  "version": "0.5.0.2",
   "scripts": {
     "publish_debs": "scripts/publish-debs.sh",
     "keyring_build": "os-image/debs/strawwu-keyring/build-deb.sh",
@@ -28,10 +28,10 @@
   "gaps_closed": [
     "APT repo dists/ + pool/ structure (RE3)",
     "strawwu-keyring deb (RE3)",
-    "publish-debs.sh Release.gpg pipeline (RE4)"
+    "publish-debs.sh Release.gpg pipeline (RE4)",
+    "CI release workflow GPG secret wiring (w7-ci-nightly)"
   ],
   "deferred": [
-    "CI release workflow GPG secret wiring (w7-ci-nightly)",
     "production archive signing key deployment"
   ]
 }

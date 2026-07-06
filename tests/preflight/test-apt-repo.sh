@@ -185,10 +185,18 @@ data = {
         "publish-debs.sh Release.gpg pipeline (RE4)",
     ],
     "deferred": [
-        "CI release workflow GPG secret wiring (w7-ci-nightly)",
         "production archive signing key deployment",
     ],
 }
+# Close w7-ci-nightly GPG wiring gap when release workflow is wired
+release_yml = repo_path / ".github/workflows/release.yml"
+if release_yml.is_file():
+    text = release_yml.read_text(encoding="utf-8", errors="replace")
+    if "ci-import-gpg.sh" in text and "STRAWWU_GPG_PRIVATE_KEY" in text:
+        item = "CI release workflow GPG secret wiring (w7-ci-nightly)"
+        if item not in data["gaps_closed"]:
+            data["gaps_closed"].append(item)
+        data["deferred"] = [x for x in data["deferred"] if "w7-ci-nightly" not in x.lower()]
 Path(out).parent.mkdir(parents=True, exist_ok=True)
 Path(out).write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 PY
