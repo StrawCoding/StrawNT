@@ -82,7 +82,7 @@ def main() -> int:
         print(f"Usage: {sys.argv[0]} REPO_DIR [suite] [arch] [component] [signed=1]", file=sys.stderr)
         return 2
     repo = Path(sys.argv[1])
-    suite = sys.argv[2] if len(sys.argv) > 2 else "noble"
+    suite = sys.argv[2] if len(sys.argv) > 2 else "resolute"
     arch = sys.argv[3] if len(sys.argv) > 3 else "amd64"
     component = sys.argv[4] if len(sys.argv) > 4 else "main"
     signed = (sys.argv[5] if len(sys.argv) > 5 else "1") not in ("0", "false", "no")

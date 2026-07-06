@@ -116,18 +116,18 @@ else
     fail "publish-debs pipeline"
 fi
 
-require_file "${TEST_REPO}/dists/noble/Release" "Release"
-require_file "${TEST_REPO}/dists/noble/Release.gpg" "Release.gpg"
-require_file "${TEST_REPO}/dists/noble/main/binary-amd64/Packages.gz" "Packages.gz"
+require_file "${TEST_REPO}/dists/resolute/Release" "Release"
+require_file "${TEST_REPO}/dists/resolute/Release.gpg" "Release.gpg"
+require_file "${TEST_REPO}/dists/resolute/main/binary-amd64/Packages.gz" "Packages.gz"
 
-if python3 "${VALIDATE}" "${TEST_REPO}" noble amd64 main 1; then
+if python3 "${VALIDATE}" "${TEST_REPO}" resolute amd64 main 1; then
     pass "validate-apt-repo.py (test repo)"
 else
     fail "validate-apt-repo.py (test repo)"
 fi
 
 if gpg --no-default-keyring --keyring "${KEYRING_GPG}" \
-    --verify "${TEST_REPO}/dists/noble/Release.gpg" "${TEST_REPO}/dists/noble/Release" >/dev/null 2>&1; then
+    --verify "${TEST_REPO}/dists/resolute/Release.gpg" "${TEST_REPO}/dists/resolute/Release" >/dev/null 2>&1; then
     pass "gpg --verify Release.gpg with strawwu keyring"
 else
     fail "gpg --verify Release.gpg with strawwu keyring"
@@ -167,7 +167,7 @@ data = {
         "sources": "os-image/config/branding/etc/apt/sources.list.d/strawwu.sources",
     },
     "repo_layout": {
-        "suite": "noble",
+        "suite": "resolute",
         "component": "main",
         "arch": "amd64",
         "dists": "dists/{suite}/Release",

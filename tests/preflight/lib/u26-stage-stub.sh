@@ -191,7 +191,55 @@ print(f"PASS: rootfs {len(installed)} strawwu-* packages at v{version}")
 print(f"PASS: rootfs dpkg --audit clean")
 PY
     ;;
-  u26-suite-migrate|u26-techrefs-refresh|u26-regression-e2e)
+  u26-suite-migrate)
+    require_plan "strawwu-ubuntu-2604-migration-plan.md"
+    require_file "${REPO_ROOT}/scripts/publish-debs.sh" "publish-debs.sh"
+    require_file "${BASELINES_DIR}/apt-repo-baseline.json" "apt-repo-baseline"
+    require_file "${REPO_ROOT}/os-image/config/branding/etc/apt/sources.list.d/strawwu.sources" "strawwu.sources"
+    PYTHONHASHSEED=0 python3 - \
+        "${REPO_ROOT}/scripts/publish-debs.sh" \
+        "${BASELINES_DIR}/apt-repo-baseline.json" \
+        "${REPO_ROOT}/os-image/config/branding/etc/apt/sources.list.d/strawwu.sources" \
+        "${PLANS_DIR}/ubuntu-base-target.json" <<'PY'
+import json, pathlib, re, sys
+
+publish, baseline_path, sources_path, target_path = map(pathlib.Path, sys.argv[1:5])
+
+target = json.loads(target_path.read_text())
+active = target.get("active", {})
+if active.get("codename") != "resolute":
+    print(f"FAIL: active.codename expected resolute got {active.get('codename')!r}", file=sys.stderr)
+    sys.exit(1)
+
+baseline = json.loads(baseline_path.read_text())
+suite = baseline.get("repo_layout", {}).get("suite", "")
+if suite != "resolute":
+    print(f"FAIL: apt-repo-baseline suite expected resolute got {suite!r}", file=sys.stderr)
+    sys.exit(1)
+
+sources = sources_path.read_text(encoding="utf-8")
+if re.search(r"Suites:\s*noble\b", sources):
+    print("FAIL: strawwu.sources still uses noble suite", file=sys.stderr)
+    sys.exit(1)
+if "Suites: resolute" not in sources:
+    print("FAIL: strawwu.sources missing Suites: resolute", file=sys.stderr)
+    sys.exit(1)
+
+pub = publish.read_text(encoding="utf-8")
+if re.search(r"STRAWWU_APT_SUITE:-noble", pub):
+    print("FAIL: publish-debs.sh still hard-defaults noble", file=sys.stderr)
+    sys.exit(1)
+if "load_ubuntu_base_env" not in pub:
+    print("FAIL: publish-debs.sh does not load ubuntu-base-env for suite", file=sys.stderr)
+    sys.exit(1)
+
+print(f"PASS: active Ubuntu {active.get('version')} resolute")
+print("PASS: apt-repo-baseline suite resolute")
+print("PASS: strawwu.sources Suites: resolute")
+print("PASS: publish-debs.sh derives APT suite from ubuntu-base-target.json")
+PY
+    ;;
+  u26-techrefs-refresh|u26-regression-e2e)
     require_plan "strawwu-ubuntu-2604-migration-plan.md"
     ;;
   software-sources)

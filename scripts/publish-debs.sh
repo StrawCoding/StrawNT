@@ -3,8 +3,11 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=os-image/scripts/lib/ubuntu-base-env.sh
+source "${REPO_ROOT}/os-image/scripts/lib/ubuntu-base-env.sh"
+load_ubuntu_base_env "${REPO_ROOT}"
 VERSION="${STRAWWU_VERSION:-$(tr -d '[:space:]' < "${REPO_ROOT}/VERSION")}"
-SUITE="${STRAWWU_APT_SUITE:-noble}"
+SUITE="${STRAWWU_APT_SUITE}"
 ARCH="${STRAWWU_APT_ARCH:-amd64}"
 COMPONENT="${STRAWWU_APT_COMPONENT:-main}"
 REPO_DIR="${STRAWWU_APT_REPO_DIR:-${REPO_ROOT}/os-image/output/apt-repo}"
@@ -26,7 +29,7 @@ Build dists/${SUITE}/ + pool/ APT tree with Packages.gz and signed Release.
 Environment:
   STRAWWU_APT_REPO_DIR     Output repo root (default: os-image/output/apt-repo)
   STRAWWU_VERSION          Package version filter (default: VERSION file)
-  STRAWWU_APT_SUITE        Suite name (default: noble)
+  STRAWWU_APT_SUITE        Suite name (default: active codename from ubuntu-base-target.json)
   STRAWWU_APT_ARCH         Binary arch (default: amd64)
   STRAWWU_GPG_KEY_ID       GPG key for Release.gpg
   STRAWWU_RELEASE_SIGN_MODE  auto | required | skip

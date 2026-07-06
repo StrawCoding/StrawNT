@@ -115,7 +115,7 @@ data = {
     "apt_signing": {
         "keyring_package": "strawwu-keyring",
         "keyring_path": "/usr/share/keyrings/strawwu-archive-keyring.gpg",
-        "release_gpg": "dists/noble/Release.gpg (RE3+RE4, w7-re-apt-repo)",
+        "release_gpg": "dists/resolute/Release.gpg (RE3+RE4, w7-re-apt-repo)",
         "publish_script": "scripts/publish-debs.sh",
     },
 }

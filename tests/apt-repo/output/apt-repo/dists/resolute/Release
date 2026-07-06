@@ -1,0 +1,23 @@
+Architectures: amd64
+Codename: resolute
+Components: main
+Date: Mon, 06 Jul 2026 13:59:01 +0000
+Label: StrawWU APT Repository
+Origin: StrawWU
+Suite: resolute
+MD5Sum:
+ e78f0b613bf606f471d4f2c3ab34d690              157 Release
+ 744b2f906094938fbb441893aa3cdc34              575 main/binary-amd64/Packages
+ cf050fd486235045f30d4d7eaad63ed3              416 main/binary-amd64/Packages.gz
+SHA1:
+ 4c9a0c1d12cbf89b538d39ab61775c50c3a17310              157 Release
+ 34344bef544026dd37884e9d1db0736b79fa62ca              575 main/binary-amd64/Packages
+ 0deee0cf75b61bbe0dfbd49f230851511bf7f785              416 main/binary-amd64/Packages.gz
+SHA256:
+ 94fffbe5972dcaa9ec8ca2be7e06ed4eaea6768c22c1d5f3de26848f2627cdef              157 Release
+ 6fca6987adf05d7dc256ed7c0489677fab8a0fb1333d737be6e64fa8f56c1737              575 main/binary-amd64/Packages
+ dcbb54fca3f32f022effd41a29f390c04b45bf3c1cf7c78623631881ee62520d              416 main/binary-amd64/Packages.gz
+SHA512:
+ 61c11345f48753701a7833d9f9182fc9c16f8c5fe5cfc2c68a9996f4585fc4a9dd8e026dfb1b8aa8479310ebd481293ef2a0694e56a260a0cf4fd538906d920f              157 Release
+ ad6cd40d9e523dfe5f2aae9ac55f371183b5b9f6d41221e22489377b3a492a63524b24faa96c273880480f979485e890a82e4ff7af9af43f8919f066d8ceda7e              575 main/binary-amd64/Packages
+ efd59ef75c85c94b398489f438f9f4cd3864edc5a25592d50b1e4bcee14b1e35a4d7af0d1d9ad40b7836bd0bec465d6f628c7088b2be81ed054d1c240b510b44              416 main/binary-amd64/Packages.gz

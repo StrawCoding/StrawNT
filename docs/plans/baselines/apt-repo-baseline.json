@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-apt-repo-baseline/v1",
   "wave": "W7-RE3+RE4",
-  "version": "0.6.1.2",
+  "version": "0.6.1.3",
   "scripts": {
     "publish_debs": "scripts/publish-debs.sh",
     "keyring_build": "os-image/debs/strawwu-keyring/build-deb.sh",
@@ -13,7 +13,7 @@
     "sources": "os-image/config/branding/etc/apt/sources.list.d/strawwu.sources"
   },
   "repo_layout": {
-    "suite": "noble",
+    "suite": "resolute",
     "component": "main",
     "arch": "amd64",
     "dists": "dists/{suite}/Release",
