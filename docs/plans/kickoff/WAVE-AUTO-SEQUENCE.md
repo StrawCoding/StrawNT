@@ -29,6 +29,7 @@ w0-baseline
 1. 每 stage PASS → Hermes 自動 launch 下一段（**不詢問使用者**）
 2. FAIL → inject Cursor 自修；連續 FAIL >10 → 通知使用者
 3. 最終 `w8-mvp-closeout` PASS → `make test-wave-all-pass` 全綠 + MVP 報告
+4. **自動接續 Post-MVP** → `post-d1-strawwu-drivers`（見 `kickoff/POST-MVP-AUTO-SEQUENCE.md`）
 
 ## 延後 5 項（不新增 stage）
 

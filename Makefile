@@ -2,7 +2,7 @@
 	build-iso dev-iso release-iso repack-iso validate-rootfs boot-test-iso boot-test-dev-iso \
 	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
-	test-install-e2e test-install-firstboot-e2e test-installed-boot test-target-flathub test-wincompat test-wincompat-os test-wincompat-registry test-wincompat-gui test-wincompat-e2e test-hw-live-usb test-user-docs test-release-manifest test-apt-repo test-ci-baseline test-ci-nightly test-perf-baseline test-perf-legal-gate test-strawwu-shell test-hub test-hub-settings test-apps-page test-flathub-hub test-l10n-ime test-firstboot test-finished-meta test-context-menu test-registry-hooks test-deep-uninstall test-target-identity test-greeter-session test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-init-tools test-bug-reporter test-calamares-settings test-app-registry test-security-baseline test-observability test-legal-trademark test-desktop-stack test-live-install-ux test-update-notifier test-target-setup test-meta-audit purge-ubuntu-telemetry \
+	test-install-e2e test-install-firstboot-e2e test-installed-boot test-target-flathub test-wincompat test-wincompat-os test-wincompat-registry test-wincompat-gui test-wincompat-e2e test-hw-live-usb test-hw-matrix test-user-docs test-release-manifest test-apt-repo test-ci-baseline test-ci-nightly test-perf-baseline test-perf-legal-gate test-strawwu-shell test-hub test-hub-settings test-apps-page test-flathub-hub test-l10n-ime test-firstboot test-finished-meta test-context-menu test-registry-hooks test-deep-uninstall test-target-identity test-greeter-session test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-init-tools test-bug-reporter test-calamares-settings test-app-registry test-security-baseline test-observability test-legal-trademark test-desktop-stack test-live-install-ux test-update-notifier test-target-setup test-meta-audit purge-ubuntu-telemetry \
 	install-flatpak-setup install-bug-reporter install-calamares-settings install-update-notifier install-target-setup install-firstboot install-wincompat nosnap-harden build-debs bump-version check-version-bump generate-release-manifest release-sign publish-debs
 
 REPO_ROOT := $(abspath .)
@@ -43,6 +43,19 @@ help:
 	@echo "  test-meta-audit               W6-B5 ubuntu-* allowlist + strawwu-minimal meta"
 	@echo "  test-wave0-baseline           Wave 0 preflight baselines (12 scripts + JSON)"
 	@echo "  test-wave-all-pass            Verify all 47 wave stages PASS (MVP closeout gate)"
+	@echo "  test-post-mvp-roadmap         Post-MVP long-task infrastructure gate"
+	@echo "  test-post-mvp-all-pass        Verify all 12 post-MVP stages PASS"
+	@echo "  test-post-mvp-v06-closeout    v0.6 drivers/HW closeout gate"
+	@echo "  test-drivers                  POST-D1 strawwu-drivers"
+	@echo "  test-hw-t1-live-usb           POST-HW-T1 real Live USB matrix"
+	@echo "  test-hw-t2-installed          POST-HW-T2 installed smoke"
+	@echo "  test-ddp-rootfs               POST-DDP device-proxy rootfs"
+	@echo "  test-mfp-smoke                POST-Q3 MFP print/scan"
+	@echo "  test-upgrade-rollback         POST-UPG rollback"
+	@echo "  test-secureboot-route         POST-SEC Secure Boot route"
+	@echo "  test-ci-kernel-selfhosted     POST-CI self-hosted kernel"
+	@echo "  test-hw-t3-wincompat          POST-HW-T3 Win compat HW smoke"
+	@echo "  test-golden-apps              POST-Q8 golden apps launch"
 	@echo "  test-purge-baseline           W1-B1 telemetry/pro/snap purge verification"
 	@echo "  test-flatpak                  W1-F1 flatpak + flathub remote verification"
 	@echo "  test-nosnap                   W1-F2 snapd absent + meta mask verification"
@@ -62,6 +75,7 @@ help:
 	@echo "  test-wincompat-gui            W5-W4 Windows GUI app launch smoke"
 	@echo "  test-wincompat-e2e            W6-W6 install→icon→launch→remove E2E"
 	@echo "  test-hw-live-usb              W6-HW1 Live USB matrix (≥3 machine profiles)"
+	@echo "  test-hw-matrix                W8-HW-MATRIX GPU/Wi-Fi/suspend/HiDPI matrix"
 	@echo "  test-user-docs                W6-DOC1 install/rescue user guides + HTML"
 	@echo "  test-release-manifest         W7-RE1+RE2 release-manifest + GPG signing"
 	@echo "  test-apt-repo                 W7-RE3+RE4 APT repo + strawwu-keyring"
@@ -140,6 +154,8 @@ preflight:
 	bash tests/preflight/test-ci-nightly.sh
 	bash tests/preflight/test-perf-baseline.sh
 	bash tests/preflight/test-perf-legal-gate.sh
+	bash tests/preflight/test-hw-matrix.sh
+	bash tests/preflight/test-post-mvp-roadmap.sh
 
 preflight-dev-vm:
 	bash tests/preflight/test-dev-vm-ready.sh
@@ -258,6 +274,45 @@ test-wave0-baseline:
 test-wave-all-pass:
 	bash tests/preflight/test-wave-all-pass.sh
 
+test-post-mvp-roadmap:
+	bash tests/preflight/test-post-mvp-roadmap.sh
+
+test-post-mvp-all-pass:
+	bash tests/preflight/test-post-mvp-all-pass.sh
+
+test-post-mvp-v06-closeout:
+	bash tests/preflight/test-post-mvp-v06-closeout.sh
+
+test-drivers:
+	bash tests/preflight/test-drivers.sh
+
+test-hw-t1-live-usb:
+	bash tests/preflight/test-hw-t1-live-usb.sh
+
+test-hw-t2-installed:
+	bash tests/preflight/test-hw-t2-installed.sh
+
+test-ddp-rootfs:
+	bash tests/preflight/test-ddp-rootfs.sh
+
+test-mfp-smoke:
+	bash tests/preflight/test-mfp-smoke.sh
+
+test-upgrade-rollback:
+	bash tests/preflight/test-upgrade-rollback.sh
+
+test-secureboot-route:
+	bash tests/preflight/test-secureboot-route.sh
+
+test-ci-kernel-selfhosted:
+	bash tests/preflight/test-ci-kernel-selfhosted.sh
+
+test-hw-t3-wincompat:
+	bash tests/preflight/test-hw-t3-wincompat.sh
+
+test-golden-apps:
+	bash tests/preflight/test-golden-apps.sh
+
 test-purge-baseline:
 	bash tests/preflight/test-purge-baseline.sh
 
@@ -324,6 +379,10 @@ test-wincompat-e2e:
 test-hw-live-usb:
 	bash tests/hw/run-live-usb-matrix.sh
 	bash tests/preflight/test-hw-live-usb.sh
+
+test-hw-matrix:
+	bash tests/hw/run-hw-matrix.sh
+	bash tests/preflight/test-hw-matrix.sh
 
 test-user-docs:
 	python3 tests/user-docs/validate-user-docs.py

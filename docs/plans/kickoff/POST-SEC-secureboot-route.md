@@ -1,26 +1,26 @@
-# Wave 8 MVP Closeout — 全 Wave PASS 驗收
+# Post-MVP — SEC secureboot route
 
-| 任務 ID | w8-mvp-closeout |
+| 任務 ID | post-sec-secureboot-route |
 |---------|-------|
-| Wave | 8 |
-| 計畫 | `strawwu-prd-v0.5.md` |
-| 狀態 | 待執行 |
+| Track | Post-MVP |
+| 計畫 | `strawwu-security-trust-model.md` |
+| 路線圖 | `strawwu-post-mvp-roadmap.md` |
 
 ## 目標
 
-test-wave-all-pass + MVP DoD + HTML 報告
+Secure Boot shim 路線
 
 ## 必讀
 
-- `docs/plans/strawwu-prd-v0.5.md`
+- `docs/plans/strawwu-post-mvp-roadmap.md`
 - `docs/plans/strawwu-ai-worker-sop.md`
-- `docs/plans/strawwu-prd-v0.5.md`
+- `docs/plans/strawwu-security-trust-model.md`
 
 ## PASS 條件
 
 ```bash
 cd /mnt/data/code/project/StrawCoding/StrawWU
-make test-wave-all-pass
+make test-secureboot-route
 make preflight
 # exit 0
 ```
@@ -28,7 +28,7 @@ make preflight
 ## 必須交付
 
 1. 本階段實作產物（見計畫文件）
-2. `docs/plans/stage-reports/W8-MVP-closeout-report.md`
+2. `docs/plans/stage-reports/POST-SEC-secureboot-route-report.md`
 3. VERSION bump（`scripts/bump-version.sh`）
 4. 對應 preflight 腳本（若尚不存在）
 
@@ -38,7 +38,8 @@ make preflight
 - `SKIP_SQUASHFS=1` 進 release 驗收
 - 并行 boot-test 寫同一 ISO
 - worker 自宣稱 PASS
+- 複製 legacy 封存程式碼
 
 ## 完成後
 
-Hermes mark PASS → **MVP 全 Wave PASS** → 自動啟動 `post-d1-strawwu-drivers`（Post-MVP 驅動/HW track，勿問使用者）。
+Hermes mark PASS → 自動啟動下一 Post-MVP stage（勿問使用者）。

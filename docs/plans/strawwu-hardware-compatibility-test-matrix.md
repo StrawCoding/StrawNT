@@ -1,8 +1,9 @@
 # StrawWU Hardware Compatibility 實機相容性計畫
 
-| 版本 | 1.0 |
+| 版本 | 2.0 |
 |------|-----|
-| 日期 | 2026-07-04 |
+| 日期 | 2026-07-06 |
+| Post-MVP | T1/T2 實機段見 `post-hw-t1-live-usb` / `post-hw-t2-installed` |
 
 ## 1. 問題
 

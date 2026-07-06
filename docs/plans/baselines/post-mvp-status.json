@@ -1,0 +1,23 @@
+{
+  "generated_at": "2026-07-06T00:00:00",
+  "target": "0.9.0.0-engineering",
+  "total": 12,
+  "passed": 0,
+  "failed": 12,
+  "all_pass": false,
+  "note": "Auto-updated by make test-post-mvp-all-pass",
+  "stages": [
+    {"id": "post-d1-strawwu-drivers", "status": "PENDING", "pass": false},
+    {"id": "post-hw-t1-live-usb", "status": "PENDING", "pass": false},
+    {"id": "post-hw-t2-installed", "status": "PENDING", "pass": false},
+    {"id": "post-ddp-rootfs", "status": "PENDING", "pass": false},
+    {"id": "post-q3-mfp-smoke", "status": "PENDING", "pass": false},
+    {"id": "post-v06-closeout", "status": "PENDING", "pass": false},
+    {"id": "post-upg-rollback", "status": "PENDING", "pass": false},
+    {"id": "post-sec-secureboot-route", "status": "PENDING", "pass": false},
+    {"id": "post-ci-kernel-selfhosted", "status": "PENDING", "pass": false},
+    {"id": "post-hw-t3-wincompat", "status": "PENDING", "pass": false},
+    {"id": "post-q8-golden-apps", "status": "PENDING", "pass": false},
+    {"id": "post-v09-engineering-closeout", "status": "PENDING", "pass": false}
+  ]
+}
