@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-ci-baseline/v1",
   "wave": "W7-CI2+CI3+CI4",
-  "version": "0.5.0.3",
+  "version": "0.5.0.4",
   "plan": "docs/plans/strawwu-ci-build-plan.md",
   "workflows": {
     "ci": ".github/workflows/ci.yml",

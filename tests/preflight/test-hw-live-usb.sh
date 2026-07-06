@@ -47,10 +47,11 @@ else
     fail "smoke-live.sh missing required fields"
 fi
 
-if grep -q 'qemu-proxy' "${RUNNER}" && grep -q 'hw-matrix-results.json' "${RUNNER}"; then
-    pass "run-live-usb-matrix.sh writes hw-matrix-results.json"
+if grep -q 'qemu-proxy' "${LIB}" && grep -q 'write_matrix_results' "${LIB}" \
+    && grep -q 'run_profile_boot' "${LIB}"; then
+    pass "hw lib.sh shared runner writes hw-matrix-results.json"
 else
-    fail "run-live-usb-matrix.sh incomplete"
+    fail "hw matrix runner incomplete"
 fi
 
 if bash -n "${SMOKE}" && bash -n "${RUNNER}" && bash -n "${LIB}"; then
@@ -70,7 +71,7 @@ from pathlib import Path
 path = Path("${RESULTS}")
 data = json.loads(path.read_text(encoding="utf-8"))
 schema = data.get("schema", "")
-if schema != "strawwu-hw-matrix-results/v1":
+if schema not in ("strawwu-hw-matrix-results/v1", "strawwu-hw-matrix-results/v2"):
     print(f"FAIL: schema={schema!r}", file=sys.stderr)
     sys.exit(1)
 
@@ -78,7 +79,7 @@ min_pass = int(data.get("minimum_live_pass", 3))
 machines = data.get("machines", [])
 live_pass = sum(1 for m in machines if m.get("tests", {}).get("live_boot") == "PASS")
 
-print(f"PASS: hw-matrix schema v1, machines={len(machines)}, live_pass={live_pass}")
+print(f"PASS: hw-matrix schema {schema}, machines={len(machines)}, live_pass={live_pass}")
 if live_pass < min_pass:
     print(f"FAIL: live_pass={live_pass} < minimum={min_pass}", file=sys.stderr)
     sys.exit(1)

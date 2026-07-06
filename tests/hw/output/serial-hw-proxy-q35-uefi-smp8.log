@@ -29,11 +29,11 @@ To disable this message for all users, run:
    sudo touch /var/lib/cloud/instance/locale-check.skip
 _____________________________________________________________________
 
-dbus-daemon[594]: [session uid=1000 pid=594] Activating service name='org.gtk.vfs.Daemon' requested by ':1.0' (uid=1000 pid=595 comm="" label="unconfined")
-dbus-daemon[594]: [session uid=1000 pid=594] Successfully activated service 'org.gtk.vfs.Daemon'
-dbus-daemon[594]: [session uid=1000 pid=594] Activating service name='org.gtk.vfs.Metadata' requested by ':1.0' (uid=1000 pid=595 comm="" label="unconfined")
+dbus-daemon[592]: [session uid=1000 pid=592] Activating service name='org.gtk.vfs.Daemon' requested by ':1.0' (uid=1000 pid=593 comm="" label="unconfined")
+dbus-daemon[592]: [session uid=1000 pid=592] Successfully activated service 'org.gtk.vfs.Daemon'
+dbus-daemon[592]: [session uid=1000 pid=592] Activating service name='org.gtk.vfs.Metadata' requested by ':1.0' (uid=1000 pid=593 comm="" label="unconfined")
 fuse: device not found, try 'modprobe fuse' first
-dbus-daemon[594]: [session uid=1000 pid=594] Successfully activated service 'org.gtk.vfs.Metadata'
+dbus-daemon[592]: [session uid=1000 pid=592] Successfully activated service 'org.gtk.vfs.Metadata'
 A connection to the bus can't be made
 ln: /root/usr/lib/update-notifier/apt-check: No such file or directory
 Using CD-ROM mount point /cdrom/
@@ -68,17 +68,18 @@ systemd-journald.service
 sys-fs-fuse-connections.mount
 sys-kernel-config.mount
 lvm2-monitor.service
-systemd-tmpfiles-setup-dev-early.service
 systemd-modules-load.service
+systemd-tmpfiles-setup-dev-early.service
 systemd-random-seed.service
 keyboard-setup.service
 systemd-journal-flush.service
-systemd-sysusers.service
 systemd-sysctl.service
-systemd-tmpfiles-setup-dev.service
+systemd-sysusers.service
 systemd-udev-trigger.service
-tmp.mount
+[0;21;33mworkqueue: drm_fb_helper_damage_work hogged CPU for >10000us 16 times, consider switching to WQ_UNBOUND[0m
+systemd-tmpfiles-setup-dev.service
 snap-ubuntu\x2ddesktop\x2dbootstrap-315.mount
+tmp.mount
 systemd-udevd.service
 plymouth-start.service
 StrawWU 0.4.1.33
@@ -94,14 +95,14 @@ zfs-load-module.service
 finalrd.service
 [[0;32m  OK  [0m] Finished [0;1;39mplymouth-read-write.servi…[0mPlymouth To Write Out Runtime Data.
 plymouth-read-write.service
-         Mounting [0;1;39mproc-sys-fs-binfmt_misc.m…[0mcutable File Formats File System...
 [[0;32m  OK  [0m] Finished [0;1;39mufw.service[0m - Uncomplicated firewall.
 ufw.service
 [[0;32m  OK  [0m] Reached target [0;1;39mnetwork-pre.target[0m - Preparation for Network.
-[[0;32m  OK  [0m] Mounted [0;1;39mproc-sys-fs-binfmt_misc.mo…[0mxecutable File Formats File System.
-proc-sys-fs-binfmt_misc.mount
+         Mounting [0;1;39mproc-sys-fs-binfmt_misc.m…[0mcutable File Formats File System...
 [[0;32m  OK  [0m] Finished [0;1;39msystemd-tmpfiles-setup.se…[0mate Volatile Files and Directories.
 systemd-tmpfiles-setup.service
+[[0;32m  OK  [0m] Mounted [0;1;39mproc-sys-fs-binfmt_misc.mo…[0mxecutable File Formats File System.
+proc-sys-fs-binfmt_misc.mount
          Starting [0;1;39msystemd-journal-catalog-u…ervice[0m - Rebuild Journal Catalog...
          Starting [0;1;39msystemd-oomd.service[0m - Us…space Out-Of-Memory (OOM) Killer...
          Starting [0;1;39msystemd-resolved.service[0m - Network Name Resolution...
@@ -109,14 +110,14 @@ systemd-tmpfiles-setup.service
          Starting [0;1;39msystemd-update-utmp.servi…[0mord System Boot/Shutdown in UTMP...
 [[0;32m  OK  [0m] Finished [0;1;39msystemd-binfmt.service[0m - Set Up Additional Binary Formats.
 systemd-binfmt.service
-[[0;32m  OK  [0m] Finished [0;1;39msystemd-update-utmp.servi…[0mecord System Boot/Shutdown in UTMP.
-systemd-update-utmp.service
 [[0;32m  OK  [0m] Finished [0;1;39msystemd-journal-catalog-u….service[0m - Rebuild Journal Catalog.
 systemd-journal-catalog-update.service
-[[0;32m  OK  [0m] Started [0;1;39msystemd-timesyncd.service[0m - Network Time Synchronization.
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-update-utmp.servi…[0mecord System Boot/Shutdown in UTMP.
+systemd-update-utmp.service
 [[0;32m  OK  [0m] Started [0;1;39msystemd-oomd.service[0m - Userspace Out-Of-Memory (OOM) Killer.
-systemd-timesyncd.service
+[[0;32m  OK  [0m] Started [0;1;39msystemd-timesyncd.service[0m - Network Time Synchronization.
 systemd-oomd.service
+systemd-timesyncd.service
 [[0;32m  OK  [0m] Reached target [0;1;39mtime-set.target[0m - System Time Set.
 [[0;32m  OK  [0m] Started [0;1;39msystemd-resolved.service[0m - Network Name Resolution.
 [[0;32m  OK  [0m] Reached target [0;1;39mnss-lookup.target[0m - Host and Network Name Lookups.
@@ -125,8 +126,8 @@ systemd-resolved.service
 ldconfig.service
          Starting [0;1;39msystemd-update-done.service[0m - Update is Completed...
 [[0;32m  OK  [0m] Finished [0;1;39msystemd-update-done.service[0m - Update is Completed.
-[[0;32m  OK  [0m] Reached target [0;1;39msysinit.target[0m - System Initialization.
 systemd-update-done.service
+[[0;32m  OK  [0m] Reached target [0;1;39msysinit.target[0m - System Initialization.
 [[0;32m  OK  [0m] Started [0;1;39mcups.path[0m - CUPS Scheduler.
 [[0;32m  OK  [0m] Started [0;1;39manacron.timer[0m - Trigger anacron every hour.
 [[0;32m  OK  [0m] Started [0;1;39mapt-daily.timer[0m - Daily apt download activities.
@@ -180,42 +181,43 @@ cron.service
 [[0;32m  OK  [0m] Started [0;1;39mdbus.service[0m - D-Bus System Message Bus.
 dbus.service
 [[0;32m  OK  [0m] Finished [0;1;39me2scrub_reap.service[0m - Re…line ext4 Metadata Check Snapshots.
-         Starting [0;1;39mNetworkManager.service[0m - Network Manager...
-         Starting [0;1;39mwpa_supplicant.service[0m - WPA supplicant...
 [[0;32m  OK  [0m] Finished [0;1;39msysstat.service[0m - Resets System Activity Logs.
 sysstat.service
+         Starting [0;1;39mNetworkManager.service[0m - Network Manager...
+         Starting [0;1;39mwpa_supplicant.service[0m - WPA supplicant...
 [[0;32m  OK  [0m] Started [0;1;39mavahi-daemon.service[0m - Avahi mDNS/DNS-SD Stack.
 avahi-daemon.service
 [[0;32m  OK  [0m] Started [0;1;39mswitcheroo-control.service[0m - Switcheroo Control Proxy service.
 switcheroo-control.service
-[[0;32m  OK  [0m] Started [0;1;39mwpa_supplicant.service[0m - WPA supplicant.
-wpa_supplicant.service
-[[0;32m  OK  [0m] Finished [0;1;39mgpu-manager.service[0m - Det…s and deal with any system changes.
+[0;21;33mworkqueue: drm_fb_helper_damage_work hogged CPU for >10000us 32 times, consider switching to WQ_UNBOUND[0m
 [[0;32m  OK  [0m] Started [0;1;39msystemd-logind.service[0m - User Login Management.
 systemd-logind.service
+[[0;32m  OK  [0m] Finished [0;1;39mgpu-manager.service[0m - Det…s and deal with any system changes.
+[[0;32m  OK  [0m] Finished [0;1;39mconsole-setup.service[0m - Set console font and keymap.
+[[0;32m  OK  [0m] Started [0;1;39mwpa_supplicant.service[0m - WPA supplicant.
+console-setup.service
+wpa_supplicant.service
+[[0;32m  OK  [0m] Finished [0;1;39mudisks2-inhibit.service[0m - inhibit disk automounting.
+udisks2-inhibit.service
+         Starting [0;1;39mudisks2.service[0m - Disk Manager...
 [[0;32m  OK  [0m] Started [0;1;39mpolkit.service[0m - Authorization Manager.
 polkit.service
          Starting [0;1;39mModemManager.service[0m - Modem Manager...
 [[0;32m  OK  [0m] Started [0;1;39mpower-profiles-daemon.service[0m - Power Profiles daemon.
-power-profiles-daemon.service
 [[0;32m  OK  [0m] Started [0;1;39mgnome-remote-desktop.service[0m - GNOME Remote Desktop.
+power-profiles-daemon.service
 gnome-remote-desktop.service
-         Starting [0;1;39msystemd-hostnamed.service[0m - Hostname Service...
-[[0;32m  OK  [0m] Finished [0;1;39mudisks2-inhibit.service[0m - inhibit disk automounting.
-udisks2-inhibit.service
-         Starting [0;1;39mudisks2.service[0m - Disk Manager...
 [[0;32m  OK  [0m] Started [0;1;39mrsyslog.service[0m - System Logging Service.
 rsyslog.service
 [[0;32m  OK  [0m] Started [0;1;39maccounts-daemon.service[0m - Accounts Service.
 accounts-daemon.service
-[[0;32m  OK  [0m] Started [0;1;39msystemd-hostnamed.service[0m - Hostname Service.
-systemd-hostnamed.service
-[[0;32m  OK  [0m] Finished [0;1;39mconsole-setup.service[0m - Set console font and keymap.
-console-setup.service
-[[0;32m  OK  [0m] Started [0;1;39mModemManager.service[0m - Modem Manager.
-ModemManager.service
+         Starting [0;1;39msystemd-hostnamed.service[0m - Hostname Service...
 [[0;32m  OK  [0m] Started [0;1;39mudisks2.service[0m - Disk Manager.
 udisks2.service
+[[0;32m  OK  [0m] Started [0;1;39mModemManager.service[0m - Modem Manager.
+[[0;32m  OK  [0m] Started [0;1;39msystemd-hostnamed.service[0m - Hostname Service.
+ModemManager.service
+systemd-hostnamed.service
          Starting [0;1;39mNetworkManager-dispatcher…[0manager Script Dispatcher Service...
 [[0;32m  OK  [0m] Started [0;1;39mNetworkManager-dispatcher.…[0m Manager Script Dispatcher Service.
 NetworkManager-dispatcher.service
@@ -238,8 +240,8 @@ systemd-user-sessions.service
 [[0;32m  OK  [0m] Started [0;1;39mNetworkManager-dispatcher.…[0m Manager Script Dispatcher Service.
 NetworkManager-dispatcher.service
 [[0;32m  OK  [0m] Started [0;1;39mcups.service[0m - CUPS Scheduler.
-cups.service
 [[0;32m  OK  [0m] Reached target [0;1;39mprinter.target[0m - Printer Support.
+cups.service
 [[0;32m  OK  [0m] Finished [0;1;39mNetworkManager-wait-onlin…vice[0m - Network Manager Wait Online.
 NetworkManager-wait-online.service
 [[0;32m  OK  [0m] Reached target [0;1;39mnetwork-online.target[0m - Network is Online.
@@ -260,4 +262,3 @@ STRAWWU_KERNEL_
 STRAWWU_BOOT_OK
 STRAWWU-DESKTOP-OK
 STRAWWU_KERNEL_
-STRAWWU-E2E-RUNNER-START

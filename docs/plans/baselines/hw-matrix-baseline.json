@@ -1,0 +1,38 @@
+{
+  "schema": "strawwu-hw-matrix-baseline/v1",
+  "wave": "W8-HW-MATRIX",
+  "version": "0.5.0.4",
+  "tier": "T1+HW3",
+  "dimensions": [
+    "gpu",
+    "wifi",
+    "suspend",
+    "hidpi"
+  ],
+  "minimum_live_pass": 3,
+  "minimum_hw_pass": {
+    "gpu_driver": 3,
+    "wifi": 3,
+    "suspend": 0,
+    "hidpi": 0
+  },
+  "smoke_script": "tests/hw/smoke-live.sh",
+  "matrix_runner": "tests/hw/run-hw-matrix.sh",
+  "merge_script": "tests/hw/merge-entry.sh",
+  "results_json": "docs/plans/hw-matrix-results.json",
+  "preflight": "tests/preflight/test-hw-matrix.sh",
+  "profiles": [
+    "hw-proxy-pc-bios (std-vga legacy BIOS)",
+    "hw-proxy-q35-uefi (virtio-gpu UEFI 4-core)",
+    "hw-proxy-q35-uefi-smp8 (virtio-gpu UEFI 8-core)"
+  ],
+  "markers": [
+    "STRAWWU_BOOT_OK",
+    "STRAWWU-DESKTOP-OK",
+    "STRAWWU-NET-OK",
+    "STRAWWU-GPU-OK",
+    "STRAWWU-SUSPEND-PROBE-OK",
+    "STRAWWU-HIDPI-PROBE-OK"
+  ],
+  "dod": "≥3 Live PASS + gpu_driver/wifi PASS on QEMU proxy; suspend/hidpi SKIP until physical session"
+}

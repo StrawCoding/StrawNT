@@ -1,10 +1,22 @@
 {
-  "schema": "strawwu-hw-matrix-results/v1",
-  "wave": "W6-HW1",
-  "version": "0.4.1.39",
-  "updated": "2026-07-05T22:58:55-04:00",
+  "schema": "strawwu-hw-matrix-results/v2",
+  "wave": "W8-HW-MATRIX",
+  "version": "0.5.0.4",
+  "updated": "2026-07-06T02:02:42-04:00",
   "iso": "os-image/output/StrawWU-0.4.1.33-amd64.iso",
+  "dimensions": [
+    "gpu",
+    "wifi",
+    "suspend",
+    "hidpi"
+  ],
   "minimum_live_pass": 3,
+  "minimum_hw_pass": {
+    "gpu_driver": 3,
+    "wifi": 3,
+    "suspend": 0,
+    "hidpi": 0
+  },
   "machines": [
     {
       "machine_id": "hw-proxy-pc-bios",
@@ -18,18 +30,28 @@
       "tests": {
         "live_boot": "PASS",
         "desktop": "PASS",
-        "network": "SKIP",
+        "network": "PASS",
         "audio": "SKIP",
-        "branding": "PASS"
+        "branding": "PASS",
+        "wifi": "PASS",
+        "gpu_driver": "PASS",
+        "suspend": "SKIP",
+        "hidpi": "SKIP"
       },
       "markers": [
         "STRAWWU_BOOT_OK",
         "STRAWWU-DESKTOP-OK"
       ],
       "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/hw/output/serial-hw-proxy-pc-bios.log",
-      "elapsed_sec": 211,
+      "elapsed_sec": 244,
       "qemu_exit": 0,
-      "tested": "2026-07-05T22:52:36-04:00"
+      "tested": "2026-07-06T01:55:54-04:00",
+      "hw_notes": {
+        "wifi": "network-online.target in serial",
+        "gpu_driver": "desktop session reached (display stack)",
+        "suspend": "suspend not exercised in qemu-proxy (Hermes physical session)",
+        "hidpi": "HiDPI scaling not exercised in qemu-proxy (Hermes physical session)"
+      }
     },
     {
       "machine_id": "hw-proxy-q35-uefi",
@@ -43,18 +65,28 @@
       "tests": {
         "live_boot": "PASS",
         "desktop": "PASS",
-        "network": "SKIP",
+        "network": "PASS",
         "audio": "SKIP",
-        "branding": "PASS"
+        "branding": "PASS",
+        "wifi": "PASS",
+        "gpu_driver": "PASS",
+        "suspend": "SKIP",
+        "hidpi": "SKIP"
       },
       "markers": [
         "STRAWWU_BOOT_OK",
         "STRAWWU-DESKTOP-OK"
       ],
       "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/hw/output/serial-hw-proxy-q35-uefi.log",
-      "elapsed_sec": 188,
+      "elapsed_sec": 208,
       "qemu_exit": 0,
-      "tested": "2026-07-05T22:55:44-04:00"
+      "tested": "2026-07-06T01:59:22-04:00",
+      "hw_notes": {
+        "wifi": "network-online.target in serial",
+        "gpu_driver": "desktop session reached (display stack)",
+        "suspend": "suspend not exercised in qemu-proxy (Hermes physical session)",
+        "hidpi": "HiDPI scaling not exercised in qemu-proxy (Hermes physical session)"
+      }
     },
     {
       "machine_id": "hw-proxy-q35-uefi-smp8",
@@ -68,23 +100,39 @@
       "tests": {
         "live_boot": "PASS",
         "desktop": "PASS",
-        "network": "SKIP",
+        "network": "PASS",
         "audio": "SKIP",
-        "branding": "PASS"
+        "branding": "PASS",
+        "wifi": "PASS",
+        "gpu_driver": "PASS",
+        "suspend": "SKIP",
+        "hidpi": "SKIP"
       },
       "markers": [
         "STRAWWU_BOOT_OK",
         "STRAWWU-DESKTOP-OK"
       ],
       "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/hw/output/serial-hw-proxy-q35-uefi-smp8.log",
-      "elapsed_sec": 191,
+      "elapsed_sec": 200,
       "qemu_exit": 0,
-      "tested": "2026-07-05T22:58:55-04:00"
+      "tested": "2026-07-06T02:02:42-04:00",
+      "hw_notes": {
+        "wifi": "network-online.target in serial",
+        "gpu_driver": "desktop session reached (display stack)",
+        "suspend": "suspend not exercised in qemu-proxy (Hermes physical session)",
+        "hidpi": "HiDPI scaling not exercised in qemu-proxy (Hermes physical session)"
+      }
     }
   ],
   "summary": {
     "total": 3,
     "live_pass": 3,
-    "live_fail": 0
+    "live_fail": 0,
+    "gpu_pass": 3,
+    "wifi_pass": 3,
+    "suspend_pass": 0,
+    "suspend_skip": 3,
+    "hidpi_pass": 0,
+    "hidpi_skip": 3
   }
 }

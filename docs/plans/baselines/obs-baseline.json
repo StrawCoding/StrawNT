@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-obs-baseline/v1",
   "generated_at": "2026-07-05",
-  "version": "0.5.0.3",
+  "version": "0.5.0.4",
   "log_paths": {
     "boot-selfcheck": "/var/log/strawwu/boot-selfcheck.log",
     "install": "/var/log/strawwu/install.log",
