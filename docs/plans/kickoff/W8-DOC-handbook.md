@@ -4,7 +4,7 @@
 |---------|-------|
 | Wave | 8 |
 | 計畫 | `strawwu-user-docs-plan.md` |
-| 狀態 | 待執行 |
+| 狀態 | 待 Hermes mark |
 
 ## 目標
 

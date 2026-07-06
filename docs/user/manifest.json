@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-user-docs-manifest/v1",
   "wave": "W6-DOC1",
-  "version": "0.4.1.40",
+  "version": "0.5.0.8",
   "locale_primary": "zh_TW",
   "guides": [
     {
@@ -25,9 +25,9 @@
     "community_url": "TBD",
     "support_url": "https://strawwu.local/support"
   },
-  "deferred": {
-    "doc2_wincompat": "w7+",
-    "doc3_full_rollback": "UPG5",
-    "handbook": "w8-doc-handbook"
+  "handbook": {
+    "index": "handbook/README.md",
+    "manifest": "handbook/manifest.json",
+    "wave": "W8-DOC-handbook"
   }
 }

@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-06T03:34:18.488608",
+  "generated_at": "2026-07-06T03:50:42.038481",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 44,
-  "failed": 3,
+  "passed": 45,
+  "failed": 2,
   "all_pass": false,
   "stages": [
     {
@@ -228,8 +228,8 @@
     },
     {
       "id": "w8-s4-initramfs-hooks",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w8-doc-handbook",

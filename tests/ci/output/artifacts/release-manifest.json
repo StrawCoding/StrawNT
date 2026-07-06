@@ -3,7 +3,7 @@
   "version": "8.8.8.8",
   "channel": "nightly",
   "git_tag": null,
-  "git_sha": "f61f400c54f0a0c6b1819b399d267d75bad3b01f",
+  "git_sha": "31e573f5ee1c4133c0da194c3447634935ce4bf6",
   "artifacts": [
     {
       "name": "StrawWU-8.8.8.8-amd64.iso",
@@ -51,6 +51,10 @@
     },
     {
       "name": "strawwu-initd",
+      "version": "8.8.8.8"
+    },
+    {
+      "name": "strawwu-initramfs-hooks",
       "version": "8.8.8.8"
     },
     {
@@ -114,5 +118,5 @@
     "file": "SHA256SUMS",
     "gpg_sig": null
   },
-  "published_at": "2026-07-06T07:14:54Z"
+  "published_at": "2026-07-06T08:09:17Z"
 }

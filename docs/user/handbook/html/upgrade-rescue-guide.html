@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrawWU — 升級與救援指南</title>
+  <style>
+:root {
+  --bg: #0f1419;
+  --surface: #1a2332;
+  --text: #e8eef4;
+  --muted: #8b9cb3;
+  --accent: #14b8a6;
+  --accent-dim: #0d9488;
+  --border: #2d3a4d;
+  --code-bg: #0d1117;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  margin: 0;
+  padding: 2rem 1rem 4rem;
+}
+.wrap { max-width: 52rem; margin: 0 auto; }
+header {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+.brand { color: var(--accent); font-weight: 600; letter-spacing: 0.02em; }
+h1 { color: var(--text); font-size: 1.85rem; margin: 0.5rem 0 0.25rem; }
+.meta { color: var(--muted); font-size: 0.9rem; }
+h2 {
+  color: var(--accent);
+  font-size: 1.25rem;
+  margin-top: 2rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.35rem;
+}
+h3 { color: var(--text); font-size: 1.05rem; margin-top: 1.5rem; }
+p { margin: 0.75rem 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 1.4rem; }
+li { margin: 0.35rem 0; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.92rem;
+}
+th, td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+}
+th { background: var(--surface); color: var(--accent); }
+tr:nth-child(even) td { background: rgba(26, 35, 50, 0.5); }
+code {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.88em;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+}
+pre code { border: none; padding: 0; background: none; }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1rem 0;
+  padding: 0.25rem 0 0.25rem 1rem;
+  color: var(--muted);
+}
+footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">StrawWU Handbook</div>
+      <h1>升級與救援指南</h1>
+      <p class="meta">版本 0.5.0.8 · W8-DOC · hermes-deliver</p>
+    </header>
+    <main>
+<h1>StrawWU 升級與救援指南</h1>
+<p>本指南（<strong>DOC3</strong>）說明系統升級失敗、rollback 規劃與救援流程的<strong>誠實邊界</strong>。基礎 Live chroot 救援見 <a href="../rescue-guide.md">rescue-guide.md</a>；本文件聚焦升級情境與 UPG 路線圖。</p>
+<h2>1. 文件層級</h2>
+<table>
+<tr><th>層級</th><th>文件</th><th>涵蓋</th></tr>
+<tr><td>基礎救援</td><td><a href="../rescue-guide.md">rescue-guide.md</a></td><td>Live USB、chroot、<code>initd repair</code>、<code>target-setup --repair-only</code></td></tr>
+<tr><td>升級／rollback</td><td>本文件</td><td>UPG 規劃、<code>strawwu-upgrade</code>、kernel 保留策略</td></tr>
+<tr><td>管理維運</td><td><a href="admin-handbook.md">admin-handbook.md</a></td><td>APT、發佈、initramfs</td></tr>
+</table>
+<h2>2. v0.5 已實作能力</h2>
+<table>
+<tr><th>能力</th><th>狀態</th><th>說明</th></tr>
+<tr><td>Live + chroot 修復</td><td><strong>可用</strong></td><td>見 rescue-guide §3–§4</td></tr>
+<tr><td><code>strawwu-initd repair</code></td><td><strong>可用</strong></td><td>狀態與 lifecycle 修復</td></tr>
+<tr><td><code>strawwu-target-setup --repair-only</code></td><td><strong>可用</strong></td><td>meta 套件還原</td></tr>
+<tr><td>GRUB 舊 kernel entry</td><td><strong>視安裝</strong></td><td>若存在可手動選擇</td></tr>
+<tr><td>apt 失敗後手動修復</td><td><strong>可用</strong></td><td><code>apt install --fix-broken</code> 等</td></tr>
+<tr><td><code>strawwu-bug-report</code></td><td><strong>可用</strong></td><td>收集升級失敗證據</td></tr>
+</table>
+<h2>3. v0.5 尚未實作（UPG 路線圖）</h2>
+<table>
+<tr><th>能力</th><th>規劃</th><th>說明</th></tr>
+<tr><td><code>strawwu-upgrade --rollback</code></td><td>UPG4+</td><td>一鍵回滾至前一版本</td></tr>
+<tr><td>保留 ≥2 個 kernel</td><td>UPG4</td><td>升級失敗時 GRUB 回退</td></tr>
+<tr><td><code>initrd.img.old</code> symlink</td><td>UPG</td><td>搭配 kernel 保留</td></tr>
+<tr><td>專用「StrawWU Rescue」GRUB 項目</td><td>UPG5</td><td>目前使用標準 Live</td></tr>
+<tr><td>Btrfs/ZFS snapshot rollback</td><td>評估中</td><td>見 upgrade-recovery-plan</td></tr>
+<tr><td>compat-db 升級後重建</td><td>UPG</td><td>保留 user profiles</td></tr>
+</table>
+<p><strong>請勿期待</strong> v0.5 具備一鍵 rollback；升級前請備份重要資料。</p>
+<h2>4. 升級失敗處理流程</h2>
+<pre><code>
+升級中斷或開機失敗
+
+        │
+
+        ├─► GRUB 有舊 kernel？ ──是──► 選舊 entry 開機 → apt 修復
+
+        │
+
+        └─► 否 ──► Live USB 開機
+
+                    │
+
+                    ├─► chroot → strawwu-initd repair
+
+                    ├─► chroot → strawwu-target-setup --repair-only
+
+                    ├─► apt update &amp;&amp; apt install -f
+
+                    └─► update-grub / grub-install（見 rescue-guide §4.4）
+
+</code></pre>
+<h3>4.1 日誌位置</h3>
+<table>
+<tr><th>路徑</th><th>內容</th></tr>
+<tr><td><code>/var/log/apt/history.log</code></td><td>APT 升級記錄</td></tr>
+<tr><td><code>/var/log/dpkg.log</code></td><td>套件解壓／設定</td></tr>
+<tr><td><code>/var/log/strawwu/</code></td><td>StrawWU 元件日誌</td></tr>
+<tr><td><code>/var/lib/strawwu/setup/state.json</code></td><td>lifecycle 狀態</td></tr>
+</table>
+<h3>4.2 收集證據</h3>
+<p>升級失敗時執行 <code>strawwu-bug-report-gtk</code>，附註升級前後版本與錯誤訊息。</p>
+<h2>5. 升級前建議（管理員）</h2>
+<ol>
+<li>確認 <code>make preflight</code> 與目標版本 release-manifest 簽章。</li>
+<li>在測試機驗證 <code>release-iso</code> 安裝 → 升級路徑。</li>
+<li>備份 <code>/home</code> 與重要設定。</li>
+<li>記錄目前 <code>VERSION</code> 與已安裝 <code>strawwu-*</code> 套件版本（<code>dpkg -l &#x27;strawwu-*&#x27;</code>）。</li>
+</ol>
+<h2>6. Live 救援與 UPG5</h2>
+<p>目前救援使用<strong>標準 StrawWU Live USB</strong>（與安裝相同 ISO），非獨立 Rescue 映像：</p>
+<ol>
+<li>Live 開機 → 掛載根分割區（rescue-guide §3）</li>
+<li>chroot 執行修復指令</li>
+<li>UPG5 將新增專用 GRUB「StrawWU Rescue」項目與精簡救援環境</li>
+</ol>
+<h2>7. rollback 設計預覽（未實作）</h2>
+<p>依 <code>docs/plans/strawwu-upgrade-recovery-plan.md</code>：</p>
+<ul>
+<li>升級前建立 snapshot 或保留前一 rootfs 標記</li>
+<li><code>strawwu-upgrade --rollback</code> 還原 kernel + initrd + staged debs</li>
+<li>compat-db 重建並保留使用者 app profiles</li>
+</ul>
+<p>實作完成後本文件將更新為操作步驟。</p>
+<h2>8. 與其他元件的關聯</h2>
+<table>
+<tr><th>元件</th><th>升級／救援角色</th></tr>
+<tr><td>strawwu-initramfs-hooks</td><td>升級後確保磁碟 initrd 無 casper</td></tr>
+<tr><td>strawwu-target-identity</td><td>升級後 GRUB／Plymouth 品牌一致</td></tr>
+<tr><td>strawwu-keyring</td><td>APT 來源簽章驗證</td></tr>
+<tr><td>strawwu-update-notifier</td><td>通知可用更新（非自動升級 major）</td></tr>
+</table>
+<h2>9. 相關文件</h2>
+<ul>
+<li><a href="../rescue-guide.md">rescue-guide.md</a> — 基礎救援步驟</li>
+<li><a href="admin-handbook.md">admin-handbook.md</a> — APT 與發佈</li>
+<li><a href="user-handbook.md">user-handbook.md</a> §5 系統更新</li>
+<li><code>docs/plans/strawwu-upgrade-recovery-plan.md</code> — 完整 UPG 規格</li>
+</ul>
+    </main>
+    <footer>
+      StrawWU v0.5 完整手冊 · 支援渠道 TBD · 問題回報：strawwu-bug-report-gtk
+    </footer>
+  </div>
+</body>
+</html>

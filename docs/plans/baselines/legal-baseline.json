@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-legal-baseline/v1",
   "generated_at": "2026-07-06",
-  "version": "0.5.0.6",
+  "version": "0.5.0.8",
   "trademark": {
     "ui_brand": "StrawWU",
     "os_release_id": "ubuntu",
@@ -53,6 +53,7 @@
     "Calamares/GRUB/Plymouth compliance audit (LEG3)"
   ],
   "gaps_closed": [
+    "release compliance gate CI (LEG4)",
     "release compliance gate CI (LEG4)"
   ]
 }

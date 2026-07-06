@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrawWU — 管理員手冊</title>
+  <style>
+:root {
+  --bg: #0f1419;
+  --surface: #1a2332;
+  --text: #e8eef4;
+  --muted: #8b9cb3;
+  --accent: #14b8a6;
+  --accent-dim: #0d9488;
+  --border: #2d3a4d;
+  --code-bg: #0d1117;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  margin: 0;
+  padding: 2rem 1rem 4rem;
+}
+.wrap { max-width: 52rem; margin: 0 auto; }
+header {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+.brand { color: var(--accent); font-weight: 600; letter-spacing: 0.02em; }
+h1 { color: var(--text); font-size: 1.85rem; margin: 0.5rem 0 0.25rem; }
+.meta { color: var(--muted); font-size: 0.9rem; }
+h2 {
+  color: var(--accent);
+  font-size: 1.25rem;
+  margin-top: 2rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.35rem;
+}
+h3 { color: var(--text); font-size: 1.05rem; margin-top: 1.5rem; }
+p { margin: 0.75rem 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 1.4rem; }
+li { margin: 0.35rem 0; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.92rem;
+}
+th, td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+}
+th { background: var(--surface); color: var(--accent); }
+tr:nth-child(even) td { background: rgba(26, 35, 50, 0.5); }
+code {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.88em;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+}
+pre code { border: none; padding: 0; background: none; }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1rem 0;
+  padding: 0.25rem 0 0.25rem 1rem;
+  color: var(--muted);
+}
+footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">StrawWU Handbook</div>
+      <h1>管理員手冊</h1>
+      <p class="meta">版本 0.5.0.8 · W8-DOC · hermes-deliver</p>
+    </header>
+    <main>
+<h1>StrawWU 管理員手冊</h1>
+<p>本手冊面向<strong>系統管理員與發行維護者</strong>，說明 StrawWU 目標系統的維運、套件、發佈與疑難排解。終端使用者日常操作見 <a href="user-handbook.md">user-handbook.md</a>。</p>
+<h2>1. 架構概覽</h2>
+<pre><code>
+ISO (Live) ──Calamares──► 已安裝系統
+
+                              │
+
+         ┌────────────────────┼────────────────────┐
+
+         ▼                    ▼                    ▼
+
+  strawwu-initd        strawwu-target-setup   strawwu-app-registry
+
+  (state.json)         (chroot meta staging)   (使用者應用登記)
+
+         │                    │
+
+         ▼                    ▼
+
+  lifecycle 旗標        meta .deb + initramfs-hooks
+
+</code></pre>
+<table>
+<tr><th>子系統</th><th>套件／工具</th><th>用途</th></tr>
+<tr><td>狀態管理</td><td><code>strawwu-initd</code></td><td><code>/var/lib/strawwu/setup/state.json</code>、lifecycle</td></tr>
+<tr><td>安裝 hook</td><td><code>strawwu-target-setup</code></td><td>Calamares chroot 內安裝 staged debs</td></tr>
+<tr><td>應用登記</td><td><code>strawwu-app-registry</code></td><td>User App Registry（與 compat-db 分離）</td></tr>
+<tr><td>開機鏈</td><td><code>strawwu-initramfs-hooks</code></td><td>剝除 casper hook、強制磁碟 <code>BOOT=local</code></td></tr>
+<tr><td>品牌</td><td><code>strawwu-target-identity</code></td><td>GRUB、Plymouth、initramfs 重生</td></tr>
+</table>
+<h2>2. strawwu-initd</h2>
+<p>CLI 管理安裝後系統狀態：</p>
+<pre><code>
+strawwu-initd show                    # 顯示 state.json
+
+strawwu-initd repair                  # 修復損毀狀態（備份後重建）
+
+strawwu-initd set &lt;key&gt; &lt;value&gt;       # 設定 lifecycle 旗標
+
+</code></pre>
+<p>常見 lifecycle 鍵：<code>firstboot_required</code>、<code>initramfs_hooks</code>、<code>target_identity</code>。</p>
+<p><strong>repair</strong> 適用於 JSON 損毀、firstboot 迴圈、升級後狀態不一致。詳見 <a href="../rescue-guide.md">rescue-guide.md</a> §4.1。</p>
+<h2>3. strawwu-target-setup</h2>
+<p>Calamares <code>target_setup</code> 階段執行，亦可在 Live chroot 手動修復：</p>
+<pre><code>
+strawwu-target-setup --repair-only    # 重新套用 target manifest staged debs
+
+</code></pre>
+<p><code>target-manifest.yaml</code> 定義安裝順序（desktop meta、bug-reporter、firstboot、initramfs-hooks、target-identity 等）。中斷安裝或手動刪除 StrawWU 套件後使用 <code>--repair-only</code>。</p>
+<h2>4. Meta 套件與 allowlist</h2>
+<table>
+<tr><th>Meta</th><th>說明</th></tr>
+<tr><td><code>strawwu-desktop</code></td><td>桌面 session、shell、hub、greeter</td></tr>
+<tr><td><code>strawwu-minimal</code></td><td>核心 StrawWU 元件</td></tr>
+<tr><td><code>strawwu-bug-reporter</code></td><td>問題回報</td></tr>
+<tr><td><code>strawwu-firstboot</code></td><td>首次設定精靈</td></tr>
+</table>
+<p><strong>meta-audit</strong>（W6-B5）維護 Ubuntu 上游套件 allowlist；禁止未審核的 <code>ubuntu-*</code> 品牌套件殘留。執行 <code>make test-meta-audit</code> 驗證。</p>
+<h2>5. APT 倉庫與簽章</h2>
+<p>StrawWU 官方倉庫（W7-RE）：</p>
+<table>
+<tr><th>元件</th><th>路徑／說明</th></tr>
+<tr><td><code>strawwu-keyring</code></td><td>GPG 金鑰，安裝於 <code>/usr/share/keyrings/</code></td></tr>
+<tr><td><code>sources.list.d/strawwu.list</code></td><td>APT 來源</td></tr>
+<tr><td><code>make publish-debs</code></td><td>從 <code>os-image/debs/</code> 建置簽章倉庫</td></tr>
+</table>
+<p>客戶端更新：<code>sudo apt update &amp;&amp; sudo apt upgrade</code>。倉庫 URL 隨發佈管線配置（見 <code>release-manifest.json</code>）。</p>
+<h2>6. 發佈與 ISO</h2>
+<h3>6.1 ISO 三模式</h3>
+<table>
+<tr><th>模式</th><th>用途</th><th>壓縮</th></tr>
+<tr><td>dev-vm</td><td>日常開發，rsync 至 VM</td><td>無 ISO</td></tr>
+<tr><td>dev-iso</td><td>快速 Live 驗證</td><td>zstd</td></tr>
+<tr><td>release-iso</td><td>正式驗收、發佈</td><td>xz</td></tr>
+</table>
+<p>Phase 驗收僅用 <strong>release-iso</strong>。詳見 <code>docs/iso-modes.md</code>。</p>
+<h3>6.2 發佈產物</h3>
+<pre><code>
+make release-iso
+
+make generate-release-manifest
+
+make release-sign          # SHA256SUMS + GPG
+
+</code></pre>
+<p>產物：<code>os-image/output/StrawWU-&lt;版本&gt;-amd64.iso</code>、<code>release-manifest.json</code>、簽章檔。</p>
+<h3>6.3 Preflight 閘門</h3>
+<p>任何改碼後須 <code>make preflight</code> PASS，才允許 boot-test／E2E。禁止 <code>SKIP_SQUASHFS=1</code> 進 release 驗收。</p>
+<h2>7. initramfs 與開機</h2>
+<p><strong>strawwu-initramfs-hooks</strong>（W8-S4）在已安裝系統：</p>
+<ul>
+<li>剝除 <code>casper</code>／<code>live-boot</code> initramfs hook（Live 專用）</li>
+<li>安裝 <code>conf.d/strawwu-disk-boot</code>（<code>BOOT=local</code>）</li>
+<li>與 ISO initrd splice（strawwu-live-init／bottom）互補</li>
+</ul>
+<p><code>strawwu-target-identity</code> post-install 執行 <code>update-initramfs</code> 重生磁碟 initrd。</p>
+<p>GRUB 修復見 <a href="../rescue-guide.md">rescue-guide.md</a> §4.4。</p>
+<h2>8. 硬體相容與 CI</h2>
+<table>
+<tr><th>資源</th><th>說明</th></tr>
+<tr><td><code>docs/plans/hw-matrix-results.json</code></td><td>GPU／Wi-Fi／suspend／HiDPI 實機結果</td></tr>
+<tr><td><code>tests/hw/smoke-live.sh</code></td><td>Live session smoke</td></tr>
+<tr><td><code>make test-hw-matrix</code></td><td>矩陣 gate</td></tr>
+</table>
+<p>維護者合併實機 smoke 輸出至 hw-matrix；使用者見 install-guide §2.4。</p>
+<h2>9. Windows 相容（管理視角）</h2>
+<p>compat-db 與 User App Registry <strong>分表</strong>：</p>
+<ul>
+<li><strong>compat-db</strong>：CI 黃金應用、反作弊矩陣、等級 A/B/C/F</li>
+<li><strong>App Registry</strong>：使用者已安裝應用</li>
+</ul>
+<p>Hub 與 <code>strawwu status</code> 讀取 compat 摘要。管理員不需手動編輯 compat-db；見 <code>components/specs/anticheat-compat.md</code>。</p>
+<h2>10. 觀測與合規</h2>
+<table>
+<tr><th>項目</th><th>工具</th></tr>
+<tr><td>Bug bundle schema</td><td><code>strawwu-bug-report</code> CLI</td></tr>
+<tr><td>商標掃描</td><td><code>make test-legal-trademark</code></td></tr>
+<tr><td>遙測清除</td><td>purge-ubuntu-telemetry（無 apport／whoopsie／ubuntu-pro）</td></tr>
+<tr><td>CI nightly</td><td><code>make test-ci-nightly</code></td></tr>
+</table>
+<h2>11. 疑難排解速查</h2>
+<table>
+<tr><th>問題</th><th>指令／文件</th></tr>
+<tr><td>meta 不完整</td><td><code>strawwu-target-setup --repair-only</code></td></tr>
+<tr><td>state 損毀</td><td><code>strawwu-initd repair</code></td></tr>
+<tr><td>initrd 仍含 casper</td><td>確認 <code>strawwu-initramfs-hooks</code> 已安裝</td></tr>
+<tr><td>registry 不同步</td><td><code>strawwu-app-registry scan</code></td></tr>
+<tr><td>升級失敗</td><td><a href="upgrade-rescue-guide.md">upgrade-rescue-guide.md</a></td></tr>
+</table>
+<h2>12. 相關文件</h2>
+<ul>
+<li><a href="user-handbook.md">user-handbook.md</a> — 終端使用者指南</li>
+<li><a href="../rescue-guide.md">rescue-guide.md</a> — Live chroot 救援</li>
+<li><a href="upgrade-rescue-guide.md">upgrade-rescue-guide.md</a> — UPG／rollback</li>
+<li><code>docs/plans/strawwu-upgrade-recovery-plan.md</code> — UPG 路線圖</li>
+<li><code>docs/iso-modes.md</code> — ISO 建置模式</li>
+</ul>
+    </main>
+    <footer>
+      StrawWU v0.5 完整手冊 · 支援渠道 TBD · 問題回報：strawwu-bug-report-gtk
+    </footer>
+  </div>
+</body>
+</html>

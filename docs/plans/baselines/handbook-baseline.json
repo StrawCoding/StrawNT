@@ -1,0 +1,35 @@
+{
+  "schema": "strawwu-handbook-baseline/v1",
+  "wave": "W8-DOC-handbook",
+  "version": "0.5.0.8",
+  "docs_root": "docs/user/handbook",
+  "volumes": [
+    {
+      "id": "user",
+      "markdown": "user-handbook.md",
+      "html": "html/user-handbook.html"
+    },
+    {
+      "id": "admin",
+      "markdown": "admin-handbook.md",
+      "html": "html/admin-handbook.html"
+    },
+    {
+      "id": "wincompat",
+      "markdown": "wincompat-guide.md",
+      "html": "html/wincompat-guide.html"
+    },
+    {
+      "id": "upgrade-rescue",
+      "markdown": "upgrade-rescue-guide.md",
+      "html": "html/upgrade-rescue-guide.html"
+    }
+  ],
+  "index": "docs/user/handbook/README.md",
+  "manifest": "docs/user/handbook/manifest.json",
+  "validate": "tests/handbook/validate-handbook.py",
+  "render": "tests/handbook/render-html.py",
+  "preflight": "tests/preflight/test-handbook.sh",
+  "dod": "user+admin handbook with DOC2 wincompat + DOC3 upgrade/rescue HTML",
+  "support_placeholder": "TBD"
+}

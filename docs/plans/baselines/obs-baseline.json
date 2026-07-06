@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-obs-baseline/v1",
   "generated_at": "2026-07-05",
-  "version": "0.5.0.6",
+  "version": "0.5.0.8",
   "log_paths": {
     "boot-selfcheck": "/var/log/strawwu/boot-selfcheck.log",
     "install": "/var/log/strawwu/install.log",
@@ -27,17 +27,7 @@
     "format": "bundle.strawwu-bug",
     "auto_upload_default": false,
     "consent_required": true,
-    "schema_ready": true,
-    "cli": "strawwu-bug-report",
-    "entries": [
-      "manifest.json",
-      "system.json",
-      "journal.txt",
-      "dmesg.txt",
-      "logs/",
-      "registry.json",
-      "user-notes.txt"
-    ]
+    "schema_ready": true
   },
   "wave0_gaps": [
     "structured JSON logging not wired"
