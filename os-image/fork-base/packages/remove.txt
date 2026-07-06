@@ -1,0 +1,8 @@
+# Packages to purge from fork base (one per line)
+# Inherited from W1 purge + fork curation
+snapd
+ubuntu-advantage-tools
+apport
+apport-symptoms
+whoopsie
+ubuntu-report

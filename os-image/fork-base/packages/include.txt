@@ -1,0 +1,4 @@
+# Extra packages to ensure in fork base (one per line)
+# Populated/curated in fork-f2-manifest-repo
+linux-firmware
+firmware-sof-signed

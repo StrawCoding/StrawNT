@@ -1,0 +1,9 @@
+# APT pin preferences for fork base
+# Format: package pin priority
+Package: linux-image-*-strawwu
+Pin: release o=StrawWU
+Pin-Priority: 1001
+
+Package: strawwu-*
+Pin: release o=StrawWU
+Pin-Priority: 1001

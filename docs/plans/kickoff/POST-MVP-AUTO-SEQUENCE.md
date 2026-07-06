@@ -3,7 +3,7 @@
 | 項目 | 值 |
 |------|-----|
 | 總 stage 數 | **21** |
-| 前置 | Ubuntu 26.04 遷移 7 段（`u26-m7-closeout` PASS） |
+| 前置 | Ubuntu 26.04 遷移 7 段 + Fork 7 段（`fork-f7-closeout` PASS） |
 | 起點 | `post-d1-strawwu-drivers` |
 | 終點 | `post-v09-engineering-closeout` |
 | 路線圖 | `docs/plans/strawwu-post-mvp-roadmap.md` |
@@ -14,6 +14,7 @@
 ```
 Wave 47 → w8-mvp-closeout
   → Ubuntu 26.04 遷移 7 段（u26-m1 … u26-m7）
+  → Fork 7 段（fork-f1 … fork-f7）
   → Post-MVP 21 段（本文件）
 ```
 
@@ -45,6 +46,7 @@ post-d1-strawwu-drivers
 
 ## 規則
 
-1. `w8-mvp-closeout` PASS → 自動 launch `u26-m1-base-clone`（非直接 post-d1）
-2. `u26-m7-closeout` PASS → 自動 launch `post-d1-strawwu-drivers`
-3. 每 post stage PASS → 自動 launch 下一段
+1. `w8-mvp-closeout` PASS → 自動 launch `u26-m1-base-clone`
+2. `u26-m7-closeout` PASS → 自動 launch `fork-f1-baseline-snapshot`
+3. `fork-f7-closeout` PASS → 自動 launch `post-d1-strawwu-drivers`
+4. 每 post stage PASS → 自動 launch 下一段

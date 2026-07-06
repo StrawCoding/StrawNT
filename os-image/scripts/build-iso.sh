@@ -473,7 +473,10 @@ sync_casper_kernel() {
     grep -q strawwu-kernel "${marker}" 2>/dev/null || return 0
 
     local vmlinuz kver
-    vmlinuz="$(ls "${ROOTFS_DIR}/boot/vmlinuz-"* 2>/dev/null | head -1)"
+    vmlinuz="$(ls "${ROOTFS_DIR}/boot/vmlinuz-"*strawwu* 2>/dev/null | head -1)"
+    if [[ -z "${vmlinuz}" ]]; then
+        vmlinuz="$(ls "${ROOTFS_DIR}/boot/vmlinuz-"* 2>/dev/null | head -1)"
+    fi
     [[ -f "${vmlinuz}" ]] || die "custom kernel vmlinuz missing in rootfs /boot after swap"
     kver="$(basename "${vmlinuz}" | sed 's/^vmlinuz-//')"
     log "syncing casper vmlinuz from ${kver} (preserving casper initrd, injecting modules)"
@@ -618,7 +621,13 @@ __build_iso_main() {
     iso_mode_resolve
     iso_mode_log "squashfs processors=${STRAWWU_MKSQUASHFS_PROCESSORS} skip_squashfs=${STRAWWU_SKIP_SQUASHFS}"
 
-    [[ -f "${WORK_DIR}/.clone-ubuntu-base-ok" ]] || die "run make clone-ubuntu-base first"
+    if [[ -f "${WORK_DIR}/.fork-sync-base-ok" ]]; then
+        :
+    elif [[ -f "${WORK_DIR}/.clone-ubuntu-base-ok" ]]; then
+        :
+    else
+        die "run make clone-ubuntu-base or make fork-sync-base first"
+    fi
     [[ -d "${ROOTFS_DIR}" ]] || die "rootfs missing: ${ROOTFS_DIR}"
 
     local kernel_deb="${STRAWWU_KERNEL_DEB:-}"

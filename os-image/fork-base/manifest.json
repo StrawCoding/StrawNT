@@ -1,0 +1,23 @@
+{
+  "schema": "strawwu-fork-base/v1",
+  "status": "pending",
+  "created_at": null,
+  "ubuntu": {
+    "version": "26.04.0",
+    "codename": "resolute",
+    "iso_name": "ubuntu-26.04-desktop-amd64.iso"
+  },
+  "snapshot": {
+    "file": null,
+    "sha256": null,
+    "size_bytes": null,
+    "strawwu_version": null
+  },
+  "packages": {
+    "include": "packages/include.txt",
+    "remove": "packages/remove.txt",
+    "replace": "packages/replace.json",
+    "pins": "packages/pins.txt"
+  },
+  "notes": "Populated by fork-f1-baseline-snapshot; status=active after fork-f7-closeout"
+}

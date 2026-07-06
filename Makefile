@@ -1,4 +1,4 @@
-.PHONY: help preflight preflight-iso-before-boot preflight-dev-vm clone-ubuntu-base swap-kernel \
+.PHONY: help preflight preflight-iso-before-boot preflight-dev-vm clone-ubuntu-base fork-sync-base fork-baseline-snapshot fork-apply-manifest swap-kernel \
 	build-iso dev-iso release-iso repack-iso validate-rootfs boot-test-iso boot-test-dev-iso \
 	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
@@ -20,7 +20,10 @@ help:
 	@echo ""
 	@echo "Targets:"
 	@echo "  preflight                 Static checks (run before anything else)"
-	@echo "  clone-ubuntu-base         Extract Ubuntu noble live rootfs (needs root)"
+	@echo "  clone-ubuntu-base         Extract Ubuntu live rootfs from ISO (needs root)"
+	@echo "  fork-sync-base            Restore/seed fork base from snapshot or clone (needs root)"
+	@echo "  fork-baseline-snapshot    Capture rootfs as fork baseline snapshot (needs root)"
+	@echo "  fork-apply-manifest       Apply fork package lists to rootfs (needs root)"
 	@echo "  swap-kernel               Replace kernel in cloned rootfs (needs root)"
 	@echo "  dev-iso                   Build ISO (dev-iso mode, zstd -l 3)"
 	@echo "  release-iso               Build ISO (release-iso mode, xz)"
@@ -43,7 +46,8 @@ help:
 	@echo "  test-meta-audit               W6-B5 ubuntu-* allowlist + strawwu-minimal meta"
 	@echo "  test-wave0-baseline           Wave 0 preflight baselines (12 scripts + JSON)"
 	@echo "  test-wave-all-pass            Verify all 47 wave stages PASS (MVP closeout gate)"
-	@echo "  test-post-mvp-roadmap         Post-MVP + Ubuntu 26.04 long-task infrastructure gate"
+	@echo "  test-post-mvp-roadmap         Post-MVP + Ubuntu 26.04 + Fork long-task infrastructure gate"
+	@echo "  test-fork-roadmap             Fork base migration infrastructure gate"
 	@echo "  test-post-mvp-all-pass        Verify all 21 post-MVP stages PASS"
 	@echo "  test-post-mvp-v06-closeout    v0.6 drivers/HW closeout gate"
 	@echo "  test-ubuntu-2604-roadmap      Ubuntu 26.04 migration infrastructure gate"
@@ -178,6 +182,15 @@ preflight-iso-before-boot:
 clone-ubuntu-base: preflight
 	sudo bash $(SCRIPTS)/clone-ubuntu-base.sh
 
+fork-sync-base: preflight
+	sudo bash $(SCRIPTS)/fork-sync-base.sh
+
+fork-baseline-snapshot: preflight
+	sudo bash $(SCRIPTS)/fork-baseline-snapshot.sh
+
+fork-apply-manifest: preflight
+	sudo bash $(SCRIPTS)/fork-apply-manifest.sh
+
 kernel-build:
 	$(MAKE) -C kernel build
 
@@ -206,11 +219,11 @@ release-iso: preflight
 		STRAWWU_SKIP_SQUASHFS=0 bash $(SCRIPTS)/build-iso.sh
 
 repack-iso: preflight
-	@test -f os-image/work/.clone-ubuntu-base-ok || (echo "run make clone-ubuntu-base first" && exit 1)
+	@test -f os-image/work/.clone-ubuntu-base-ok -o -f os-image/work/.fork-sync-base-ok || (echo "run make clone-ubuntu-base or fork-sync-base first" && exit 1)
 	sudo STRAWWU_ISO_MODE=dev-iso STRAWWU_VERSION=$(VERSION) STRAWWU_KERNEL_DEB="$${STRAWWU_KERNEL_DEB:-$(KERNEL_DEB)}" STRAWWU_SKIP_SQUASHFS=1 bash $(SCRIPTS)/build-iso.sh
 
 validate-rootfs:
-	@test -d os-image/work/rootfs/etc || (echo "run make clone-ubuntu-base first" && exit 1)
+	@test -d os-image/work/rootfs/etc || (echo "run make clone-ubuntu-base or fork-sync-base first" && exit 1)
 	@test -f os-image/work/rootfs/usr/bin/calamares
 	@test -f os-image/work/rootfs/etc/calamares/modules/mount.conf
 	@test -d os-image/work/rootfs/usr/share/doc/strawwu-calamares-settings || (echo "missing strawwu-calamares-settings" >&2; exit 1)
@@ -300,6 +313,16 @@ test-ubuntu-2604-roadmap:
 
 test-ubuntu-2604-all-pass:
 	bash tests/preflight/test-ubuntu-2604-all-pass.sh
+
+test-fork-roadmap:
+	bash tests/preflight/test-fork-roadmap.sh
+
+test-fork-all-pass:
+	bash tests/preflight/test-fork-all-pass.sh
+
+test-fork-f1-baseline-snapshot test-fork-f2-manifest-repo test-fork-f3-build-pipeline \
+test-fork-f4-package-overlays test-fork-f5-apt-fork-suite test-fork-f6-regression-e2e:
+	bash tests/preflight/test-$(subst test-,,$@).sh
 
 test-u26-base-clone test-u26-kernel-rebase test-u26-debs-rebuild test-u26-suite-migrate \
 test-u26-techrefs-refresh test-u26-regression-e2e:

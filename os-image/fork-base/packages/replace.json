@@ -1,0 +1,8 @@
+{
+  "schema": "strawwu-fork-replace/v1",
+  "replacements": {
+    "calamares-settings-ubuntu-common": "strawwu-calamares-settings",
+    "ubuntu-desktop-minimal": "strawwu-desktop",
+    "ubuntu-minimal": "strawwu-minimal"
+  }
+}

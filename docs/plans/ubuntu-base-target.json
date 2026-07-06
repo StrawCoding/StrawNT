@@ -1,6 +1,19 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "updated_at": "2026-07-06",
+  "base_mode": "clone",
+  "base_mode_note": "clone until fork-f7-closeout; then fork (Mint-style persistent base)",
+  "fork": {
+    "manifest": "os-image/fork-base/manifest.json",
+    "snapshots_dir": "os-image/fork-base/snapshots",
+    "packages_dir": "os-image/fork-base/packages",
+    "fork_packages_dir": "os-image/fork/packages",
+    "locked_sequence": "fork_locked_sequence",
+    "trigger_after": "u26-m7-closeout",
+    "first_stage": "fork-f1-baseline-snapshot",
+    "closeout_stage": "fork-f7-closeout",
+    "post_fork_first": "post-d1-strawwu-drivers"
+  },
   "active": {
     "version": "26.04.0",
     "codename": "resolute",

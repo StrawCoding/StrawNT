@@ -23,41 +23,109 @@ def align512(value: int) -> int:
     return (value + 511) & ~511
 
 
-def split_prefix_phases(initrd_path: Path, out_dir: Path) -> tuple[list[Path], Path | None]:
-    data = initrd_path.read_bytes()
-    offset = 0
-    blobs: list[Path] = []
-    out_dir.mkdir(parents=True, exist_ok=True)
+def read_hex_field(data: bytes, offset: int, count: int) -> str | None:
+    chunk = data[offset : offset + count]
+    if len(chunk) != count:
+        return None
+    try:
+        text = chunk.decode("ascii")
+    except UnicodeDecodeError:
+        return None
+    if not all(ch in "0123456789abcdefABCDEF" for ch in text):
+        return None
+    return text
 
-    for phase in PREFIX_PHASES:
-        if offset >= len(data) or data[offset : offset + 6] != b"070701":
-            raise ValueError(f"expected cpio phase {phase} at offset {offset} in {initrd_path}")
 
-        start = offset
-        while True:
-            namesize = int(data[offset + 94 : offset + 102], 16)
-            filesize = int(data[offset + 54 : offset + 62], 16)
-            name = (
-                data[offset + 110 : offset + 110 + namesize - 1]
-                .split(b"\0", 1)[0]
-                .decode("ascii", "replace")
-            )
-            offset += align4(110 + namesize) + align4(filesize)
-            if name == "TRAILER!!!":
+def parse_prefix_archives(data: bytes) -> tuple[list[tuple[int, int]], int]:
+    """Split prepended cpio archives using the same rules as unmkinitramfs(8)."""
+    archives: list[tuple[int, int]] = []
+    start = 0
+
+    while True:
+        end = start
+        while end < len(data):
+            if data[end] == 0:
+                end += 4
+                while end < len(data) and data[end] == 0:
+                    end += 4
                 break
 
-        end = align512(offset)
+            magic = read_hex_field(data, end, 6)
+            if magic not in ("070701", "070702"):
+                break
+
+            namesize_hex = read_hex_field(data, end + 94, 8)
+            filesize_hex = read_hex_field(data, end + 54, 8)
+            if namesize_hex is None or filesize_hex is None:
+                break
+
+            namesize = int(namesize_hex, 16)
+            filesize = int(filesize_hex, 16)
+            end = end + 110
+            end = (end + namesize + 3) & ~3
+            end = (end + filesize + 3) & ~3
+
+        if end == start:
+            break
+
+        archives.append((start, end))
+        start = end
+
+    return archives, start
+
+
+def parse_initrd_layout(data: bytes) -> tuple[list[tuple[int, int]], list[bytes], bytes]:
+    """Return (cpio spans, inter-phase gaps, compressed main payload).
+
+    Resolute 26.04 uses early + early2 prefix archives with binary headers
+    between segments; noble 24.04 uses early/early2/early3 back-to-back.
+    """
+    archives, main_start = parse_prefix_archives(data)
+    if not archives:
+        raise ValueError("no cpio prefix archives found in initrd")
+
+  # Gaps are not re-encoded separately for resolute headers — each archive span
+  # already includes any binary metadata that unmkinitramfs consumes while walking.
+    gaps: list[bytes] = []
+    main_bytes = data[main_start:]
+    if not main_bytes:
+        raise ValueError("compressed main phase missing in initrd")
+    return archives, gaps, main_bytes
+
+
+def split_prefix_phases(initrd_path: Path, out_dir: Path) -> tuple[list[Path], Path | None]:
+    data = initrd_path.read_bytes()
+    cpios, gaps, main_bytes = parse_initrd_layout(data)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    blobs: list[Path] = []
+
+    for idx, (start, end) in enumerate(cpios):
+        phase = PREFIX_PHASES[idx] if idx < len(PREFIX_PHASES) else f"early{idx + 1}"
         blob = out_dir / f"{phase}.cpio.bin"
         blob.write_bytes(data[start:end])
         blobs.append(blob)
-        offset = end
+
+    for idx, gap in enumerate(gaps):
+        (out_dir / f"gap-{idx}.bin").write_bytes(gap)
 
     main_blob: Path | None = None
-    if offset < len(data):
+    if main_bytes:
         main_blob = out_dir / "main.zst"
-        main_blob.write_bytes(data[offset:])
+        main_blob.write_bytes(main_bytes)
 
     return blobs, main_blob
+
+
+def load_prefix_gaps(prefix_dir: Path) -> list[bytes]:
+    gaps: list[bytes] = []
+    idx = 0
+    while True:
+        gap_path = prefix_dir / f"gap-{idx}.bin"
+        if not gap_path.is_file():
+            break
+        gaps.append(gap_path.read_bytes())
+        idx += 1
+    return gaps
 
 
 def repack_main(main_dir: Path, out_cpio: Path) -> None:
@@ -90,9 +158,13 @@ def compress_main_cpio(main_cpio: Path, out_zst: Path, level: int = 19) -> None:
 
 
 def concat_initrd(prefix_blobs: list[Path], main_payload: Path, out_initrd: Path) -> None:
+    prefix_dir = prefix_blobs[0].parent if prefix_blobs else None
+    gaps = load_prefix_gaps(prefix_dir) if prefix_dir is not None else []
     with out_initrd.open("wb") as handle:
-        for blob in prefix_blobs:
+        for idx, blob in enumerate(prefix_blobs):
             handle.write(blob.read_bytes())
+            if idx < len(gaps):
+                handle.write(gaps[idx])
         handle.write(main_payload.read_bytes())
 
 
@@ -450,6 +522,21 @@ def replace_modules_tree(modules_root: Path, old_kver: str, new_kver: str, modul
         shutil.rmtree(old_dir)
 
 
+def find_module_phase_index(prefix_blobs: list[Path], scratch: Path) -> int:
+    import shutil
+
+    for idx in range(len(prefix_blobs) - 1, -1, -1):
+        scan_dir = scratch / f"module-scan-{idx}"
+        if scan_dir.exists():
+            shutil.rmtree(scan_dir)
+        extract_cpio_blob(prefix_blobs[idx], scan_dir)
+        for rel in (Path("usr/lib/modules"), Path("lib/modules")):
+            mod_root = scan_dir / rel
+            if mod_root.is_dir() and any(child.is_dir() for child in mod_root.iterdir()):
+                return idx
+    return max(0, len(prefix_blobs) - 1)
+
+
 def replace_early3_modules(
     initrd_src: Path,
     scratch: Path,
@@ -459,27 +546,29 @@ def replace_early3_modules(
     prefix_dir = scratch / "prefix"
     prefix_dir.mkdir(parents=True, exist_ok=True)
     prefix_blobs, main_blob = split_prefix_phases(initrd_src, prefix_dir)
-    if len(prefix_blobs) < 3:
+    if not prefix_blobs:
         return main_blob, ""
 
-    early3_blob = prefix_blobs[2]
-    early3_dir = scratch / "early3"
-    if early3_dir.exists():
+    module_idx = find_module_phase_index(prefix_blobs, scratch)
+    phase_name = PREFIX_PHASES[module_idx] if module_idx < len(PREFIX_PHASES) else f"early{module_idx + 1}"
+    module_blob = prefix_blobs[module_idx]
+    module_dir = scratch / f"{phase_name}-modules"
+    if module_dir.exists():
         import shutil
 
-        shutil.rmtree(early3_dir)
-    extract_cpio_blob(early3_blob, early3_dir)
+        shutil.rmtree(module_dir)
+    extract_cpio_blob(module_blob, module_dir)
 
     modules_rel = Path("usr/lib/modules")
-    if not (early3_dir / modules_rel).is_dir():
+    if not (module_dir / modules_rel).is_dir():
         modules_rel = Path("lib/modules")
-    modules_root = early3_dir / modules_rel
+    modules_root = module_dir / modules_rel
     if not modules_root.is_dir():
-        raise ValueError("early3 initrd has no modules tree")
+        raise ValueError(f"{phase_name} initrd has no modules tree")
 
     old_kvers = sorted(p.name for p in modules_root.iterdir() if p.is_dir())
     if not old_kvers:
-        raise ValueError("early3 initrd has no module version directory")
+        raise ValueError(f"{phase_name} initrd has no module version directory")
     old_kver = old_kvers[0]
     replace_modules_tree(modules_root, old_kver, new_kver, modules_src)
     # Remove any leftover upstream kver trees (prevents dual 6.11 + 6.8.12 trees).
@@ -495,9 +584,9 @@ def replace_early3_modules(
 
             shutil.rmtree(child)
 
-    new_early3 = prefix_dir / "early3.cpio.bin"
-    repack_cpio_dir(early3_dir, new_early3)
-    prefix_blobs[2] = new_early3
+    new_module_blob = prefix_dir / f"{phase_name}.cpio.bin"
+    repack_cpio_dir(module_dir, new_module_blob)
+    prefix_blobs[module_idx] = new_module_blob
     return main_blob, old_kver
 
 
@@ -726,16 +815,20 @@ def repack_initrd_phases(
         main_blob, old_kver = replace_early3_modules(initrd_src, scratch, new_kver, modules_src)
         prefix_blobs = sorted(prefix_dir.glob("early*.cpio.bin"), key=lambda p: p.name)
         if branding_root is not None and branding_root.is_dir():
-            early3_dir = scratch / "early3-brand"
-            if early3_dir.exists():
+            module_idx = find_module_phase_index(prefix_blobs, scratch)
+            phase_name = (
+                PREFIX_PHASES[module_idx] if module_idx < len(PREFIX_PHASES) else f"early{module_idx + 1}"
+            )
+            brand_dir = scratch / f"{phase_name}-brand"
+            if brand_dir.exists():
                 import shutil
 
-                shutil.rmtree(early3_dir)
-            extract_cpio_blob(prefix_blobs[2], early3_dir)
-            inject_plymouth_into_early3(early3_dir, branding_root)
-            new_early3 = prefix_dir / "early3.cpio.bin"
-            repack_cpio_dir(early3_dir, new_early3)
-            prefix_blobs[2] = new_early3
+                shutil.rmtree(brand_dir)
+            extract_cpio_blob(prefix_blobs[module_idx], brand_dir)
+            inject_plymouth_into_early3(brand_dir, branding_root)
+            new_branded = prefix_dir / f"{phase_name}.cpio.bin"
+            repack_cpio_dir(brand_dir, new_branded)
+            prefix_blobs[module_idx] = new_branded
         preserve_main = True
     else:
         prefix_blobs, main_blob = split_prefix_phases(initrd_src, prefix_dir)

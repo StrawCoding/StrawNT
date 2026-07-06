@@ -20,6 +20,10 @@ for k in POST-D1-strawwu-drivers POST-HW-T1-live-usb POST-HW-T2-installed POST-H
     require_file "${PLANS_DIR}/kickoff/${k}.md" "kickoff ${k}"
 done
 
+require_plan "strawwu-ubuntu-2604-migration-plan.md"
+require_plan "strawwu-fork-migration-plan.md"
+require_file "${PLANS_DIR}/kickoff/FORK-AUTO-SEQUENCE.md" "FORK-AUTO-SEQUENCE"
+
 python3 - "${CFG}" <<'PY'
 import json, pathlib, sys
 cfg = json.loads(pathlib.Path(sys.argv[1]).read_text())
@@ -27,15 +31,18 @@ seq = cfg.get("post_mvp_locked_sequence") or []
 assert len(seq) == 21, f"expected 21 post-mvp stages got {len(seq)}"
 u26 = cfg.get("ubuntu_2604_locked_sequence") or []
 assert len(u26) == 7, f"expected 7 u26 stages got {len(u26)}"
-for sid in seq + u26:
+fork = cfg.get("fork_locked_sequence") or []
+assert len(fork) == 7, f"expected 7 fork stages got {len(fork)}"
+for sid in seq + u26 + fork:
     assert sid in cfg.get("stages", {}), f"missing stage def {sid}"
 print(f"PASS: post_mvp_locked_sequence {len(seq)} stages")
 print(f"PASS: ubuntu_2604_locked_sequence {len(u26)} stages")
+print(f"PASS: fork_locked_sequence {len(fork)} stages")
 PY
 
 require_file "${HERMES}/scripts/longtask_post_mvp_transition_next.sh" "post-mvp transition"
 require_file "${HERMES}/scripts/longtask_ubuntu_2604_transition_next.sh" "u26 transition"
-require_plan "strawwu-ubuntu-2604-migration-plan.md"
+require_file "${HERMES}/scripts/longtask_fork_transition_next.sh" "fork transition"
 
 if [[ "${PREFLIGHT_FAIL}" -ne 0 ]]; then
     exit 1

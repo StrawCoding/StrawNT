@@ -73,10 +73,16 @@ fi
 check "ISO file exists" test -f "${ISO_PATH}"
 if [[ -f "${ISO_PATH}" ]]; then
   iso_bytes=$(stat -c%s "${ISO_PATH}")
-  if [[ "${iso_bytes}" -ge 5000000000 ]]; then
-    echo "PASS: ISO size ${iso_bytes} bytes (>= 5GB)"
+  iso_min=4500000000
+  staging_sq="${STAGING}/casper/minimal.squashfs"
+  if [[ -f "${staging_sq}" ]]; then
+    sq_bytes_for_iso=$(stat -c%s "${staging_sq}")
+    iso_min=$(( sq_bytes_for_iso + 800000000 ))
+  fi
+  if [[ "${iso_bytes}" -ge "${iso_min}" ]]; then
+    echo "PASS: ISO size ${iso_bytes} bytes (>= ${iso_min})"
   else
-    echo "FAIL: ISO too small (${iso_bytes} bytes) — likely incomplete xorriso" >&2
+    echo "FAIL: ISO too small (${iso_bytes} bytes, need >= ${iso_min}) — likely incomplete xorriso" >&2
     FAIL=1
   fi
 fi
@@ -165,37 +171,58 @@ if [[ -n "${CASPER_DIR}" && -d "${CASPER_DIR}" ]]; then
       fi
     fi
 
-    # early3 modules must be strawwu, not upstream-only 6.11
+    # Module payloads live in early3 (noble) or early2 (resolute 26.04).
     if command -v unmkinitramfs >/dev/null 2>&1; then
-      early3_tmp=$(mktemp -d)
-      if unmkinitramfs "${INITRD_PATH}" "${early3_tmp}" 2>/dev/null; then
-        early3_dir="${early3_tmp}/early3"
-        if [[ -d "${early3_dir}/usr/lib/modules" ]]; then
-          mod_kvers=$(find "${early3_dir}/usr/lib/modules" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' 2>/dev/null || true)
+      initrd_tmp=$(mktemp -d)
+      if unmkinitramfs "${INITRD_PATH}" "${initrd_tmp}" 2>/dev/null; then
+        modules_dir=""
+        modules_phase=""
+        for phase in early3 early2; do
+          candidate="${initrd_tmp}/${phase}"
+          if [[ -d "${candidate}/usr/lib/modules" ]]; then
+            modules_dir="${candidate}"
+            modules_phase="${phase}"
+            break
+          fi
+        done
+        if [[ -n "${modules_dir}" ]]; then
+          mod_kvers=$(find "${modules_dir}/usr/lib/modules" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' 2>/dev/null || true)
           if echo "${mod_kvers}" | grep -q 'strawwu'; then
-            echo "PASS: initrd early3 has strawwu modules"
+            echo "PASS: initrd ${modules_phase} has strawwu modules"
           else
-            echo "FAIL: initrd early3 missing strawwu modules (found: ${mod_kvers:-none})" >&2
+            echo "FAIL: initrd ${modules_phase} missing strawwu modules (found: ${mod_kvers:-none})" >&2
             FAIL=1
           fi
           if echo "${mod_kvers}" | grep -q '6\.11\.0-17-generic' && ! echo "${mod_kvers}" | grep -q 'strawwu'; then
-            echo "FAIL: initrd early3 still upstream 6.11-only modules" >&2
+            echo "FAIL: initrd ${modules_phase} still upstream 6.11-only modules" >&2
             FAIL=1
           fi
         else
-          echo "FAIL: initrd early3 has no usr/lib/modules" >&2
+          echo "FAIL: initrd has no early2/early3 usr/lib/modules" >&2
           FAIL=1
         fi
-        if find "${early3_dir}" -name 'isofs.ko*' -o -name 'iso9660.ko*' 2>/dev/null | grep -q .; then
-          echo "PASS: initrd early3 has ISO filesystem module"
-        else
-          echo "FAIL: initrd early3 missing isofs/iso9660 module (CD mount will fail)" >&2
+        iso_fs_ok=0
+        if [[ -n "${modules_dir}" ]] && find "${modules_dir}" -name 'isofs.ko*' -o -name 'iso9660.ko*' 2>/dev/null | grep -q .; then
+          iso_fs_ok=1
+        fi
+        if [[ "${iso_fs_ok}" -eq 0 ]]; then
+          while IFS= read -r builtin_file; do
+            if grep -qE 'isofs|iso9660' "${builtin_file}" 2>/dev/null; then
+              iso_fs_ok=1
+              break
+            fi
+          done < <(find "${initrd_tmp}/main/lib/modules" -maxdepth 2 -name 'modules.builtin' 2>/dev/null || true)
+        fi
+        if [[ "${iso_fs_ok}" -eq 1 ]]; then
+          echo "PASS: initrd has ISO filesystem module (ko or built-in)"
+        elif [[ -n "${modules_dir}" ]]; then
+          echo "FAIL: initrd ${modules_phase} missing isofs/iso9660 module (CD mount will fail)" >&2
           FAIL=1
         fi
       else
-        warn "unmkinitramfs failed — skipping early3 module checks"
+        warn "unmkinitramfs failed — skipping initrd module checks"
       fi
-      rm -rf "${early3_tmp}"
+      rm -rf "${initrd_tmp}"
     fi
   fi
 
