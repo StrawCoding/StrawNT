@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-05T15:32:55.444424",
+  "generated_at": "2026-07-05T19:43:37.442144",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 30,
-  "failed": 17,
+  "passed": 31,
+  "failed": 16,
   "all_pass": false,
   "stages": [
     {
@@ -158,8 +158,8 @@
     },
     {
       "id": "w6-i4-installed-boot",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w6-f5-target-flathub",

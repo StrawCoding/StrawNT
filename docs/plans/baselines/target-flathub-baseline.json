@@ -1,0 +1,15 @@
+{
+  "schema": "strawwu-target-flathub-baseline/v1",
+  "wave": "W6-F5",
+  "version": "0.4.1.35",
+  "flathub_marker": "TARGET_FLATHUB_OK",
+  "runner": "tests/install-e2e/run-target-flathub.sh",
+  "result_json": "tests/install-e2e/output/target-flathub-result.json",
+  "remote": "flathub",
+  "remote_url": "https://dl.flathub.org/repo/",
+  "package": "strawwu-flatpak-setup",
+  "depends_on": [
+    "validate-calamares-preflight",
+    "validate-partition-probe"
+  ]
+}

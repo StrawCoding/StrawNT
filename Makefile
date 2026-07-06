@@ -2,7 +2,7 @@
 	build-iso dev-iso release-iso repack-iso validate-rootfs boot-test-iso boot-test-dev-iso \
 	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
-	test-install-e2e test-install-firstboot-e2e test-installed-boot test-wincompat test-wincompat-os test-wincompat-registry test-wincompat-gui test-strawwu-shell test-hub test-hub-settings test-apps-page test-flathub-hub test-l10n-ime test-firstboot test-finished-meta test-context-menu test-registry-hooks test-target-identity test-greeter-session test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-init-tools test-bug-reporter test-calamares-settings test-app-registry test-security-baseline test-observability test-legal-trademark test-desktop-stack test-live-install-ux test-update-notifier test-target-setup purge-ubuntu-telemetry \
+	test-install-e2e test-install-firstboot-e2e test-installed-boot test-target-flathub test-wincompat test-wincompat-os test-wincompat-registry test-wincompat-gui test-strawwu-shell test-hub test-hub-settings test-apps-page test-flathub-hub test-l10n-ime test-firstboot test-finished-meta test-context-menu test-registry-hooks test-target-identity test-greeter-session test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-init-tools test-bug-reporter test-calamares-settings test-app-registry test-security-baseline test-observability test-legal-trademark test-desktop-stack test-live-install-ux test-update-notifier test-target-setup purge-ubuntu-telemetry \
 	install-flatpak-setup install-bug-reporter install-calamares-settings install-update-notifier install-target-setup install-firstboot install-wincompat nosnap-harden build-debs bump-version check-version-bump
 
 REPO_ROOT := $(abspath .)
@@ -39,6 +39,7 @@ help:
 	@echo "  test-install-e2e              Calamares install E2E (preflight→probe→install)"
 	@echo "  test-install-firstboot-e2e    Install + installed boot + serial FIRSTBOOT_OK"
 	@echo "  test-installed-boot           Install + BIOS+UEFI installed disk STRAWWU_BOOT_OK"
+	@echo "  test-target-flathub           Install + target flathub system remote E2E"
 	@echo "  test-wave0-baseline           Wave 0 preflight baselines (12 scripts + JSON)"
 	@echo "  test-wave-all-pass            Verify all 47 wave stages PASS (MVP closeout gate)"
 	@echo "  test-purge-baseline           W1-B1 telemetry/pro/snap purge verification"
@@ -114,6 +115,7 @@ preflight:
 	bash tests/preflight/test-upstream-init-disabled.sh
 	bash tests/preflight/test-install-firstboot-e2e.sh
 	bash tests/preflight/test-installed-boot.sh
+	bash tests/preflight/test-target-flathub.sh
 
 preflight-dev-vm:
 	bash tests/preflight/test-dev-vm-ready.sh
@@ -217,6 +219,9 @@ test-install-firstboot-e2e: validate-calamares-preflight validate-partition-prob
 
 test-installed-boot: validate-calamares-preflight validate-partition-probe
 	bash tests/install-e2e/run-installed-boot.sh
+
+test-target-flathub: validate-calamares-preflight validate-partition-probe
+	bash tests/install-e2e/run-target-flathub.sh
 
 test-wincompat:
 	@echo "=== Phase 6: Windows Compatibility Layer ==="
@@ -327,6 +332,9 @@ test-install-firstboot-e2e-static:
 
 test-installed-boot-static:
 	bash tests/preflight/test-installed-boot.sh
+
+test-target-flathub-static:
+	bash tests/preflight/test-target-flathub.sh
 
 install-calamares-settings:
 	sudo bash $(SCRIPTS)/chroot-install-calamares-settings.sh

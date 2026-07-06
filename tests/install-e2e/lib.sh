@@ -16,6 +16,9 @@ MARKER_DESKTOP="${STRAWWU_E2E_DESKTOP_MARKER:-STRAWWU-DESKTOP-OK}"
 MARKER_BOOT="${STRAWWU_E2E_BOOT_MARKER:-STRAWWU_BOOT_OK}"
 MARKER_INSTALL="${STRAWWU_E2E_INSTALL_MARKER:-STRAWWU-CALAMARES-INSTALL-OK}"
 MARKER_FIRSTBOOT="${STRAWWU_E2E_FIRSTBOOT_MARKER:-FIRSTBOOT_OK}"
+MARKER_FLATHUB="${STRAWWU_E2E_FLATHUB_MARKER:-TARGET_FLATHUB_OK}"
+INSTALLED_ROOT_MOUNT=""
+INSTALLED_LOOP_DEV=""
 
 log() { echo "==> $*" >&2; }
 warn() { echo "WARNING: $*" >&2; }
@@ -245,6 +248,82 @@ run_installed_disk_boot() {
     warn "installed boot ${mode}: FAIL (waited=${waited}s)"
     warn "serial tail: $(tail -8 "${boot_log}" 2>/dev/null | tr '\n' '|')"
     return 1
+}
+
+cleanup_installed_root_mount() {
+    if [[ -n "${INSTALLED_ROOT_MOUNT}" ]] && mountpoint -q "${INSTALLED_ROOT_MOUNT}" 2>/dev/null; then
+        umount "${INSTALLED_ROOT_MOUNT}" 2>/dev/null || true
+    fi
+    if [[ -n "${INSTALLED_ROOT_MOUNT}" && -d "${INSTALLED_ROOT_MOUNT}" ]]; then
+        rmdir "${INSTALLED_ROOT_MOUNT}" 2>/dev/null || true
+    fi
+    if [[ -n "${INSTALLED_LOOP_DEV}" ]]; then
+        losetup -d "${INSTALLED_LOOP_DEV}" 2>/dev/null || true
+    fi
+    INSTALLED_ROOT_MOUNT=""
+    INSTALLED_LOOP_DEV=""
+}
+
+# Mount GPT root partition (default p3) from a raw installed disk image.
+mount_installed_root() {
+    local disk_img="$1"
+    local part="${2:-3}"
+    local mount_mode="${3:-ro}"
+
+    cleanup_installed_root_mount
+    INSTALLED_ROOT_MOUNT="$(mktemp -d)"
+    INSTALLED_LOOP_DEV="$(losetup --find --show -P "${disk_img}")"
+    partprobe "${INSTALLED_LOOP_DEV}" 2>/dev/null || true
+    sleep 1
+    local root_part="${INSTALLED_LOOP_DEV}p${part}"
+    [[ -b "${root_part}" ]] || die "partition ${root_part} not found on ${disk_img}"
+    mount -o "${mount_mode}" "${root_part}" "${INSTALLED_ROOT_MOUNT}"
+    log "mounted ${root_part} → ${INSTALLED_ROOT_MOUNT} (${mount_mode})"
+}
+
+check_flathub_remote_in_root() {
+    local root="${1:-${INSTALLED_ROOT_MOUNT}}"
+    [[ -n "${root}" && -d "${root}" ]] || return 1
+    if [[ -f "${root}/etc/flatpak/remotes.d/flathub.flatpakrepo" ]]; then
+        return 0
+    fi
+    if [[ -f "${root}/var/lib/flatpak/repo/config" ]] \
+        && grep -q '^\[remote "flathub"\]' "${root}/var/lib/flatpak/repo/config" 2>/dev/null; then
+        return 0
+    fi
+    return 1
+}
+
+check_flatpak_setup_pkg_in_root() {
+    local root="${1:-${INSTALLED_ROOT_MOUNT}}"
+    [[ -f "${root}/var/lib/dpkg/status" ]] || return 1
+    awk '/^Package: strawwu-flatpak-setup$/,/^$/ { if (/^Status: .* ok installed/) found=1 }
+         END { exit !found }' "${root}/var/lib/dpkg/status"
+}
+
+inject_flathub_e2e_service() {
+    local root="${1:-${INSTALLED_ROOT_MOUNT}}"
+    local unit="${root}/etc/systemd/system/strawwu-flathub-e2e.service"
+    local wants="${root}/etc/systemd/system/multi-user.target.wants"
+
+    cat > "${unit}" <<'SVC'
+[Unit]
+Description=StrawWU target Flathub E2E probe
+DefaultDependencies=no
+After=local-fs.target sysinit.target
+Before=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'command -v flatpak >/dev/null && flatpak remotes --system 2>/dev/null | awk "{print $1}" | grep -qx flathub && echo TARGET_FLATHUB_OK > /dev/ttyS0 || exit 1'
+
+[Install]
+WantedBy=multi-user.target
+SVC
+    mkdir -p "${wants}"
+    ln -sf /etc/systemd/system/strawwu-flathub-e2e.service \
+        "${wants}/strawwu-flathub-e2e.service"
+    log "injected strawwu-flathub-e2e.service on installed root"
 }
 
 write_e2e_result() {
