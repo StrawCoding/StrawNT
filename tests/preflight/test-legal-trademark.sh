@@ -108,10 +108,16 @@ data = {
         "no_default_telemetry": True,
         "bug_consent_required": True,
     },
+    "phases": {
+        "LEG0": {"status": "complete", "artifact": "trademark scan in test-legal-trademark.sh"},
+        "LEG1": {"status": "deferred", "note": "license-inventory.csv auto-generation"},
+        "LEG2": {"status": "complete", "artifact": "privacy.html + eula.html"},
+        "LEG3": {"status": "deferred", "note": "Calamares/GRUB/Plymouth compliance audit"},
+        "LEG4": {"status": "pending", "note": "release compliance gate CI (w7-perf-legal-gate)"},
+    },
     "wave2_gaps": [
         "license-inventory.csv auto-generation (LEG1)",
         "Calamares/GRUB/Plymouth compliance audit (LEG3)",
-        "release compliance gate CI (LEG4)",
     ],
 }
 Path(out).parent.mkdir(parents=True, exist_ok=True)

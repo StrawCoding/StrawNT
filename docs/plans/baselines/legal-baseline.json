@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-legal-baseline/v1",
   "generated_at": "2026-07-05",
-  "version": "0.5.0.2",
+  "version": "0.5.0.3",
   "trademark": {
     "ui_brand": "StrawWU",
     "os_release_id": "ubuntu",
@@ -19,9 +19,30 @@
     "no_default_telemetry": true,
     "bug_consent_required": true
   },
+  "phases": {
+    "LEG0": {
+      "status": "complete",
+      "artifact": "trademark scan in test-legal-trademark.sh"
+    },
+    "LEG1": {
+      "status": "deferred",
+      "note": "license-inventory.csv auto-generation"
+    },
+    "LEG2": {
+      "status": "complete",
+      "artifact": "privacy.html + eula.html"
+    },
+    "LEG3": {
+      "status": "deferred",
+      "note": "Calamares/GRUB/Plymouth compliance audit"
+    },
+    "LEG4": {
+      "status": "pending",
+      "note": "release compliance gate CI (w7-perf-legal-gate)"
+    }
+  },
   "wave2_gaps": [
     "license-inventory.csv auto-generation (LEG1)",
-    "Calamares/GRUB/Plymouth compliance audit (LEG3)",
-    "release compliance gate CI (LEG4)"
+    "Calamares/GRUB/Plymouth compliance audit (LEG3)"
   ]
 }

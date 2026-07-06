@@ -36,6 +36,8 @@ fi
 ci_checks=(
     'make test-phase0'
     'make preflight'
+    'make test-perf-baseline'
+    'make test-legal-trademark'
     'make test-wincompat'
     'make validate-calamares-preflight'
     'check-version-bump'

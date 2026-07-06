@@ -1,13 +1,13 @@
 {
   "schema": "strawwu-perf-baseline/v1",
-  "generated_at": "2026-07-04",
-  "version": "0.4.0.1",
+  "generated_at": "2026-07-06",
+  "version": "0.5.0.3",
   "measurements": {
-    "latest_iso_bytes": 6520250368,
-    "latest_iso_gb": 6.07,
-    "latest_iso_file": "StrawWU-0.4.0.1-amd64.iso",
-    "squashfs_bytes": 5451675054,
-    "squashfs_gb": 5.08,
+    "latest_iso_bytes": 5357494272,
+    "latest_iso_gb": 4.99,
+    "latest_iso_file": "StrawWU-0.4.1.4-amd64.iso",
+    "squashfs_bytes": 5428777143,
+    "squashfs_gb": 5.06,
     "live_boot_to_plymouth_sec": null,
     "installed_idle_ram_mb": null,
     "firstboot_complete_sec": null
@@ -18,9 +18,26 @@
     "installed_idle_ram_max_mb": 2500,
     "firstboot_complete_max_sec": 180
   },
+  "phases": {
+    "PERF0": {
+      "status": "complete",
+      "artifact": "perf-baseline.json"
+    },
+    "PERF1": {
+      "status": "complete",
+      "gate_mode": "advisory",
+      "last_result": "pass",
+      "note": "ISO 4.99 GB within 7GB budget",
+      "ci_workflow": "release.yml (STRAWWU_PERF_GATE=strict after release-iso)"
+    },
+    "PERF2": {
+      "status": "deferred",
+      "note": "boot-time regression gate"
+    }
+  },
   "wave0_gaps": [
-    "boot-time not measured yet",
-    "idle RAM not measured yet",
-    "firstboot duration not measured yet"
+    "boot-time not measured yet (PERF2)",
+    "idle RAM not measured yet (PERF2)",
+    "firstboot duration not measured yet (PERF2)"
   ]
 }

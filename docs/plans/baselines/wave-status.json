@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-06T00:08:46.565047",
+  "generated_at": "2026-07-06T00:28:37.330945",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 39,
-  "failed": 8,
+  "passed": 40,
+  "failed": 7,
   "all_pass": false,
   "stages": [
     {
@@ -203,8 +203,8 @@
     },
     {
       "id": "w7-ci-nightly",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w7-perf-legal-gate",

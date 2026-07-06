@@ -79,6 +79,14 @@ jobs:
       - name: ISO integrity gate
         run: make preflight-iso-before-boot
 
+      - name: PERF1 release size gate (strict)
+        env:
+          STRAWWU_PERF_GATE: strict
+        run: make test-perf-baseline
+
+      - name: LEG4 release legal compliance gate
+        run: make test-legal-trademark
+
       - name: Generate SHA256SUMS and GPG signatures
         env:
           STRAWWU_GPG_PRIVATE_KEY: ${{ secrets.STRAWWU_GPG_PRIVATE_KEY }}

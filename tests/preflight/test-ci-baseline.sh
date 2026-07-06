@@ -19,6 +19,8 @@ make_targets=(
     bump-version
     test-ci-baseline
     test-ci-nightly
+    test-perf-baseline
+    test-perf-legal-gate
     dev-iso
     generate-release-manifest
     release-sign

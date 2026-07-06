@@ -14,6 +14,13 @@ jobs:
       - name: Phase 0 preflight
         run: make test-phase0 && make preflight
 
+  perf-legal-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: PERF1 advisory + LEG4 trademark/compliance gate
+        run: make test-perf-baseline && make test-legal-trademark
+
   version-bump:
     runs-on: ubuntu-latest
     steps:

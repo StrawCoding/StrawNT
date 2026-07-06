@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-ci-baseline/v1",
   "wave": "W7-CI2+CI3+CI4",
-  "version": "0.5.0.2",
+  "version": "0.5.0.3",
   "plan": "docs/plans/strawwu-ci-build-plan.md",
   "workflows": {
     "ci": ".github/workflows/ci.yml",
@@ -17,7 +17,10 @@
     "test-ci-baseline",
     "test-ci-nightly",
     "generate-release-manifest",
-    "release-sign"
+    "release-sign",
+    "test-perf-baseline",
+    "test-legal-trademark",
+    "test-perf-legal-gate"
   ],
   "phases": {
     "CI0": {
@@ -79,11 +82,29 @@
   "gaps_closed": [
     "CI2 nightly pipeline (cron → dev-iso → SHA256 → manifest draft)",
     "CI3 PR gate (preflight + wincompat + calamares + version bump)",
-    "CI4 self-hosted runner wiring (nightly + release + GPG secrets)"
+    "CI4 self-hosted runner wiring (nightly + release + GPG secrets)",
+    "PERF1 ISO size gate in release CI (w7-perf-legal-gate)",
+    "LEG4 release compliance gate in CI (w7-perf-legal-gate)"
   ],
   "deferred": [
     "CI1 rootfs reproducibility hash gate",
     "production archive signing key deployment on runner",
     "kernel-build.yml self-hosted workflow (Phase 2 Q6)"
-  ]
+  ],
+  "perf_legal_gates": {
+    "PERF1": {
+      "status": "complete",
+      "target": "test-perf-baseline",
+      "strict_env": "STRAWWU_PERF_GATE=strict",
+      "workflow": "release.yml"
+    },
+    "LEG4": {
+      "status": "complete",
+      "target": "test-legal-trademark",
+      "workflows": [
+        "ci.yml",
+        "release.yml"
+      ]
+    }
+  }
 }
