@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-07-06T04:40:53.354107",
+  "generated_at": "2026-07-06T04:44:58.001848",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 46,
-  "failed": 1,
-  "all_pass": false,
+  "passed": 47,
+  "failed": 0,
+  "all_pass": true,
   "stages": [
     {
       "id": "w0-baseline",
@@ -238,8 +238,8 @@
     },
     {
       "id": "w8-mvp-closeout",
-      "status": "IN_PROGRESS",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     }
   ]
 }
