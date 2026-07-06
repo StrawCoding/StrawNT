@@ -12,6 +12,7 @@ from pathlib import Path
 PREFIX_PHASES = ("early", "early2", "early3")
 DEFAULT_OVERLAYS_ROOT = Path(__file__).resolve().parent.parent / "initrd/overlays"
 DEFAULT_LIVE_INIT_ROOT = Path(__file__).resolve().parent.parent / "initrd/strawwu-live-init"
+DEFAULT_LIVE_BOTTOM_ROOT = Path(__file__).resolve().parent.parent / "initrd/strawwu-live-bottom"
 
 
 def align4(value: int) -> int:
@@ -295,6 +296,41 @@ def inject_strawwu_live_init(main_dir: Path, live_init_root: Path | None = None)
     casper_dest.chmod(0o755)
 
 
+def resolve_live_bottom_root(live_bottom_root: Path | None) -> Path | None:
+    if live_bottom_root is not None and (live_bottom_root / "scripts/ORDER").is_file():
+        return live_bottom_root
+    if (DEFAULT_LIVE_BOTTOM_ROOT / "scripts/ORDER").is_file():
+        return DEFAULT_LIVE_BOTTOM_ROOT
+    return None
+
+
+def inject_strawwu_live_bottom(main_dir: Path, live_bottom_root: Path | None = None) -> None:
+    """Replace upstream casper-bottom hooks with repo-owned strawwu-live-bottom fork."""
+    import shutil
+
+    root = resolve_live_bottom_root(live_bottom_root)
+    if root is None:
+        return
+
+    scripts_src = root / "scripts"
+    dest = main_dir / "scripts/strawwu-live-bottom"
+    if dest.exists():
+        shutil.rmtree(dest)
+    inject_tree_into_dir(dest, scripts_src)
+    for hook in dest.iterdir():
+        if hook.is_file() and hook.name != "ORDER":
+            hook.chmod(0o755)
+
+    casper_bottom = main_dir / "scripts/casper-bottom"
+    if casper_bottom.exists():
+        shutil.rmtree(casper_bottom)
+    casper_bottom.mkdir(parents=True)
+    order_src = dest / "ORDER"
+    if order_src.is_file():
+        # boot=casper compat: casper-bottom ORDER delegates to strawwu-live-bottom hooks.
+        (casper_bottom / "ORDER").write_text(order_src.read_text())
+
+
 def inject_initrd_overlays(main_dir: Path, overlays_root: Path | None) -> None:
     root = resolve_overlays_root(overlays_root)
     if root is None:
@@ -303,6 +339,8 @@ def inject_initrd_overlays(main_dir: Path, overlays_root: Path | None) -> None:
     if not scripts_src.is_dir():
         return
     for hook_dir in sorted(p for p in scripts_src.iterdir() if p.is_dir()):
+        if hook_dir.name == "casper-bottom":
+            continue
         inject_tree_into_dir(main_dir / "scripts" / hook_dir.name, hook_dir)
         strawwu_hooks = sorted(
             p.name
@@ -659,6 +697,7 @@ def refresh_preserved_main(
         mirror_critical_modules_to_main(main_dir, modules_src, new_kver)
         regenerate_main_module_deps(main_dir, new_kver)
     inject_strawwu_live_init(main_dir)
+    inject_strawwu_live_bottom(main_dir)
     inject_initrd_overlays(main_dir, overlays_root)
     if branding_root is not None and branding_root.is_dir():
         inject_plymouth_into_main(main_dir, branding_root)

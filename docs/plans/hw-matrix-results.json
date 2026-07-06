@@ -2,7 +2,7 @@
   "schema": "strawwu-hw-matrix-results/v2",
   "wave": "W8-HW-MATRIX",
   "version": "0.5.0.4",
-  "updated": "2026-07-06T02:02:42-04:00",
+  "updated": "2026-07-06T02:26:22-04:00",
   "iso": "os-image/output/StrawWU-0.4.1.33-amd64.iso",
   "dimensions": [
     "gpu",
@@ -43,9 +43,9 @@
         "STRAWWU-DESKTOP-OK"
       ],
       "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/hw/output/serial-hw-proxy-pc-bios.log",
-      "elapsed_sec": 244,
+      "elapsed_sec": 262,
       "qemu_exit": 0,
-      "tested": "2026-07-06T01:55:54-04:00",
+      "tested": "2026-07-06T02:19:19-04:00",
       "hw_notes": {
         "wifi": "network-online.target in serial",
         "gpu_driver": "desktop session reached (display stack)",
@@ -78,9 +78,9 @@
         "STRAWWU-DESKTOP-OK"
       ],
       "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/hw/output/serial-hw-proxy-q35-uefi.log",
-      "elapsed_sec": 208,
+      "elapsed_sec": 207,
       "qemu_exit": 0,
-      "tested": "2026-07-06T01:59:22-04:00",
+      "tested": "2026-07-06T02:22:46-04:00",
       "hw_notes": {
         "wifi": "network-online.target in serial",
         "gpu_driver": "desktop session reached (display stack)",
@@ -113,9 +113,9 @@
         "STRAWWU-DESKTOP-OK"
       ],
       "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/hw/output/serial-hw-proxy-q35-uefi-smp8.log",
-      "elapsed_sec": 200,
+      "elapsed_sec": 216,
       "qemu_exit": 0,
-      "tested": "2026-07-06T02:02:42-04:00",
+      "tested": "2026-07-06T02:26:22-04:00",
       "hw_notes": {
         "wifi": "network-online.target in serial",
         "gpu_driver": "desktop session reached (display stack)",

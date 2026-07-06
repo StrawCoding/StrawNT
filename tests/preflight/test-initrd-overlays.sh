@@ -17,12 +17,10 @@ require_file "${SPLICE}" "initrd-splice.py"
 
 require_file "${OVERLAYS}/scripts/casper-premount/05strawwu-wait-live-media" "premount wait-live-media"
 require_file "${OVERLAYS}/scripts/casper-premount/20iso_scan" "iso-scan overlay"
-require_file "${OVERLAYS}/scripts/casper-bottom/25disable_cdrom.mount" "live-shutdown overlay"
 
 for script in \
 	"${OVERLAYS}/scripts/casper-premount/05strawwu-wait-live-media" \
-	"${OVERLAYS}/scripts/casper-premount/20iso_scan" \
-	"${OVERLAYS}/scripts/casper-bottom/25disable_cdrom.mount"; do
+	"${OVERLAYS}/scripts/casper-premount/20iso_scan"; do
 	if [[ -x "${script}" ]]; then
 		pass "$(basename "${script}") executable"
 	else
@@ -37,10 +35,11 @@ else
 	fail "iso-scan overlay missing StrawWU panic text"
 fi
 
-if grep -q 'live-shutdown' "${OVERLAYS}/scripts/casper-bottom/25disable_cdrom.mount"; then
-	pass "live-shutdown overlay documented in header"
+live_bottom="${REPO_ROOT}/os-image/initrd/strawwu-live-bottom/scripts/25disable_cdrom.mount"
+if [[ -f "${live_bottom}" ]] && grep -q 'live-shutdown' "${live_bottom}"; then
+	pass "live-shutdown hook in strawwu-live-bottom (not overlay)"
 else
-	fail "live-shutdown overlay missing header marker"
+	fail "live-shutdown hook missing from strawwu-live-bottom"
 fi
 
 if grep -q 'DEFAULT_OVERLAYS_ROOT' "${SPLICE}" && grep -q 'inject_initrd_overlays' "${SPLICE}"; then
@@ -61,8 +60,7 @@ if [[ -f "${STAGING_INITRD}" ]] && command -v unmkinitramfs >/dev/null 2>&1; the
 	if unmkinitramfs "${STAGING_INITRD}" "${initrd_tmp}" 2>/dev/null; then
 		for rel in \
 			scripts/casper-premount/05strawwu-wait-live-media \
-			scripts/casper-premount/20iso_scan \
-			scripts/casper-bottom/25disable_cdrom.mount; do
+			scripts/casper-premount/20iso_scan; do
 			if [[ -f "${initrd_tmp}/main/${rel}" ]]; then
 				if grep -q 'StrawWU' "${initrd_tmp}/main/${rel}"; then
 					pass "staged initrd contains overlay ${rel}"

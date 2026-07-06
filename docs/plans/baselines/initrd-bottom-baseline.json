@@ -1,0 +1,21 @@
+{
+  "schema": "strawwu-initrd-bottom-baseline/v1",
+  "wave": "W8-S3",
+  "package": "strawwu-live-bottom",
+  "paths": {
+    "hooks": "os-image/initrd/strawwu-live-bottom/scripts",
+    "order": "os-image/initrd/strawwu-live-bottom/scripts/ORDER",
+    "manifest": "os-image/initrd/strawwu-live-bottom/MANIFEST.yaml"
+  },
+  "markers": {
+    "order_header": "strawwu-live-bottom ORDER",
+    "live_shutdown": "live-shutdown",
+    "hook_path_prefix": "/scripts/strawwu-live-bottom/"
+  },
+  "compat": {
+    "kernel_boot": "boot=casper",
+    "initrd_inject": "inject_strawwu_live_bottom",
+    "core_runner": "strawwu-live-bottom"
+  },
+  "hook_count": 34
+}

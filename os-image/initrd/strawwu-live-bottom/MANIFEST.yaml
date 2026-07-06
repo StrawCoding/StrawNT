@@ -1,0 +1,14 @@
+schema: strawwu-live-bottom-manifest/v1
+package: strawwu-live-bottom
+wave: W8-S3
+description: Fork of Ubuntu casper initramfs casper-bottom hooks for StrawWU initrd splice.
+upstream_reference: casper initramfs /scripts/casper-bottom (Noble 24.04)
+hook_count: 34
+compat:
+  kernel_boot: boot=casper
+  casper_bottom_shim: scripts/casper-bottom/ORDER delegates to strawwu-live-bottom
+paths:
+  hooks: scripts/
+  order: scripts/ORDER
+deltas:
+  - 25disable_cdrom.mount live-shutdown (StrawWU W1-S1, migrated from overlays)

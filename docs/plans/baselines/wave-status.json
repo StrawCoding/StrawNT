@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-06T02:15:30.987007",
+  "generated_at": "2026-07-06T03:02:22.997997",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 42,
-  "failed": 5,
+  "passed": 43,
+  "failed": 4,
   "all_pass": false,
   "stages": [
     {
@@ -218,8 +218,8 @@
     },
     {
       "id": "w8-s2-initrd-core",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w8-s3-initrd-bottom",

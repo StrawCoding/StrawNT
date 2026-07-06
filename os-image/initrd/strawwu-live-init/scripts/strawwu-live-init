@@ -1048,10 +1048,10 @@ Readonly: true" /root/etc/debconf.conf >"/root$DEBCONF_TMPDIR/debconf.conf"
     # debconf-communicate.
     exec 4</tmp/debconf-out.fifo 3>/tmp/debconf-in.fifo
 
-    maybe_break casper-bottom
-    [ "$quiet" != "y" ] && log_begin_msg "Running /scripts/casper-bottom"
+    maybe_break strawwu-live-bottom
+    [ "$quiet" != "y" ] && log_begin_msg "Running /scripts/strawwu-live-bottom"
 
-    run_scripts /scripts/casper-bottom
+    run_scripts /scripts/strawwu-live-bottom
     [ "$quiet" != "y" ] && log_end_msg
 
     # Close the fd's associated with debconf-communicate.

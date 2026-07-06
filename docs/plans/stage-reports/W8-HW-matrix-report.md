@@ -2,10 +2,10 @@
 
 | 任務 | w8-hw-matrix |
 |------|--------------|
-| 版本 | 0.5.0.4 |
+| 版本 | 0.5.0.4（階段交付）；repo 現行 0.5.0.5 |
 | 日期 | 2026-07-06 |
 | Worker | 階段 42/47（w8-hw-matrix） |
-| 結果 | **待 Hermes mark**（worker 不自宣稱 PASS） |
+| 結果 | **Hermes mark PASS**（2026-07-06T02:15 UTC-4） |
 
 ## 目標
 
@@ -43,27 +43,31 @@
 | hw-proxy-q35-uefi | virtio-gpu | PASS | PASS | SKIP | SKIP |
 | hw-proxy-q35-uefi-smp8 | virtio-gpu | PASS | PASS | SKIP | SKIP |
 
-## 驗收命令輸出（2026-07-06 01:52–02:05 UTC-4，worker 終驗）
+## 驗收命令輸出（2026-07-06 02:15–02:29 UTC-4，worker session 3 終驗）
 
-### `make test-hw-matrix` — exit 0（653s）
+### `make test-hw-matrix` — exit 0（685s）
 
-Log: `/tmp/w8-hw-matrix-test.log`
+Log: `/tmp/w8-hw-matrix-test-worker3.log`
 
 ```
-==> hw-proxy-pc-bios: live_boot=PASS boot=PASS desktop=PASS (244s)
-==> hw-proxy-q35-uefi: live_boot=PASS boot=PASS desktop=PASS (208s)
-==> hw-proxy-q35-uefi-smp8: live_boot=PASS boot=PASS desktop=PASS (200s)
+==> hw-proxy-pc-bios: live_boot=PASS boot=PASS desktop=PASS (262s)
+==> hw-proxy-q35-uefi: live_boot=PASS boot=PASS desktop=PASS (207s)
+==> hw-proxy-q35-uefi-smp8: live_boot=PASS boot=PASS desktop=PASS (216s)
 PASS: hw-matrix-results.json written (3/3 live PASS, gpu=3, wifi=3)
 === W8-HW-MATRIX done: PASS ===
 ```
 
 ISO: `StrawWU-0.4.1.33-amd64.iso`（`STRAWWU_ISO_PATH` 指定；VERSION 0.5.0.4 尚無對應 ISO）
 
-### `make preflight` — exit 0（173s）
+### `make preflight` — exit 0（185s）
 
-Log: `/tmp/w8-hw-matrix-preflight.log`
+Log: `/tmp/w8-hw-matrix-preflight-worker3.log`
 
 含 W0–W7 全部階段 + **W6-HW1** + **W8-HW-MATRIX** 全部 exit 0（終行：`=== W8-HW-MATRIX done: PASS ===`）。
+
+### 先前驗收（2026-07-06 01:52–02:10 UTC-4，worker session 1–2）
+
+Log: `/tmp/w8-hw-matrix-test.log`、`/tmp/w8-hw-matrix-preflight.log`、`/tmp/w8-hw-matrix-preflight-worker2.log` — 同樣 exit 0。
 
 ## 變更檔案清單
 
@@ -127,6 +131,11 @@ Version: 0.5.0.4
 | 2026-07-06T02:05 UTC-4 | `[worker-DONE]` 終驗：`make test-hw-matrix`（653s）+ `make preflight`（173s）exit 0 — 待 Hermes mark PASS |
 | 2026-07-06T02:06 UTC-4 | `[worker-START]` Hermes companion tick 267：2/3 PASS、smp8 QEMU 執行中 |
 | 2026-07-06T02:10 UTC-4 | `[worker-DONE]` smp8 完成（3/3 live PASS）；`make preflight` 複驗 exit 0（226s，log: `/tmp/w8-hw-matrix-preflight-worker2.log`）— 待 Hermes mark PASS |
+| 2026-07-06T02:14 UTC-4 | `[worker-TICK]` companion check status=IN_PROGRESS（session 3） |
+| 2026-07-06T02:29 UTC-4 | `[worker-DONE]` session 3 終驗：`make test-hw-matrix`（685s）+ `make preflight`（185s）exit 0 — 待 Hermes mark PASS |
+| 2026-07-06T02:15 UTC-4 | `[worker-PASS]` Hermes mark PASS → next=w8-s2-initrd-core |
+| 2026-07-06T02:29 UTC-4 | `[worker-DONE]` stage ended with PASS |
+| 2026-07-06T02:30 UTC-4 | companion 複驗：`bash tests/preflight/test-hw-matrix.sh` + `make preflight` exit 0（log: `/tmp/w8-hw-matrix-preflight-verify.log`，195s） |
 
 ## 下一步
 
@@ -134,7 +143,7 @@ Version: 0.5.0.4
 
 ## 續跑狀態
 
-**無阻塞，實作與驗證均已完成。** Hermes tick 267 時 smp8 尚在執行；至 02:02:42 三 profile 皆 PASS，結果已寫入 `hw-matrix-results.json`。
+**階段已結案（Hermes PASS）。** Session 3（02:29 UTC-4）複驗三 profile 皆 PASS，結果已寫入 `hw-matrix-results.json`（updated: 2026-07-06T02:26:22-04:00）。Companion tick（02:30 UTC-4）再次確認 preflight 全綠。
 
 若需重跑矩陣：
 
