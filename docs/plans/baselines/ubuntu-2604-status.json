@@ -1,0 +1,18 @@
+{
+  "generated_at": "2026-07-06T00:00:00",
+  "target": "26.04.0-resolute",
+  "total": 7,
+  "passed": 0,
+  "failed": 7,
+  "all_pass": false,
+  "note": "Auto-updated by make test-ubuntu-2604-all-pass",
+  "stages": [
+    {"id": "u26-m1-base-clone", "status": "PENDING", "pass": false},
+    {"id": "u26-m2-kernel-rebase", "status": "PENDING", "pass": false},
+    {"id": "u26-m3-debs-rebuild", "status": "PENDING", "pass": false},
+    {"id": "u26-m4-suite-migrate", "status": "PENDING", "pass": false},
+    {"id": "u26-m5-techrefs-refresh", "status": "PENDING", "pass": false},
+    {"id": "u26-m6-regression-e2e", "status": "PENDING", "pass": false},
+    {"id": "u26-m7-closeout", "status": "PENDING", "pass": false}
+  ]
+}

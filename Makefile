@@ -43,9 +43,11 @@ help:
 	@echo "  test-meta-audit               W6-B5 ubuntu-* allowlist + strawwu-minimal meta"
 	@echo "  test-wave0-baseline           Wave 0 preflight baselines (12 scripts + JSON)"
 	@echo "  test-wave-all-pass            Verify all 47 wave stages PASS (MVP closeout gate)"
-	@echo "  test-post-mvp-roadmap         Post-MVP long-task infrastructure gate"
-	@echo "  test-post-mvp-all-pass        Verify all 12 post-MVP stages PASS"
+	@echo "  test-post-mvp-roadmap         Post-MVP + Ubuntu 26.04 long-task infrastructure gate"
+	@echo "  test-post-mvp-all-pass        Verify all 14 post-MVP stages PASS"
 	@echo "  test-post-mvp-v06-closeout    v0.6 drivers/HW closeout gate"
+	@echo "  test-ubuntu-2604-roadmap      Ubuntu 26.04 migration infrastructure gate"
+	@echo "  test-ubuntu-2604-all-pass     Verify all 7 Ubuntu 26.04 migration stages PASS"
 	@echo "  test-drivers                  POST-D1 strawwu-drivers"
 	@echo "  test-hw-t1-live-usb           POST-HW-T1 real Live USB matrix"
 	@echo "  test-hw-t2-installed          POST-HW-T2 installed smoke"
@@ -282,6 +284,19 @@ test-post-mvp-all-pass:
 
 test-post-mvp-v06-closeout:
 	bash tests/preflight/test-post-mvp-v06-closeout.sh
+
+test-ubuntu-2604-roadmap:
+	bash tests/preflight/test-ubuntu-2604-roadmap.sh
+
+test-ubuntu-2604-all-pass:
+	bash tests/preflight/test-ubuntu-2604-all-pass.sh
+
+test-u26-base-clone test-u26-kernel-rebase test-u26-debs-rebuild test-u26-suite-migrate \
+test-u26-techrefs-refresh test-u26-regression-e2e:
+	bash tests/preflight/test-$(subst test-,,$@).sh
+
+test-software-sources test-ux-theme-curation:
+	bash tests/preflight/test-$(subst test-,,$@).sh
 
 test-drivers:
 	bash tests/preflight/test-drivers.sh

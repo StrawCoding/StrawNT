@@ -7,14 +7,17 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+# shellcheck source=lib/ubuntu-base-env.sh
+source "${SCRIPT_DIR}/lib/ubuntu-base-env.sh"
+load_ubuntu_base_env "${REPO_ROOT}"
 WORK_DIR="${STRAWWU_WORK_DIR:-${REPO_ROOT}/os-image/work}"
 OUTPUT_DIR="${REPO_ROOT}/os-image/output"
 ISO_CACHE="${OUTPUT_DIR}/cache"
 
-UBUNTU_VERSION="${STRAWWU_UBUNTU_VERSION:-24.04.2}"
-UBUNTU_ISO_NAME="ubuntu-${UBUNTU_VERSION}-desktop-amd64.iso"
+UBUNTU_VERSION="${STRAWWU_UBUNTU_VERSION}"
+UBUNTU_ISO_NAME="${STRAWWU_UBUNTU_ISO_NAME}"
 UBUNTU_SERIES="${UBUNTU_VERSION%.*}"
-UBUNTU_MIRROR="${STRAWWU_UBUNTU_MIRROR:-https://old-releases.ubuntu.com/releases/${UBUNTU_VERSION}}"
+UBUNTU_MIRROR="${STRAWWU_UBUNTU_MIRROR}"
 ISO_URL="${UBUNTU_MIRROR}/${UBUNTU_ISO_NAME}"
 
 ROOTFS_DIR="${WORK_DIR}/rootfs"

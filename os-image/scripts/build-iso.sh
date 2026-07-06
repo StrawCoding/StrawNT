@@ -4,6 +4,9 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+# shellcheck source=lib/ubuntu-base-env.sh
+source "${SCRIPT_DIR}/lib/ubuntu-base-env.sh"
+load_ubuntu_base_env "${REPO_ROOT}"
 read_repo_version() {
     tr -d '[:space:]' < "${REPO_ROOT}/VERSION" 2>/dev/null || echo "0.4.0.0"
 }
@@ -14,8 +17,8 @@ ISO_CACHE="${OUTPUT_DIR}/cache"
 ISO_STAGING="${WORK_DIR}/iso-staging"
 ISO_MOUNT="${WORK_DIR}/iso-mount"
 
-UBUNTU_VERSION="${STRAWWU_UBUNTU_VERSION:-24.04.2}"
-UBUNTU_ISO_NAME="ubuntu-${UBUNTU_VERSION}-desktop-amd64.iso"
+UBUNTU_VERSION="${STRAWWU_UBUNTU_VERSION}"
+UBUNTU_ISO_NAME="${STRAWWU_UBUNTU_ISO_NAME}"
 VERSION="${STRAWWU_VERSION:-$(read_repo_version)}"
 ISO_NAME="StrawWU-${VERSION}-amd64.iso"
 ISO_PATH="${OUTPUT_DIR}/${ISO_NAME}"
@@ -139,6 +142,30 @@ RemainAfterExit=yes
 WantedBy=multi-user.target
 EOF
     chroot_run systemctl enable strawwu-boot-marker.service
+
+    log "injecting W8 HW matrix probe serial markers"
+    cat > "${ROOTFS_DIR}/etc/systemd/system/strawwu-hw-matrix-probe.service" <<'EOF'
+[Unit]
+Description=StrawWU HW matrix probe (GPU/Wi-Fi/suspend/HiDPI)
+DefaultDependencies=no
+After=network-online.target gdm.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c '\
+  M=""; \
+  systemctl is-active network-online.target >/dev/null 2>&1 && M="${M} STRAWWU-NET-OK"; \
+  [ -e /dev/dri/card0 ] && M="${M} STRAWWU-GPU-OK"; \
+  busctl get-property org.freedesktop.login1 /org/freedesktop/login1 org.freedesktop.login1.Manager CanSuspend 2>/dev/null | grep -q yes && M="${M} STRAWWU-SUSPEND-PROBE-OK"; \
+  command -v gsettings >/dev/null 2>&1 && M="${M} STRAWWU-HIDPI-PROBE-OK"; \
+  [ -n "$M" ] && echo $M | tee /dev/ttyS0 /dev/console /dev/kmsg >/dev/null 2>&1 || true'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+    chroot_run systemctl enable strawwu-hw-matrix-probe.service
 }
 
 apply_branding() {

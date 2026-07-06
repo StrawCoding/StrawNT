@@ -1,0 +1,31 @@
+{
+  "schema_version": 2,
+  "updated_at": "2026-07-06",
+  "active": {
+    "version": "24.04.2",
+    "codename": "noble",
+    "iso_name": "ubuntu-24.04.2-desktop-amd64.iso",
+    "mirror": "https://old-releases.ubuntu.com/releases/24.04.2",
+    "kernel_localversion": "-strawwu",
+    "kernel_upstream": "6.8.12"
+  },
+  "target": {
+    "version": "26.04.0",
+    "codename": "resolute",
+    "iso_name": "ubuntu-26.04-desktop-amd64.iso",
+    "mirror": "https://releases.ubuntu.com/26.04",
+    "kernel_localversion": "-strawwu",
+    "kernel_upstream": "6.14"
+  },
+  "migration": {
+    "locked_sequence": "ubuntu_2604_locked_sequence",
+    "trigger_after": "w8-mvp-closeout",
+    "first_stage": "u26-m1-base-clone",
+    "closeout_stage": "u26-m7-closeout",
+    "post_migration_first": "post-d1-strawwu-drivers"
+  },
+  "comparison_baseline": {
+    "ubuntu_lts": "26.04 LTS Resolute Raccoon",
+    "peer_distros": ["Ubuntu 26.04", "Linux Mint 22.x", "Pop!_OS 24.04+", "Zorin OS 18", "elementary OS 8"]
+  }
+}

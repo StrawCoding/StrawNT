@@ -1,9 +1,9 @@
 {
   "generated_at": "2026-07-06T00:00:00",
   "target": "0.9.0.0-engineering",
-  "total": 12,
+  "total": 14,
   "passed": 0,
-  "failed": 12,
+  "failed": 14,
   "all_pass": false,
   "note": "Auto-updated by make test-post-mvp-all-pass",
   "stages": [
@@ -12,6 +12,8 @@
     {"id": "post-hw-t2-installed", "status": "PENDING", "pass": false},
     {"id": "post-ddp-rootfs", "status": "PENDING", "pass": false},
     {"id": "post-q3-mfp-smoke", "status": "PENDING", "pass": false},
+    {"id": "post-d7-software-sources", "status": "PENDING", "pass": false},
+    {"id": "post-ux-theme-curation", "status": "PENDING", "pass": false},
     {"id": "post-v06-closeout", "status": "PENDING", "pass": false},
     {"id": "post-upg-rollback", "status": "PENDING", "pass": false},
     {"id": "post-sec-secureboot-route", "status": "PENDING", "pass": false},

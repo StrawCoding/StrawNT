@@ -1,0 +1,34 @@
+# POST-D7-software-sources
+
+| 任務 ID | post-d7-software-sources |
+|---------|-------|
+| 計畫 | `strawwu-d7-software-sources-plan.md` |
+
+## 目標
+
+見 `docs/plans/strawwu-d7-software-sources-plan.md`
+
+## PASS 條件
+
+```bash
+cd /mnt/data/code/project/StrawCoding/StrawWU
+make test-software-sources
+make preflight
+```
+
+## 必須交付
+
+1. 本階段實作產物（見計畫文件）
+2. `docs/plans/stage-reports/POST-D7-software-sources-report.md`
+3. VERSION bump（`scripts/bump-version.sh`）
+
+## 禁止
+
+- SKIP_SQUASHFS=1 進 release 驗收
+- 并行 boot-test 寫同一 ISO
+- worker 自宣稱 PASS
+- 複製 legacy 封存程式碼
+
+## 完成後
+
+Hermes mark PASS → 自動啟動下一 stage（勿問使用者）。
