@@ -2,7 +2,7 @@
 	build-iso dev-iso release-iso repack-iso validate-rootfs boot-test-iso boot-test-dev-iso \
 	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
-	test-install-e2e test-install-firstboot-e2e test-installed-boot test-target-flathub test-wincompat test-wincompat-os test-wincompat-registry test-wincompat-gui test-strawwu-shell test-hub test-hub-settings test-apps-page test-flathub-hub test-l10n-ime test-firstboot test-finished-meta test-context-menu test-registry-hooks test-target-identity test-greeter-session test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-init-tools test-bug-reporter test-calamares-settings test-app-registry test-security-baseline test-observability test-legal-trademark test-desktop-stack test-live-install-ux test-update-notifier test-target-setup test-meta-audit purge-ubuntu-telemetry \
+	test-install-e2e test-install-firstboot-e2e test-installed-boot test-target-flathub test-wincompat test-wincompat-os test-wincompat-registry test-wincompat-gui test-strawwu-shell test-hub test-hub-settings test-apps-page test-flathub-hub test-l10n-ime test-firstboot test-finished-meta test-context-menu test-registry-hooks test-deep-uninstall test-target-identity test-greeter-session test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-init-tools test-bug-reporter test-calamares-settings test-app-registry test-security-baseline test-observability test-legal-trademark test-desktop-stack test-live-install-ux test-update-notifier test-target-setup test-meta-audit purge-ubuntu-telemetry \
 	install-flatpak-setup install-bug-reporter install-calamares-settings install-update-notifier install-target-setup install-firstboot install-wincompat nosnap-harden build-debs bump-version check-version-bump
 
 REPO_ROOT := $(abspath .)
@@ -69,6 +69,7 @@ help:
 	@echo "  test-finished-meta            W5-N4 install-init meta + Calamares finished zh_TW"
 	@echo "  test-context-menu             W5-D4 desktop remove context menu + favorites sync"
 	@echo "  test-registry-hooks           W5-R4 Linux/Flatpak install scan → app registry"
+	@echo "  test-deep-uninstall           W6-R5 registry deep remove + scan uninstall sync"
 	@echo "  test-target-identity          W5-I3 GRUB/Plymouth post-install target branding"
 	@echo "  test-greeter-session          W5-GRT strawwu-greeter GDM theme + session defaults"
 	@echo "  purge-ubuntu-telemetry        chroot purge apport/whoopsie/ubuntu-pro/snapd (needs root)"
@@ -118,6 +119,7 @@ preflight:
 	bash tests/preflight/test-installed-boot.sh
 	bash tests/preflight/test-target-flathub.sh
 	bash tests/preflight/test-meta-audit.sh
+	bash tests/preflight/test-deep-uninstall.sh
 
 preflight-dev-vm:
 	bash tests/preflight/test-dev-vm-ready.sh
@@ -283,6 +285,9 @@ test-target-setup:
 
 test-meta-audit:
 	bash tests/preflight/test-meta-audit.sh
+
+test-deep-uninstall:
+	bash tests/preflight/test-deep-uninstall.sh
 
 test-wincompat-os:
 	bash tests/preflight/test-wincompat-os.sh

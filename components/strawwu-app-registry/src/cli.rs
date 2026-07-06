@@ -19,11 +19,18 @@ pub enum Command {
     Remove {
         id: String,
         dry_run: bool,
+        deep: bool,
+        json: bool,
+    },
+    DeepRemove {
+        id: String,
+        dry_run: bool,
         json: bool,
     },
     RemoveByDesktop {
         desktop: String,
         dry_run: bool,
+        deep: bool,
         json: bool,
     },
     Validate { path: Option<PathBuf> },
@@ -45,6 +52,7 @@ pub fn parse_args(args: &[String]) -> Result<Command, String> {
 
     let mut json = false;
     let mut dry_run = false;
+    let mut deep = false;
     let mut scan_linux = false;
     let mut scan_flatpak = false;
     let mut scan_all = false;
@@ -55,6 +63,7 @@ pub fn parse_args(args: &[String]) -> Result<Command, String> {
         match args[i].as_str() {
             "--json" => json = true,
             "--dry-run" => dry_run = true,
+            "--deep" => deep = true,
             "--linux" => scan_linux = true,
             "--flatpak" => scan_flatpak = true,
             "--all" => scan_all = true,
@@ -86,6 +95,17 @@ pub fn parse_args(args: &[String]) -> Result<Command, String> {
             Ok(Command::Remove {
                 id: positional[1].clone(),
                 dry_run,
+                deep,
+                json,
+            })
+        }
+        "deep-remove" => {
+            if positional.len() < 2 {
+                return Err("deep-remove requires an app id".into());
+            }
+            Ok(Command::DeepRemove {
+                id: positional[1].clone(),
+                dry_run,
                 json,
             })
         }
@@ -96,6 +116,7 @@ pub fn parse_args(args: &[String]) -> Result<Command, String> {
             Ok(Command::RemoveByDesktop {
                 desktop: positional[1..].join(" "),
                 dry_run,
+                deep,
                 json,
             })
         }
@@ -260,12 +281,38 @@ mod tests {
     }
 
     #[test]
+    fn parse_remove_deep_dry_run() {
+        let cmd = parse_args(&args("remove demo --deep --dry-run")).unwrap();
+        match cmd {
+            Command::Remove { id, dry_run, deep, .. } => {
+                assert_eq!(id, "demo");
+                assert!(dry_run);
+                assert!(deep);
+            }
+            _ => panic!("expected Remove"),
+        }
+    }
+
+    #[test]
+    fn parse_deep_remove() {
+        let cmd = parse_args(&args("deep-remove demo --json")).unwrap();
+        match cmd {
+            Command::DeepRemove { id, json, .. } => {
+                assert_eq!(id, "demo");
+                assert!(json);
+            }
+            _ => panic!("expected DeepRemove"),
+        }
+    }
+
+    #[test]
     fn parse_remove_dry_run() {
         let cmd = parse_args(&args("remove demo --dry-run")).unwrap();
         match cmd {
-            Command::Remove { id, dry_run, .. } => {
+            Command::Remove { id, dry_run, deep, .. } => {
                 assert_eq!(id, "demo");
                 assert!(dry_run);
+                assert!(!deep);
             }
             _ => panic!("expected Remove"),
         }
@@ -278,10 +325,12 @@ mod tests {
             Command::RemoveByDesktop {
                 desktop,
                 dry_run,
+                deep,
                 json,
             } => {
                 assert_eq!(desktop, "/tmp/foo.desktop");
                 assert!(dry_run);
+                assert!(!deep);
                 assert!(json);
             }
             _ => panic!("expected RemoveByDesktop"),

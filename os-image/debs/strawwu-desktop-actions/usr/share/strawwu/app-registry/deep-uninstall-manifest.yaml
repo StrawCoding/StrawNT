@@ -1,0 +1,29 @@
+schema: strawwu-deep-uninstall-manifest/v1
+registry_cli: /usr/bin/strawwu-app-registry
+commands:
+  - deep-remove
+  - remove --deep
+  - remove-by-desktop --deep
+scan_sync:
+  enabled: true
+  description: Mark Linux/Flatpak registry entries removed when absent from scan
+allow_prefixes:
+  - ~/.strawwu
+  - /opt/strawwu/apps
+  - ~/.local/share/applications
+  - ~/.var/app
+  - ~/.local/share/flatpak
+  - ~/.wine
+forbidden_prefixes:
+  - /usr
+  - /etc
+  - /bin
+  - /sbin
+  - /lib
+  - /boot
+  - /var/lib/dpkg
+  - /var/lib/strawwu
+flatpak_uninstall: flatpak uninstall -y --system
+env:
+  STRAWWU_DEEP_REMOVE_ALLOW_PREFIXES: extra test/dev prefixes (colon-separated)
+  STRAWWU_SKIP_FLATPAK_UNINSTALL: skip flatpak uninstall during deep-remove

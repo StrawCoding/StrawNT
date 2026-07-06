@@ -1,9 +1,13 @@
+use std::collections::HashSet;
 use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
 use thiserror::Error;
 
+use crate::deep_remove::{
+    execute_deep_remove_plan, plan_deep_remove, should_sync_remove_on_scan, DeepRemoveResult,
+};
 use crate::desktop::{find_by_desktop, slug_from_desktop_basename};
 use crate::entry::{AppEntry, AppKind, AppRegistryFile, AppSource, ExecutionBackend, InstallState};
 use crate::scan::ScannedApp;
@@ -24,6 +28,8 @@ pub enum RegistryError {
     Protected(String),
     #[error("app already exists: {0}")]
     Duplicate(String),
+    #[error("deep remove failed: {0}")]
+    DeepRemove(String),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
@@ -33,6 +39,20 @@ pub enum ScanUpsertAction {
     Updated,
     Reactivated,
     Skipped,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum ScanRemoveAction {
+    Removed,
+    Skipped,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct ScanRemoveResult {
+    pub id: String,
+    pub name: String,
+    pub action: ScanRemoveAction,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
@@ -315,6 +335,103 @@ impl RegistryStore {
         Ok(preview)
     }
 
+    /// Deep remove: delete allowlisted install/desktop paths, optional flatpak uninstall, then mark removed.
+    pub fn deep_remove(&mut self, id: &str, dry_run: bool) -> Result<DeepRemoveResult, RegistryError> {
+        let preview = self.preview_remove(id)?;
+        if preview.protected {
+            return Err(RegistryError::Protected(id.to_string()));
+        }
+
+        let app = self
+            .data
+            .find(id)
+            .ok_or_else(|| RegistryError::NotFound(id.to_string()))?;
+        let plan = plan_deep_remove(app);
+        let paths_skipped = plan.paths_skipped.clone();
+
+        if dry_run {
+            let (paths_deleted, flatpak) = execute_deep_remove_plan(&plan, true)
+                .map_err(|e| RegistryError::DeepRemove(e.to_string()))?;
+            self.log_event("deep-remove-dry-run", id);
+            return Ok(DeepRemoveResult {
+                preview,
+                dry_run: true,
+                registry_removed: false,
+                paths_deleted,
+                paths_skipped,
+                flatpak,
+            });
+        }
+
+        let (paths_deleted, flatpak) = execute_deep_remove_plan(&plan, false)
+            .map_err(|e| RegistryError::DeepRemove(e.to_string()))?;
+
+        if let Some(app) = self.data.find_mut(id) {
+            app.install_state = InstallState::Removed;
+            app.touch();
+        }
+        self.data.touch();
+        self.flush()?;
+        self.log_event("deep-remove", id);
+
+        Ok(DeepRemoveResult {
+            preview,
+            dry_run: false,
+            registry_removed: true,
+            paths_deleted,
+            paths_skipped,
+            flatpak,
+        })
+    }
+
+    pub fn deep_remove_by_desktop(
+        &mut self,
+        raw: &str,
+        dry_run: bool,
+    ) -> Result<DeepRemoveResult, RegistryError> {
+        let id = self
+            .resolve_id_for_desktop(raw)
+            .ok_or_else(|| RegistryError::NotFound(raw.to_string()))?;
+        self.deep_remove(&id, dry_run)
+    }
+
+    /// Mark scan-managed apps removed when they disappear from Linux/Flatpak discovery.
+    pub fn sync_removed_from_scan(
+        &mut self,
+        discovered_ids: &HashSet<String>,
+        dry_run: bool,
+    ) -> Result<Vec<ScanRemoveResult>, RegistryError> {
+        let candidates: Vec<(String, String)> = self
+            .data
+            .active_apps()
+            .iter()
+            .filter(|app| should_sync_remove_on_scan(app))
+            .filter(|app| !discovered_ids.contains(&app.id))
+            .map(|app| (app.id.clone(), app.name.clone()))
+            .collect();
+
+        let mut results = Vec::new();
+        for (id, name) in candidates {
+            if dry_run {
+                self.log_event("scan-remove-dry-run", &id);
+                results.push(ScanRemoveResult {
+                    id: id.clone(),
+                    name,
+                    action: ScanRemoveAction::Removed,
+                });
+                continue;
+            }
+            self.remove(&id, false)?;
+            self.log_event("scan-remove", &id);
+            results.push(ScanRemoveResult {
+                id,
+                name,
+                action: ScanRemoveAction::Removed,
+            });
+        }
+        Ok(results)
+    }
+
     pub fn flush(&self) -> Result<(), RegistryError> {
         validate_registry(&self.data)
             .map_err(|errs| RegistryError::Validation(errs.join("; ")))?;
@@ -357,6 +474,7 @@ pub fn load_registry_file(path: &Path) -> Result<AppRegistryFile, RegistryError>
 mod tests {
     use super::*;
     use crate::scan::ScannedApp;
+    use std::collections::HashSet;
     use tempfile::tempdir;
 
     #[test]
@@ -526,5 +644,114 @@ mod tests {
         let app = store.get("org.gnome.calculator").unwrap();
         assert_eq!(app.kind, AppKind::Flatpak);
         assert_eq!(app.source, AppSource::Flatpak);
+    }
+
+    #[test]
+    fn deep_remove_deletes_allowlisted_install_path() {
+        let dir = tempdir().unwrap();
+        let app_dir = dir.path().join("demo-app");
+        std::fs::create_dir_all(&app_dir).unwrap();
+        let path = dir.path().join("registry.json");
+        std::env::set_var(
+            "STRAWWU_DEEP_REMOVE_ALLOW_PREFIXES",
+            dir.path().to_string_lossy().as_ref(),
+        );
+        std::env::set_var(
+            "STRAWWU_APP_REGISTRY_LOG",
+            dir.path().join("registry.log").to_string_lossy().as_ref(),
+        );
+
+        let mut store = RegistryStore::open_at(path).unwrap();
+        store
+            .register_new(
+                "demo-app",
+                "Demo",
+                AppKind::Win32,
+                AppSource::Installer,
+                Some(app_dir.to_string_lossy().into_owned()),
+                None,
+                false,
+                None,
+            )
+            .unwrap();
+
+        std::env::set_var(
+            "STRAWWU_DEEP_REMOVE_ALLOW_PREFIXES",
+            dir.path().to_string_lossy().as_ref(),
+        );
+        let result = store.deep_remove("demo-app", false).unwrap();
+        assert!(result.registry_removed);
+        assert!(!app_dir.exists());
+        assert!(store.list_active().is_empty());
+    }
+
+    #[test]
+    fn deep_remove_skips_forbidden_system_path() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("registry.json");
+        let mut store = RegistryStore::open_at(path).unwrap();
+        store
+            .register_new(
+                "system-linux",
+                "System Linux",
+                AppKind::Linux,
+                AppSource::Manual,
+                Some("/usr/bin/demo".into()),
+                Some("/usr/share/applications/demo.desktop".into()),
+                false,
+                None,
+            )
+            .unwrap();
+
+        let result = store.deep_remove("system-linux", false).unwrap();
+        assert_eq!(result.paths_skipped.len(), 2);
+        assert!(result.paths_deleted.is_empty());
+        assert!(store.list_active().is_empty());
+    }
+
+    #[test]
+    fn sync_removed_from_scan_marks_missing_flatpak() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("registry.json");
+        let mut store = RegistryStore::open_at(path).unwrap();
+        store
+            .register_new(
+                "org.gnome.calculator",
+                "Calculator",
+                AppKind::Flatpak,
+                AppSource::Flatpak,
+                Some("org.gnome.Calculator".into()),
+                None,
+                false,
+                None,
+            )
+            .unwrap();
+
+        let discovered = HashSet::from(["com.spotify.client".to_string()]);
+        let removed = store.sync_removed_from_scan(&discovered, false).unwrap();
+        assert_eq!(removed.len(), 1);
+        assert_eq!(removed[0].id, "org.gnome.calculator");
+        assert!(store.list_active().is_empty());
+    }
+
+    #[test]
+    fn sync_removed_from_scan_skips_launcher_entries() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("registry.json");
+        let mut store = RegistryStore::open_at(path).unwrap();
+        store
+            .upsert_from_launch(
+                "demo-app",
+                "Demo",
+                AppKind::Win32,
+                Some("/opt/demo".into()),
+                None,
+                None,
+            )
+            .unwrap();
+
+        let removed = store.sync_removed_from_scan(&HashSet::new(), false).unwrap();
+        assert!(removed.is_empty());
+        assert_eq!(store.list_active().len(), 1);
     }
 }

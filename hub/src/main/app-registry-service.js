@@ -64,17 +64,33 @@ async function listApps() {
   };
 }
 
-async function previewRemoveApp(id) {
-  return removeApp(id, true);
+function normalizeRemoveResult(raw) {
+  if (raw && raw.preview && typeof raw.preview === 'object') {
+    return {
+      ...raw.preview,
+      deep: {
+        dryRun: raw.dry_run,
+        registryRemoved: raw.registry_removed,
+        pathsDeleted: raw.paths_deleted || [],
+        pathsSkipped: raw.paths_skipped || [],
+        flatpak: raw.flatpak || null,
+      },
+    };
+  }
+  return raw;
 }
 
-async function removeApp(id, dryRun = false) {
+async function previewRemoveApp(id) {
+  return normalizeRemoveResult(await removeApp(id, true));
+}
+
+async function removeApp(id, dryRun = false, deep = true) {
   const cli = resolveAppRegistryCli();
   if (!cli) {
     throw new Error('strawwu-app-registry CLI not found');
   }
 
-  const args = ['remove', id];
+  const args = deep ? ['deep-remove', id] : ['remove', id];
   if (dryRun) {
     args.push('--dry-run');
   }
@@ -82,11 +98,11 @@ async function removeApp(id, dryRun = false) {
 
   try {
     const { stdout } = await execFileAsync(cli, args, {
-      timeout: 10000,
+      timeout: 30000,
       encoding: 'utf8',
       env: registryEnv(),
     });
-    return JSON.parse(stdout);
+    return normalizeRemoveResult(JSON.parse(stdout));
   } catch (err) {
     if (err.code === 2) {
       const protectedErr = new Error(`App is protected: ${id}`);

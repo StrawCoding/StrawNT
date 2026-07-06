@@ -1,0 +1,16 @@
+{
+  "schema": "strawwu-deep-uninstall-baseline/v1",
+  "wave": "W6-R5",
+  "version": "0.4.1.37",
+  "registry_cli": "/usr/bin/strawwu-app-registry",
+  "registry_path": "/var/lib/strawwu/app-registry.json",
+  "manifest": "os-image/debs/strawwu-desktop-actions/usr/share/strawwu/app-registry/deep-uninstall-manifest.yaml",
+  "commands": [
+    "deep-remove",
+    "remove --deep",
+    "remove-by-desktop --deep"
+  ],
+  "scan_sync": true,
+  "hub_default_deep": true,
+  "desktop_remove_deep": true
+}

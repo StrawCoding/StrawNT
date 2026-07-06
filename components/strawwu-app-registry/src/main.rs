@@ -54,12 +54,26 @@ fn run(cmd: Command) -> Result<(), i32> {
             protected,
             backend,
         ),
-        Command::Remove { id, dry_run, json } => cmd_remove(&id, dry_run, json),
+        Command::Remove { id, dry_run, deep, json } => {
+            if deep {
+                cmd_deep_remove(&id, dry_run, json)
+            } else {
+                cmd_remove(&id, dry_run, json)
+            }
+        }
+        Command::DeepRemove { id, dry_run, json } => cmd_deep_remove(&id, dry_run, json),
         Command::RemoveByDesktop {
             desktop,
             dry_run,
+            deep,
             json,
-        } => cmd_remove_by_desktop(&desktop, dry_run, json),
+        } => {
+            if deep {
+                cmd_deep_remove_by_desktop(&desktop, dry_run, json)
+            } else {
+                cmd_remove_by_desktop(&desktop, dry_run, json)
+            }
+        }
         Command::Validate { path } => cmd_validate(path),
         Command::Scan {
             linux,
@@ -139,6 +153,67 @@ fn cmd_register(
         }
         Err(e) => {
             eprintln!("strawwu-app-registry: register failed: {e}");
+            Err(exit_code(&e))
+        }
+    }
+}
+
+fn cmd_deep_remove(id: &str, dry_run: bool, json: bool) -> Result<(), i32> {
+    let mut store = open_store()?;
+    match store.deep_remove(id, dry_run) {
+        Ok(result) => {
+            if json {
+                println!("{}", serde_json::to_string_pretty(&result).unwrap());
+            } else if dry_run {
+                println!(
+                    "strawwu-app-registry: dry-run deep-remove {id} ({})",
+                    result.preview.name
+                );
+                for path in &result.paths_deleted {
+                    println!("  would delete: {path}");
+                }
+                for skip in &result.paths_skipped {
+                    println!("  skip {}: {}", skip.path, skip.reason);
+                }
+            } else {
+                println!(
+                    "strawwu-app-registry: deep-removed {id} ({})",
+                    result.preview.name
+                );
+                for path in &result.paths_deleted {
+                    println!("  deleted: {path}");
+                }
+            }
+            Ok(())
+        }
+        Err(e) => {
+            eprintln!("strawwu-app-registry: deep-remove failed: {e}");
+            Err(exit_code(&e))
+        }
+    }
+}
+
+fn cmd_deep_remove_by_desktop(desktop: &str, dry_run: bool, json: bool) -> Result<(), i32> {
+    let mut store = open_store()?;
+    match store.deep_remove_by_desktop(desktop, dry_run) {
+        Ok(result) => {
+            if json {
+                println!("{}", serde_json::to_string_pretty(&result).unwrap());
+            } else if dry_run {
+                println!(
+                    "strawwu-app-registry: dry-run deep-remove {} via desktop ({})",
+                    result.preview.id, result.preview.name
+                );
+            } else {
+                println!(
+                    "strawwu-app-registry: deep-removed {} via desktop ({})",
+                    result.preview.id, result.preview.name
+                );
+            }
+            Ok(())
+        }
+        Err(e) => {
+            eprintln!("strawwu-app-registry: deep-remove-by-desktop failed: {e}");
             Err(exit_code(&e))
         }
     }
@@ -227,6 +302,8 @@ fn cmd_scan(linux: bool, flatpak: bool, dry_run: bool, json: bool) -> Result<(),
         .map(PathBuf::from);
 
     let discovered = strawwu_app_registry::scan_apps(&options);
+    let discovered_ids: std::collections::HashSet<String> =
+        discovered.iter().map(|app| app.id.clone()).collect();
     let mut store = open_store()?;
     let mut results = Vec::new();
     let mut counts = std::collections::HashMap::new();
@@ -248,6 +325,14 @@ fn cmd_scan(linux: bool, flatpak: bool, dry_run: bool, json: bool) -> Result<(),
         }));
     }
 
+    let removed = store
+        .sync_removed_from_scan(&discovered_ids, dry_run)
+        .map_err(|e| {
+            eprintln!("strawwu-app-registry: scan-remove sync failed: {e}");
+            exit_code(&e)
+        })?;
+    let removed_count = removed.len();
+
     if json {
         println!(
             "{}",
@@ -258,17 +343,22 @@ fn cmd_scan(linux: bool, flatpak: bool, dry_run: bool, json: bool) -> Result<(),
                 "discovered": discovered.len(),
                 "counts": counts,
                 "results": results,
+                "removed": removed,
+                "removed_count": removed_count,
             }))
             .unwrap()
         );
     } else {
         let prefix = if dry_run { "dry-run " } else { "" };
         println!(
-            "strawwu-app-registry: {prefix}scan complete ({} discovered)",
+            "strawwu-app-registry: {prefix}scan complete ({} discovered, {removed_count} removed)",
             discovered.len()
         );
         for (action, count) in &counts {
             println!("  {action}: {count}");
+        }
+        if removed_count > 0 {
+            println!("  scan-remove synced: {removed_count}");
         }
     }
     Ok(())
@@ -287,6 +377,7 @@ fn exit_code(err: &RegistryError) -> i32 {
         RegistryError::NotFound(_) => 1,
         RegistryError::Duplicate(_) => 1,
         RegistryError::Validation(_) => 1,
+        RegistryError::DeepRemove(_) => 1,
         RegistryError::Io(_) | RegistryError::Json(_) => 1,
     }
 }
@@ -305,9 +396,12 @@ COMMANDS:
              [--source installer|launcher|flatpak|seed|manual]
              [--install-path <path>] [--desktop-entry <path>] [--protected]
              [--backend native|container|microvm]
-    remove <id> [--dry-run] [--json]  Mark app removed (protected apps rejected)
-    remove-by-desktop <path> [--dry-run] [--json]
-                                      Resolve app from .desktop path and mark removed
+    remove <id> [--deep] [--dry-run] [--json]
+                                      Mark app removed; --deep deletes allowlisted paths first
+    deep-remove <id> [--dry-run] [--json]
+                                      Delete allowlisted install paths + flatpak uninstall, then mark removed
+    remove-by-desktop <path> [--deep] [--dry-run] [--json]
+                                      Resolve app from .desktop path and remove (optional --deep)
     validate [path]                   Validate registry JSON (default: /var/lib/strawwu/app-registry.json)
     scan [--linux] [--flatpak] [--all] [--dry-run] [--json]
                                       Scan Linux .desktop / Flatpak apps into registry
@@ -317,6 +411,8 @@ COMMANDS:
 ENV:
     STRAWWU_APP_REGISTRY      Override registry JSON path
     STRAWWU_APP_REGISTRY_LOG  Override log path (/var/log/strawwu/app-registry.log)
+    STRAWWU_DEEP_REMOVE_ALLOW_PREFIXES  Extra colon-separated deletable path prefixes (tests/dev)
+    STRAWWU_SKIP_FLATPAK_UNINSTALL      Skip flatpak uninstall during deep-remove
 "
     );
 }

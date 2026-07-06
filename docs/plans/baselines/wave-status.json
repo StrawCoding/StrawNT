@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-05T20:24:51.657312",
+  "generated_at": "2026-07-05T21:58:04.401109",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 32,
-  "failed": 15,
+  "passed": 33,
+  "failed": 14,
   "all_pass": false,
   "stages": [
     {
@@ -168,8 +168,8 @@
     },
     {
       "id": "w6-b5-meta-audit",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w6-r5-deep-uninstall",

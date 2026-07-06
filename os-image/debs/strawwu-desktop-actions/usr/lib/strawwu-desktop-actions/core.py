@@ -33,6 +33,13 @@ def registry_cli() -> Path:
     return DEFAULT_REGISTRY_CLI
 
 
+def normalize_remove_payload(data: dict) -> dict:
+    preview = data.get("preview")
+    if isinstance(preview, dict):
+        return preview
+    return data
+
+
 def remove_via_registry(desktop_path: Path, dry_run: bool = False) -> dict:
     cli = registry_cli()
     if not cli.exists():
@@ -41,7 +48,7 @@ def remove_via_registry(desktop_path: Path, dry_run: bool = False) -> dict:
     env = os.environ.copy()
     env.setdefault("STRAWWU_APP_REGISTRY", str(registry_path()))
 
-    args = [str(cli), "remove-by-desktop", str(desktop_path), "--json"]
+    args = [str(cli), "remove-by-desktop", str(desktop_path), "--deep", "--json"]
     if dry_run:
         args.insert(-1, "--dry-run")
 
@@ -58,7 +65,7 @@ def remove_via_registry(desktop_path: Path, dry_run: bool = False) -> dict:
             raise LookupError(format_message("not_registered"))
         raise RuntimeError(result.stderr.strip() or result.stdout.strip() or "remove failed")
 
-    preview = json.loads(result.stdout)
+    preview = normalize_remove_payload(json.loads(result.stdout))
     return preview
 
 
