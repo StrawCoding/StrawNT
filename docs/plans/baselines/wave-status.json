@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-06T03:02:22.997997",
+  "generated_at": "2026-07-06T03:34:18.488608",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 43,
-  "failed": 4,
+  "passed": 44,
+  "failed": 3,
   "all_pass": false,
   "stages": [
     {
@@ -223,8 +223,8 @@
     },
     {
       "id": "w8-s3-initrd-bottom",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w8-s4-initramfs-hooks",

@@ -56,7 +56,7 @@ build_debs() {
     local version="${STRAWWU_VERSION:-$(tr -d '[:space:]' < "${REPO_ROOT}/VERSION")}"
     local pkg
     for pkg in strawwu-initd strawwu-wincompat strawwu-shell strawwu-session strawwu-greeter strawwu-update-notifier strawwu-bug-reporter \
-        strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-install-init strawwu-desktop-actions strawwu-registry-hooks strawwu-target-identity strawwu-disable-upstream-init strawwu-minimal strawwu-desktop strawwu-live-install-ux \
+        strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-install-init strawwu-desktop-actions strawwu-registry-hooks strawwu-initramfs-hooks strawwu-target-identity strawwu-disable-upstream-init strawwu-minimal strawwu-desktop strawwu-live-install-ux \
         strawwu-target-setup strawwu-calamares-settings; do
         local build="${DEBS_ROOT}/${pkg}/build-deb.sh"
         [[ -x "${build}" ]] || die "missing build script: ${build}"
@@ -88,7 +88,7 @@ stage_debs() {
 
     local pkg deb
     for pkg in strawwu-initd strawwu-wincompat strawwu-shell strawwu-session strawwu-greeter strawwu-update-notifier strawwu-bug-reporter \
-        strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-install-init strawwu-desktop-actions strawwu-registry-hooks strawwu-target-identity strawwu-disable-upstream-init strawwu-minimal strawwu-desktop; do
+        strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-install-init strawwu-desktop-actions strawwu-registry-hooks strawwu-initramfs-hooks strawwu-target-identity strawwu-disable-upstream-init strawwu-minimal strawwu-desktop; do
         deb="$(latest_deb "${pkg}")"
         [[ -n "${deb}" && -f "${deb}" ]] || die "deb missing for ${pkg}"
         cp -f "${deb}" "${STAGED}/"
@@ -173,6 +173,11 @@ STRAWWU_TARGET_DEB_DIR=/usr/share/strawwu/target-setup/staged-debs \
     strawwu-target-identity --calamares-chroot --skip-initramfs
 
 command -v strawwu-target-identity >/dev/null
+command -v strawwu-initramfs-hooks >/dev/null
+test -f /etc/initramfs-tools/conf.d/strawwu-disk-boot
+grep -q 'BOOT=local' /etc/initramfs-tools/conf.d/strawwu-disk-boot
+dpkg-query -W -f='${Status}' strawwu-initramfs-hooks 2>/dev/null | grep -q "ok installed"
+strawwu-initd get lifecycle.initramfs_hooks | grep -q done
 test -f /etc/default/grub.d/99-strawwu-identity.cfg
 grep -q 'GRUB_DISTRIBUTOR="StrawWU"' /etc/default/grub.d/99-strawwu-identity.cfg
 strawwu-initd get lifecycle.target_identity | grep -q done

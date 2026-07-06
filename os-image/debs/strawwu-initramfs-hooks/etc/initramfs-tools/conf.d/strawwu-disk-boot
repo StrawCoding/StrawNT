@@ -1,0 +1,3 @@
+# StrawWU installed target — disk boot (not live casper ISO).
+# Managed by strawwu-initramfs-hooks (W8-S4).
+BOOT=local

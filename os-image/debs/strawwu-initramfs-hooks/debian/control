@@ -1,0 +1,14 @@
+Package: strawwu-initramfs-hooks
+Version: __VERSION__
+Section: admin
+Priority: optional
+Architecture: all
+Depends: strawwu-initd,
+         python3
+Recommends: initramfs-tools
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU installed-target initramfs hooks (disk boot)
+ Strips casper/live-boot initramfs-tools hooks on installed systems and
+ enforces BOOT=local for standard disk boot. Complements ISO initrd splice
+ (strawwu-live-init / strawwu-live-bottom). Installed via target-setup
+ before target-identity regenerates initramfs.

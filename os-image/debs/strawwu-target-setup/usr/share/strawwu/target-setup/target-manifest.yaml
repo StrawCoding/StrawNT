@@ -15,6 +15,7 @@ packages:
   - strawwu-install-init
   - strawwu-desktop-actions
   - strawwu-registry-hooks
+  - strawwu-initramfs-hooks
   - strawwu-target-identity
   - strawwu-disable-upstream-init
   - strawwu-minimal

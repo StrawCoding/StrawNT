@@ -1,0 +1,16 @@
+{
+  "schema": "strawwu-initramfs-hooks-baseline/v1",
+  "wave": "W8-S4",
+  "version": "0.5.0.7",
+  "package": "strawwu-initramfs-hooks",
+  "cli": "/usr/bin/strawwu-initramfs-hooks",
+  "manifest": "os-image/debs/strawwu-initramfs-hooks/usr/share/strawwu/initramfs-hooks/initramfs-hooks-manifest.yaml",
+  "disk_boot_conf": "etc/initramfs-tools/conf.d/strawwu-disk-boot",
+  "boot_mode": "local",
+  "strip_hooks": [
+    "/usr/share/initramfs-tools/hooks/casper",
+    "/usr/share/initramfs-tools/hooks/live-boot"
+  ],
+  "lifecycle_key": "lifecycle.initramfs_hooks",
+  "log_path": "/var/log/strawwu/initramfs-hooks.log"
+}

@@ -38,6 +38,7 @@ class TargetSetupTests(unittest.TestCase):
         self.assertIn("strawwu-desktop", text)
         self.assertIn("strawwu-firstboot", text)
         self.assertIn("strawwu-install-init", text)
+        self.assertIn("strawwu-initramfs-hooks", text)
         self.assertIn("strawwu-target-identity", text)
 
     def test_load_manifest(self) -> None:

@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+if [[ "${1:-}" == "configure" ]] && [[ -x /usr/bin/strawwu-initramfs-hooks ]]; then
+    /usr/bin/strawwu-initramfs-hooks apply --skip-initramfs 2>/dev/null || true
+fi
+
+echo "strawwu-initramfs-hooks: installed (disk BOOT=local; live casper hooks stripped)"

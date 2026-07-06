@@ -5,7 +5,7 @@
 | 版本 | 0.5.0.6 |
 | 日期 | 2026-07-06 |
 | Worker | 階段 44/47（w8-s3-initrd-bottom） |
-| 最後驗證 | 2026-07-06T03:33 UTC-4（worker 階段 44/47 複驗） |
+| 最後驗證 | 2026-07-06T03:34 UTC-4（worker 階段 44/47 最終複驗） |
 | 結果 | **待 Hermes mark**（worker 不自宣稱 PASS） |
 
 ## 目標
@@ -36,7 +36,7 @@ casper-bottom 審計替換 → repo 擁有 `strawwu-live-bottom`（34 支 hook +
 | 相容 | `scripts/casper-bottom/ORDER` 僅保留委派至 `strawwu-live-bottom` 的 ORDER shim |
 | 開機 | GRUB 仍 `boot=casper`；bottom 階段 log 顯示 `Running /scripts/strawwu-live-bottom` |
 
-## 驗收命令輸出（2026-07-06T03:33 UTC-4，worker 階段 44/47 複驗）
+## 驗收命令輸出（2026-07-06T03:34 UTC-4，worker 階段 44/47 最終複驗）
 
 ### `make test-initrd-bottom` — exit 0
 

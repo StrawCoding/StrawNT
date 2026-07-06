@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+"""StrawWU initramfs hooks CLI — strip live casper; enforce disk BOOT=local."""
+from __future__ import annotations
+
+import argparse
+import importlib.util
+import sys
+from pathlib import Path
+
+_CORE = Path(__file__).resolve().parent.parent / "lib" / "strawwu-initramfs-hooks" / "core.py"
+_spec = importlib.util.spec_from_file_location("strawwu_initramfs_hooks_core", _CORE)
+_mod = importlib.util.module_from_spec(_spec)
+assert _spec.loader is not None
+_spec.loader.exec_module(_mod)
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="strawwu-initramfs-hooks",
+        description="Strip casper/live-boot initramfs hooks; configure disk BOOT=local.",
+    )
+    parser.add_argument(
+        "--calamares-chroot",
+        action="store_true",
+        help="Invoked during Calamares target chroot (same as apply)",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Log actions without modifying the system",
+    )
+    parser.add_argument(
+        "--skip-initramfs",
+        action="store_true",
+        help="Skip update-initramfs (postinst / fast path)",
+    )
+    sub = parser.add_subparsers(dest="command")
+    sub.add_parser("apply", help="Apply initramfs-hooks (default)")
+    sub.add_parser("version", help="Print version")
+
+    args = parser.parse_args(argv)
+    if args.command == "version":
+        return _mod.cmd_version()
+
+    if args.command in (None, "apply") or args.calamares_chroot:
+        return _mod.run_initramfs_hooks(
+            skip_initramfs=args.skip_initramfs,
+            dry_run=args.dry_run,
+        )
+
+    parser.print_help()
+    return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
