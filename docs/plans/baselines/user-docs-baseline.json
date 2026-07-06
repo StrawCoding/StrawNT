@@ -1,0 +1,25 @@
+{
+  "schema": "strawwu-user-docs-baseline/v1",
+  "wave": "W6-DOC1",
+  "version": "0.4.1.40",
+  "docs_root": "docs/user",
+  "guides": [
+    {
+      "id": "install",
+      "markdown": "install-guide.md",
+      "html": "html/install-guide.html"
+    },
+    {
+      "id": "rescue",
+      "markdown": "rescue-guide.md",
+      "html": "html/rescue-guide.html"
+    }
+  ],
+  "index": "docs/user/README.md",
+  "manifest": "docs/user/manifest.json",
+  "validate": "tests/user-docs/validate-user-docs.py",
+  "render": "tests/user-docs/render-html.py",
+  "preflight": "tests/preflight/test-user-docs.sh",
+  "dod": "docs/user install+rescue guides with HTML hermes-deliver artifacts",
+  "support_placeholder": "TBD"
+}

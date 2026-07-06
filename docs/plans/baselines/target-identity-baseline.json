@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-target-identity-baseline/v1",
   "wave": "W5-I3",
-  "version": "0.4.1.39",
+  "version": "0.4.1.40",
   "package": "strawwu-target-identity",
   "log_path": "/var/log/strawwu/target-identity.log",
   "marker_path": "/var/lib/strawwu/setup/target-identity.ok",

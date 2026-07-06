@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrawWU — 救援與修復指南</title>
+  <style>
+:root {
+  --bg: #0f1419;
+  --surface: #1a2332;
+  --text: #e8eef4;
+  --muted: #8b9cb3;
+  --accent: #14b8a6;
+  --accent-dim: #0d9488;
+  --border: #2d3a4d;
+  --code-bg: #0d1117;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  margin: 0;
+  padding: 2rem 1rem 4rem;
+}
+.wrap { max-width: 52rem; margin: 0 auto; }
+header {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+.brand { color: var(--accent); font-weight: 600; letter-spacing: 0.02em; }
+h1 { color: var(--text); font-size: 1.85rem; margin: 0.5rem 0 0.25rem; }
+.meta { color: var(--muted); font-size: 0.9rem; }
+h2 {
+  color: var(--accent);
+  font-size: 1.25rem;
+  margin-top: 2rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.35rem;
+}
+h3 { color: var(--text); font-size: 1.05rem; margin-top: 1.5rem; }
+p { margin: 0.75rem 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 1.4rem; }
+li { margin: 0.35rem 0; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.92rem;
+}
+th, td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+}
+th { background: var(--surface); color: var(--accent); }
+tr:nth-child(even) td { background: rgba(26, 35, 50, 0.5); }
+code {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.88em;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+}
+pre code { border: none; padding: 0; background: none; }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1rem 0;
+  padding: 0.25rem 0 0.25rem 1rem;
+  color: var(--muted);
+}
+footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">StrawWU User Docs</div>
+      <h1>救援與修復指南</h1>
+      <p class="meta">版本 0.4.1.40 · DOC1 · hermes-deliver</p>
+    </header>
+    <main>
+<h1>StrawWU 救援與修復指南</h1>
+<p>本指南說明當已安裝系統無法正常開機、設定損毀或安裝中斷時的<strong>基礎救援</strong>流程。v0.5 完整升級 rollback（<code>strawwu-upgrade --rollback</code>）屬 UPG 計畫，此處說明<strong>目前已實作</strong>的能力。</p>
+<h2>1. 何時使用本指南</h2>
+<table>
+<tr><th>情境</th><th>建議路徑</th></tr>
+<tr><td>安裝到一半失敗</td><td>Live USB → 檢查 log → 重裝或修復分割區</td></tr>
+<tr><td>開機進 GRUB 但 kernel panic</td><td>GRUB 選單選前一個 kernel entry（若存在）</td></tr>
+<tr><td>桌面無法登入 / firstboot 迴圈</td><td>Live → chroot → <code>strawwu-initd repair</code></td></tr>
+<tr><td>meta 套件遺失 / registry 損毀</td><td>Live → chroot → <code>strawwu-target-setup --repair-only</code></td></tr>
+<tr><td>僅需收集除錯資訊</td><td>Live 或已安裝系統執行 <code>strawwu-bug-report-gtk</code></td></tr>
+</table>
+<h2>2. 從 Live ISO 進入救援</h2>
+<ol>
+<li>使用與安裝相同的 <strong>StrawWU Live USB</strong> 開機。</li>
+<li>在 GRUB 選單選擇 <strong>Live</strong>（非「安全圖形」除非必要）。</li>
+<li>Live 桌面載入後開啟終端機。</li>
+</ol>
+<blockquote><p><strong>v0.5 說明：</strong> 專用「StrawWU Rescue」GRUB 項目規劃於 UPG5；目前使用標準 Live 環境掛載已安裝分割區進行修復。</p></blockquote>
+<h2>3. 掛載已安裝系統</h2>
+<p>假設根分割區為 <code>/dev/sda2</code>、EFI 為 <code>/dev/sda1</code>（請依 <code>lsblk</code> 調整）：</p>
+<pre><code>
+sudo mkdir -p /mnt/strawwu
+
+sudo mount /dev/sda2 /mnt/strawwu
+
+
+
+# UEFI 系統
+
+sudo mkdir -p /mnt/strawwu/boot/efi
+
+sudo mount /dev/sda1 /mnt/strawwu/boot/efi
+
+
+
+# 綁定 chroot 所需 pseudo-fs
+
+sudo mount --bind /dev  /mnt/strawwu/dev
+
+sudo mount --bind /proc /mnt/strawwu/proc
+
+sudo mount --bind /sys  /mnt/strawwu/sys
+
+sudo mount --bind /run  /mnt/strawwu/run
+
+</code></pre>
+<p>進入 chroot：</p>
+<pre><code>
+sudo chroot /mnt/strawwu /bin/bash
+
+</code></pre>
+<h2>4. 修復指令</h2>
+<h3>4.1 strawwu-initd repair</h3>
+<p>修復 <code>state.json</code> 與 lifecycle 旗標（備份損毀檔後重新初始化）：</p>
+<pre><code>
+strawwu-initd repair
+
+</code></pre>
+<p>適用：firstboot 狀態不一致、JSON 損毀、升級後 lifecycle 異常。</p>
+<h3>4.2 strawwu-target-setup --repair-only</h3>
+<p>重新套用 target manifest 中的 staged deb（desktop meta、bug-reporter、firstboot 等）：</p>
+<pre><code>
+strawwu-target-setup --repair-only
+
+</code></pre>
+<p>適用：Calamares 安裝中斷後 meta 不完整、手動刪除 StrawWU 套件後需還原。</p>
+<h3>4.3 重設 firstboot（進階）</h3>
+<p>若需讓首次設定精靈再次執行（會覆寫使用者偏好，請謹慎）：</p>
+<pre><code>
+strawwu-initd set lifecycle.firstboot_required=true
+
+rm -f /var/lib/strawwu/setup/firstboot-prefs.json
+
+</code></pre>
+<p>登出後重新登入觸發 <code>strawwu-firstboot</code> autostart。</p>
+<h3>4.4 GRUB / UEFI 修復</h3>
+<p>在 chroot 內（已掛載 <code>/boot/efi</code>）：</p>
+<pre><code>
+update-grub
+
+# UEFI
+
+grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=StrawWU
+
+efibootmgr -v
+
+</code></pre>
+<p><strong>已知案例：</strong> 部分 UEFI 環境需確保 <code>EFI/BOOT/grub.cfg</code> 與 <code>EFI/strawwu/grub.cfg</code> 一致（見 W6-I4 報告）。</p>
+<h2>5. 升級失敗與 rollback（誠實邊界）</h2>
+<table>
+<tr><th>能力</th><th>v0.5 狀態</th></tr>
+<tr><td>保留 ≥2 個 kernel</td><td>規劃於 UPG4</td></tr>
+<tr><td><code>initrd.img.old</code> symlink</td><td>規劃於 UPG</td></tr>
+<tr><td><code>strawwu-upgrade --rollback</code></td><td><strong>未實作</strong> — 見 <code>strawwu-upgrade-recovery-plan.md</code></td></tr>
+<tr><td>apt 失敗後手動 <code>apt install</code> 修復</td><td>可用</td></tr>
+<tr><td>Live chroot + repair 指令</td><td><strong>可用（本指南）</strong></td></tr>
+</table>
+<p>升級失敗時請先嘗試 GRUB 舊 kernel（若存在），否則以 Live + chroot + §4 修復。</p>
+<h2>6. 問題回報與日誌</h2>
+<table>
+<tr><th>路徑</th><th>內容</th></tr>
+<tr><td><code>/var/log/installation.log</code></td><td>Calamares 安裝</td></tr>
+<tr><td><code>/var/log/strawwu/firstboot.log</code></td><td>首次設定精靈</td></tr>
+<tr><td><code>/var/lib/strawwu/</code></td><td>state、registry、備份</td></tr>
+<tr><td><code>strawwu-bug-report</code></td><td>產生本機 bundle（需 opt-in 上傳）</td></tr>
+</table>
+<p>Hub「關於」→ <strong>回報問題</strong> 啟動 GTK 回報器。社群支援 URL：<strong>TBD</strong>。</p>
+<h2>7. Live 硬體 smoke（實機驗證）</h2>
+<p>在 Live session 驗證開機與桌面是否正常：</p>
+<pre><code>
+bash tests/hw/smoke-live.sh --output /tmp/smoke.json --environment physical
+
+</code></pre>
+<p>將輸出合併至專案 <code>docs/plans/hw-matrix-results.json</code> 供相容性追蹤（維護者／Hermes 實機 session）。</p>
+<h2>8. 離開 chroot 與卸載</h2>
+<pre><code>
+exit   # 離開 chroot
+
+sudo umount -R /mnt/strawwu
+
+</code></pre>
+<p>重新開機並移除 USB。</p>
+<h2>9. 相關文件</h2>
+<ul>
+<li><a href="install-guide.md">install-guide.md</a> — 正常安裝流程</li>
+<li><code>docs/plans/strawwu-upgrade-recovery-plan.md</code> — 完整 UPG／rollback 路線圖</li>
+<li><a href="README.md">README.md</a> — 文件索引</li>
+</ul>
+    </main>
+    <footer>
+      StrawWU v0.5 預發布使用者文件 · 支援渠道 TBD · 問題回報：strawwu-bug-report-gtk
+    </footer>
+  </div>
+</body>
+</html>

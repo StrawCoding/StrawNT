@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrawWU — 安裝與首次設定指南</title>
+  <style>
+:root {
+  --bg: #0f1419;
+  --surface: #1a2332;
+  --text: #e8eef4;
+  --muted: #8b9cb3;
+  --accent: #14b8a6;
+  --accent-dim: #0d9488;
+  --border: #2d3a4d;
+  --code-bg: #0d1117;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  margin: 0;
+  padding: 2rem 1rem 4rem;
+}
+.wrap { max-width: 52rem; margin: 0 auto; }
+header {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+.brand { color: var(--accent); font-weight: 600; letter-spacing: 0.02em; }
+h1 { color: var(--text); font-size: 1.85rem; margin: 0.5rem 0 0.25rem; }
+.meta { color: var(--muted); font-size: 0.9rem; }
+h2 {
+  color: var(--accent);
+  font-size: 1.25rem;
+  margin-top: 2rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.35rem;
+}
+h3 { color: var(--text); font-size: 1.05rem; margin-top: 1.5rem; }
+p { margin: 0.75rem 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 1.4rem; }
+li { margin: 0.35rem 0; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.92rem;
+}
+th, td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+}
+th { background: var(--surface); color: var(--accent); }
+tr:nth-child(even) td { background: rgba(26, 35, 50, 0.5); }
+code {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.88em;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+}
+pre code { border: none; padding: 0; background: none; }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1rem 0;
+  padding: 0.25rem 0 0.25rem 1rem;
+  color: var(--muted);
+}
+footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">StrawWU User Docs</div>
+      <h1>安裝與首次設定指南</h1>
+      <p class="meta">版本 0.4.1.40 · DOC1 · hermes-deliver</p>
+    </header>
+    <main>
+<h1>StrawWU 安裝與首次設定指南</h1>
+<p>本指南說明從 Live USB 試用到完成安裝與首次設定（firstboot）的流程。適用於 StrawWU v0.5 預發布。</p>
+<h2>1. 系統需求</h2>
+<table>
+<tr><th>項目</th><th>建議</th></tr>
+<tr><td>架構</td><td>amd64（x86_64）</td></tr>
+<tr><td>記憶體</td><td>≥ 4 GiB（安裝建議 8 GiB）</td></tr>
+<tr><td>磁碟</td><td>≥ 32 GiB 可用空間（建議獨立分割區）</td></tr>
+<tr><td>韌體</td><td>UEFI 或 Legacy BIOS 皆可（release-iso 驗收涵蓋兩者）</td></tr>
+<tr><td>顯示</td><td>支援 1920×1080 以上桌面環境</td></tr>
+</table>
+<p>硬體相容性分級與 CI 代理矩陣見 <code>docs/plans/strawwu-hardware-compatibility-test-matrix.md</code>。</p>
+<h2>2. 製作 Live USB</h2>
+<h3>2.1 下載 ISO</h3>
+<p>取得 <code>StrawWU-&lt;版本&gt;-amd64.iso</code>。可選驗證 <code>SHA256SUMS</code>（發佈管線產物，路徑見 <code>os-image/output/</code>）。</p>
+<h3>2.2 寫入隨身碟</h3>
+<p>任選一種方式（實機驗證建議三種皆試，見硬體矩陣計畫）：</p>
+<table>
+<tr><th>工具</th><th>平台</th><th>備註</th></tr>
+<tr><td><strong>Rufus</strong></td><td>Windows</td><td>選 DD 或 ISO 模式；UEFI 優先</td></tr>
+<tr><td><strong>dd</strong></td><td>Linux / macOS</td><td><code>sudo dd if=StrawWU-*.iso of=/dev/sdX bs=4M status=progress conv=fsync</code></td></tr>
+<tr><td><strong>Ventoy</strong></td><td>跨平台</td><td>複製 ISO 至 Ventoy 資料分割區</td></tr>
+</table>
+<p><strong>注意：</strong> 確認目標裝置代號正確，<code>dd</code> 會覆寫整顆隨身碟。</p>
+<h3>2.3 開機</h3>
+<ol>
+<li>在韌體選單啟用 USB 開機（或暫時 Boot Menu）。</li>
+<li>選擇 <strong>StrawWU Live</strong>（或同等標題的 Live 項目）。</li>
+<li>等待 Plymouth 與桌面載入；Live 環境可試用瀏覽器、Flathub 等，<strong>尚未寫入硬碟</strong>。</li>
+</ol>
+<h3>2.4 Live 環境快速檢查（選用）</h3>
+<p>在已開機的 Live session 可執行硬體 smoke（開發者／進階使用者）：</p>
+<pre><code>
+sudo /path/to/smoke-live.sh --output /tmp/live-smoke.json --environment physical
+
+</code></pre>
+<p>腳本位於發行版 <code>tests/hw/smoke-live.sh</code>；檢查 session、網路、音效與 StrawWU branding。結果可合併至 <code>hw-matrix-results.json</code>（見 W6-HW1 報告）。</p>
+<h2>3. 安裝 StrawWU</h2>
+<h3>3.1 啟動安裝程式</h3>
+<p>在 Live 桌面：</p>
+<ol>
+<li>開啟應用程式選單，選擇 <strong>安裝 StrawWU</strong>（<code>strawwu-install.desktop</code>）。</li>
+<li>Calamares 安裝精靈啟動（StrawWU 品牌主題，非 Ubuntu 預設）。</li>
+</ol>
+<h3>3.2 安裝步驟概要</h3>
+<table>
+<tr><th>步驟</th><th>說明</th></tr>
+<tr><td>語言與鍵盤</td><td>預設含繁體中文與英文</td></tr>
+<tr><td>分割區</td><td>可整碟或自訂；<strong>保留 /home</strong> 選項於重裝時建議勾選</td></tr>
+<tr><td>使用者帳號</td><td>建立本機使用者與密碼</td></tr>
+<tr><td>安裝</td><td>複製系統檔並執行 target-setup hook</td></tr>
+</table>
+<p>安裝過程會透過 <code>strawwu-target-setup</code> 在 chroot 內安裝 meta 套件（desktop、bug-reporter、firstboot、flathub 等）。</p>
+<h3>3.3 完成畫面</h3>
+<p>安裝成功時顯示（繁中／英文對照見 <code>finished-copy.yaml</code>）：</p>
+<blockquote><p>全部完成。StrawWU 已安裝至您的電腦。您可立即重新開機進入新系統，或繼續使用 Live 環境。</p></blockquote>
+<p>可勾選 <strong>完成後立即重新開機</strong>。</p>
+<h3>3.4 安裝失敗</h3>
+<p>若安裝未完成：</p>
+<ol>
+<li>查看 <code>/var/log/installation.log</code>（Live 環境）。</li>
+<li>使用 <strong>StrawWU 問題回報</strong>（<code>strawwu-bug-report-gtk</code>）產生本機除錯套件（預設不上傳，需明確同意）。</li>
+<li>必要時參閱 <a href="rescue-guide.md">rescue-guide.md</a> 修復已部分寫入的系統。</li>
+</ol>
+<h2>4. 首次開機與 firstboot 精靈</h2>
+<p>重新開機進入已安裝系統後，首次登入會啟動 <strong>strawwu-firstboot</strong> 六步精靈：</p>
+<table>
+<tr><th>步驟</th><th>內容</th></tr>
+<tr><td>welcome</td><td>歡迎</td></tr>
+<tr><td>language</td><td>語系（zh_TW / en_US）</td></tr>
+<tr><td>privacy</td><td>隱私權與 EULA 摘要</td></tr>
+<tr><td>flathub</td><td>Flathub 遠端與範例應用</td></tr>
+<tr><td>desktop</td><td>桌面偏好</td></tr>
+<tr><td>finish</td><td>完成並寫入 lifecycle</td></tr>
+</table>
+<p>狀態記錄於 <code>/var/lib/strawwu/setup/</code> 與 <code>strawwu-initd</code> lifecycle。日誌：<code>/var/log/strawwu/firstboot.log</code>。</p>
+<p>完成後精靈不再自動顯示。若需手動重跑（救援情境）見 <a href="rescue-guide.md">rescue-guide.md</a>。</p>
+<h2>5. 安裝後驗證（使用者可選）</h2>
+<table>
+<tr><th>檢查</th><th>預期</th></tr>
+<tr><td><code>strawwu --version</code> 或 Hub「關於」</td><td>顯示 StrawWU 版本</td></tr>
+<tr><td>Flathub</td><td>Hub 或 <code>flatpak remote-list</code> 含 flathub</td></tr>
+<tr><td>更新通知</td><td><code>strawwu-update-notifier</code> 取代 Ubuntu update-notifier</td></tr>
+<tr><td>Windows 相容</td><td>Hub「Windows 相容」分頁（啟動器級別，見 PRD Q8）</td></tr>
+</table>
+<h2>6. 常見問題</h2>
+<p><strong>Q：可以只試用不安裝嗎？</strong>  </p>
+<p>A：可以。Live 環境完整可用，重開機前資料不寫入硬碟（除非您手動掛載並修改）。</p>
+<p><strong>Q：與 Ubuntu 雙系統？</strong>  </p>
+<p>A：Calamares 分割區步驟可保留既有系統；請先備份重要資料。</p>
+<p><strong>Q：安裝後 GRUB 沒有 StrawWU？</strong>  </p>
+<p>A：UEFI 機器請確認 ESP 掛載正確；必要時從 Live ISO 執行 <code>efibootmgr</code> 或 chroot 修復（見救援指南）。</p>
+<p><strong>Q：哪裡取得更多說明？</strong>  </p>
+<p>A：官方支援渠道 <strong>TBD</strong>（v1.0）；目前請使用 Hub 問題回報。</p>
+<h2>7. 相關文件</h2>
+<ul>
+<li><a href="rescue-guide.md">rescue-guide.md</a> — Live 救援與狀態修復</li>
+<li><a href="README.md">README.md</a> — 文件索引</li>
+<li><code>docs/iso-modes.md</code> — ISO 建置模式（開發者）</li>
+</ul>
+    </main>
+    <footer>
+      StrawWU v0.5 預發布使用者文件 · 支援渠道 TBD · 問題回報：strawwu-bug-report-gtk
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,46 @@
+# StrawWU 使用者文件
+
+| 版本 | 對齊 `VERSION` |
+|------|----------------|
+| 語系 | 繁體中文（部分章節含英文對照） |
+| 範圍 | v0.5 預發布 — 安裝、Live、首次設定、基礎救援 |
+
+本目錄為 **DOC0 資訊架構** 與 **DOC1 安裝／救援指南** 的正式來源。工程計畫與 PRD 見 `docs/plans/`。
+
+## 指南索引
+
+| 文件 | 說明 | HTML（hermes-deliver） |
+|------|------|------------------------|
+| [install-guide.md](install-guide.md) | Live USB、試用、安裝、首次設定（firstboot） | [html/install-guide.html](html/install-guide.html) |
+| [rescue-guide.md](rescue-guide.md) | Live 救援、狀態修復、安裝失敗排除 | [html/rescue-guide.html](html/rescue-guide.html) |
+
+## 快速流程
+
+```
+下載 ISO → 寫入 USB → Live 試用 → 安裝 StrawWU → 重新開機 → 首次設定精靈 → 日常使用
+```
+
+若已安裝系統無法開機或設定損毀，請改閱 [rescue-guide.md](rescue-guide.md)。
+
+## 取得 ISO
+
+正式驗收使用 **release-iso** 產物：
+
+- 檔名：`StrawWU-<版本>-amd64.iso`（例：`StrawWU-0.4.1.39-amd64.iso`）
+- 建置：見 `docs/iso-modes.md`（開發者）或官方發佈頁（TBD）
+
+## 支援與回報
+
+| 管道 | v0.5 狀態 |
+|------|-----------|
+| Hub「關於」→ 回報問題 | 已內建 `strawwu-bug-report-gtk` |
+| 官方論壇 / Matrix / Discord | **TBD**（v1.0 路線，不阻擋本階段） |
+| 支援網址 | **TBD** — `https://strawwu.local/support`（佔位） |
+
+## 後續文件（非本階段）
+
+| Phase | 主題 | Wave |
+|-------|------|------|
+| DOC2 | Windows 相容分級說明 | W7+ |
+| DOC3 | 完整升級 rollback / UPG rescue | UPG5 / W8 |
+| 完整手冊 | 使用者＋管理員手冊 | w8-doc-handbook |
