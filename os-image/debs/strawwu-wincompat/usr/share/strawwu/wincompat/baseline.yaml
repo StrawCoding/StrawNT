@@ -21,3 +21,12 @@ registry_integration:
   run_registers: true
   install_registers: pending
   apps_list_source: app-registry
+e2e_flow:
+  wave: W6-W6
+  steps:
+    - install
+    - icon
+    - launch
+    - remove
+  smoke_script: tests/e2e/wincompat-smoke.sh
+  preflight: tests/preflight/test-wincompat-e2e.sh

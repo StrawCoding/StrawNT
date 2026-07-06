@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-05T21:58:04.401109",
+  "generated_at": "2026-07-05T22:15:25.983425",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 33,
-  "failed": 14,
+  "passed": 34,
+  "failed": 13,
   "all_pass": false,
   "stages": [
     {
@@ -173,8 +173,8 @@
     },
     {
       "id": "w6-r5-deep-uninstall",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w6-w6-wincompat-e2e",

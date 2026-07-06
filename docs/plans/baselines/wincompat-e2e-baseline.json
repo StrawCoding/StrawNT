@@ -1,0 +1,20 @@
+{
+  "schema": "strawwu-wincompat-e2e-baseline/v1",
+  "wave": "W6-W6",
+  "version": "0.4.1.38",
+  "flow": [
+    "install",
+    "icon",
+    "launch",
+    "remove"
+  ],
+  "smoke_script": "tests/e2e/wincompat-smoke.sh",
+  "preflight": "tests/preflight/test-wincompat-e2e.sh",
+  "cli": {
+    "install": "strawwu install <installer.exe>",
+    "icon": "strawwu run <app.exe> → ~/.local/share/applications/<id>.desktop",
+    "launch": "desktop Exec → strawwu run",
+    "remove": "strawwu-app-registry remove-by-desktop --deep"
+  },
+  "dod": "install→icon→launch→remove CLI E2E with registry + desktop-actions"
+}

@@ -2,7 +2,7 @@
 	build-iso dev-iso release-iso repack-iso validate-rootfs boot-test-iso boot-test-dev-iso \
 	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
-	test-install-e2e test-install-firstboot-e2e test-installed-boot test-target-flathub test-wincompat test-wincompat-os test-wincompat-registry test-wincompat-gui test-strawwu-shell test-hub test-hub-settings test-apps-page test-flathub-hub test-l10n-ime test-firstboot test-finished-meta test-context-menu test-registry-hooks test-deep-uninstall test-target-identity test-greeter-session test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-init-tools test-bug-reporter test-calamares-settings test-app-registry test-security-baseline test-observability test-legal-trademark test-desktop-stack test-live-install-ux test-update-notifier test-target-setup test-meta-audit purge-ubuntu-telemetry \
+	test-install-e2e test-install-firstboot-e2e test-installed-boot test-target-flathub test-wincompat test-wincompat-os test-wincompat-registry test-wincompat-gui test-wincompat-e2e test-strawwu-shell test-hub test-hub-settings test-apps-page test-flathub-hub test-l10n-ime test-firstboot test-finished-meta test-context-menu test-registry-hooks test-deep-uninstall test-target-identity test-greeter-session test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-init-tools test-bug-reporter test-calamares-settings test-app-registry test-security-baseline test-observability test-legal-trademark test-desktop-stack test-live-install-ux test-update-notifier test-target-setup test-meta-audit purge-ubuntu-telemetry \
 	install-flatpak-setup install-bug-reporter install-calamares-settings install-update-notifier install-target-setup install-firstboot install-wincompat nosnap-harden build-debs bump-version check-version-bump
 
 REPO_ROOT := $(abspath .)
@@ -60,6 +60,7 @@ help:
 	@echo "  test-wincompat-os             W3-W0 strawwu-wincompat CLI in rootfs (strawwu status)"
 	@echo "  test-wincompat-registry       W4-W1 launcher ↔ app-registry integration"
 	@echo "  test-wincompat-gui            W5-W4 Windows GUI app launch smoke"
+	@echo "  test-wincompat-e2e            W6-W6 install→icon→launch→remove E2E"
 	@echo "  test-strawwu-shell            W4-D2 strawwu-shell fork profile + built-in dock"
 	@echo "  test-hub-settings             W4-D3 Hub settings center preflight"
 	@echo "  test-apps-page                W4-R2 Hub Apps page (App Registry UI)"
@@ -120,6 +121,7 @@ preflight:
 	bash tests/preflight/test-target-flathub.sh
 	bash tests/preflight/test-meta-audit.sh
 	bash tests/preflight/test-deep-uninstall.sh
+	bash tests/preflight/test-wincompat-e2e.sh
 
 preflight-dev-vm:
 	bash tests/preflight/test-dev-vm-ready.sh
@@ -297,6 +299,9 @@ test-wincompat-registry:
 
 test-wincompat-gui:
 	bash tests/preflight/test-wincompat-gui.sh
+
+test-wincompat-e2e:
+	bash tests/preflight/test-wincompat-e2e.sh
 
 test-strawwu-shell:
 	bash tests/preflight/test-strawwu-shell.sh
