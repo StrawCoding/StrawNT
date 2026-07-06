@@ -1,0 +1,80 @@
+{
+  "schema": "strawwu-meta-audit-baseline/v1",
+  "wave": "W6-B5",
+  "version": "0.4.1.36",
+  "package": "strawwu-minimal",
+  "manifest": "usr/share/strawwu/meta-audit/meta-audit-manifest.yaml",
+  "forbidden_ubuntu_metas": [
+    "ubuntu-minimal",
+    "ubuntu-desktop",
+    "ubuntu-desktop-minimal",
+    "ubuntu-session",
+    "ubuntu-standard"
+  ],
+  "forbidden_ubuntu_packages": [
+    "apport",
+    "apport-core-dump-handler",
+    "whoopsie",
+    "ubuntu-report",
+    "ubuntu-pro-client",
+    "ubuntu-pro-client-l10n",
+    "ubuntu-advantage-desktop-daemon",
+    "snapd",
+    "snap-confine"
+  ],
+  "allowed_ubuntu_packages": [
+    "ubuntu-keyring",
+    "ubuntu-drivers-common",
+    "ubuntu-release-upgrader-core",
+    "ubuntu-release-upgrader-gtk",
+    "ubuntu-settings",
+    "ubuntu-mono",
+    "ubuntu-wallpapers",
+    "ubuntu-wallpapers-noble",
+    "ubuntu-docs"
+  ],
+  "strawwu_metas_required": [
+    "strawwu-minimal",
+    "strawwu-desktop"
+  ],
+  "squashfs": {
+    "present": true,
+    "ubuntu_packages": [
+      "ubuntu-desktop",
+      "ubuntu-desktop-minimal",
+      "ubuntu-docs",
+      "ubuntu-drivers-common",
+      "ubuntu-keyring",
+      "ubuntu-minimal",
+      "ubuntu-mono",
+      "ubuntu-release-upgrader-core",
+      "ubuntu-settings",
+      "ubuntu-standard",
+      "ubuntu-wallpapers",
+      "ubuntu-wallpapers-noble"
+    ],
+    "ubuntu_package_count": 12,
+    "forbidden_present": [
+      "ubuntu-desktop",
+      "ubuntu-desktop-minimal",
+      "ubuntu-minimal",
+      "ubuntu-standard"
+    ],
+    "allowed_present": [
+      "ubuntu-docs",
+      "ubuntu-drivers-common",
+      "ubuntu-keyring",
+      "ubuntu-mono",
+      "ubuntu-release-upgrader-core",
+      "ubuntu-settings",
+      "ubuntu-wallpapers",
+      "ubuntu-wallpapers-noble"
+    ],
+    "unexpected": [],
+    "audit_clean": false
+  },
+  "replaces": {
+    "ubuntu-minimal": "strawwu-minimal",
+    "ubuntu-desktop": "strawwu-desktop"
+  }
+}

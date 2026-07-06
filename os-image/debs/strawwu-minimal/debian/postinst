@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+case "${1}" in
+    configure)
+        ;;
+esac
+
+echo "strawwu-minimal: meta installed (StrawWU minimal base, no ubuntu-pro-client)"
+
+exit 0

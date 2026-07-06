@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-desktop-baseline/v1",
   "wave": "W3-D1",
-  "version": "0.4.1.35",
+  "version": "0.4.1.36",
   "packages": {
     "strawwu-session": {
       "path": "os-image/debs/strawwu-session",
@@ -14,7 +14,13 @@
       "path": "os-image/debs/strawwu-desktop",
       "replaces_ubuntu_desktop_wave": "W5-B4",
       "replaces_ubuntu_desktop_done": true,
-      "audit_wave": "W6-B5"
+      "audit_wave": "W6-B5",
+      "audit_done": true
+    },
+    "strawwu-minimal": {
+      "path": "os-image/debs/strawwu-minimal",
+      "replaces_ubuntu_minimal_wave": "W6-B5",
+      "replaces_ubuntu_minimal_done": true
     }
   },
   "forbidden_meta_deps": [

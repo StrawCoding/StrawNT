@@ -56,7 +56,7 @@ build_debs() {
     local version="${STRAWWU_VERSION:-$(tr -d '[:space:]' < "${REPO_ROOT}/VERSION")}"
     local pkg
     for pkg in strawwu-initd strawwu-wincompat strawwu-shell strawwu-session strawwu-greeter strawwu-update-notifier strawwu-bug-reporter \
-        strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-install-init strawwu-desktop-actions strawwu-registry-hooks strawwu-target-identity strawwu-disable-upstream-init strawwu-desktop strawwu-live-install-ux \
+        strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-install-init strawwu-desktop-actions strawwu-registry-hooks strawwu-target-identity strawwu-disable-upstream-init strawwu-minimal strawwu-desktop strawwu-live-install-ux \
         strawwu-target-setup strawwu-calamares-settings; do
         local build="${DEBS_ROOT}/${pkg}/build-deb.sh"
         [[ -x "${build}" ]] || die "missing build script: ${build}"
@@ -69,7 +69,7 @@ latest_deb() {
     local pkg="$1"
     local version="${STRAWWU_VERSION:-$(tr -d '[:space:]' < "${REPO_ROOT}/VERSION")}"
     local exact="${DEBS_ROOT}/${pkg}/output/${pkg}_${version}"
-    if [[ "${pkg}" == "strawwu-desktop" ]]; then
+    if [[ "${pkg}" == "strawwu-desktop" || "${pkg}" == "strawwu-minimal" ]]; then
         exact="${exact}_amd64.deb"
     else
         exact="${exact}_all.deb"
@@ -88,7 +88,7 @@ stage_debs() {
 
     local pkg deb
     for pkg in strawwu-initd strawwu-wincompat strawwu-shell strawwu-session strawwu-greeter strawwu-update-notifier strawwu-bug-reporter \
-        strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-install-init strawwu-desktop-actions strawwu-registry-hooks strawwu-target-identity strawwu-disable-upstream-init strawwu-desktop; do
+        strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-install-init strawwu-desktop-actions strawwu-registry-hooks strawwu-target-identity strawwu-disable-upstream-init strawwu-minimal strawwu-desktop; do
         deb="$(latest_deb "${pkg}")"
         [[ -n "${deb}" && -f "${deb}" ]] || die "deb missing for ${pkg}"
         cp -f "${deb}" "${STAGED}/"
@@ -184,9 +184,20 @@ command -v strawwu-disable-upstream-init >/dev/null
 test -f /etc/cloud/cloud-init.disabled
 strawwu-initd get lifecycle.upstream_init_disabled | grep -q done
 
-# W5-B4: keep ubuntu-minimal base; upstream desktop metas purged by disable-upstream-init.
-if ! dpkg-query -W -f='${Status}' ubuntu-minimal 2>/dev/null | grep -q "ok installed"; then
-    (cd /tmp && apt-get download ubuntu-minimal 2>/dev/null && dpkg -i --force-depends ubuntu-minimal_*.deb && rm -f ubuntu-minimal_*.deb) || true
+# W6-B5: strawwu-minimal replaces ubuntu-minimal; purge upstream base metas.
+minimal_deb="$(ls -1t /usr/share/strawwu/target-setup/staged-debs/strawwu-minimal_*.deb | head -1)"
+if [[ -n "${minimal_deb}" && -f "${minimal_deb}" ]]; then
+    dpkg -i --force-depends "${minimal_deb}" 2>/dev/null || true
+fi
+for meta_pkg in ubuntu-minimal ubuntu-standard; do
+    if dpkg-query -W -f='${Status}' "${meta_pkg}" 2>/dev/null | grep -q "ok installed"; then
+        dpkg --purge --force-depends "${meta_pkg}" 2>/dev/null || apt-get remove -y --purge "${meta_pkg}" 2>/dev/null || true
+    fi
+done
+if dpkg-query -W -f='${Status}' strawwu-minimal 2>/dev/null | grep -q "ok installed"; then
+    :
+else
+    echo "WARN: strawwu-minimal not installed after meta audit step" >&2
 fi
 
 # Re-purge telemetry if apt pulled them back during meta operations.

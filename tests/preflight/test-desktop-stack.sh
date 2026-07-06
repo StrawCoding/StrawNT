@@ -205,6 +205,12 @@ data = {
             "replaces_ubuntu_desktop_wave": "W5-B4",
             "replaces_ubuntu_desktop_done": True,
             "audit_wave": "W6-B5",
+            "audit_done": True,
+        },
+        "strawwu-minimal": {
+            "path": "os-image/debs/strawwu-minimal",
+            "replaces_ubuntu_minimal_wave": "W6-B5",
+            "replaces_ubuntu_minimal_done": True,
         },
     },
     "forbidden_meta_deps": forbidden,

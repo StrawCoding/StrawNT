@@ -1,0 +1,10 @@
+strawwu-minimal — StrawWU minimal system meta package (W6-B5)
+
+Replaces ubuntu-minimal on StrawWU live and installed systems.
+
+Key differences from ubuntu-minimal:
+  - No Depends on ubuntu-pro-client or ubuntu-advantage
+  - Conflicts with ubuntu-minimal to prevent dual meta installs
+  - Ships meta-audit-manifest.yaml for ubuntu-* allowlist enforcement
+
+See docs/plans/strawwu-ubuntu-components-plan.md and W6-B5 meta audit.

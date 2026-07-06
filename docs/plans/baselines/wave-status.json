@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-05T19:43:37.442144",
+  "generated_at": "2026-07-05T20:24:51.657312",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 31,
-  "failed": 16,
+  "passed": 32,
+  "failed": 15,
   "all_pass": false,
   "stages": [
     {
@@ -163,8 +163,8 @@
     },
     {
       "id": "w6-f5-target-flathub",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w6-b5-meta-audit",

@@ -1,0 +1,43 @@
+schema: strawwu-meta-audit-manifest/v1
+wave: W6-B5
+description: >-
+  Ubuntu package allowlist for StrawWU v0.5. Upstream desktop/base metas are
+  replaced by strawwu-minimal and strawwu-desktop. Internal compat packages
+  (keyring, drivers, release upgrader) remain until later replacement waves.
+
+forbidden_ubuntu_metas:
+  - ubuntu-minimal
+  - ubuntu-desktop
+  - ubuntu-desktop-minimal
+  - ubuntu-session
+  - ubuntu-standard
+
+forbidden_ubuntu_packages:
+  - apport
+  - apport-core-dump-handler
+  - whoopsie
+  - ubuntu-report
+  - ubuntu-pro-client
+  - ubuntu-pro-client-l10n
+  - ubuntu-advantage-desktop-daemon
+  - snapd
+  - snap-confine
+
+allowed_ubuntu_packages:
+  - ubuntu-keyring
+  - ubuntu-drivers-common
+  - ubuntu-release-upgrader-core
+  - ubuntu-release-upgrader-gtk
+  - ubuntu-settings
+  - ubuntu-mono
+  - ubuntu-wallpapers
+  - ubuntu-wallpapers-noble
+  - ubuntu-docs
+
+strawwu_metas_required:
+  - strawwu-minimal
+  - strawwu-desktop
+
+retained_internal:
+  apt_keyring: ubuntu-keyring
+  casper_compat: true

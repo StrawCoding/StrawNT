@@ -16,6 +16,7 @@ if [[ ! -x "${REPO_ROOT}/os-image/scripts/chroot-purge-ubuntu-telemetry.sh" ]]; 
 fi
 
 marker="${REPO_ROOT}/os-image/work/.purge-ubuntu-telemetry-ok"
+TARGET_MARKER="${REPO_ROOT}/os-image/work/.target-setup-ok"
 if [[ -f "${marker}" ]]; then
     pass "purge marker present (${marker})"
 else
@@ -55,10 +56,20 @@ else
 fi
 
 for pkg in ubuntu-minimal; do
-    if has_rootfs && package_installed_in_rootfs "${pkg}"; then
-        pass "retained ${pkg}"
+    if has_rootfs && package_installed_in_rootfs strawwu-minimal; then
+        pass "rootfs has strawwu-minimal meta (W6-B5)"
+    elif has_rootfs && package_installed_in_rootfs "${pkg}"; then
+        if [[ -f "${TARGET_MARKER}" ]]; then
+            warn "rootfs still has ${pkg} — re-run chroot-install-target-setup (W6-B5)"
+        else
+            pass "rootfs retained ${pkg} (pre-W6-B5 transition)"
+        fi
     elif has_rootfs; then
-        fail "missing required ${pkg} in rootfs"
+        if [[ -f "${TARGET_MARKER}" ]]; then
+            warn "rootfs missing strawwu-minimal and ${pkg}"
+        else
+            fail "missing required ${pkg} in rootfs"
+        fi
     fi
 done
 
