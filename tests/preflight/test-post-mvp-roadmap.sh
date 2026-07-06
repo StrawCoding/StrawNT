@@ -11,10 +11,12 @@ require_plan "strawwu-post-mvp-roadmap.md"
 require_plan "strawwu-drivers-plan.md"
 require_file "${PLANS_DIR}/kickoff/POST-MVP-AUTO-SEQUENCE.md" "POST-MVP-AUTO-SEQUENCE"
 
-for k in POST-D1-strawwu-drivers POST-HW-T1-live-usb POST-HW-T2-installed POST-DDP-rootfs \
-         POST-Q3-mfp-smoke POST-D7-software-sources POST-UX-theme-curation POST-V06-closeout \
-         POST-UPG-rollback POST-SEC-secureboot-route \
-         POST-CI-kernel-selfhosted POST-HW-T3-wincompat POST-Q8-golden-apps POST-V09-engineering-closeout; do
+for k in POST-D1-strawwu-drivers POST-HW-T1-live-usb POST-HW-T2-installed POST-HW4-peripherals \
+         POST-DDP-rootfs POST-Q3-mfp-smoke POST-I2-calamares-luks POST-D7-software-sources \
+         POST-UX-theme-curation POST-V06-closeout POST-UPG-rollback POST-SEC-secureboot-route \
+         POST-SEC-cve-policy POST-PERF-boot-regression POST-CI-kernel-selfhosted \
+         POST-W7-anticheat-substantive POST-HW-T3-wincompat POST-Q8-golden-apps \
+         POST-HW5-stable-gate POST-BACKUP-timeshift POST-V09-engineering-closeout; do
     require_file "${PLANS_DIR}/kickoff/${k}.md" "kickoff ${k}"
 done
 
@@ -22,7 +24,7 @@ python3 - "${CFG}" <<'PY'
 import json, pathlib, sys
 cfg = json.loads(pathlib.Path(sys.argv[1]).read_text())
 seq = cfg.get("post_mvp_locked_sequence") or []
-assert len(seq) == 14, f"expected 14 post-mvp stages got {len(seq)}"
+assert len(seq) == 21, f"expected 21 post-mvp stages got {len(seq)}"
 u26 = cfg.get("ubuntu_2604_locked_sequence") or []
 assert len(u26) == 7, f"expected 7 u26 stages got {len(u26)}"
 for sid in seq + u26:

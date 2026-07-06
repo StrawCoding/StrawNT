@@ -44,7 +44,7 @@ help:
 	@echo "  test-wave0-baseline           Wave 0 preflight baselines (12 scripts + JSON)"
 	@echo "  test-wave-all-pass            Verify all 47 wave stages PASS (MVP closeout gate)"
 	@echo "  test-post-mvp-roadmap         Post-MVP + Ubuntu 26.04 long-task infrastructure gate"
-	@echo "  test-post-mvp-all-pass        Verify all 14 post-MVP stages PASS"
+	@echo "  test-post-mvp-all-pass        Verify all 21 post-MVP stages PASS"
 	@echo "  test-post-mvp-v06-closeout    v0.6 drivers/HW closeout gate"
 	@echo "  test-ubuntu-2604-roadmap      Ubuntu 26.04 migration infrastructure gate"
 	@echo "  test-ubuntu-2604-all-pass     Verify all 7 Ubuntu 26.04 migration stages PASS"
@@ -334,6 +334,27 @@ test-ci-kernel-selfhosted:
 
 test-hw-t3-wincompat:
 	bash tests/preflight/test-hw-t3-wincompat.sh
+
+test-hw4-peripherals:
+	bash tests/preflight/test-hw4-peripherals.sh
+
+test-calamares-luks-dualboot:
+	bash tests/preflight/test-calamares-luks-dualboot.sh
+
+test-sec-cve-policy:
+	bash tests/preflight/test-sec-cve-policy.sh
+
+test-perf-boot-regression:
+	bash tests/preflight/test-perf-boot-regression.sh
+
+test-anticheat-substantive:
+	bash tests/preflight/test-anticheat-substantive.sh
+
+test-hw5-stable-gate:
+	bash tests/preflight/test-hw5-stable-gate.sh
+
+test-backup-timeshift:
+	bash tests/preflight/test-backup-timeshift.sh
 
 test-golden-apps:
 	bash tests/preflight/test-golden-apps.sh

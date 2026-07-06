@@ -14,8 +14,12 @@ v06 = [
     "post-d1-strawwu-drivers",
     "post-hw-t1-live-usb",
     "post-hw-t2-installed",
+    "post-hw4-peripherals",
     "post-ddp-rootfs",
     "post-q3-mfp-smoke",
+    "post-i2-calamares-luks",
+    "post-d7-software-sources",
+    "post-ux-theme-curation",
 ]
 st = state.get("stages") or {}
 fail = 0
