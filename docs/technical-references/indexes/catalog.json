@@ -1,75 +1,121 @@
 {
-  "updated_at": "2026-07-03T18:10:00+08:00",
-  "ubuntu_release": "noble",
-  "strawwu_version": "0.3.0.0",
-  "total_size_human": "~372MB",
+  "updated_at": "2026-07-06T10:11:05-04:00",
+  "ubuntu_release": "resolute",
+  "strawwu_version": "0.6.1.4",
+  "total_size_human": "471M",
   "refresh_script": "docs/technical-references/scripts/refresh-technical-references.sh",
   "packages": [
     {
       "name": "casper",
-      "version": "1.498",
-      "path": "upstream/casper-1.498",
-      "git": "https://git.launchpad.net/casper",
-      "phases": ["phase1-ubuntu-clone", "phase2-custom-kernel"],
-      "key_files": ["hooks/", "scripts/", "debian/manpage/casper.7"]
+      "version": "26.04.2",
+      "path": "upstream/casper-26.04.2",
+      "phases": [
+        "phase1-ubuntu-clone",
+        "phase2-custom-kernel"
+      ],
+      "key_files": [
+        "hooks/",
+        "scripts/",
+        "debian/manpage/casper.7"
+      ],
+      "git": "https://git.launchpad.net/casper"
     },
     {
       "name": "initramfs-tools",
-      "version": "0.142ubuntu25.8",
-      "path": "upstream/initramfs-tools-0.142ubuntu25.8",
-      "git": "https://git.launchpad.net/~ubuntu-core-dev/ubuntu/+source/initramfs-tools",
-      "phases": ["phase2-custom-kernel"],
-      "key_files": ["hooks/", "scripts/", "docs/"]
+      "version": "0.151ubuntu1",
+      "path": "upstream/initramfs-tools-0.151ubuntu1",
+      "phases": [
+        "phase2-custom-kernel"
+      ],
+      "key_files": [
+        "hooks/",
+        "scripts/",
+        "docs/"
+      ],
+      "git": "https://git.launchpad.net/~ubuntu-core-dev/ubuntu/+source/initramfs-tools"
     },
     {
       "name": "plymouth",
-      "version": "24.004.60-1ubuntu7.1",
-      "path": "upstream/plymouth-24.004.60",
-      "phases": ["phase2-custom-kernel"],
-      "key_files": ["docs/", "themes/", "src/"]
+      "version": "24.004.60+git20250831.4a3c171d",
+      "path": "upstream/plymouth-24.004.60+git20250831.4a3c171d",
+      "phases": [
+        "phase2-custom-kernel"
+      ],
+      "key_files": [
+        "docs/",
+        "themes/",
+        "src/"
+      ]
     },
     {
       "name": "libisoburn",
-      "version": "1.5.6-1.1ubuntu3",
+      "version": "1.5.6",
       "path": "upstream/libisoburn-1.5.6",
-      "phases": ["phase1-ubuntu-clone", "phase2-custom-kernel", "v3.0-release"],
-      "key_files": ["doc/", "xorriso/"]
+      "phases": [
+        "phase1-ubuntu-clone",
+        "phase2-custom-kernel",
+        "v3.0-release"
+      ],
+      "key_files": [
+        "doc/",
+        "xorriso/"
+      ]
     },
     {
       "name": "grub2",
-      "version": "2.12-1ubuntu7.3",
-      "path": "upstream/grub2-2.12",
-      "phases": ["phase1-ubuntu-clone", "phase2-custom-kernel", "phase3-calamares-e2e"],
-      "key_files": ["docs/", "grub-core/"]
+      "version": "2.14",
+      "path": "upstream/grub2-2.14",
+      "phases": [
+        "phase1-ubuntu-clone",
+        "phase2-custom-kernel",
+        "phase3-calamares-e2e"
+      ],
+      "key_files": [
+        "docs/",
+        "grub-core/"
+      ]
     },
     {
       "name": "calamares",
-      "version": "3.3.5-0ubuntu4",
-      "path": "upstream/calamares-3.3.5",
-      "git": "https://github.com/calamares/calamares",
-      "phases": ["phase3-calamares-e2e"],
-      "key_files": ["man/", "src/"]
+      "version": "3.3.14",
+      "path": "upstream/calamares-3.3.14",
+      "phases": [
+        "phase3-calamares-e2e"
+      ],
+      "key_files": [
+        "man/",
+        "src/"
+      ],
+      "git": "https://github.com/calamares/calamares"
     },
     {
-      "name": "calamares-settings-ubuntu",
-      "version": "24.04.40",
-      "path": "upstream/calamares-settings-ubuntu-24.04.40",
-      "git": "https://git.lubuntu.me/Lubuntu/calamares-settings-ubuntu.git",
-      "phases": ["phase3-calamares-e2e"],
-      "key_files": ["common/etc/calamares/"]
+      "name": "calamares-settings-ubuntu-common",
+      "version": "26.04.12",
+      "path": "upstream/calamares-settings-ubuntu-26.04.12",
+      "phases": [
+        "phase3-calamares-e2e"
+      ],
+      "key_files": [
+        "etc/calamares/",
+        "usr/share/calamares/"
+      ],
+      "git": "https://code.launchpad.net/~ubuntu-qt-code/+git/calamares-settings-ubuntu"
     },
     {
       "name": "linux-stable",
-      "version": "v6.8.12",
-      "path": "upstream/linux-v6.8.12",
-      "git": "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git",
-      "phases": ["phase2-custom-kernel", "phase4-greenfield"],
+      "version": "v6.14.9",
+      "path": "upstream/linux-v6.14.9",
+      "phases": [
+        "phase2-custom-kernel",
+        "phase4-greenfield"
+      ],
       "key_files": [
         "Documentation/kbuild/",
         "Documentation/filesystems/overlayfs.rst",
         "Documentation/filesystems/isofs.rst",
         "Documentation/driver-api/"
-      ]
+      ],
+      "git": "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git"
     }
   ],
   "manpages": {
@@ -84,8 +130,19 @@
     }
   ],
   "strawwu_validation_commands": {
-    "phase1": ["make preflight", "make boot-test-release-iso"],
-    "phase2": ["make preflight-iso-before-boot", "make release-iso", "make boot-test-release-iso", "make test-phase2"],
-    "phase3": ["make validate-calamares-preflight", "make test-install-e2e"]
+    "phase1": [
+      "make preflight",
+      "make boot-test-release-iso"
+    ],
+    "phase2": [
+      "make preflight-iso-before-boot",
+      "make release-iso",
+      "make boot-test-release-iso",
+      "make test-phase2"
+    ],
+    "phase3": [
+      "make validate-calamares-preflight",
+      "make test-install-e2e"
+    ]
   }
 }

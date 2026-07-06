@@ -239,7 +239,72 @@ print("PASS: strawwu.sources Suites: resolute")
 print("PASS: publish-debs.sh derives APT suite from ubuntu-base-target.json")
 PY
     ;;
-  u26-techrefs-refresh|u26-regression-e2e)
+  u26-techrefs-refresh)
+    require_plan "strawwu-ubuntu-2604-migration-plan.md"
+    require_file "${REPO_ROOT}/docs/technical-references/scripts/refresh-technical-references.sh" "refresh-technical-references.sh"
+    require_file "${REPO_ROOT}/docs/technical-references/indexes/catalog.json" "catalog.json"
+    require_file "${REPO_ROOT}/docs/technical-references/.techrefs-refresh-ok" "techrefs-refresh marker"
+    PYTHONHASHSEED=0 python3 - \
+        "${REPO_ROOT}/docs/technical-references/indexes/catalog.json" \
+        "${REPO_ROOT}/docs/technical-references/scripts/refresh-technical-references.sh" \
+        "${REPO_ROOT}/docs/technical-references/.techrefs-refresh-ok" \
+        "${REPO_ROOT}/docs/plans/ubuntu-base-target.json" \
+        "${REPO_ROOT}/VERSION" <<'PY'
+import json, pathlib, re, sys
+
+catalog_path, script_path, marker_path, target_path, version_path = map(pathlib.Path, sys.argv[1:6])
+catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+target = json.loads(target_path.read_text(encoding="utf-8"))
+active = target.get("active", {})
+version = version_path.read_text().strip()
+
+if catalog.get("ubuntu_release") != "resolute":
+    print(f"FAIL: catalog ubuntu_release expected resolute got {catalog.get('ubuntu_release')!r}", file=sys.stderr)
+    sys.exit(1)
+
+script = script_path.read_text(encoding="utf-8")
+script_code = "\n".join(
+    ln for ln in script.splitlines() if not ln.lstrip().startswith("#")
+)
+if re.search(r"manpages/noble/", script_code):
+    print("FAIL: refresh script still references noble manpages", file=sys.stderr)
+    sys.exit(1)
+if "manpages/${APT_SUITE}/" not in script and "manpages/resolute/" not in script:
+    print("FAIL: refresh script missing resolute manpage URLs", file=sys.stderr)
+    sys.exit(1)
+if re.search(r'\bnoble\b', script_code):
+    print("FAIL: refresh script still hardcodes noble", file=sys.stderr)
+    sys.exit(1)
+
+marker = marker_path.read_text().strip().split()
+if not marker or marker[0] != "resolute":
+    print(f"FAIL: .techrefs-refresh-ok expected resolute marker got {marker!r}", file=sys.stderr)
+    sys.exit(1)
+
+pkgs = {p["name"]: p for p in catalog.get("packages", [])}
+required = ("casper", "initramfs-tools", "calamares", "grub2", "linux-stable")
+missing = [n for n in required if n not in pkgs]
+if missing:
+    print(f"FAIL: catalog missing packages: {missing}", file=sys.stderr)
+    sys.exit(1)
+
+linux = pkgs["linux-stable"]
+if linux.get("version", "").startswith("v6.8"):
+    print(f"FAIL: catalog linux-stable still noble era ({linux.get('version')})", file=sys.stderr)
+    sys.exit(1)
+
+if active.get("codename") != "resolute":
+    print(f"FAIL: active.codename expected resolute got {active.get('codename')!r}", file=sys.stderr)
+    sys.exit(1)
+
+print(f"PASS: catalog ubuntu_release resolute ({len(catalog.get('packages', []))} packages)")
+print(f"PASS: refresh script targets resolute manpages")
+print(f"PASS: .techrefs-refresh-ok marker suite=resolute")
+print(f"PASS: linux-stable {linux.get('version')} (resolute 6.14+ docs)")
+print(f"PASS: catalog strawwu_version {catalog.get('strawwu_version')} (VERSION {version})")
+PY
+    ;;
+  u26-regression-e2e)
     require_plan "strawwu-ubuntu-2604-migration-plan.md"
     ;;
   software-sources)
