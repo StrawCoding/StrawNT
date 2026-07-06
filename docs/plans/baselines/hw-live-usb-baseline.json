@@ -1,0 +1,21 @@
+{
+  "schema": "strawwu-hw-live-usb-baseline/v1",
+  "wave": "W6-HW1",
+  "version": "0.4.1.39",
+  "minimum_live_pass": 3,
+  "tier": "T1",
+  "smoke_script": "tests/hw/smoke-live.sh",
+  "matrix_runner": "tests/hw/run-live-usb-matrix.sh",
+  "results_json": "docs/plans/hw-matrix-results.json",
+  "preflight": "tests/preflight/test-hw-live-usb.sh",
+  "profiles": [
+    "hw-proxy-pc-bios (legacy BIOS pc/i440fx)",
+    "hw-proxy-q35-uefi (UEFI q35 4-core)",
+    "hw-proxy-q35-uefi-smp8 (UEFI q35 8-core)"
+  ],
+  "markers": [
+    "STRAWWU_BOOT_OK",
+    "STRAWWU-DESKTOP-OK"
+  ],
+  "dod": "≥3 Live USB boot PASS recorded in hw-matrix-results.json"
+}

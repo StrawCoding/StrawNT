@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-wincompat-gui-baseline/v1",
   "wave": "W5-W4",
-  "version": "0.4.1.38",
+  "version": "0.4.1.39",
   "runtime_module": "strawwu-runtime/gui_smoke.rs",
   "launcher_modules": [
     "desktop.rs",

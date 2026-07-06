@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-05T22:15:25.983425",
+  "generated_at": "2026-07-05T22:31:13.708968",
   "target_mvp": "0.5.0.0",
   "total": 47,
-  "passed": 34,
-  "failed": 13,
+  "passed": 35,
+  "failed": 12,
   "all_pass": false,
   "stages": [
     {
@@ -178,8 +178,8 @@
     },
     {
       "id": "w6-w6-wincompat-e2e",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "w6-hw1-live-usb",

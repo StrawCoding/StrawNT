@@ -1,0 +1,90 @@
+{
+  "schema": "strawwu-hw-matrix-results/v1",
+  "wave": "W6-HW1",
+  "version": "0.4.1.39",
+  "updated": "2026-07-05T22:58:55-04:00",
+  "iso": "os-image/output/StrawWU-0.4.1.33-amd64.iso",
+  "minimum_live_pass": 3,
+  "machines": [
+    {
+      "machine_id": "hw-proxy-pc-bios",
+      "tier": "T1",
+      "environment": "qemu-proxy",
+      "cpu": "QEMU Virtual (pc/i440fx Legacy BIOS)",
+      "gpu": "std-vga",
+      "firmware": "legacy-bios",
+      "usb_method": "qemu-cdrom",
+      "iso": "os-image/output/StrawWU-0.4.1.33-amd64.iso",
+      "tests": {
+        "live_boot": "PASS",
+        "desktop": "PASS",
+        "network": "SKIP",
+        "audio": "SKIP",
+        "branding": "PASS"
+      },
+      "markers": [
+        "STRAWWU_BOOT_OK",
+        "STRAWWU-DESKTOP-OK"
+      ],
+      "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/hw/output/serial-hw-proxy-pc-bios.log",
+      "elapsed_sec": 211,
+      "qemu_exit": 0,
+      "tested": "2026-07-05T22:52:36-04:00"
+    },
+    {
+      "machine_id": "hw-proxy-q35-uefi",
+      "tier": "T1",
+      "environment": "qemu-proxy",
+      "cpu": "QEMU Virtual (q35 UEFI)",
+      "gpu": "virtio-gpu",
+      "firmware": "uefi",
+      "usb_method": "qemu-cdrom",
+      "iso": "os-image/output/StrawWU-0.4.1.33-amd64.iso",
+      "tests": {
+        "live_boot": "PASS",
+        "desktop": "PASS",
+        "network": "SKIP",
+        "audio": "SKIP",
+        "branding": "PASS"
+      },
+      "markers": [
+        "STRAWWU_BOOT_OK",
+        "STRAWWU-DESKTOP-OK"
+      ],
+      "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/hw/output/serial-hw-proxy-q35-uefi.log",
+      "elapsed_sec": 188,
+      "qemu_exit": 0,
+      "tested": "2026-07-05T22:55:44-04:00"
+    },
+    {
+      "machine_id": "hw-proxy-q35-uefi-smp8",
+      "tier": "T1",
+      "environment": "qemu-proxy",
+      "cpu": "QEMU Virtual (q35 UEFI 8-core)",
+      "gpu": "virtio-gpu",
+      "firmware": "uefi",
+      "usb_method": "qemu-cdrom",
+      "iso": "os-image/output/StrawWU-0.4.1.33-amd64.iso",
+      "tests": {
+        "live_boot": "PASS",
+        "desktop": "PASS",
+        "network": "SKIP",
+        "audio": "SKIP",
+        "branding": "PASS"
+      },
+      "markers": [
+        "STRAWWU_BOOT_OK",
+        "STRAWWU-DESKTOP-OK"
+      ],
+      "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/hw/output/serial-hw-proxy-q35-uefi-smp8.log",
+      "elapsed_sec": 191,
+      "qemu_exit": 0,
+      "tested": "2026-07-05T22:58:55-04:00"
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "live_pass": 3,
+    "live_fail": 0
+  }
+}
