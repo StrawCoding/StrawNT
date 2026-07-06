@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-user-docs-baseline/v1",
   "wave": "W6-DOC1",
-  "version": "0.6.1.1",
+  "version": "0.6.1.2",
   "docs_root": "docs/user",
   "guides": [
     {

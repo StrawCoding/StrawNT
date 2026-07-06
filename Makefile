@@ -552,3 +552,6 @@ purge-ubuntu-telemetry:
 
 build-debs:
 	bash packaging/build-debs.sh
+
+build-os-debs:
+	bash $(SCRIPTS)/build-os-debs.sh

@@ -31,7 +31,7 @@ allowed_ubuntu_packages:
   - ubuntu-settings
   - ubuntu-mono
   - ubuntu-wallpapers
-  - ubuntu-wallpapers-noble
+  - ubuntu-wallpapers-resolute
   - ubuntu-docs
 
 strawwu_metas_required:

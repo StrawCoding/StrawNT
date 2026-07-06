@@ -11,6 +11,7 @@ WORK_DIR="${STRAWWU_WORK_DIR:-${REPO_ROOT}/os-image/work}"
 ROOTFS_DIR="${WORK_DIR}/rootfs"
 SQUASH_SRC="${WORK_DIR}/squashfs-root"
 MARKER="${WORK_DIR}/.target-setup-ok"
+DEBS_MARKER="${WORK_DIR}/.debs-rebuild-ok"
 CLONE_MARKER="${WORK_DIR}/.clone-ubuntu-base-ok"
 PURGE_MARKER="${WORK_DIR}/.purge-ubuntu-telemetry-ok"
 DEBS_ROOT="${REPO_ROOT}/os-image/debs"
@@ -53,27 +54,17 @@ verify_prerequisites() {
 }
 
 build_debs() {
-    local version="${STRAWWU_VERSION:-$(tr -d '[:space:]' < "${REPO_ROOT}/VERSION")}"
-    local pkg
-    for pkg in strawwu-initd strawwu-wincompat strawwu-shell strawwu-session strawwu-greeter strawwu-update-notifier strawwu-bug-reporter \
-        strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-install-init strawwu-desktop-actions strawwu-registry-hooks strawwu-initramfs-hooks strawwu-target-identity strawwu-disable-upstream-init strawwu-minimal strawwu-desktop strawwu-live-install-ux \
-        strawwu-target-setup strawwu-calamares-settings; do
-        local build="${DEBS_ROOT}/${pkg}/build-deb.sh"
-        [[ -x "${build}" ]] || die "missing build script: ${build}"
-        log "building ${pkg}"
-        STRAWWU_VERSION="${version}" bash "${build}"
-    done
+    bash "${SCRIPT_DIR}/build-os-debs.sh"
 }
 
 latest_deb() {
     local pkg="$1"
     local version="${STRAWWU_VERSION:-$(tr -d '[:space:]' < "${REPO_ROOT}/VERSION")}"
-    local exact="${DEBS_ROOT}/${pkg}/output/${pkg}_${version}"
-    if [[ "${pkg}" == "strawwu-desktop" || "${pkg}" == "strawwu-minimal" ]]; then
-        exact="${exact}_amd64.deb"
-    else
-        exact="${exact}_all.deb"
-    fi
+    local arch=all
+    case "${pkg}" in
+        strawwu-desktop|strawwu-minimal|strawwu-wincompat) arch=amd64 ;;
+    esac
+    local exact="${DEBS_ROOT}/${pkg}/output/${pkg}_${version}_${arch}.deb"
     if [[ -f "${exact}" ]]; then
         echo "${exact}"
         return 0
@@ -183,6 +174,7 @@ STRAWWU_TARGET_DEB_DIR=/usr/share/strawwu/target-setup/staged-debs \
     strawwu-target-identity --calamares-chroot --skip-initramfs
 
 command -v strawwu-target-identity >/dev/null
+strawwu-initramfs-hooks --skip-initramfs apply
 command -v strawwu-initramfs-hooks >/dev/null
 test -f /etc/initramfs-tools/conf.d/strawwu-disk-boot
 grep -q 'BOOT=local' /etc/initramfs-tools/conf.d/strawwu-disk-boot
@@ -347,8 +339,10 @@ sync_squashfs() {
 }
 
 write_marker() {
+    local version="${STRAWWU_VERSION:-$(tr -d '[:space:]' < "${REPO_ROOT}/VERSION")}"
     date -Iseconds > "${MARKER}"
-    log "marker written: ${MARKER}"
+    printf '%s\n' "${version}" > "${DEBS_MARKER}"
+    log "marker written: ${MARKER} + ${DEBS_MARKER} (v${version})"
 }
 
 main() {

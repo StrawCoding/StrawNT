@@ -153,6 +153,13 @@ def patch_user_visible_strings(*, dry_run: bool = False) -> None:
             log_event("info", "patched user-visible string", path=str(path))
 
 
+def _grub_chroot_skip() -> bool:
+    """Live ISO rootfs / Calamares chroot often lacks a probe-able / device."""
+    proc = run_cmd(["grub-probe", "-t", "fs", "/"], dry_run=False)
+    combined = f"{proc.stdout or ''}{proc.stderr or ''}"
+    return proc.returncode != 0 and "cannot find a device" in combined
+
+
 def regenerate_boot_artifacts(*, skip_initramfs: bool = False, dry_run: bool = False) -> bool:
     ok = True
     if dry_run:
@@ -163,6 +170,9 @@ def regenerate_boot_artifacts(*, skip_initramfs: bool = False, dry_run: bool = F
 
     if run_cmd(["update-grub"], dry_run=False).returncode != 0:
         if run_cmd(["grub-mkconfig", "-o", "/boot/grub/grub.cfg"], dry_run=False).returncode != 0:
+            if _grub_chroot_skip():
+                log_event("warn", "grub refresh skipped (chroot/no root device)")
+                return True
             log_event("error", "grub config refresh failed", code=ERROR_CODE)
             ok = False
 

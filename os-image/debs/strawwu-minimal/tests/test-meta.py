@@ -76,6 +76,12 @@ def test_manifest_schema() -> None:
     assert "strawwu-desktop" in text
 
 
+def test_manifest_resolute_wallpapers() -> None:
+    text = MANIFEST.read_text(encoding="utf-8")
+    assert "ubuntu-wallpapers-resolute" in text
+    assert "ubuntu-wallpapers-noble" not in text
+
+
 def main() -> int:
     tests = [
         test_forbidden_absent,
@@ -83,6 +89,7 @@ def main() -> int:
         test_conflicts_ubuntu_minimal,
         test_meta_section,
         test_manifest_schema,
+        test_manifest_resolute_wallpapers,
     ]
     failed = 0
     for fn in tests:

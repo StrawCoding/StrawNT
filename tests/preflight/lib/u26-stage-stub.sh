@@ -102,7 +102,96 @@ if rootfs_boot.is_dir():
         print("WARN: rootfs not yet swapped to strawwu kernel (run make swap-kernel)")
 PY
     ;;
-  u26-debs-rebuild|u26-suite-migrate|u26-techrefs-refresh|u26-regression-e2e)
+  u26-debs-rebuild)
+    require_plan "strawwu-ubuntu-2604-migration-plan.md"
+    require_file "${REPO_ROOT}/os-image/scripts/build-os-debs.sh" "build-os-debs.sh"
+    require_file "${PLANS_DIR}/ubuntu-base-target.json" "ubuntu-base-target"
+    require_file "${REPO_ROOT}/os-image/work/.debs-rebuild-ok" "debs-rebuild marker"
+    PYTHONHASHSEED=0 python3 - \
+        "${PLANS_DIR}/ubuntu-base-target.json" \
+        "${REPO_ROOT}/VERSION" \
+        "${REPO_ROOT}/os-image/work/.debs-rebuild-ok" \
+        "${REPO_ROOT}/os-image/debs/strawwu-minimal/usr/share/strawwu/meta-audit/meta-audit-manifest.yaml" \
+        "${REPO_ROOT}/os-image/debs" \
+        "${REPO_ROOT}/os-image/work/rootfs" <<'PY'
+import json, pathlib, re, subprocess, sys
+
+target_path, version_path, marker_path, manifest_path, debs_root, rootfs = map(
+    pathlib.Path, sys.argv[1:7]
+)
+target = json.loads(target_path.read_text())
+active = target.get("active", {})
+if active.get("codename") != "resolute":
+    print(f"FAIL: active.codename expected resolute got {active.get('codename')!r}", file=sys.stderr)
+    sys.exit(1)
+
+version = version_path.read_text().strip()
+marker_ver = marker_path.read_text().strip()
+if marker_ver != version:
+    print(f"FAIL: .debs-rebuild-ok version {marker_ver!r} != VERSION {version!r}", file=sys.stderr)
+    sys.exit(1)
+
+manifest = manifest_path.read_text(encoding="utf-8")
+if "ubuntu-wallpapers-noble" in manifest:
+    print("FAIL: meta-audit still references ubuntu-wallpapers-noble", file=sys.stderr)
+    sys.exit(1)
+if "ubuntu-wallpapers-resolute" not in manifest:
+    print("FAIL: meta-audit missing ubuntu-wallpapers-resolute allowlist entry", file=sys.stderr)
+    sys.exit(1)
+
+amd64_pkgs = {"strawwu-desktop", "strawwu-minimal", "strawwu-wincompat"}
+missing = []
+for pkg_dir in sorted(debs_root.iterdir()):
+    if not pkg_dir.is_dir() or not pkg_dir.name.startswith("strawwu-"):
+        continue
+    build = pkg_dir / "build-deb.sh"
+    if not build.is_file():
+        continue
+    arch = "amd64" if pkg_dir.name in amd64_pkgs else "all"
+    deb = pkg_dir / "output" / f"{pkg_dir.name}_{version}_{arch}.deb"
+    if not deb.is_file():
+        missing.append(str(deb.relative_to(debs_root.parent.parent)))
+if missing:
+    print("FAIL: missing rebuilt debs:", file=sys.stderr)
+    for m in missing:
+        print(f"  {m}", file=sys.stderr)
+    sys.exit(1)
+
+proc = subprocess.run(
+    ["chroot", str(rootfs), "dpkg", "--audit"],
+    capture_output=True, text=True,
+)
+audit = (proc.stdout + proc.stderr).strip()
+if audit:
+    print(f"FAIL: rootfs dpkg --audit not clean:\n{audit}", file=sys.stderr)
+    sys.exit(1)
+
+proc = subprocess.run(
+    ["chroot", str(rootfs), "dpkg-query", "-W", "-f=${Package} ${Version}\n", "strawwu-*"],
+    capture_output=True, text=True,
+)
+installed = []
+for ln in proc.stdout.splitlines():
+    parts = ln.split()
+    if len(parts) >= 2 and parts[1][0].isdigit():
+        installed.append(ln)
+stale = [ln for ln in installed if not ln.endswith(f" {version}")]
+if stale:
+    print("FAIL: rootfs strawwu-* not at VERSION:", file=sys.stderr)
+    for ln in stale[:10]:
+        print(f"  {ln}", file=sys.stderr)
+    sys.exit(1)
+
+deb_count = sum(1 for d in debs_root.iterdir() if d.is_dir() and (d / "build-deb.sh").is_file())
+print(f"PASS: active Ubuntu {active.get('version')} resolute")
+print(f"PASS: .debs-rebuild-ok v{version}")
+print(f"PASS: meta-audit allowlist resolute (no noble wallpapers)")
+print(f"PASS: {deb_count} strawwu-* debs rebuilt at v{version}")
+print(f"PASS: rootfs {len(installed)} strawwu-* packages at v{version}")
+print(f"PASS: rootfs dpkg --audit clean")
+PY
+    ;;
+  u26-suite-migrate|u26-techrefs-refresh|u26-regression-e2e)
     require_plan "strawwu-ubuntu-2604-migration-plan.md"
     ;;
   software-sources)

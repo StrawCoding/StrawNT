@@ -8,6 +8,13 @@ if ! command -v flatpak >/dev/null 2>&1; then
     exit 1
 fi
 
+# Calamares chroot / incomplete proc lacks boot_id; flatpak needs it for repo open.
+# Defer flathub registration — chroot-install-flatpak-setup or first boot completes it.
+if [[ ! -r /proc/sys/kernel/random/boot_id ]]; then
+    echo "strawwu-flatpak-setup: deferring flathub remote (chroot/incomplete proc)"
+    exit 0
+fi
+
 flatpak remote-add --if-not-exists --system flathub "${FLATHUB_URL}"
 
 if flatpak remotes --system 2>/dev/null | awk '{print $1}' | grep -qx flathub; then

@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-initramfs-hooks-baseline/v1",
   "wave": "W8-S4",
-  "version": "0.6.1.1",
+  "version": "0.6.1.2",
   "package": "strawwu-initramfs-hooks",
   "cli": "/usr/bin/strawwu-initramfs-hooks",
   "manifest": "os-image/debs/strawwu-initramfs-hooks/usr/share/strawwu/initramfs-hooks/initramfs-hooks-manifest.yaml",

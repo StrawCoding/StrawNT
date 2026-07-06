@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-meta-audit-baseline/v1",
   "wave": "W6-B5",
-  "version": "0.6.1.1",
+  "version": "0.6.1.2",
   "package": "strawwu-minimal",
   "manifest": "usr/share/strawwu/meta-audit/meta-audit-manifest.yaml",
   "forbidden_ubuntu_metas": [
@@ -30,7 +30,7 @@
     "ubuntu-settings",
     "ubuntu-mono",
     "ubuntu-wallpapers",
-    "ubuntu-wallpapers-noble",
+    "ubuntu-wallpapers-resolute",
     "ubuntu-docs"
   ],
   "strawwu_metas_required": [
@@ -67,12 +67,12 @@
       "ubuntu-release-upgrader-core",
       "ubuntu-release-upgrader-gtk",
       "ubuntu-settings",
-      "ubuntu-wallpapers"
+      "ubuntu-wallpapers",
+      "ubuntu-wallpapers-resolute"
     ],
     "unexpected": [
       "ubuntu-insights",
-      "ubuntu-kernel-accessories",
-      "ubuntu-wallpapers-resolute"
+      "ubuntu-kernel-accessories"
     ],
     "audit_clean": false
   },
