@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-release-baseline/v1",
   "generated_at": "2026-07-04",
-  "version": "0.5.0.0",
+  "version": "0.5.0.1",
   "channels": {
     "dev": {
       "iso_mode": "dev-iso",
@@ -78,7 +78,7 @@
     ],
     "latest_iso": "StrawWU-0.4.1.4-amd64.iso",
     "gpg_signing_ready": true,
-    "apt_repo_ready": false,
+    "apt_repo_ready": true,
     "release_manifest_ready": true
   },
   "scripts": {
@@ -86,12 +86,12 @@
     "bump_version": "scripts/bump-version.sh",
     "release_sign": "scripts/release-sign.sh",
     "manifest_generator": "scripts/generate-release-manifest.sh",
-    "publish_debs": null
+    "publish_debs": "scripts/publish-debs.sh"
   },
   "wave0_gaps": [
-    "no APT publish pipeline",
     "12 ubuntu-* packages still in squashfs",
     "W7-RE1 manifest + RE2 GPG signing scripts present",
+    "W7-RE3 APT repo + strawwu-keyring + publish-debs.sh present",
     "W1-B1 purge complete — snap transition apps removed (Flathub in F1)",
     "W1-F2 nosnap complete — snapd masked, desktop meta Recommends documented"
   ]

@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-desktop-baseline/v1",
   "wave": "W3-D1",
-  "version": "0.5.0.0",
+  "version": "0.5.0.1",
   "packages": {
     "strawwu-session": {
       "path": "os-image/debs/strawwu-session",

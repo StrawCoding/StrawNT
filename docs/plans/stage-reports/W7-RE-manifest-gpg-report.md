@@ -3,9 +3,9 @@
 | 任務 | w7-re-manifest-gpg |
 |------|-------------------|
 | 版本 | 0.5.0.0 |
-| 日期 | 2026-07-06 |
+| 日期 | 2026-07-05 |
 | Worker | 階段 38/47（w7-re-manifest-gpg） |
-| 結果 | **待 Hermes mark**（worker 不自宣稱 PASS） |
+| 結果 | **Hermes mark PASS**（2026-07-05T23:53:57-0400；worker 重驗 2026-07-06） |
 
 ## 目標
 
@@ -27,7 +27,7 @@
 
 | 元件 | 說明 |
 |------|------|
-| **generate-release-manifest.sh** | 依 `VERSION` 產生 `strawwu-release-manifest/v1` JSON：git sha/tag、channel（preview→beta / d=0→stable）、ISO artifact（sha256+size+gpg_sig）、22 個 strawwu deb 套件清單、boot_test 狀態、checksums 中繼資料 |
+| **generate-release-manifest.sh** | 依 `VERSION` 產生 `strawwu-release-manifest/v1` JSON：git sha/tag、channel（preview→beta / d=0→stable）、ISO artifact（sha256+size+gpg_sig）、23 個 strawwu deb 套件清單、boot_test 狀態、checksums 中繼資料 |
 | **release-sign.sh** | 產生 `SHA256SUMS`；`auto`/`required`/`skip` 三模式 GPG detached 簽章（`*.asc`）；簽章後自動更新 manifest |
 | **效能** | 優先讀取既有 `SHA256SUMS` 避免重算 6GB ISO；預設僅納入版本對應或最新單一 ISO（非全量掃描） |
 | **validate-release-manifest.py** | 驗證 schema、channel、artifact sha256、packages、published_at |
@@ -62,11 +62,13 @@ Log: `/tmp/w7-re-test-release-manifest.log`
 === W7-RE manifest+gpg done: PASS ===
 ```
 
-### `make preflight` — exit 0（~321s）
+### `make preflight` — exit 0（~224s，2026-07-05 重驗）
 
 Log: `/tmp/w7-re-preflight.log`
 
 含 W0–W6 全部階段 + **W7-RE manifest+gpg** 終行：`=== W7-RE manifest+gpg done: PASS ===`
+
+隔離測試：ephemeral GPG key `release@test.strawwu.local` → `SHA256SUMS` + `.asc` + stub ISO 簽章 → `gpg --verify` OK → manifest schema 驗證 PASS（23 packages）。
 
 ## 變更檔案清單
 

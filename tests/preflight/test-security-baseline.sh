@@ -104,7 +104,6 @@ data = {
         "documented": True,
     },
     "wave2_gaps": [
-        "APT repo Release.gpg + strawwu-keyring (w7-re-apt-repo)",
         "Registry protected list + polkit (SEC3)",
         "compat session audit (SEC4)",
     ],
@@ -112,6 +111,12 @@ data = {
         "iso": "SHA256SUMS + detached GPG (RE2, w7-re-manifest-gpg)",
         "manifest": "release-manifest.json (RE1)",
         "ci_gpg_secret": "deferred — wire in release.yml",
+    },
+    "apt_signing": {
+        "keyring_package": "strawwu-keyring",
+        "keyring_path": "/usr/share/keyrings/strawwu-archive-keyring.gpg",
+        "release_gpg": "dists/noble/Release.gpg (RE3+RE4, w7-re-apt-repo)",
+        "publish_script": "scripts/publish-debs.sh",
     },
 }
 Path(out).parent.mkdir(parents=True, exist_ok=True)

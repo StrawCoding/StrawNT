@@ -1,0 +1,9 @@
+Package: strawwu-keyring
+Version: __VERSION__
+Section: misc
+Priority: important
+Architecture: all
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: GnuPG archive key for the StrawWU APT repository
+ Installs /usr/share/keyrings/strawwu-archive-keyring.gpg used by
+ deb822 sources (strawwu.sources) to verify apt.strawwu packages.

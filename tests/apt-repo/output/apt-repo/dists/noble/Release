@@ -1,0 +1,23 @@
+Architectures: amd64
+Codename: noble
+Components: main
+Date: Mon, 06 Jul 2026 04:08:27 +0000
+Label: StrawWU APT Repository
+Origin: StrawWU
+Suite: noble
+MD5Sum:
+ e6b1e5d5c6ae36ddd68e28ff55ca57d6              151 Release
+ f723558ade8b7747b33bd00912b6f80f              575 main/binary-amd64/Packages
+ d1df6d3756b20e7ba4a70d228baf3077              413 main/binary-amd64/Packages.gz
+SHA1:
+ ab1f0c87c0a972112a926a11478ef90844196c9c              151 Release
+ 9dc382219422fb1eb8d52045544cc9fe4ba2531d              575 main/binary-amd64/Packages
+ c395ed8ef50bf84c37c6891eed614eba1d9f640a              413 main/binary-amd64/Packages.gz
+SHA256:
+ fd94ddbeb7de30cbc90f5590f2f158c4e45a992ffac6685027bb4a618f8943be              151 Release
+ 1554c8fa6587d2821271f37932c54e51cda32e6a1602e755b9ed125fb3036a31              575 main/binary-amd64/Packages
+ 5d4e8a73468185df87ef3e45d966ef8d61d5c9c213e4617db0eee950c119060f              413 main/binary-amd64/Packages.gz
+SHA512:
+ d0f93c923ceaf8f42321a643eca5d2ce913fa38701246abed2da3cd863822492ee4b77d732e06e1119d90df705ffca192fa852c880234ce117c325c1b82be484              151 Release
+ fed5bf8ebde31236dffb9c5710cf91b1f309c7c407c413eeed58b40359241841a60a69cb414af625929621bd2fb438db0d045ece0dcbb6b54037e0d4602607bf              575 main/binary-amd64/Packages
+ 595193c356081ff9fe195e19999bc1cee51798786de6feb4705a958d2d23763f23e37445e000a9e7bbadd94d34451ae97604e6c1fe79909a5cdbda4e56088ed8              413 main/binary-amd64/Packages.gz

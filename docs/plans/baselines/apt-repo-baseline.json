@@ -1,0 +1,37 @@
+{
+  "schema": "strawwu-apt-repo-baseline/v1",
+  "wave": "W7-RE3+RE4",
+  "version": "0.5.0.1",
+  "scripts": {
+    "publish_debs": "scripts/publish-debs.sh",
+    "keyring_build": "os-image/debs/strawwu-keyring/build-deb.sh",
+    "validate": "tests/apt-repo/validate-apt-repo.py"
+  },
+  "keyring": {
+    "package": "strawwu-keyring",
+    "path": "/usr/share/keyrings/strawwu-archive-keyring.gpg",
+    "sources": "os-image/config/branding/etc/apt/sources.list.d/strawwu.sources"
+  },
+  "repo_layout": {
+    "suite": "noble",
+    "component": "main",
+    "arch": "amd64",
+    "dists": "dists/{suite}/Release",
+    "release_sig": "dists/{suite}/Release.gpg",
+    "packages": "dists/{suite}/main/binary-amd64/Packages.gz",
+    "pool": "pool/main/{letter}/{package}/"
+  },
+  "apt_uris": [
+    "https://strawcoding.github.io/strawwu-apt",
+    "https://apt.strawwu.wastebase.xyz"
+  ],
+  "gaps_closed": [
+    "APT repo dists/ + pool/ structure (RE3)",
+    "strawwu-keyring deb (RE3)",
+    "publish-debs.sh Release.gpg pipeline (RE4)"
+  ],
+  "deferred": [
+    "CI release workflow GPG secret wiring (w7-ci-nightly)",
+    "production archive signing key deployment"
+  ]
+}

@@ -184,10 +184,10 @@ data = {
     "gaps_closed": [
         "release-manifest.json generator (RE1)",
         "SHA256SUMS + GPG release-sign.sh (RE2)",
+        "APT publish pipeline (RE4, w7-re-apt-repo)",
+        "strawwu-keyring deb (RE3, w7-re-apt-repo)",
     ],
     "deferred": [
-        "APT publish pipeline (w7-re-apt-repo)",
-        "strawwu-keyring deb (w7-re-apt-repo)",
         "CI release workflow GPG secret wiring",
     ],
 }

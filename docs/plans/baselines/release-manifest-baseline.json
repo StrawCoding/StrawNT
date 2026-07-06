@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-release-manifest-baseline/v1",
   "wave": "W7-RE1+RE2",
-  "version": "0.5.0.0",
+  "version": "0.5.0.1",
   "scripts": {
     "generate_manifest": "scripts/generate-release-manifest.sh",
     "release_sign": "scripts/release-sign.sh",
@@ -35,11 +35,11 @@
   },
   "gaps_closed": [
     "release-manifest.json generator (RE1)",
-    "SHA256SUMS + GPG release-sign.sh (RE2)"
+    "SHA256SUMS + GPG release-sign.sh (RE2)",
+    "APT publish pipeline (RE4, w7-re-apt-repo)",
+    "strawwu-keyring deb (RE3, w7-re-apt-repo)"
   ],
   "deferred": [
-    "APT publish pipeline (w7-re-apt-repo)",
-    "strawwu-keyring deb (w7-re-apt-repo)",
     "CI release workflow GPG secret wiring"
   ]
 }

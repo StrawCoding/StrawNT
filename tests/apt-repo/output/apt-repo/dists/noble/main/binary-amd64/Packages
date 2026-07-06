@@ -1,0 +1,15 @@
+Package: strawwu-keyring
+Version: 9.9.9.9
+Architecture: all
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Filename: pool/main/s/strawwu-keyring/strawwu-keyring_9.9.9.9_all.deb
+Size: 1584
+MD5sum: 3b31b230841992324e4133375d4e3879
+SHA1: 74e92a05addb27de738341d0eef01f45c2fe4d89
+SHA256: 564078cb13ea4e3900c7f4c0cd7f6cfe9e8acc3b078c2238b462c303a2f3fb13
+Section: misc
+Priority: important
+Description: GnuPG archive key for the StrawWU APT repository
+ Installs /usr/share/keyrings/strawwu-archive-keyring.gpg used by
+ deb822 sources (strawwu.sources) to verify apt.strawwu packages.
+
