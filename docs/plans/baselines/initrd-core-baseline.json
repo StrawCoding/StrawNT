@@ -1,0 +1,20 @@
+{
+  "schema": "strawwu-initrd-core-baseline/v1",
+  "wave": "W8-S2",
+  "package": "strawwu-live-init",
+  "paths": {
+    "core": "os-image/initrd/strawwu-live-init/scripts/strawwu-live-init",
+    "casper_shim": "os-image/initrd/strawwu-live-init/scripts/casper-wrapper",
+    "manifest": "os-image/initrd/strawwu-live-init/MANIFEST.yaml"
+  },
+  "markers": {
+    "core_header": "strawwu-live-init",
+    "live_user_default": "USERNAME=ubuntu",
+    "optical_hint": "/dev/sr0",
+    "overlay_fallback": "overlay.ko"
+  },
+  "compat": {
+    "kernel_boot": "boot=casper",
+    "initrd_inject": "inject_strawwu_live_init"
+  }
+}

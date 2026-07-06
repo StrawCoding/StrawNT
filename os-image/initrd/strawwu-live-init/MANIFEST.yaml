@@ -1,0 +1,16 @@
+schema: strawwu-live-init-manifest/v1
+package: strawwu-live-init
+wave: W8-S2
+description: Fork of Ubuntu casper initramfs live boot core for StrawWU initrd splice.
+upstream_reference: casper initramfs /scripts/casper (Noble 24.04)
+compat:
+  kernel_boot: boot=casper
+  live_user: ubuntu
+  os_release_id: ubuntu
+paths:
+  core: scripts/strawwu-live-init
+  casper_shim: scripts/casper-wrapper
+deltas:
+  - optical live-media hint (/dev/sr0 fallback in find_livefs)
+  - overlay insmod fallback for strawwu kernel modules layout
+  - BUILD_SYSTEM/FLAVOUR StrawWU branding via casper.conf splice

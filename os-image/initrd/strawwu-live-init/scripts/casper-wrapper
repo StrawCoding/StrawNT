@@ -1,0 +1,4 @@
+#!/bin/sh
+# StrawWU compatibility shim — kernel boot=casper still sources /scripts/casper.
+# Delegate to strawwu-live-init (forked casper core).
+. /scripts/strawwu-live-init

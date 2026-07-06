@@ -11,6 +11,7 @@ from pathlib import Path
 
 PREFIX_PHASES = ("early", "early2", "early3")
 DEFAULT_OVERLAYS_ROOT = Path(__file__).resolve().parent.parent / "initrd/overlays"
+DEFAULT_LIVE_INIT_ROOT = Path(__file__).resolve().parent.parent / "initrd/strawwu-live-init"
 
 
 def align4(value: int) -> int:
@@ -252,6 +253,46 @@ def ensure_hook_order(main_dir: Path, hook_dir: str, hook_names: list[str]) -> N
             prefix_lines.append(f'{needle} "$@"')
     if prefix_lines:
         order.write_text("\n".join(prefix_lines + ([existing.rstrip()] if existing.strip() else [])) + "\n")
+
+
+def resolve_live_init_root(live_init_root: Path | None) -> Path | None:
+    if live_init_root is not None and (live_init_root / "scripts/strawwu-live-init").is_file():
+        return live_init_root
+    if (DEFAULT_LIVE_INIT_ROOT / "scripts/strawwu-live-init").is_file():
+        return DEFAULT_LIVE_INIT_ROOT
+    return None
+
+
+def inject_strawwu_live_init(main_dir: Path, live_init_root: Path | None = None) -> None:
+    """Replace upstream casper core with repo-owned strawwu-live-init fork."""
+    import shutil
+
+    root = resolve_live_init_root(live_init_root)
+    if root is None:
+        return
+
+    live_init_src = root / "scripts/strawwu-live-init"
+    live_init_dest = main_dir / "scripts/strawwu-live-init"
+    live_init_dest.parent.mkdir(parents=True, exist_ok=True)
+    if live_init_dest.exists() or live_init_dest.is_symlink():
+        live_init_dest.unlink()
+    shutil.copy2(live_init_src, live_init_dest)
+    live_init_dest.chmod(0o755)
+
+    casper_dest = main_dir / "scripts/casper"
+    wrapper_src = root / "scripts/casper-wrapper"
+    casper_dest.parent.mkdir(parents=True, exist_ok=True)
+    if casper_dest.exists() or casper_dest.is_symlink():
+        casper_dest.unlink()
+    if wrapper_src.is_file():
+        shutil.copy2(wrapper_src, casper_dest)
+    else:
+        casper_dest.write_text(
+            "#!/bin/sh\n"
+            "# StrawWU: boot=casper compat — delegate to strawwu-live-init\n"
+            ". /scripts/strawwu-live-init\n"
+        )
+    casper_dest.chmod(0o755)
 
 
 def inject_initrd_overlays(main_dir: Path, overlays_root: Path | None) -> None:
@@ -617,13 +658,11 @@ def refresh_preserved_main(
         sync_main_modules_tree(main_dir, old_kver, new_kver, modules_src)
         mirror_critical_modules_to_main(main_dir, modules_src, new_kver)
         regenerate_main_module_deps(main_dir, new_kver)
+    inject_strawwu_live_init(main_dir)
     inject_initrd_overlays(main_dir, overlays_root)
     if branding_root is not None and branding_root.is_dir():
         inject_plymouth_into_main(main_dir, branding_root)
         patch_casper_conf_in_initrd(main_dir)
-    if modules_src is not None and new_kver and modules_src.is_dir():
-        patch_casper_overlay_insmod(main_dir)
-        patch_casper_live_media_hint(main_dir)
     return recompress_main_dir(main_dir, scratch)
 
 
