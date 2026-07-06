@@ -2,6 +2,14 @@
   "schema_version": 2,
   "updated_at": "2026-07-06",
   "active": {
+    "version": "26.04.0",
+    "codename": "resolute",
+    "iso_name": "ubuntu-26.04-desktop-amd64.iso",
+    "mirror": "https://releases.ubuntu.com/26.04",
+    "kernel_localversion": "-strawwu",
+    "kernel_upstream": "6.14"
+  },
+  "previous": {
     "version": "24.04.2",
     "codename": "noble",
     "iso_name": "ubuntu-24.04.2-desktop-amd64.iso",

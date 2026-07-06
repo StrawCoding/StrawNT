@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-finished-meta-baseline/v1",
   "wave": "W5-N4",
-  "version": "0.5.0.9",
+  "version": "0.6.0.0",
   "package": "strawwu-install-init",
   "depends": [
     "strawwu-initd",

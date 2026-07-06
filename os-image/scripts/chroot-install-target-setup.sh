@@ -130,6 +130,14 @@ if [[ ${#missing[@]} -gt 0 ]]; then
     apt-get install -y --no-install-recommends "${missing[@]}" 2>/dev/null || true
 fi
 
+# Resolute live rootfs may lack desktop/IME deps after purge meta restore.
+apt-get install -y --no-install-recommends \
+    gnome-shell gdm3 session-migration mutter \
+    fcitx5 fcitx5-chewing fcitx5-table-cangjie5 \
+    fcitx5-frontend-gtk3 fcitx5-frontend-gtk4 fcitx5-frontend-qt5 \
+    fcitx5-frontend-qt6 fcitx5-module-wayland \
+    2>/dev/null || true
+
 # initd must exist before target-setup (Depends).
 initd_deb="$(ls -1t /usr/share/strawwu/target-setup/staged-debs/strawwu-initd_*.deb | head -1)"
 dpkg -i "${initd_deb}"
@@ -141,6 +149,8 @@ dpkg -i /tmp/strawwu-live-install-ux.deb || apt-get install -f -y
 rm -f /tmp/strawwu-live-install-ux.deb
 dpkg -i /tmp/strawwu-calamares-settings.deb || apt-get install -f -y
 rm -f /tmp/strawwu-calamares-settings.deb
+firstboot_deb="$(ls -1t /usr/share/strawwu/target-setup/staged-debs/strawwu-firstboot_*.deb | head -1)"
+dpkg -i "${firstboot_deb}" || apt-get install -f -y
 dpkg -i /tmp/strawwu-install-init.deb || apt-get install -f -y
 rm -f /tmp/strawwu-install-init.deb
 

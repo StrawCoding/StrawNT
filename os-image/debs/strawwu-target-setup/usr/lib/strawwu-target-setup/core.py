@@ -130,17 +130,28 @@ def install_staged_debs(packages: list[str], *, dry_run: bool = False) -> bool:
             if _dpkg_installed(pkg):
                 log_event("info", "package already installed", package=pkg)
                 continue
+            if pkg == "strawwu-keyring":
+                log_event("warn", "staged deb missing (optional)", package=pkg)
+                continue
             log_event("warn", "staged deb missing", package=pkg)
             ok = False
             continue
 
         extra: list[str] = []
-        if pkg == "strawwu-desktop":
+        if pkg in ("strawwu-desktop", "strawwu-minimal", "strawwu-l10n-ime"):
             extra = ["--force-depends"]
+
+        if pkg == "strawwu-minimal" and not dry_run:
+            for meta in ("ubuntu-minimal", "ubuntu-standard"):
+                if _dpkg_installed(meta):
+                    run_cmd(["dpkg", "--purge", "--force-depends", meta], dry_run=dry_run)
 
         cmd = ["dpkg", "-i", *extra, str(deb)]
         proc = run_cmd(cmd, dry_run=dry_run)
         if proc.returncode != 0 and not dry_run:
+            if pkg == "strawwu-l10n-ime" and _dpkg_installed(pkg):
+                log_event("warn", "dpkg install had deps warnings but package present", package=pkg)
+                continue
             log_event(
                 "error",
                 "dpkg install failed",

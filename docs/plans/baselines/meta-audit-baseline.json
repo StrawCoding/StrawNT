@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-meta-audit-baseline/v1",
   "wave": "W6-B5",
-  "version": "0.5.0.9",
+  "version": "0.6.0.0",
   "package": "strawwu-minimal",
   "manifest": "usr/share/strawwu/meta-audit/meta-audit-manifest.yaml",
   "forbidden_ubuntu_metas": [
@@ -44,33 +44,36 @@
       "ubuntu-desktop-minimal",
       "ubuntu-docs",
       "ubuntu-drivers-common",
+      "ubuntu-insights",
+      "ubuntu-kernel-accessories",
       "ubuntu-keyring",
-      "ubuntu-minimal",
-      "ubuntu-mono",
       "ubuntu-release-upgrader-core",
+      "ubuntu-release-upgrader-gtk",
+      "ubuntu-session",
       "ubuntu-settings",
-      "ubuntu-standard",
       "ubuntu-wallpapers",
-      "ubuntu-wallpapers-noble"
+      "ubuntu-wallpapers-resolute"
     ],
-    "ubuntu_package_count": 12,
+    "ubuntu_package_count": 13,
     "forbidden_present": [
       "ubuntu-desktop",
       "ubuntu-desktop-minimal",
-      "ubuntu-minimal",
-      "ubuntu-standard"
+      "ubuntu-session"
     ],
     "allowed_present": [
       "ubuntu-docs",
       "ubuntu-drivers-common",
       "ubuntu-keyring",
-      "ubuntu-mono",
       "ubuntu-release-upgrader-core",
+      "ubuntu-release-upgrader-gtk",
       "ubuntu-settings",
-      "ubuntu-wallpapers",
-      "ubuntu-wallpapers-noble"
+      "ubuntu-wallpapers"
     ],
-    "unexpected": [],
+    "unexpected": [
+      "ubuntu-insights",
+      "ubuntu-kernel-accessories",
+      "ubuntu-wallpapers-resolute"
+    ],
     "audit_clean": false
   },
   "replaces": {

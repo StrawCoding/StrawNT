@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-hub-apps-page-baseline/v1",
   "wave": "W4-R2",
-  "version": "0.5.0.9",
+  "version": "0.6.0.0",
   "package": "strawwu-hub",
   "panel": "apps",
   "registry_installed": "/var/lib/strawwu/app-registry.json",

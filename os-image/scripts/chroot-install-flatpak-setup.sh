@@ -88,8 +88,17 @@ rm -f *.deb 2>/dev/null || true
 
 flatpak_pkgs=(
     flatpak libostree-1-1 bubblewrap xdg-dbus-proxy libappstream5
-    libarchive13t64 libmalcontent-0-0 libjson-glib-1.0-0 libfuse3-3 fuse3
+    libarchive13t64 libmalcontent-0-0 libjson-glib-1.0-0 fuse3 libcomposefs1
 )
+# noble: libfuse3-3; resolute: libfuse3-4
+if apt-cache show libfuse3-3 &>/dev/null; then
+    flatpak_pkgs+=(libfuse3-3)
+elif apt-cache show libfuse3-4 &>/dev/null; then
+    flatpak_pkgs+=(libfuse3-4)
+else
+    echo "no libfuse3 package found in apt cache" >&2
+    exit 1
+fi
 for pkg in "${flatpak_pkgs[@]}"; do
     apt-get download "${pkg}"
 done

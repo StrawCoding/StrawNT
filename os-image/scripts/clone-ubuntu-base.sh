@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# clone-ubuntu-base.sh — Extract Ubuntu noble desktop live rootfs from official ISO.
+# clone-ubuntu-base.sh — Extract Ubuntu desktop live rootfs from official ISO.
 #
-# Noble (24.04+) live ISOs use layered casper/minimal*.squashfs; we merge layers
+# Ubuntu 24.04+ live ISOs use layered casper/minimal*.squashfs; we merge layers
 # then install strawwu-calamares-settings deb inside chroot (replaces ubuntu-common).
 set -euo pipefail
 
@@ -112,7 +112,7 @@ extract_layered() {
     local layer
     for layer in "${layers[@]}"; do
         log "unsquashfs layer $(basename "${layer}")"
-        unsquashfs -force -d "${SQUASH_SRC}" "${layer}"
+        unsquashfs -force -ignore-errors -d "${SQUASH_SRC}" "${layer}"
     done
     return 0
 }
@@ -156,6 +156,16 @@ chroot_run() {
     return "${rc}"
 }
 
+prepare_chroot_apt() {
+    # Live ISO squashfs may ship cdrom.sources (file:///cdrom) — invalid outside ISO mount.
+    local cdrom_src="${ROOTFS_DIR}/etc/apt/sources.list.d/cdrom.sources"
+    if [[ -f "${cdrom_src}" ]]; then
+        mv -f "${cdrom_src}" "${cdrom_src}.disabled"
+        log "disabled cdrom.sources for chroot apt"
+    fi
+    cp -f /etc/resolv.conf "${ROOTFS_DIR}/etc/resolv.conf" 2>/dev/null || true
+}
+
 install_calamares() {
     if [[ -f "${ROOTFS_DIR}/usr/bin/calamares" ]] \
         && dpkg-query --root="${ROOTFS_DIR}" -W -f='${Status}' strawwu-calamares-settings 2>/dev/null | grep -q "ok installed"; then
@@ -175,14 +185,14 @@ install_calamares() {
     [[ -n "${deb_file}" && -f "${deb_file}" ]] || die "strawwu-calamares-settings .deb not built"
 
     log "installing calamares + strawwu-calamares-settings in chroot"
+    prepare_chroot_apt
     cp -f "${deb_file}" "${ROOTFS_DIR}/tmp/strawwu-calamares-settings.deb"
-    cp -f /etc/resolv.conf "${ROOTFS_DIR}/etc/resolv.conf" 2>/dev/null || true
     chroot_run bash -c '
         set -euo pipefail
         export DEBIAN_FRONTEND=noninteractive
         apt-get update -qq
         apt-get install -y --no-install-recommends calamares
-        if dpkg-query -W -f="${Status}" calamares-settings-ubuntu-common 2>/dev/null | grep -q "ok installed"; then
+        if dpkg-query -W -f='\${Status}' calamares-settings-ubuntu-common 2>/dev/null | grep -q "ok installed"; then
             apt-get remove -y --purge calamares-settings-ubuntu-common || true
         fi
         dpkg -i /tmp/strawwu-calamares-settings.deb

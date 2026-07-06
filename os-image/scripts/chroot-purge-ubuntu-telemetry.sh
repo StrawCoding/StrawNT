@@ -137,7 +137,16 @@ if ! dpkg -s ubuntu-desktop 2>/dev/null | grep -q '^Status: install ok installed
 fi
 apt-get install -y -o DPkg::Options::="--force-depends" --no-install-recommends \
     xserver-xorg xorg gnome-control-center \
+    gnome-shell gdm3 session-migration mutter ubuntu-session \
+    gnome-shell-ubuntu-extensions \
     2>/dev/null || true
+# Fallback: force-install desktop stack when apt meta is broken after telemetry purge.
+cd /tmp
+for pkg in gnome-control-center gnome-shell gdm3 session-migration mutter ubuntu-session; do
+    apt-get download "${pkg}" 2>/dev/null || true
+done
+dpkg -i --force-depends ./*.deb 2>/dev/null || true
+rm -f ./*.deb 2>/dev/null || true
 
 mkdir -p /snap
 chmod 755 /snap
