@@ -1,6 +1,6 @@
 # StrawWU Custom Kernel
 
-Phase 2 deliverable: build `linux-image-strawwu` .deb from Ubuntu noble kernel source + `strawwu_ipc` module.
+Phase 2 deliverable: build `linux-image-strawwu` .deb from Ubuntu resolute (26.04) kernel source + `strawwu_ipc` module.
 
 ## Build
 

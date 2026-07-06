@@ -49,7 +49,11 @@ main() {
     log "installing ${kernel_deb}"
     mkdir -p "${ROOTFS_DIR}/tmp"
     cp "${kernel_deb}" "${ROOTFS_DIR}/tmp/strawwu-kernel.deb"
-    chroot_run bash -c 'DEBIAN_FRONTEND=noninteractive apt-get update -qq && apt-get install -y /tmp/strawwu-kernel.deb && apt-get purge -y "linux-image-generic*" "linux-image-unsigned-*" 2>/dev/null || true && update-initramfs -u -k all'
+    if ! chroot_run bash -c 'DEBIAN_FRONTEND=noninteractive apt-get update -qq && apt-get install -y /tmp/strawwu-kernel.deb'; then
+        log "apt install failed (broken deps?) — falling back to dpkg -i"
+        chroot_run bash -c 'DEBIAN_FRONTEND=noninteractive dpkg -i --force-depends /tmp/strawwu-kernel.deb || dpkg -i /tmp/strawwu-kernel.deb'
+    fi
+    chroot_run bash -c 'apt-get purge -y "linux-image-generic*" "linux-image-unsigned-*" 2>/dev/null || true; update-initramfs -u -k all' || true
     rm -f "${ROOTFS_DIR}/tmp/strawwu-kernel.deb"
 
     local kver=""

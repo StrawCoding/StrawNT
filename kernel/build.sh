@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# build.sh — Build linux-image-strawwu .deb from Ubuntu noble kernel source + strawwu_ipc.
+# build.sh — Build linux-image-strawwu .deb from Ubuntu resolute kernel source + strawwu_ipc.
 set -euo pipefail
 
 KERNEL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -8,16 +8,41 @@ BUILD_DIR="${KERNEL_BUILD_DIR:-${KERNEL_DIR}/build}"
 OUTPUT_DIR="${KERNEL_OUTPUT_DIR:-${KERNEL_DIR}/output}"
 PATCH_DIR="${KERNEL_DIR}/patches"
 MODULE_SRC="${KERNEL_DIR}/strawwu_ipc"
+TARGET_JSON="${REPO_ROOT}/docs/plans/ubuntu-base-target.json"
+ROOTFS_DIR="${STRAWWU_ROOTFS:-${REPO_ROOT}/os-image/work/rootfs}"
 
-# Match noble live ISO / host generic ABI.
-KERNEL_ABI="${STRAWWU_KERNEL_ABI:-6.8.0-124}"
-KERNEL_FLAVOR="${STRAWWU_KERNEL_FLAVOR:-generic}"
 LOCAL_VERSION="${STRAWWU_LOCAL_VERSION:--strawwu}"
+KERNEL_FLAVOR="${STRAWWU_KERNEL_FLAVOR:-generic}"
 JOBS="${STRAWWU_KERNEL_JOBS:-$(nproc)}"
 MARKER="${OUTPUT_DIR}/.build-ok"
 
 log() { echo "==> $*" >&2; }
 die() { echo "ERROR: $*" >&2; exit 1; }
+
+read_target_codename() {
+    if [[ -f "${TARGET_JSON}" ]]; then
+        python3 - "${TARGET_JSON}" <<'PY'
+import json, sys
+print(json.load(open(sys.argv[1])).get("active", {}).get("codename", "resolute"))
+PY
+    else
+        echo "resolute"
+    fi
+}
+
+detect_rootfs_kernel_abi() {
+    local mod_dir kver
+    mod_dir="$(ls -d "${ROOTFS_DIR}/lib/modules/"* 2>/dev/null | head -1 || true)"
+    [[ -n "${mod_dir}" ]] || return 1
+    kver="$(basename "${mod_dir}")"
+    kver="${kver%-strawwu}"
+    kver="${kver%-${KERNEL_FLAVOR}}"
+    echo "${kver}"
+}
+
+UBUNTU_CODENAME="${STRAWWU_APT_SUITE:-$(read_target_codename)}"
+KERNEL_ABI="${STRAWWU_KERNEL_ABI:-$(detect_rootfs_kernel_abi || true)}"
+KERNEL_ABI="${KERNEL_ABI:-7.0.0-14}"
 
 need_cmd() {
     for c in "$@"; do command -v "$c" >/dev/null 2>&1 || die "missing command: $c"; done
@@ -26,7 +51,7 @@ need_cmd() {
 ensure_build_deps() {
     local missing=()
     for pkg in build-essential bc bison flex libelf-dev libssl-dev libncurses-dev \
-        dwarves rsync devscripts equivs dpkg-dev; do
+        dwarves rsync devscripts equivs dpkg-dev python3 libdw-dev; do
         dpkg-query -W -f='${Status}' "${pkg}" 2>/dev/null | grep -q "install ok installed" \
             || missing+=("${pkg}")
     done
@@ -37,45 +62,52 @@ ensure_build_deps() {
     fi
 }
 
-enable_deb_src() {
-    if apt-cache policy linux-source-6.8.0 2>/dev/null | grep -q 'Candidate:'; then
-        if ! grep -q 'Types: deb-src' /etc/apt/sources.list.d/ubuntu.sources 2>/dev/null; then
-            log "enabling deb-src in ubuntu.sources"
-            cat >> /etc/apt/sources.list.d/ubuntu.sources <<'EOF'
-
-Types: deb-src
+ensure_deb_src_for_codename() {
+    local codename="$1"
+    local src_pkg="linux-source-${KERNEL_ABI%%-*}"
+    if apt-cache policy "${src_pkg}" 2>/dev/null | grep -q 'Candidate:'; then
+        return 0
+    fi
+    local marker="/etc/apt/sources.list.d/strawwu-kernel-src.sources"
+    if [[ -f "${marker}" ]] && grep -q "Suites: ${codename}" "${marker}" 2>/dev/null; then
+        apt-get update -qq
+        return 0
+    fi
+    log "enabling deb-src for ${codename} (${src_pkg})"
+    cat > "${marker}" <<EOF
+Types: deb deb-src
 URIs: http://archive.ubuntu.com/ubuntu/
-Suites: noble noble-updates noble-backports
+Suites: ${codename} ${codename}-updates ${codename}-backports
 Components: main restricted universe multiverse
 Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
 
-Types: deb-src
+Types: deb deb-src
 URIs: http://security.ubuntu.com/ubuntu/
-Suites: noble-security
+Suites: ${codename}-security
 Components: main restricted universe multiverse
 Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
 EOF
-            apt-get update -qq
-        fi
-    fi
+    apt-get update -qq
 }
 
 fetch_source() {
     local src_deb="linux-source-${KERNEL_ABI%%-*}"
     local tree="${BUILD_DIR}/linux-source"
     local stamp="${BUILD_DIR}/.source-abi"
+    local abi_rev="${KERNEL_ABI##*-}"
+    local src_ver="${KERNEL_ABI}.${abi_rev}"
     mkdir -p "${BUILD_DIR}"
     if [[ -d "${tree}" ]] && [[ -f "${stamp}" ]] && [[ "$(cat "${stamp}")" == "${KERNEL_ABI}" ]]; then
         log "reusing ${tree} (${KERNEL_ABI})"
         return
     fi
-    log "fetching ${src_deb} for ABI ${KERNEL_ABI}"
+    log "fetching ${src_deb} for ABI ${KERNEL_ABI} (suite ${UBUNTU_CODENAME})"
     rm -rf "${BUILD_DIR}"/linux-* "${stamp}"
-    enable_deb_src
+    ensure_deb_src_for_codename "${UBUNTU_CODENAME}"
     (
         cd "${BUILD_DIR}"
-        apt-get source -y "linux=${KERNEL_ABI}.${KERNEL_ABI##*-}" 2>/dev/null \
-            || apt-get source -y "${src_deb}=${KERNEL_ABI}.${KERNEL_ABI##*-}" 2>/dev/null \
+        apt-get source -y "linux=${src_ver}" 2>/dev/null \
+            || apt-get source -y "${src_deb}=${src_ver}" 2>/dev/null \
             || apt-get source -y "${src_deb}"
     )
     local extracted
@@ -85,11 +117,30 @@ fetch_source() {
     echo "${KERNEL_ABI}" > "${stamp}"
 }
 
+resolve_kernel_config() {
+    local candidates=()
+    candidates+=("/boot/config-${KERNEL_ABI}-${KERNEL_FLAVOR}")
+    candidates+=("${ROOTFS_DIR}/boot/config-${KERNEL_ABI}-${KERNEL_FLAVOR}")
+    if [[ -d "${ROOTFS_DIR}/boot" ]]; then
+        while IFS= read -r cfg; do
+            candidates+=("${cfg}")
+        done < <(find "${ROOTFS_DIR}/boot" -maxdepth 1 -name 'config-*-generic' 2>/dev/null | sort -r)
+    fi
+    candidates+=("/boot/config-$(uname -r)")
+    local cfg
+    for cfg in "${candidates[@]}"; do
+        if [[ -f "${cfg}" ]]; then
+            echo "${cfg}"
+            return 0
+        fi
+    done
+    return 1
+}
+
 prepare_config() {
     local tree="${BUILD_DIR}/linux-source"
-    local config_src="/boot/config-${KERNEL_ABI}-${KERNEL_FLAVOR}"
-    [[ -f "${config_src}" ]] || config_src="/boot/config-$(uname -r)"
-    [[ -f "${config_src}" ]] || die "kernel config not found (install linux-image-${KERNEL_ABI}-${KERNEL_FLAVOR})"
+    local config_src
+    config_src="$(resolve_kernel_config)" || die "kernel config not found for ABI ${KERNEL_ABI} (install linux-image-${KERNEL_ABI}-${KERNEL_FLAVOR} or clone resolute rootfs)"
 
     log "using config ${config_src}"
     cp "${config_src}" "${tree}/.config"
@@ -178,9 +229,7 @@ build_debs() {
         return
     fi
     log "building kernel debs (jobs=${JOBS}) — this may take 20-60 minutes"
-    # Clean stale objects from failed partial builds; keep .config.
     make -C "${tree}" ARCH=x86_64 clean
-    # LOCALVERSION already in .config — do not pass again (would double-append)
     make -C "${tree}" ARCH=x86_64 -j"${JOBS}" bindeb-pkg \
         KDEB_CHANGELOG_DIST="strawwu"
 }
@@ -207,7 +256,6 @@ repackage_strawwu_image() {
         fi
     fi
 
-    # Ensure strawwu_ipc.ko is present (bindeb-pkg may omit late-built misc modules).
     local kmod_tree mod_ko kmod_dest
     kmod_tree="$(ls -d "${work}/root/lib/modules/"* 2>/dev/null | head -1)"
     mod_ko="$(find "${BUILD_DIR}/linux-source" -path '*/strawwu_ipc/strawwu_ipc.ko' 2>/dev/null | head -1)"
@@ -224,20 +272,21 @@ repackage_strawwu_image() {
     kver="$(grep -E '^Version:' "${work}/root/DEBIAN/control" | awk '{print $2}')"
     sed -i 's/^Package: .*/Package: linux-image-strawwu/' "${work}/root/DEBIAN/control"
     sed -i "s/^Description: .*/Description: StrawWU custom kernel image (${kver})/" "${work}/root/DEBIAN/control"
-    # Bundled modules — drop split-package Depends so chroot apt install succeeds.
     sed -i '/^Depends:/s/, linux-modules-[^,)]*//g' "${work}/root/DEBIAN/control"
     sed -i '/^Depends:/s/linux-modules-[^,)]*, //g' "${work}/root/DEBIAN/control"
 
     local out="${OUTPUT_DIR}/linux-image-strawwu_${kver}_amd64.deb"
-    rm -f "${out}"
+    rm -f "${OUTPUT_DIR}"/linux-image-strawwu_*.deb
     dpkg-deb -b "${work}/root" "${out}"
     log "produced ${out} (image+modules merged)"
     echo "${out}" > "${OUTPUT_DIR}/.kernel-deb-path"
+    echo "${KERNEL_ABI}" > "${OUTPUT_DIR}/.kernel-abi"
     date -Is > "${MARKER}"
 }
 
 main() {
-    need_cmd make patch dpkg-deb apt-get
+    log "StrawWU kernel build: ABI=${KERNEL_ABI} suite=${UBUNTU_CODENAME} LOCALVERSION=${LOCAL_VERSION}"
+    need_cmd make patch dpkg-deb apt-get python3
     ensure_build_deps
     fetch_source
     integrate_module

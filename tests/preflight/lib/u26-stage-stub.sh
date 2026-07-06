@@ -39,7 +39,70 @@ print(f"PASS: clone marker {marker_path}")
 print(f"PASS: rootfs os-release resolute")
 PY
     ;;
-  u26-kernel-rebase|u26-debs-rebuild|u26-suite-migrate|u26-techrefs-refresh|u26-regression-e2e)
+  u26-kernel-rebase)
+    require_plan "strawwu-ubuntu-2604-migration-plan.md"
+    require_file "${REPO_ROOT}/kernel/output/.build-ok" "kernel build marker"
+    PYTHONHASHSEED=0 python3 - \
+        "${REPO_ROOT}/docs/plans/ubuntu-base-target.json" \
+        "${REPO_ROOT}/kernel/output" \
+        "${REPO_ROOT}/os-image/work/rootfs" <<'PY'
+import json, pathlib, re, subprocess, sys
+
+target_path, kernel_out, rootfs = map(pathlib.Path, sys.argv[1:4])
+target = json.loads(target_path.read_text())
+active = target.get("active", {})
+upstream = active.get("kernel_upstream", "6.14")
+localver = active.get("kernel_localversion", "-strawwu")
+
+debs = sorted(kernel_out.glob("linux-image-strawwu_*.deb"))
+if not debs:
+    print("FAIL: linux-image-strawwu_*.deb missing", file=sys.stderr)
+    sys.exit(1)
+deb = debs[-1]
+ver = deb.name.replace("linux-image-strawwu_", "").replace("_amd64.deb", "")
+# Resolute ships linux 7.0.0 (upstream 6.14+); reject noble 6.8 artifacts.
+if ver.startswith("6.8") or ver.startswith("6.8."):
+    print(f"FAIL: kernel deb still noble ABI ({ver})", file=sys.stderr)
+    sys.exit(1)
+major = int(ver.split(".", 1)[0])
+if major < 7:
+    print(f"FAIL: kernel deb version {ver} < 7.0 (expected resolute 6.14+ / 7.0.0)", file=sys.stderr)
+    sys.exit(1)
+
+abi_file = kernel_out / ".kernel-abi"
+if abi_file.is_file():
+    abi = abi_file.read_text().strip()
+    print(f"PASS: kernel ABI stamp {abi}")
+
+proc = subprocess.run(
+    ["dpkg-deb", "-c", str(deb)],
+    capture_output=True, text=True, check=True,
+)
+listing = proc.stdout
+if localver not in listing and f"modules/{ver.split('-')[0]}" not in listing:
+  # modules dir uses full kver e.g. 7.0.0-14-strawwu
+    if not re.search(rf"lib/modules/[0-9].*{re.escape(localver)}", listing):
+        print(f"FAIL: {deb.name} missing LOCALVERSION {localver!r} in modules tree", file=sys.stderr)
+        sys.exit(1)
+if "strawwu_ipc.ko" not in listing:
+    print(f"FAIL: strawwu_ipc.ko not in {deb.name}", file=sys.stderr)
+    sys.exit(1)
+
+print(f"PASS: linux-image-strawwu deb {deb.name}")
+print(f"PASS: upstream target {upstream}+ (deb {ver})")
+print(f"PASS: LOCALVERSION {localver} + strawwu_ipc.ko in deb")
+
+# rootfs should reflect swap or still have resolute generic until swap-kernel
+rootfs_boot = rootfs / "boot"
+if rootfs_boot.is_dir():
+    strawwu_vmlinuz = list(rootfs_boot.glob("vmlinuz-*strawwu*"))
+    if strawwu_vmlinuz:
+        print(f"PASS: rootfs vmlinuz {strawwu_vmlinuz[0].name}")
+    else:
+        print("WARN: rootfs not yet swapped to strawwu kernel (run make swap-kernel)")
+PY
+    ;;
+  u26-debs-rebuild|u26-suite-migrate|u26-techrefs-refresh|u26-regression-e2e)
     require_plan "strawwu-ubuntu-2604-migration-plan.md"
     ;;
   software-sources)

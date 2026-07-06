@@ -1,6 +1,6 @@
 .PHONY: help build clean test
 
-KERNEL_ABI ?= 6.8.0-124
+KERNEL_ABI ?= 7.0.0-14
 JOBS       ?= $(shell nproc)
 
 help:
