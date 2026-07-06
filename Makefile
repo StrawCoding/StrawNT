@@ -2,8 +2,8 @@
 	build-iso dev-iso release-iso repack-iso validate-rootfs boot-test-iso boot-test-dev-iso \
 	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
-	test-install-e2e test-install-firstboot-e2e test-installed-boot test-target-flathub test-wincompat test-wincompat-os test-wincompat-registry test-wincompat-gui test-wincompat-e2e test-hw-live-usb test-user-docs test-strawwu-shell test-hub test-hub-settings test-apps-page test-flathub-hub test-l10n-ime test-firstboot test-finished-meta test-context-menu test-registry-hooks test-deep-uninstall test-target-identity test-greeter-session test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-init-tools test-bug-reporter test-calamares-settings test-app-registry test-security-baseline test-observability test-legal-trademark test-desktop-stack test-live-install-ux test-update-notifier test-target-setup test-meta-audit purge-ubuntu-telemetry \
-	install-flatpak-setup install-bug-reporter install-calamares-settings install-update-notifier install-target-setup install-firstboot install-wincompat nosnap-harden build-debs bump-version check-version-bump
+	test-install-e2e test-install-firstboot-e2e test-installed-boot test-target-flathub test-wincompat test-wincompat-os test-wincompat-registry test-wincompat-gui test-wincompat-e2e test-hw-live-usb test-user-docs test-release-manifest test-strawwu-shell test-hub test-hub-settings test-apps-page test-flathub-hub test-l10n-ime test-firstboot test-finished-meta test-context-menu test-registry-hooks test-deep-uninstall test-target-identity test-greeter-session test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-init-tools test-bug-reporter test-calamares-settings test-app-registry test-security-baseline test-observability test-legal-trademark test-desktop-stack test-live-install-ux test-update-notifier test-target-setup test-meta-audit purge-ubuntu-telemetry \
+	install-flatpak-setup install-bug-reporter install-calamares-settings install-update-notifier install-target-setup install-firstboot install-wincompat nosnap-harden build-debs bump-version check-version-bump generate-release-manifest release-sign
 
 REPO_ROOT := $(abspath .)
 SCRIPTS   := os-image/scripts
@@ -63,6 +63,9 @@ help:
 	@echo "  test-wincompat-e2e            W6-W6 install→icon→launch→remove E2E"
 	@echo "  test-hw-live-usb              W6-HW1 Live USB matrix (≥3 machine profiles)"
 	@echo "  test-user-docs                W6-DOC1 install/rescue user guides + HTML"
+	@echo "  test-release-manifest         W7-RE1+RE2 release-manifest + GPG signing"
+	@echo "  generate-release-manifest     Build os-image/output/release-manifest.json"
+	@echo "  release-sign                  SHA256SUMS + detached GPG for release ISO"
 	@echo "  test-strawwu-shell            W4-D2 strawwu-shell fork profile + built-in dock"
 	@echo "  test-hub-settings             W4-D3 Hub settings center preflight"
 	@echo "  test-apps-page                W4-R2 Hub Apps page (App Registry UI)"
@@ -126,6 +129,7 @@ preflight:
 	bash tests/preflight/test-wincompat-e2e.sh
 	bash tests/preflight/test-hw-live-usb.sh
 	bash tests/preflight/test-user-docs.sh
+	bash tests/preflight/test-release-manifest.sh
 
 preflight-dev-vm:
 	bash tests/preflight/test-dev-vm-ready.sh
@@ -361,6 +365,15 @@ test-installed-boot-static:
 
 test-target-flathub-static:
 	bash tests/preflight/test-target-flathub.sh
+
+test-release-manifest:
+	bash tests/preflight/test-release-manifest.sh
+
+generate-release-manifest:
+	bash scripts/generate-release-manifest.sh
+
+release-sign:
+	bash scripts/release-sign.sh
 
 install-calamares-settings:
 	sudo bash $(SCRIPTS)/chroot-install-calamares-settings.sh

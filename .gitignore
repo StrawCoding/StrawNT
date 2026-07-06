@@ -5,6 +5,7 @@ tests/boot/output/serial-*.log
 tests/boot/output/qemu-*.log
 tests/boot/output/*.log
 tests/install-e2e/output/
+tests/release-manifest/output/
 calamares-settings-ubuntu-common_*.deb
 *.partial
 

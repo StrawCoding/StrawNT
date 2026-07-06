@@ -1,0 +1,114 @@
+{
+  "schema": "strawwu-release-manifest/v1",
+  "version": "0.5.0.0",
+  "channel": "stable",
+  "git_tag": null,
+  "git_sha": "392c37606265c9823724a9e083f9868c3e54b429",
+  "artifacts": [
+    {
+      "name": "StrawWU-0.4.1.33-amd64.iso",
+      "sha256": "21ecacdf2ad9ad9ba2db0d92ba8bd571b2193d9927be36ad84954345576806bb",
+      "size": 6085685248,
+      "gpg_sig": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "strawwu-branding",
+      "version": "0.4.0.0"
+    },
+    {
+      "name": "strawwu-bug-reporter",
+      "version": "0.5.0.0"
+    },
+    {
+      "name": "strawwu-calamares-settings",
+      "version": "0.5.0.0"
+    },
+    {
+      "name": "strawwu-desktop",
+      "version": "0.5.0.0"
+    },
+    {
+      "name": "strawwu-desktop-actions",
+      "version": "0.5.0.0"
+    },
+    {
+      "name": "strawwu-disable-upstream-init",
+      "version": "0.5.0.0"
+    },
+    {
+      "name": "strawwu-firstboot",
+      "version": "0.5.0.0"
+    },
+    {
+      "name": "strawwu-flatpak-setup",
+      "version": "0.5.0.0"
+    },
+    {
+      "name": "strawwu-greeter",
+      "version": "0.5.0.0"
+    },
+    {
+      "name": "strawwu-initd",
+      "version": "0.5.0.0"
+    },
+    {
+      "name": "strawwu-install-init",
+      "version": "0.5.0.0"
+    },
+    {
+      "name": "strawwu-l10n-ime",
+      "version": "0.5.0.0"
+    },
+    {
+      "name": "strawwu-live-install-ux",
+      "version": "0.5.0.0"
+    },
+    {
+      "name": "strawwu-minimal",
+      "version": "0.5.0.0"
+    },
+    {
+      "name": "strawwu-registry-hooks",
+      "version": "0.5.0.0"
+    },
+    {
+      "name": "strawwu-session",
+      "version": "0.5.0.0"
+    },
+    {
+      "name": "strawwu-shell",
+      "version": "0.5.0.0"
+    },
+    {
+      "name": "strawwu-system",
+      "version": "0.4.0.0"
+    },
+    {
+      "name": "strawwu-target-identity",
+      "version": "0.5.0.0"
+    },
+    {
+      "name": "strawwu-target-setup",
+      "version": "0.5.0.0"
+    },
+    {
+      "name": "strawwu-update-notifier",
+      "version": "0.5.0.0"
+    },
+    {
+      "name": "strawwu-wincompat",
+      "version": "0.5.0.0"
+    }
+  ],
+  "boot_test": {
+    "bios": "PASS",
+    "uefi": "PENDING"
+  },
+  "checksums": {
+    "file": "SHA256SUMS",
+    "gpg_sig": null
+  },
+  "published_at": "2026-07-06T03:53:32Z"
+}

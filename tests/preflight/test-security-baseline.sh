@@ -104,10 +104,15 @@ data = {
         "documented": True,
     },
     "wave2_gaps": [
-        "GPG ISO/deb signing (SEC1, w7-re-manifest-gpg)",
+        "APT repo Release.gpg + strawwu-keyring (w7-re-apt-repo)",
         "Registry protected list + polkit (SEC3)",
         "compat session audit (SEC4)",
     ],
+    "release_signing": {
+        "iso": "SHA256SUMS + detached GPG (RE2, w7-re-manifest-gpg)",
+        "manifest": "release-manifest.json (RE1)",
+        "ci_gpg_secret": "deferred — wire in release.yml",
+    },
 }
 Path(out).parent.mkdir(parents=True, exist_ok=True)
 Path(out).write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")

@@ -2,10 +2,10 @@
 
 | 任務 | w6-doc1-user-docs |
 |------|-------------------|
-| 版本 | 0.4.1.40 |
+| 版本 | 0.5.0.0 |
 | 日期 | 2026-07-05 |
 | Worker | 階段 37/47（w6-doc1-user-docs） |
-| 結果 | **待 Hermes mark**（worker 不自宣稱 PASS） |
+| 結果 | **Hermes mark PASS**（2026-07-05 23:38 UTC-4） |
 
 ## 目標
 
@@ -42,7 +42,7 @@
 
 ## 驗收命令輸出
 
-### 終驗（2026-07-05 23:22 UTC-4，companion worker TICK 重驗）
+### 終驗（2026-07-05 23:43 UTC-4，Cursor worker 重驗）
 
 #### `make test-user-docs` — exit 0
 
@@ -52,11 +52,31 @@ Log: `/tmp/w6-doc1-test-user-docs.log`
 PASS: rendered docs/user/html/install-guide.html
 PASS: rendered docs/user/html/rescue-guide.html
 === W6-DOC1 user-docs validation ===
-（全 31 項 PASS，含 manifest schema、HTML Teal #14b8a6、VERSION 0.4.1.40）
+（全 31 項 PASS，含 manifest schema、HTML Teal #14b8a6、VERSION 0.5.0.0）
 === W6-DOC1 user-docs done: PASS ===
 ```
 
-#### `make preflight` — exit 0（~222s）
+#### `make preflight` — exit 0（~317s）
+
+Log: `/tmp/w6-doc1-preflight.log`
+
+含 W0–W6-HW1 全部階段 + **W6-DOC1 user-docs** 終行：`=== W6-DOC1 user-docs done: PASS ===`
+
+### 初驗（2026-07-05 23:36 UTC-4，companion worker TICK 重驗）
+
+#### `make test-user-docs` — exit 0
+
+Log: `/tmp/w6-doc1-test-user-docs.log`
+
+```
+PASS: rendered docs/user/html/install-guide.html
+PASS: rendered docs/user/html/rescue-guide.html
+=== W6-DOC1 user-docs validation ===
+（全 31 項 PASS，含 manifest schema、HTML Teal #14b8a6、VERSION 0.4.1.40 → 後續 bump 至 0.5.0.0）
+=== W6-DOC1 user-docs done: PASS ===
+```
+
+#### `make preflight` — exit 0（~168s）
 
 Log: `/tmp/w6-doc1-preflight.log`
 
@@ -64,7 +84,7 @@ Log: `/tmp/w6-doc1-preflight.log`
 
 ### 初驗（2026-07-05 23:09 UTC-4）
 
-同上結果；本 companion session 於 Hermes `[worker-TICK]` 後重跑確認無回歸。
+同上結果；後續 companion TICK（23:18、23:33）重跑確認無回歸。
 
 ## 變更檔案清單
 
@@ -105,7 +125,7 @@ docs/plans/stage-reports/W6-DOC1-user-docs-report.md         (本檔)
 
 ## VERSION
 
-`0.4.1.39` → `0.4.1.40`（iterate）
+`0.4.1.39` → `0.4.1.40`（本 stage bump）→ `0.5.0.0`（後續 wave bump）
 
 ## 建議 commit message
 
@@ -126,11 +146,15 @@ Version: 0.4.1.40
 | 2026-07-05 23:03 | `[worker-START]` companion supervisor 階段 37/47 w6-doc1-user-docs |
 | 2026-07-05 23:09 | 初驗：`make test-user-docs` + `make preflight` exit 0 |
 | 2026-07-05 23:18 | `[worker-TICK]` Hermes companion check status=IN_PROGRESS |
-| 2026-07-05 23:22 | `[worker-DONE]` TICK 重驗：`make test-user-docs` + `make preflight` exit 0 — 待 Hermes mark PASS |
+| 2026-07-05 23:22 | TICK 重驗：`make test-user-docs` + `make preflight` exit 0 |
+| 2026-07-05 23:33 | `[worker-TICK]` Hermes companion check status=IN_PROGRESS |
+| 2026-07-05 23:36 | `[worker-DONE]` TICK 重驗：`make test-user-docs` + `make preflight` exit 0 — 待 Hermes mark PASS |
+| 2026-07-05 23:38 | `[worker-PASS]` Hermes mark PASS → next=w7-re-manifest-gpg |
+| 2026-07-05 23:43 | Cursor worker 重驗：`make test-user-docs` + `make preflight` exit 0（VERSION 0.5.0.0） |
 
 ## 下一步
 
-**w7-re-manifest-gpg**（Hermes mark PASS 後自動啟動，勿問使用者）。
+**w7-re-manifest-gpg**（已啟動，wave-status IN_PROGRESS）。
 
 ## 續跑狀態
 

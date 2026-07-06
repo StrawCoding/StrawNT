@@ -1,0 +1,45 @@
+{
+  "schema": "strawwu-release-manifest-baseline/v1",
+  "wave": "W7-RE1+RE2",
+  "version": "0.5.0.0",
+  "scripts": {
+    "generate_manifest": "scripts/generate-release-manifest.sh",
+    "release_sign": "scripts/release-sign.sh",
+    "validate": "tests/release-manifest/validate-release-manifest.py"
+  },
+  "manifest_schema": "strawwu-release-manifest/v1",
+  "manifest_path": "os-image/output/release-manifest.json",
+  "signing": {
+    "checksums": "SHA256SUMS",
+    "detached_sig": "SHA256SUMS.asc",
+    "iso_sig_suffix": ".asc",
+    "modes": [
+      "auto",
+      "required",
+      "skip"
+    ],
+    "env": [
+      "STRAWWU_GPG_KEY_ID",
+      "STRAWWU_RELEASE_SIGN_MODE"
+    ]
+  },
+  "channels": {
+    "beta": {
+      "signed": "sha256+gpg",
+      "preview": true
+    },
+    "stable": {
+      "signed": "sha256+gpg",
+      "preview": false
+    }
+  },
+  "gaps_closed": [
+    "release-manifest.json generator (RE1)",
+    "SHA256SUMS + GPG release-sign.sh (RE2)"
+  ],
+  "deferred": [
+    "APT publish pipeline (w7-re-apt-repo)",
+    "strawwu-keyring deb (w7-re-apt-repo)",
+    "CI release workflow GPG secret wiring"
+  ]
+}

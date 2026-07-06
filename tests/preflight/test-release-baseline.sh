@@ -36,11 +36,18 @@ if command -v gpg >/dev/null 2>&1 && gpg --list-secret-keys 2>/dev/null | grep -
     gpg_ready=true
 fi
 
-python3 - "${BASELINES_DIR}/release-baseline.json" "${VERSION}" "${REPO_ROOT}" "${ubuntu_list_file}" "${iso_list_file}" "${gpg_ready}" <<'PY'
+release_sign_script="scripts/release-sign.sh"
+manifest_generator="scripts/generate-release-manifest.sh"
+release_manifest_ready=false
+if [[ -f "${REPO_ROOT}/${manifest_generator}" && -f "${REPO_ROOT}/${release_sign_script}" ]]; then
+    release_manifest_ready=true
+fi
+
+python3 - "${BASELINES_DIR}/release-baseline.json" "${VERSION}" "${REPO_ROOT}" "${ubuntu_list_file}" "${iso_list_file}" "${gpg_ready}" "${release_manifest_ready}" "${release_sign_script}" <<'PY'
 import json, sys
 from pathlib import Path
 
-out, version, repo, ubuntu_file, iso_file, gpg_ready = sys.argv[1:7]
+out, version, repo, ubuntu_file, iso_file, gpg_ready, release_manifest_ready, release_sign = sys.argv[1:9]
 ubuntu = Path(ubuntu_file).read_text().splitlines()
 ubuntu = [x for x in ubuntu if x.strip()]
 isos = Path(iso_file).read_text().splitlines()
@@ -89,21 +96,23 @@ data = {
         "latest_iso": isos[-1] if isos else None,
         "gpg_signing_ready": gpg_ready.lower() == "true",
         "apt_repo_ready": False,
-        "release_manifest_ready": False,
+        "release_manifest_ready": release_manifest_ready.lower() == "true",
     },
     "scripts": {
         "build_iso": "os-image/scripts/build-iso.sh",
         "bump_version": "scripts/bump-version.sh",
-        "release_sign": None,
+        "release_sign": release_sign if release_manifest_ready.lower() == "true" else None,
+        "manifest_generator": "scripts/generate-release-manifest.sh" if release_manifest_ready.lower() == "true" else None,
         "publish_debs": None,
     },
     "wave0_gaps": [
-        "no GPG release-sign script",
         "no APT publish pipeline",
-        "no release-manifest.json generator",
         f"{len(ubuntu)} ubuntu-* packages still in squashfs",
     ],
 }
+if release_manifest_ready.lower() == "true":
+    data["wave0_gaps"] = [g for g in data["wave0_gaps"] if "release-manifest" not in g.lower() and "gpg release-sign" not in g.lower()]
+    data["wave0_gaps"].append("W7-RE1 manifest + RE2 GPG signing scripts present")
 if purge_marker.is_file():
     data["wave0_gaps"] = [g for g in data["wave0_gaps"] if "purge" not in g.lower()]
     data["wave0_gaps"].append("W1-B1 purge complete — snap transition apps removed (Flathub in F1)")
