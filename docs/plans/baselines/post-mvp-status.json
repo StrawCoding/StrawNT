@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-08T06:14:14.389373",
+  "generated_at": "2026-07-08T07:35:26.656960",
   "target": "0.9.0.0-engineering",
   "total": 21,
-  "passed": 5,
-  "failed": 16,
+  "passed": 6,
+  "failed": 15,
   "all_pass": false,
   "stages": [
     {
@@ -33,8 +33,8 @@
     },
     {
       "id": "post-q3-mfp-smoke",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "post-i2-calamares-luks",
