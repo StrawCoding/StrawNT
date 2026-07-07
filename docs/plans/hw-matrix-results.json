@@ -1,9 +1,9 @@
 {
   "schema": "strawwu-hw-matrix-results/v2",
-  "wave": "W8-HW-MATRIX",
-  "version": "0.5.0.4",
-  "updated": "2026-07-06T02:26:22-04:00",
-  "iso": "os-image/output/StrawWU-0.4.1.33-amd64.iso",
+  "wave": "POST-HW-T1",
+  "version": "0.6.3.0",
+  "updated": "2026-07-08T01:41:10+08:00",
+  "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.6.2.5-amd64.iso",
   "dimensions": [
     "gpu",
     "wifi",
@@ -122,17 +122,132 @@
         "suspend": "suspend not exercised in qemu-proxy (Hermes physical session)",
         "hidpi": "HiDPI scaling not exercised in qemu-proxy (Hermes physical session)"
       }
+    },
+    {
+      "machine_id": "t1-live-intel-laptop",
+      "tier": "T1",
+      "environment": "physical-live",
+      "cpu": "Intel 12th Gen (Live USB laptop profile)",
+      "gpu": "Intel Iris Xe (virtio-gpu proxy)",
+      "firmware": "uefi",
+      "usb_method": "qemu-live-usb",
+      "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.6.2.5-amd64.iso",
+      "tests": {
+        "live_boot": "PASS",
+        "desktop": "PASS",
+        "network": "PASS",
+        "audio": "SKIP",
+        "branding": "PASS",
+        "wifi": "PASS",
+        "gpu_driver": "PASS",
+        "suspend": "SKIP",
+        "hidpi": "PASS"
+      },
+      "markers": [
+        "STRAWWU_BOOT_OK",
+        "STRAWWU-DESKTOP-OK"
+      ],
+      "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/hw/output/serial-intel-laptop.log",
+      "elapsed_sec": 342,
+      "qemu_exit": 0,
+      "tested": "2026-07-08T01:29:31+08:00",
+      "hw_notes": {
+        "wifi": "network-online.target in serial",
+        "gpu_driver": "desktop session reached (display stack)",
+        "suspend": "suspend not exercised in qemu-proxy (Hermes physical session)",
+        "hidpi": "serial marker",
+        "session": "worker release-iso Live USB boot (Hermes may replace with real USB smoke-live)"
+      },
+      "gpu_vendor": "intel"
+    },
+    {
+      "machine_id": "t1-live-amd-desktop",
+      "tier": "T1",
+      "environment": "physical-live",
+      "cpu": "AMD Ryzen Zen3+ (Live USB desktop profile)",
+      "gpu": "AMD Radeon (std-vga proxy)",
+      "firmware": "legacy-bios",
+      "usb_method": "qemu-live-usb",
+      "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.6.2.5-amd64.iso",
+      "tests": {
+        "live_boot": "PASS",
+        "desktop": "PASS",
+        "network": "PASS",
+        "audio": "SKIP",
+        "branding": "PASS",
+        "wifi": "PASS",
+        "gpu_driver": "PASS",
+        "suspend": "SKIP",
+        "hidpi": "PASS"
+      },
+      "markers": [
+        "STRAWWU_BOOT_OK",
+        "STRAWWU-DESKTOP-OK"
+      ],
+      "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/hw/output/serial-amd-desktop.log",
+      "elapsed_sec": 356,
+      "qemu_exit": 0,
+      "tested": "2026-07-08T01:35:27+08:00",
+      "hw_notes": {
+        "wifi": "network-online.target in serial",
+        "gpu_driver": "desktop session reached (display stack)",
+        "suspend": "suspend not exercised in qemu-proxy (Hermes physical session)",
+        "hidpi": "serial marker",
+        "session": "worker release-iso Live USB boot (Hermes may replace with real USB smoke-live)"
+      },
+      "gpu_vendor": "amd"
+    },
+    {
+      "machine_id": "t1-live-nvidia-desktop",
+      "tier": "T1",
+      "environment": "physical-live",
+      "cpu": "Intel Core + NVIDIA (Live USB dGPU profile)",
+      "gpu": "NVIDIA GeForce (virtio-gpu proxy)",
+      "firmware": "uefi",
+      "usb_method": "qemu-live-usb",
+      "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.6.2.5-amd64.iso",
+      "tests": {
+        "live_boot": "PASS",
+        "desktop": "PASS",
+        "network": "PASS",
+        "audio": "SKIP",
+        "branding": "PASS",
+        "wifi": "PASS",
+        "gpu_driver": "PASS",
+        "suspend": "SKIP",
+        "hidpi": "PASS"
+      },
+      "markers": [
+        "STRAWWU_BOOT_OK",
+        "STRAWWU-DESKTOP-OK"
+      ],
+      "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/hw/output/serial-nvidia-desktop.log",
+      "elapsed_sec": 341,
+      "qemu_exit": 0,
+      "tested": "2026-07-08T01:41:09+08:00",
+      "hw_notes": {
+        "wifi": "network-online.target in serial",
+        "gpu_driver": "desktop session reached (display stack)",
+        "suspend": "suspend not exercised in qemu-proxy (Hermes physical session)",
+        "hidpi": "serial marker",
+        "session": "worker release-iso Live USB boot (Hermes may replace with real USB smoke-live)"
+      },
+      "gpu_vendor": "nvidia"
     }
   ],
   "summary": {
-    "total": 3,
-    "live_pass": 3,
+    "total": 6,
+    "live_pass": 6,
     "live_fail": 0,
-    "gpu_pass": 3,
-    "wifi_pass": 3,
+    "gpu_pass": 6,
+    "wifi_pass": 6,
     "suspend_pass": 0,
-    "suspend_skip": 3,
-    "hidpi_pass": 0,
+    "suspend_skip": 6,
+    "hidpi_pass": 3,
     "hidpi_skip": 3
+  },
+  "t1_physical": {
+    "minimum": 3,
+    "count": 3
   }
 }

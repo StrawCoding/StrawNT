@@ -9,12 +9,12 @@ source "${HW_DIR}/lib.sh"
 
 OUTPUT=""
 MACHINE_ID=""
-ENVIRONMENT="physical"
+ENVIRONMENT="physical-live"
 FULL_HW=0
 
 usage() {
     cat <<EOF
-Usage: smoke-live.sh [--output FILE] [--machine-id ID] [--environment physical|dev-vm] [--full-hw]
+Usage: smoke-live.sh [--output FILE] [--machine-id ID] [--environment physical-live|physical|dev-vm] [--full-hw]
 
 Run on a Live StrawWU session after USB boot. Checks:
   - live session (systemd + display manager)

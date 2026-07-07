@@ -1,0 +1,28 @@
+{
+  "schema": "strawwu-hw-t1-live-usb-baseline/v1",
+  "wave": "POST-HW-T1",
+  "version": "0.6.3.0",
+  "tier": "T1",
+  "minimum_physical_live": 3,
+  "dimensions_required": [
+    "gpu_driver",
+    "wifi"
+  ],
+  "smoke_script": "tests/hw/smoke-live.sh",
+  "matrix_runner": "tests/hw/run-hw-t1-live-usb.sh",
+  "merge_script": "tests/hw/merge-entry.sh",
+  "results_json": "docs/plans/hw-matrix-results.json",
+  "preflight": "tests/preflight/test-hw-t1-live-usb.sh",
+  "profiles": [
+    "t1-live-intel-laptop (Intel iGPU + AX Wi-Fi)",
+    "t1-live-amd-desktop (AMD Zen3+ + Realtek Wi-Fi)",
+    "t1-live-nvidia-desktop (NVIDIA dGPU + Broadcom Wi-Fi)"
+  ],
+  "hermes_workflow": [
+    "flash release-iso to USB (Rufus/dd/Ventoy)",
+    "boot Live session",
+    "bash tests/hw/smoke-live.sh --full-hw --environment physical-live --output /tmp/smoke.json",
+    "bash tests/hw/merge-entry.sh --entry /tmp/smoke.json"
+  ],
+  "dod": "≥3 physical-live Live USB boot PASS; gpu_driver/wifi non-SKIP in hw-matrix-results.json"
+}
