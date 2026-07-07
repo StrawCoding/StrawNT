@@ -1,9 +1,9 @@
 {
   "schema": "strawwu-fork-status/v1",
-  "updated_at": "2026-07-06",
+  "updated_at": "2026-07-07",
   "pipeline": "fork_locked_sequence",
   "stages": {
-    "fork-f1-baseline-snapshot": {"status": "PENDING"},
+    "fork-f1-baseline-snapshot": {"status": "PASS"},
     "fork-f2-manifest-repo": {"status": "PENDING"},
     "fork-f3-build-pipeline": {"status": "PENDING"},
     "fork-f4-package-overlays": {"status": "PENDING"},

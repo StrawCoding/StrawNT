@@ -1,17 +1,17 @@
 {
   "schema": "strawwu-fork-base/v1",
-  "status": "pending",
-  "created_at": null,
+  "status": "snapshot",
+  "created_at": "2026-07-07T11:23:02Z",
   "ubuntu": {
     "version": "26.04.0",
     "codename": "resolute",
     "iso_name": "ubuntu-26.04-desktop-amd64.iso"
   },
   "snapshot": {
-    "file": null,
-    "sha256": null,
-    "size_bytes": null,
-    "strawwu_version": null
+    "file": "snapshots/fork-baseline-0.6.2.0-20260707T110640Z.tar.zst",
+    "sha256": "7e4b098f44f0ec31c1e9aa03668c3628ee56b09378da66c840a3c2bf534dd9f6",
+    "size_bytes": 2611972740,
+    "strawwu_version": "0.6.2.0"
   },
   "packages": {
     "include": "packages/include.txt",
