@@ -1,76 +1,81 @@
-22:41:14 [6]: Calamares::Settings::Settings(const QString&, bool)
+sudo: preserving the entire environment is not supported, '-E' is ignored
+07:06:27 [6]: Calamares::Settings::Settings(const QString&, bool)
     Using Calamares settings file at "/etc/calamares/settings.conf" 
-22:41:14 [6]: void Logger::setupLogfile()
-    Using log file: "//.cache/calamares/session.log" 
-22:41:14 [6]: void CalamaresApplication::init()
-    Calamares version: 3.3.5 
-    .. Using Qt version: 5.15.13 
+07:06:28 [6]: void Logger::setupLogfile()
+    Using log file: "/root/.cache/calamares/session.log" 
+07:06:28 [6]: void CalamaresApplication::init()
+    Calamares version: 3.3.14 
+    .. Using Qt version: 6.10.2 
     .. Build type: None 
-    .. Using PyBind11 
+    .. Using Boost Python 
     .. Using settings: "/etc/calamares/settings.conf" 
-    .. Using log file: "//.cache/calamares/session.log" 
-    .. Languages: ("ar", "as", "ast", "az", "az_AZ", "be", "bg", "bn", "ca", "ca@valencia", "cs_CZ", "da", "de", "el", "en", "en_GB", "eo", "es", "es_AR", "es_MX", "et", "eu", "fa", "fi_FI", "fr", "fur", "gl", "he", "hi", "hr", "hu", "id", "is", "it_IT", "ja", "ka", "ko", "lt", "ml", "mr", "nb", "nl", "oc", "pl", "pt_BR", "pt_PT", "ro", "ru", "si", "sk", "sl", "sq", "sr", "sr@latin", "sv", "tg", "th", "tr_TR", "uk", "vi", "zh_CN", "zh_TW") 
-22:41:14 [6]: bool Calamares::initQmlModulesDir()
+    .. Using log file: "/root/.cache/calamares/session.log" 
+    .. Languages: QList("ar", "as", "ast", "az", "az_AZ", "be", "bg", "bn", "ca", "ca@valencia", "cs_CZ", "da", "de", "el", "en", "en_GB", "eo", "es", "es_AR", "es_MX", "et", "eu", "fa", "fi_FI", "fr", "fur", "gl", "he", "hi", "hr", "hu", "id", "is", "it_IT", "ja", "ka", "ko", "lt", "ml", "mr", "nb", "nl", "oc", "pl", "pt_BR", "pt_PT", "ro", "ru", "si", "sk", "sl", "sq", "sr", "sr@latin", "sv", "tg", "th", "tr_TR", "uk", "vi", "zh_CN", "zh_TW") 
+07:06:28 [6]: bool Calamares::initQmlModulesDir()
     Using Calamares QML directory "/usr/share/calamares/qml" 
-22:41:14 [6]: Calamares::Branding::Branding(const QString&, QObject*, qreal)
+07:06:28 [6]: Calamares::Branding::Branding(const QString&, QObject*, qreal)
     Using Calamares branding file at "/usr/share/calamares/branding/strawwu/branding.desc" 
-22:41:14 [6]: Calamares::Branding::Branding(const QString&, QObject*, qreal)
+07:06:28 [6]: Calamares::Branding::Branding(const QString&, QObject*, qreal)
     Loaded branding component "strawwu" 
     .. Loaded QRC translation "tz_" "en_US" 
     .. Loaded QRC translation "calamares_" "en_US" 
     .. STARTUP: initSettings, initQmlPath, initBranding done 
     .. STARTUP: initModuleManager: module init started 
-22:41:15 [6]: void Calamares::ModuleManager::doInit()
-    Found 61 modules 
-22:41:15 [6]: void CalamaresApplication::initView()
+07:06:32 [6]: void Calamares::ModuleManager::doInit()
+    Found 62 modules 
+07:06:32 [6]: void CalamaresApplication::initView()
     STARTUP: initModuleManager: all modules init done 
-22:41:15 [6]: void CalamaresApplication::initView()
+07:06:32 [6]: void CalamaresApplication::initView()
     STARTUP: initJobQueue done 
-22:41:15 [6]: CalamaresWindow::CalamaresWindow(QWidget*)
+07:06:33 [6]: CalamaresWindow::CalamaresWindow(QWidget*)
     Available desktop QSize(1024, 768) minimum size QSize(1024, 520) 
     .. Proposed window size: 1024 520 
-22:41:18 [2]: QString Calamares::_stylesheet(const QDir&)
+07:06:46 [2]: QString Calamares::_stylesheet(const QDir&)
     WARNING: The branding component "/usr/share/calamares/branding/strawwu" does not ship stylesheet.qss. 
-22:41:18 [6]: void CalamaresApplication::initView()
+07:06:46 [6]: void CalamaresApplication::initView()
     STARTUP: CalamaresWindow created; loadModules started 
-22:41:18 [6]: Calamares::SlideshowQML::SlideshowQML(QWidget*)
+07:06:51 [6]: Calamares::SlideshowQML::SlideshowQML(QWidget*)
     QML import paths: 
      "/usr/share/calamares/qml" 
      "/usr/bin" 
      "qrc:/qt-project.org/imports" 
-     "/usr/lib/x86_64-linux-gnu/qt5/qml" 
-22:41:18 [6]: Calamares::SlideshowQML::SlideshowQML(QWidget*)
+     "qrc:/qt/qml" 
+     "/usr/lib/x86_64-linux-gnu/qt6/qml" 
+07:06:51 [6]: Calamares::SlideshowQML::SlideshowQML(QWidget*)
     QML load on startup, API 2. 
-22:41:20 [6]: virtual void Calamares::CppJobModule::loadSelf()
+07:07:00 [6]: virtual void Calamares::CppJobModule::loadSelf()
     CppJobModule "machineid@machineid" loading complete. 
-22:41:20 [2]: void Calamares::Module::loadConfigurationFile(const QString&)
+07:07:00 [2]: void Calamares::Module::loadConfigurationFile(const QString&)
     WARNING: No config file for "shellprocess" found anywhere at 
      "/etc/calamares/modules/shellprocess_e2e-locale.conf" 
      "/usr/share/calamares/modules/shellprocess_e2e-locale.conf" 
-22:41:20 [2]: virtual void ShellProcessJob::setConfigurationMap(const QVariantMap&)
+07:07:00 [2]: virtual void ShellProcessJob::setConfigurationMap(const QVariantMap&)
     WARNING: No script given for ShellProcessJob "shellprocess@e2e_locale" 
-22:41:20 [6]: virtual void Calamares::CppJobModule::loadSelf()
+07:07:00 [6]: virtual void Calamares::CppJobModule::loadSelf()
     CppJobModule "shellprocess@e2e_locale" loading complete. 
-22:41:20 [6]: virtual void Calamares::CppJobModule::loadSelf()
+07:07:00 [6]: virtual void Calamares::CppJobModule::loadSelf()
     CppJobModule "shellprocess@e2e_user" loading complete. 
-22:41:20 [2]: void Calamares::Module::loadConfigurationFile(const QString&)
-    WARNING: No config file for "initramfs" found anywhere at 
-     "/etc/calamares/modules/initramfs.conf" 
-     "/usr/share/calamares/modules/initramfs.conf" 
-22:41:20 [6]: virtual void Calamares::CppJobModule::loadSelf()
-    CppJobModule "initramfs@initramfs" loading complete. 
-22:41:20 [6]: virtual void Calamares::CppJobModule::loadSelf()
+07:07:00 [2]: Calamares::CommandLine::CommandLine(const QVariantMap&)
+    WARNING: Bad CommandLine element QMap(("command", QVariant(bool, true))) 
+07:07:00 [6]: virtual void ShellProcessJob::setConfigurationMap(const QVariantMap&)
+    ShellProcessJob: "script" contains no commands for "shellprocess@initramfs_e2e" 
+07:07:00 [6]: virtual void Calamares::CppJobModule::loadSelf()
+    CppJobModule "shellprocess@initramfs_e2e" loading complete. 
+07:07:00 [6]: virtual void Calamares::CppJobModule::loadSelf()
     CppJobModule "shellprocess@bootloader_e2e" loading complete. 
-22:41:20 [6]: virtual void Calamares::CppJobModule::loadSelf()
+07:07:00 [6]: virtual void Calamares::CppJobModule::loadSelf()
     CppJobModule "umount@umount" loading complete. 
-22:41:20 [6]: void CalamaresApplication::initViewSteps()
+07:07:00 [6]: void Calamares::SlideshowQML::loadQmlV2Complete()
+    QML component complete, API 2 
+    .. Loading "/usr/share/calamares/branding/strawwu/show.qml" 
+07:07:00 [6]: void CalamaresApplication::initViewSteps()
     STARTUP: loadModules for all modules done 
-22:41:20 [6]: void Calamares::ModuleManager::checkRequirements()
+07:07:00 [6]: void Calamares::ModuleManager::checkRequirements()
     Checking module requirements .. 
-22:41:23 [6]: void CalamaresApplication::initViewSteps()
+07:07:01 [6]: void CalamaresApplication::initViewSteps()
     STARTUP: Window now visible and ProgressTreeView populated 
     .. 1 view steps loaded. 
-22:41:23 [6]: void Calamares::JobThread::finalize()
+07:07:01 [6]: void Calamares::JobThread::finalize()
     There are 13 jobs, total weight 24 
     .. Job 1 "partition" +wt 1 tot.wt 1 
     .. Job 2 "mount" +wt 1 tot.wt 2 
@@ -82,18 +87,17 @@
     .. Job 8 "networkcfg" +wt 1 tot.wt 19 
     .. Job 9 "hwclock" +wt 1 tot.wt 20 
     .. Job 10 "initramfscfg" +wt 1 tot.wt 21 
-    .. Job 11 "Creating initramfs…" +wt 1 tot.wt 22 
+    .. Job 11 "Running shell processes…" +wt 1 tot.wt 22 
     .. Job 12 "Running shell processes…" +wt 1 tot.wt 23 
     .. Job 13 "Unmounting file systems…" +wt 1 tot.wt 24 
-22:41:23 [6]: virtual void Calamares::JobThread::run()
+07:07:01 [6]: virtual void Calamares::JobThread::run()
     Starting job "partition" ( 1 / 13 ) 
-22:41:24 [6]: void Calamares::SlideshowQML::loadQmlV2Complete()
-    QML component complete, API 2 
-    .. Loading "/usr/share/calamares/branding/strawwu/show.qml" 
-22:41:24 [6]: void Calamares::RequirementsChecker::finished()
+07:07:02 [6]: void Calamares::RequirementsChecker::finished()
     All requirements have been checked. 
-22:41:24 [6]: void Calamares::RequirementsModel::describe() const
+07:07:02 [6]: void Calamares::RequirementsModel::describe() const
     Requirements model has 0 items 
+07:07:07 [6]: virtual Calamares::JobResult Calamares::PythonJob::exec()
+    Job file "/usr/lib/x86_64-linux-gnu/calamares/modules/partition/main.py" 
 [PYTHON JOB]: "partition(python): target=/dev/vda rootMountPoint=/tmp/calamares-root" 
 [PYTHON JOB]: "partition(python): sgdisk --zap-all /dev/vda" 
 [PYTHON JOB]: "partition(python): sgdisk -n 1:0:+512M -t 1:ef00 -c 1:EFI /dev/vda" 
@@ -105,9 +109,11 @@
 [PYTHON JOB]: "partition(python): mkfs.ext4 -F -L strawwu-root /dev/vda3" 
 [PYTHON JOB]: "partition(python): mount /dev/vda3 /tmp/calamares-root" 
 [PYTHON JOB]: "partition(python): mount /dev/vda1 /tmp/calamares-root/boot/efi" 
-[PYTHON JOB]: "partition(python): done. rootMountPoint=/tmp/calamares-root root_uuid=18d78291-e64a-4182-8e85-b7261390e1e5 efi_uuid=DA24-B04C firmwareType=efi" 
-22:41:41 [6]: virtual void Calamares::JobThread::run()
+[PYTHON JOB]: "partition(python): done. rootMountPoint=/tmp/calamares-root root_uuid=e909b12e-394f-4b65-905b-87317a388b63 efi_uuid=5B61-CAC5 firmwareType=efi" 
+07:07:39 [6]: virtual void Calamares::JobThread::run()
     Starting job "mount" ( 2 / 13 ) 
+07:07:39 [6]: virtual Calamares::JobResult Calamares::PythonJob::exec()
+    Job file "/usr/lib/x86_64-linux-gnu/calamares/modules/mount/main.py" 
 [PYTHON JOB]: "mount(python): setting up bind mounts at /tmp/calamares-root" 
 [PYTHON JOB]: "mount(python): mount --bind /dev /tmp/calamares-root/dev" 
 [PYTHON JOB]: "mount(python): mount --bind /proc /tmp/calamares-root/proc" 
@@ -116,77 +122,86 @@
 [PYTHON JOB]: "mount(python): mount --bind /run/udev /tmp/calamares-root/run/udev" 
 [PYTHON JOB]: "mount(python): mount --bind /run/systemd/resolve /tmp/calamares-root/run/systemd/resolve" 
 [PYTHON JOB]: "mount(python): bind mounts complete at /tmp/calamares-root" 
-22:41:44 [6]: virtual void Calamares::JobThread::run()
+07:07:42 [6]: virtual void Calamares::JobThread::run()
     Starting job "unpackfs" ( 3 / 13 ) 
+07:07:42 [6]: virtual Calamares::JobResult Calamares::PythonJob::exec()
+    Job file "/usr/lib/x86_64-linux-gnu/calamares/modules/unpackfs/main.py" 
 [PYTHON JOB]: Found gettext "en_US" in "/usr/share/locale/en_US" 
-    .. Running ("mount", "-t", "squashfs", "-o", "loop", "/cdrom/casper/minimal.squashfs", "/tmp/tmpv3068982/minimal") 
-    .. Running ("udevadm", "settle") 
-    .. Running ("sync") 
-    .. Running ("unsquashfs", "-l", "/cdrom/casper/minimal.squashfs") 
-22:41:55 [2]: Calamares::Python::Object Calamares::Python::GlobalStorageProxy::value(const std::string&) const
+    .. Job description from pretty_name "unpackfs" = "Filling up filesystems." 
+    .. Running QList("mount", "-t", "squashfs", "-o", "loop", "/cdrom/casper/minimal.squashfs", "/tmp/tmphvruph_d/minimal") 
+    .. Running QList("udevadm", "settle") 
+    .. Running QList("sync") 
+    .. Running QList("unsquashfs", "-l", "/cdrom/casper/minimal.squashfs") 
+07:07:56 [2]: boost::python::api::object CalamaresPython::GlobalStoragePythonWrapper::value(const std::string&) const
     WARNING: Unknown GS key extraMounts 
-    .. Running ("rsync", "-aHAXSr", "--filter=-x trusted.overlay.*", "--progress", "/tmp/tmpv3068982/minimal/", "/tmp/calamares-root") 
-23:02:06 [6]: virtual void Calamares::JobThread::run()
+    .. Running QList("rsync", "-aHAXSr", "--filter=-x trusted.overlay.*", "--progress", "/tmp/tmphvruph_d/minimal/", "/tmp/calamares-root") 
+08:04:40 [6]: virtual void Calamares::JobThread::run()
     Starting job "Generate machine-id." ( 4 / 13 ) 
-    .. Running ("systemd-machine-id-setup", "--root=/tmp/calamares-root") 
-    .. Running ("ln", "-sf", "/etc/machine-id", "/var/lib/dbus/machine-id") 
-23:02:06 [6]: virtual void Calamares::JobThread::run()
+    .. Running QList("systemd-machine-id-setup", "--root=/tmp/calamares-root") 
+    .. Running QList("ln", "-sf", "/etc/machine-id", "/var/lib/dbus/machine-id") 
+08:04:42 [6]: virtual void Calamares::JobThread::run()
     Starting job "fstab" ( 5 / 13 ) 
+08:04:42 [6]: virtual Calamares::JobResult Calamares::PythonJob::exec()
+    Job file "/usr/lib/x86_64-linux-gnu/calamares/modules/fstab/main.py" 
 [PYTHON JOB]: "fstab: wrote /tmp/calamares-root/etc/fstab with 2 entries" 
-23:02:07 [6]: virtual void Calamares::JobThread::run()
+08:04:42 [6]: virtual void Calamares::JobThread::run()
     Starting job "Running shell processes…" ( 6 / 13 ) 
-23:02:07 [2]: virtual Calamares::JobResult ShellProcessJob::exec()
+08:04:42 [2]: virtual Calamares::JobResult ShellProcessJob::exec()
     WARNING: No commands to execute "shellprocess@e2e_locale" 
-23:02:07 [6]: virtual void Calamares::JobThread::run()
+08:04:42 [6]: virtual void Calamares::JobThread::run()
     Starting job "Running shell processes…" ( 7 / 13 ) 
-    .. Running ("/bin/sh", "-c", "useradd -m -G sudo,users,audio,video,plugdev,netdev -s /bin/bash strawwu 2>/dev/null || true") 
-    .. Running ("/bin/sh", "-c", "echo 'strawwu:strawwu' | chpasswd") 
-    .. Running ("/bin/sh", "-c", "usermod -aG autologin strawwu 2>/dev/null || true") 
-23:02:11 [6]: virtual void Calamares::JobThread::run()
+    .. Running QList("/bin/sh", "-c", "useradd -m -G sudo,users,audio,video,plugdev,netdev -s /bin/bash strawwu 2>/dev/null || true") 
+    .. Running QList("/bin/sh", "-c", "echo 'strawwu:strawwu' | chpasswd") 
+    .. Running QList("/bin/sh", "-c", "usermod -aG autologin strawwu 2>/dev/null || true") 
+08:04:47 [6]: virtual void Calamares::JobThread::run()
     Starting job "networkcfg" ( 8 / 13 ) 
+08:04:47 [6]: virtual Calamares::JobResult Calamares::PythonJob::exec()
+    Job file "/usr/lib/x86_64-linux-gnu/calamares/modules/networkcfg/main.py" 
 [PYTHON JOB]: Found gettext "en_US" in "/usr/share/locale/en_US" 
-23:02:12 [2]: Calamares::Python::Object Calamares::Python::GlobalStorageProxy::value(const std::string&) const
+    .. Job description from pretty_name "networkcfg" = "Saving network configuration." 
+08:04:48 [2]: boost::python::api::object CalamaresPython::GlobalStoragePythonWrapper::value(const std::string&) const
     WARNING: Unknown GS key username 
-23:02:12 [6]: virtual void Calamares::JobThread::run()
+08:04:48 [6]: virtual void Calamares::JobThread::run()
     Starting job "hwclock" ( 9 / 13 ) 
+08:04:48 [6]: virtual Calamares::JobResult Calamares::PythonJob::exec()
+    Job file "/usr/lib/x86_64-linux-gnu/calamares/modules/hwclock/main.py" 
 [PYTHON JOB]: Found gettext "en_US" in "/usr/share/locale/en_US" 
-    .. Running ("hwclock", "--systohc", "--utc") 
+    .. Job description from pretty_name "hwclock" = "Setting hardware clock." 
+    .. Running QList("hwclock", "--systohc", "--utc") 
 [PYTHON JOB]: "Hwclock set using RTC method." 
-23:02:13 [6]: virtual void Calamares::JobThread::run()
+08:04:49 [6]: virtual void Calamares::JobThread::run()
     Starting job "initramfscfg" ( 10 / 13 ) 
+08:04:49 [6]: virtual Calamares::JobResult Calamares::PythonJob::exec()
+    Job file "/usr/lib/x86_64-linux-gnu/calamares/modules/initramfscfg/main.py" 
 [PYTHON JOB]: Found gettext "en_US" in "/usr/share/locale/en_US" 
-23:02:14 [6]: virtual void Calamares::JobThread::run()
-    Starting job "Creating initramfs…" ( 11 / 13 ) 
-23:02:14 [6]: virtual Calamares::JobResult InitramfsJob::exec()
-    Updating initramfs with kernel "all" 
-    .. Running ("update-initramfs", "-k", "all", "-c", "-t") 
-23:02:15 [6]: virtual void Calamares::JobThread::run()
+    .. Job description from pretty_name "initramfscfg" = "Configuring initramfs." 
+08:04:49 [6]: virtual void Calamares::JobThread::run()
+    Starting job "Running shell processes…" ( 11 / 13 ) 
+08:04:49 [2]: virtual Calamares::JobResult ShellProcessJob::exec()
+    WARNING: No commands to execute "shellprocess@initramfs_e2e" 
+08:04:49 [6]: virtual void Calamares::JobThread::run()
     Starting job "Running shell processes…" ( 12 / 13 ) 
-    .. Running ("/bin/sh", "-c", "bash /mnt/strawwu-e2e/e2e-bootloader-setup.sh") 
-    .. Running ("/bin/sh", "-c", "echo STRAWWU-CALAMARES-INSTALL-OK > /dev/kmsg 2>/dev/null || true") 
-    .. Running ("/bin/sh", "-c", "echo STRAWWU-CALAMARES-INSTALL-OK > /dev/ttyS0 2>/dev/null || true") 
-23:06:34 [6]: virtual void Calamares::JobThread::run()
+    .. Running QList("/bin/sh", "-c", "bash /mnt/strawwu-e2e/e2e-bootloader-setup.sh") 
+    .. Running QList("/bin/sh", "-c", "echo STRAWWU-CALAMARES-INSTALL-OK > /dev/kmsg 2>/dev/null || true") 
+    .. Running QList("/bin/sh", "-c", "echo STRAWWU-CALAMARES-INSTALL-OK > /dev/ttyS0 2>/dev/null || true") 
+08:15:21 [6]: virtual void Calamares::JobThread::run()
     Starting job "Unmounting file systems…" ( 13 / 13 ) 
-23:06:34 [6]: Calamares::JobResult unmountTargetMounts(const QString&)
-    Read 7 entries from "/tmp/calamares-root/" 
-    .. Running ("umount", "-lv", "/tmp/calamares-root/sys") 
-    .. Running ("udevadm", "settle") 
-    .. Running ("sync") 
-    .. Running ("umount", "-lv", "/tmp/calamares-root/run/udev") 
-    .. Running ("udevadm", "settle") 
-    .. Running ("sync") 
-    .. Running ("umount", "-lv", "/tmp/calamares-root/run/systemd/resolve") 
-    .. Running ("udevadm", "settle") 
-    .. Running ("sync") 
-    .. Running ("umount", "-lv", "/tmp/calamares-root/run") 
-    .. Running ("udevadm", "settle") 
-    .. Running ("sync") 
-    .. Running ("umount", "-lv", "/tmp/calamares-root/proc") 
-    .. Running ("udevadm", "settle") 
-    .. Running ("sync") 
-    .. Running ("umount", "-lv", "/tmp/calamares-root/dev") 
-    .. Running ("udevadm", "settle") 
-    .. Running ("sync") 
-    .. Running ("umount", "-lv", "/tmp/calamares-root/boot/efi") 
-    .. Running ("udevadm", "settle") 
-    .. Running ("sync") 
+08:15:21 [6]: Calamares::JobResult unmountTargetMounts(const QString&)
+    Read 4 entries from "/tmp/calamares-root/" 
+    .. Running QList("umount", "-lv", "/tmp/calamares-root/run/udev") 
+    .. Running QList("udevadm", "settle") 
+    .. Running QList("sync") 
+    .. Running QList("umount", "-lv", "/tmp/calamares-root/run/systemd/resolve") 
+    .. Running QList("udevadm", "settle") 
+    .. Running QList("sync") 
+    .. Running QList("umount", "-lv", "/tmp/calamares-root/run") 
+    .. Running QList("udevadm", "settle") 
+    .. Running QList("sync") 
+    .. Running QList("umount", "-lv", "/tmp/calamares-root/boot/efi") 
+    .. Running QList("udevadm", "settle") 
+    .. Running QList("sync") 
+    .. Running QList("umount", "-lv", "/tmp/calamares-root") 
+    .. Running QList("udevadm", "settle") 
+    .. Running QList("sync") 
+08:15:33 [6]: void {anonymous}::PowerManagementInterface::uninhibitSleep()
+    Sleep was never inhibited. 

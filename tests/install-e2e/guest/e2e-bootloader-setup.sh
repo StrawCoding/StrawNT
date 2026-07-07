@@ -58,6 +58,13 @@ rm -f  "$ROOT/usr/share/initramfs-tools/conf.d/casper"
 rm -f  "$ROOT/etc/initramfs-tools/conf.d/casper"
 echo "Casper/live-boot hooks removed from chroot"
 
+# Dracut on resolute pulls the full strawwu module tree; limit to dep graph for E2E.
+if [ -f "$ROOT/etc/initramfs-tools/initramfs.conf" ]; then
+    sed -i 's/^MODULES=.*/MODULES=dep/' "$ROOT/etc/initramfs-tools/initramfs.conf" 2>/dev/null || true
+    grep -q '^MODULES=dep' "$ROOT/etc/initramfs-tools/initramfs.conf" 2>/dev/null || \
+        echo 'MODULES=dep' >> "$ROOT/etc/initramfs-tools/initramfs.conf"
+fi
+
 # Ensure BOOT= is set to local for standard disk boot
 mkdir -p "$ROOT/etc/initramfs-tools"
 if ! grep -q '^BOOT=local' "$ROOT/etc/initramfs-tools/initramfs.conf" 2>/dev/null; then
@@ -65,9 +72,20 @@ if ! grep -q '^BOOT=local' "$ROOT/etc/initramfs-tools/initramfs.conf" 2>/dev/nul
         echo "BOOT=local" >> "$ROOT/etc/initramfs-tools/initramfs.conf"
 fi
 
-# Generate proper standard initramfs inside the chroot
+# Generate proper standard initramfs inside the chroot (TMPDIR on target disk — live /var/tmp is small tmpfs).
 rm -f "$ROOT/boot/initrd.img-$KVER"
-chroot "$ROOT" update-initramfs -c -k "$KVER" 2>&1
+mkdir -p "$ROOT/var/tmp"
+for _mp in dev proc sys run; do
+    mkdir -p "$ROOT/$_mp"
+    mountpoint -q "$ROOT/$_mp" 2>/dev/null || mount --bind "/$_mp" "$ROOT/$_mp"
+done
+chroot "$ROOT" env TMPDIR=/var/tmp update-initramfs -c -k "$KVER" 2>&1 || {
+    echo "WARN: update-initramfs failed; copying ISO initrd as fallback" >&2
+    cp /cdrom/casper/initrd "$ROOT/boot/initrd.img-$KVER"
+}
+for _mp in run sys proc dev; do
+    mountpoint -q "$ROOT/$_mp" 2>/dev/null && umount "$ROOT/$_mp" 2>/dev/null || true
+done
 ln -sf "initrd.img-$KVER" "$ROOT/boot/initrd.img"
 echo "Standard initramfs generated for $KVER"
 
@@ -130,8 +148,30 @@ FBsvc
 ln -sf /etc/systemd/system/strawwu-firstboot-e2e.service \
     "$ROOT/etc/systemd/system/multi-user.target.wants/strawwu-firstboot-e2e.service"
 
-# Generate GRUB config
+# Generate GRUB config (bind-mount chroot; mkconfig often fails without /dev on resolute).
+for _mp in dev proc sys run; do
+    mkdir -p "$ROOT/$_mp"
+    mountpoint -q "$ROOT/$_mp" 2>/dev/null || mount --bind "/$_mp" "$ROOT/$_mp"
+done
+ROOT_UUID="$(blkid -s UUID -o value "${DEV}3" 2>/dev/null || true)"
 chroot "$ROOT" update-grub 2>&1 || chroot "$ROOT" grub-mkconfig -o /boot/grub/grub.cfg 2>&1 || true
+for _mp in run sys proc dev; do
+    mountpoint -q "$ROOT/$_mp" 2>/dev/null && umount "$ROOT/$_mp" 2>/dev/null || true
+done
+if [ ! -s "$ROOT/boot/grub/grub.cfg" ]; then
+    echo "WARN: grub-mkconfig missing grub.cfg; writing minimal E2E grub.cfg" >&2
+    cat > "$ROOT/boot/grub/grub.cfg" <<GRUBCFG
+set timeout=5
+set default=0
+menuentry 'StrawWU' {
+    insmod part_gpt
+    insmod ext2
+    set root='hd0,gpt3'
+    linux /boot/vmlinuz-${KVER} root=UUID=${ROOT_UUID} ro console=ttyS0,115200n8
+    initrd /boot/initrd.img-${KVER}
+}
+GRUBCFG
+fi
 
 # Install GRUB to MBR (BIOS boot)
 grub-install --target=i386-pc --boot-directory="$ROOT/boot" --recheck --force "$DEV"

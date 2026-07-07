@@ -1,8 +1,9 @@
 PRETTY_NAME="StrawWU"
 NAME="StrawWU"
-VERSION_ID="24.04"
-VERSION="0.4.0.0"
-VERSION_CODENAME=noble
+VERSION_ID="26.04"
+VERSION="0.6.0.0"
+VERSION_CODENAME=resolute
+UBUNTU_CODENAME=resolute
 ID=ubuntu
 ID_LIKE=debian
 HOME_URL="https://strawwu.local/"

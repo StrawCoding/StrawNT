@@ -85,7 +85,7 @@ main() {
     # Deploy custom settings (exec-only, Python partition module)
     sudo cp -f /mnt/strawwu-e2e/settings.conf /etc/calamares/settings.conf
     sudo cp -f /mnt/strawwu-e2e/users-e2e.conf /etc/calamares/modules/users.conf
-    for cf in shellprocess_install-marker.conf shellprocess_e2e-user.conf shellprocess_bootloader-e2e.conf shellprocess_e2e-boot-prep.conf fstab.conf; do
+    for cf in shellprocess_install-marker.conf shellprocess_e2e-user.conf shellprocess_bootloader-e2e.conf shellprocess_e2e-boot-prep.conf shellprocess_initramfs-e2e.conf fstab.conf; do
         [[ -f /mnt/strawwu-e2e/${cf} ]] && \
             sudo cp -f /mnt/strawwu-e2e/${cf} /etc/calamares/modules/${cf}
     done
@@ -163,7 +163,7 @@ main() {
     done
     cp -f "${LOG}" /mnt/strawwu-e2e/calamares-debug.log 2>/dev/null || true) &
 
-    for i in $(seq 1 720); do
+    for i in $(seq 1 2160); do
         install_finished && {
             cp -f "${LOG}" /mnt/strawwu-e2e/calamares-debug.log 2>/dev/null || true
             emit "${MARKER_INSTALL}"

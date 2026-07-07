@@ -48,20 +48,14 @@ if grep -qE '(^|[[:space:]])- storage' "${ROOTFS_DIR}/etc/calamares/modules/welc
     die "welcome.conf must not require storage check"
 fi
 
-if [[ "${STRAWWU_ENABLE_E2E:-0}" == "1" ]]; then
-    if [[ -f "${ROOTFS_DIR}/etc/systemd/system/strawwu-e2e-guest-runner.service" ]]; then
-        log "enabling install-e2e guest runner (STRAWWU_ENABLE_E2E=1)"
-        mkdir -p "${ROOTFS_DIR}/etc/systemd/system/multi-user.target.wants"
-        ln -sf ../strawwu-e2e-guest-runner.service \
-            "${ROOTFS_DIR}/etc/systemd/system/multi-user.target.wants/strawwu-e2e-guest-runner.service"
-    fi
-else
-    log "production ISO: disabling install-e2e guest runner"
-    rm -f "${ROOTFS_DIR}/etc/systemd/system/multi-user.target.wants/strawwu-e2e-guest-runner.service"
+if [[ -f "${ROOTFS_DIR}/etc/systemd/system/strawwu-e2e-guest-runner.service" ]]; then
+    log "enabling install-e2e guest runner (fast-exit when no virtio-9p)"
+    mkdir -p "${ROOTFS_DIR}/etc/systemd/system/multi-user.target.wants"
+    ln -sf ../strawwu-e2e-guest-runner.service \
+        "${ROOTFS_DIR}/etc/systemd/system/multi-user.target.wants/strawwu-e2e-guest-runner.service"
 fi
 
 install_e2e_guest_deps() {
-    [[ "${STRAWWU_ENABLE_E2E:-0}" == "1" ]] || return 0
     local need_install=0
     [[ -f "${ROOTFS_DIR}/usr/bin/xdotool" ]] || need_install=1
     [[ -f "${ROOTFS_DIR}/usr/bin/Xvfb" ]] || need_install=1

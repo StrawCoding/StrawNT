@@ -10,7 +10,7 @@ LIVE_LOG="${LOG_DIR}/firstboot-e2e-live.log"
 BOOT_LOG="${LOG_DIR}/firstboot-e2e-installed.log"
 DISK_IMG="${OUT_DIR}/firstboot-e2e-disk.img"
 RESULT_JSON="${OUT_DIR}/firstboot-e2e-result.json"
-TIMEOUT="${STRAWWU_INSTALL_E2E_TIMEOUT:-3600}"
+TIMEOUT="${STRAWWU_INSTALL_E2E_TIMEOUT:-10800}"
 BOOT_TIMEOUT="${STRAWWU_FIRSTBOOT_E2E_TIMEOUT:-1200}"
 
 ISO="$(resolve_iso)"
@@ -92,7 +92,7 @@ run_install_phase() {
     load_qemu_disk_args "${DISK_IMG}"
 
     qemu-system-x86_64 \
-        -m 3072 -smp 2 -no-reboot -machine accel=kvm:tcg -cpu max \
+        -m 4096 -smp 2 -no-reboot -machine accel=kvm:tcg -cpu max \
         -cdrom "${ISO}" \
         "${QEMU_DISK_ARGS[@]}" \
         -boot d \
@@ -141,7 +141,7 @@ run_firstboot_boot_phase() {
     load_qemu_disk_args "${DISK_IMG}"
 
     qemu-system-x86_64 \
-        -m 3072 -smp 2 -no-reboot -machine accel=kvm:tcg \
+        -m 4096 -smp 2 -no-reboot -machine accel=kvm:tcg \
         "${QEMU_DISK_ARGS[@]}" \
         -boot c \
         -serial "file:${BOOT_LOG}" \

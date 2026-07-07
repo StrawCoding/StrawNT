@@ -4,6 +4,9 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+# shellcheck source=lib/ubuntu-base-env.sh
+source "${SCRIPT_DIR}/lib/ubuntu-base-env.sh"
+load_ubuntu_base_env "${REPO_ROOT}"
 BRANDING_DIR="${REPO_ROOT}/os-image/config/branding"
 WORK_DIR="${STRAWWU_WORK_DIR:-${REPO_ROOT}/os-image/work}"
 ROOTFS_DIR="${WORK_DIR}/rootfs"
@@ -43,10 +46,17 @@ overlay_rootfs() {
     cp -a "${BRANDING_DIR}/." "${ROOTFS_DIR}/"
     chmod 755 "${ROOTFS_DIR}/usr/local/sbin/strawwu-boot-selfcheck"
 
-    # Version-specific os-release fields
+    # Version-specific os-release fields (preserve active Ubuntu base from ubuntu-base-target.json)
+    local ubuntu_series="${STRAWWU_UBUNTU_VERSION%.*}"
     if [[ -f "${ROOTFS_DIR}/etc/os-release" ]]; then
         sed -i "s/^VERSION=.*/VERSION=\"${VERSION}\"/" "${ROOTFS_DIR}/etc/os-release"
         sed -i "s/^PRETTY_NAME=.*/PRETTY_NAME=\"StrawWU ${VERSION}\"/" "${ROOTFS_DIR}/etc/os-release"
+        sed -i "s/^VERSION_ID=.*/VERSION_ID=\"${ubuntu_series}\"/" "${ROOTFS_DIR}/etc/os-release"
+        sed -i "s/^VERSION_CODENAME=.*/VERSION_CODENAME=${STRAWWU_APT_SUITE}/" "${ROOTFS_DIR}/etc/os-release"
+        if grep -q '^UBUNTU_CODENAME=' "${ROOTFS_DIR}/etc/os-release"; then
+            sed -i "s/^UBUNTU_CODENAME=.*/UBUNTU_CODENAME=${STRAWWU_APT_SUITE}/" "${ROOTFS_DIR}/etc/os-release"
+        fi
+        sed -i "s/^NAME=.*/NAME=\"StrawWU\"/" "${ROOTFS_DIR}/etc/os-release"
     fi
     if [[ -f "${ROOTFS_DIR}/etc/lsb-release" ]]; then
         sed -i "s/^DISTRIB_RELEASE=.*/DISTRIB_RELEASE=${VERSION}/" "${ROOTFS_DIR}/etc/lsb-release"

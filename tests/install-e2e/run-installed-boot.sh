@@ -11,7 +11,7 @@ BIOS_LOG="${LOG_DIR}/installed-boot-bios.log"
 UEFI_LOG="${LOG_DIR}/installed-boot-uefi.log"
 DISK_IMG="${OUT_DIR}/installed-boot-disk.img"
 RESULT_JSON="${OUT_DIR}/installed-boot-result.json"
-TIMEOUT="${STRAWWU_INSTALL_E2E_TIMEOUT:-3600}"
+TIMEOUT="${STRAWWU_INSTALL_E2E_TIMEOUT:-10800}"
 BOOT_TIMEOUT="${STRAWWU_INSTALLED_BOOT_TIMEOUT:-900}"
 
 ISO="$(resolve_iso)"

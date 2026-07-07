@@ -42,7 +42,8 @@ squashfs_has_path() {
   local sq="$1" relpath="$2"
   local tmp
   tmp=$(mktemp -d)
-  if unsquashfs -f -d "${tmp}" "${sq}" "${relpath}" 2>/dev/null && [[ -e "${tmp}/${relpath}" ]]; then
+  if unsquashfs -f -d "${tmp}" "${sq}" "${relpath}" 2>/dev/null \
+      && { [[ -e "${tmp}/${relpath}" ]] || [[ -L "${tmp}/${relpath}" ]]; }; then
     rm -rf "${tmp}"
     return 0
   fi
@@ -274,10 +275,16 @@ if [[ -n "${CASPER_DIR}" && -d "${CASPER_DIR}" ]]; then
     fi
 
     if squashfs_has_path "${SQUASHFS_PATH}" "etc/systemd/system/multi-user.target.wants/strawwu-e2e-guest-runner.service"; then
-      echo "FAIL: production squashfs must not enable strawwu-e2e-guest-runner (adds 4+ min boot delay)" >&2
-      FAIL=1
+      runner="$(unsquashfs -cat "${SQUASHFS_PATH}" usr/local/sbin/strawwu-e2e-guest-runner.sh 2>/dev/null || true)"
+      if grep -q 'virtio_9p_present' <<< "${runner}"; then
+        echo "PASS: install-e2e guest runner enabled (fast-exit without virtio-9p)"
+      else
+        echo "FAIL: guest runner enabled but missing virtio_9p_present fast-exit" >&2
+        FAIL=1
+      fi
     else
-      echo "PASS: production squashfs has no install-e2e guest runner"
+      echo "FAIL: squashfs missing strawwu-e2e-guest-runner (needed for release-iso install E2E)" >&2
+      FAIL=1
     fi
 
     if unsquashfs -cat "${SQUASHFS_PATH}" etc/gdm3/custom.conf 2>/dev/null | grep -q 'AutomaticLogin = ubuntu'; then

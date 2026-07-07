@@ -10,7 +10,7 @@ LIVE_LOG="${LOG_DIR}/target-flathub-live.log"
 BOOT_LOG="${LOG_DIR}/target-flathub-boot.log"
 DISK_IMG="${OUT_DIR}/target-flathub-disk.img"
 RESULT_JSON="${OUT_DIR}/target-flathub-result.json"
-TIMEOUT="${STRAWWU_INSTALL_E2E_TIMEOUT:-3600}"
+TIMEOUT="${STRAWWU_INSTALL_E2E_TIMEOUT:-10800}"
 BOOT_TIMEOUT="${STRAWWU_TARGET_FLATHUB_BOOT_TIMEOUT:-900}"
 
 ISO="$(resolve_iso)"

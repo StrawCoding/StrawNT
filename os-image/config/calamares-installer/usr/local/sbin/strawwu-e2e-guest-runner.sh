@@ -23,6 +23,11 @@ mount_share() {
         || mount -t 9p -o trans=virtio,cache=none "${TAG}" "${MNT}" 2>>"${LOG}"
 }
 
+# Real hardware / boot-test QEMU have no virtio-9p share — exit immediately (no 4 min mount poll).
+virtio_9p_present() {
+    mount_share 2>/dev/null && mountpoint -q "${MNT}"
+}
+
 run_if_trigger() {
     local trigger="$1" script="$2"
     [[ -f "${MNT}/${trigger}" ]] || return 0
@@ -50,19 +55,12 @@ disable_auto_sleep() {
 }
 
 main() {
-    emit "STRAWWU-E2E-RUNNER-START"
     disable_auto_sleep
-    for _ in $(seq 1 120); do
-        if mount_share 2>/dev/null; then
-            break
-        fi
-        sleep 2
-    done
-    mountpoint -q "${MNT}" || {
-        log "virtfs mount failed"
-        emit "STRAWWU-E2E-RUNNER-FAIL virtfs"
-        exit 1
-    }
+    if ! virtio_9p_present; then
+        log "no virtio-9p share (not install-e2e QEMU) — idle exit"
+        exit 0
+    fi
+    emit "STRAWWU-E2E-RUNNER-START"
     emit "STRAWWU-E2E-RUNNER-MOUNTED"
     log "9p listing: $(ls -1 "${MNT}" 2>&1 | tr '\n' ' ')"
 

@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-nosnap-audit/v1",
   "wave": "W1-F2",
-  "version": "0.6.0.0",
+  "version": "0.6.1.5",
   "snapd_installed": false,
   "snap_confine_installed": false,
   "meta_snap_references": [

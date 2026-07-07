@@ -6,7 +6,10 @@ import base64
 import shutil
 import subprocess
 import sys
+from collections import deque
 from pathlib import Path
+
+from PIL import Image
 
 BRAND = Path(__file__).resolve().parent
 REPO_ROOT = BRAND.parents[2]
@@ -36,6 +39,69 @@ ICON_CORNER_RADIUS_PCT = 0.22
 RECT_CORNER_RADIUS_PCT = 0.08
 
 
+def _is_near_white(r: int, g: int, b: int) -> bool:
+    return r > 235 and g > 235 and b > 235
+
+
+def _is_light_gray(r: int, g: int, b: int, *, min_v: int = 185, max_v: int = 254) -> bool:
+    return abs(r - g) < 12 and abs(g - b) < 12 and min_v <= r <= max_v
+
+
+def _is_removable_bg(r: int, g: int, b: int, *, preserve_white_logo: bool) -> bool:
+    if preserve_white_logo:
+        return _is_light_gray(r, g, b, min_v=200, max_v=249)
+    return _is_near_white(r, g, b) or _is_light_gray(r, g, b)
+
+
+def strip_white_gray_background(
+    src: Path,
+    dst: Path,
+    *,
+    preserve_white_logo: bool = False,
+    tolerance: int = 28,
+) -> None:
+    """Remove white / light-gray backgrounds via edge flood-fill."""
+    im = Image.open(src).convert("RGBA")
+    w, h = im.size
+    px = im.load()
+    visited = [[False] * w for _ in range(h)]
+    q: deque[tuple[int, int]] = deque()
+    for x in range(w):
+        q.append((x, 0))
+        q.append((x, h - 1))
+    for y in range(h):
+        q.append((0, y))
+        q.append((w - 1, y))
+
+    removed = 0
+    while q:
+        x, y = q.popleft()
+        if visited[y][x]:
+            continue
+        visited[y][x] = True
+        r, g, b, a = px[x, y]
+        if a < 10:
+            continue
+        if not _is_removable_bg(r, g, b, preserve_white_logo=preserve_white_logo):
+            continue
+        px[x, y] = (r, g, b, 0)
+        removed += 1
+        for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+            if not (0 <= nx < w and 0 <= ny < h) or visited[ny][nx]:
+                continue
+            nr, ng, nb, na = px[nx, ny]
+            if na < 10:
+                continue
+            if _is_removable_bg(nr, ng, nb, preserve_white_logo=preserve_white_logo) and (
+                abs(nr - r) <= tolerance and abs(ng - g) <= tolerance and abs(nb - b) <= tolerance
+            ):
+                q.append((nx, ny))
+
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    im.save(dst)
+    print(f"stripped bg {src.name} -> {dst.name} ({removed} px)")
+
+
 def run(cmd: list[str]) -> None:
     subprocess.run(cmd, check=True, capture_output=True)
 
@@ -54,17 +120,28 @@ def apply_rounded_corners(src: Path, dst: Path, *, radius_pct: float) -> None:
         [
             "convert",
             str(src),
-            "-alpha",
-            "set",
             "(",
             "+clone",
             "-alpha",
             "extract",
-            "-draw",
-            f"fill black roundrectangle 0,0,{w - 1},{h - 1},{radius},{radius}",
             ")",
+            "(",
+            "-size",
+            f"{w}x{h}",
+            "xc:black",
+            "-fill",
+            "white",
+            "-draw",
+            f"roundrectangle 0,0,{w - 1},{h - 1},{radius},{radius}",
+            ")",
+            "-compose",
+            "Multiply",
+            "-composite",
+            "(",
+            str(src),
             "-alpha",
             "off",
+            ")",
             "-compose",
             "CopyOpacity",
             "-composite",
@@ -300,6 +377,7 @@ def ingest(source_dir: Path) -> None:
 
     dest_source = BRAND / "source"
     dest_source.mkdir(parents=True, exist_ok=True)
+    stripped_sources: dict[str, Path] = {}
     for role, resolved in (
         ("icon", icon_png),
         ("primary", primary_png),
@@ -308,7 +386,17 @@ def ingest(source_dir: Path) -> None:
     ):
         if resolved is None:
             continue
-        copy_file(resolved, dest_source / canonical_source_name(role, resolved))
+        dest = dest_source / canonical_source_name(role, resolved)
+        strip_white_gray_background(
+            resolved,
+            dest,
+            preserve_white_logo=(role == "momo_light"),
+        )
+        stripped_sources[role] = dest
+    icon_png = stripped_sources.get("icon", icon_png)
+    primary_png = stripped_sources.get("primary", primary_png)
+    momo_png = stripped_sources.get("momo", momo_png)
+    momo_light_png = stripped_sources.get("momo_light", momo_light_png)
     for name in (
         "strawwu-logo-icon.svg",
         "strawwu-logo-primary.svg",
@@ -317,8 +405,9 @@ def ingest(source_dir: Path) -> None:
         "strawwu-colors.md",
     ):
         src = source_dir / name
-        if src.is_file():
-            copy_file(src, dest_source / name)
+        dst = dest_source / name
+        if src.is_file() and src.resolve() != dst.resolve():
+            copy_file(src, dst)
 
     # Core branding copies (rounded corners on all raster logos)
     rasterize(icon_png, BRAND / "logo-icon.png", 512)
@@ -401,7 +490,9 @@ def ingest(source_dir: Path) -> None:
     write_text(BRAND / "README.md", readme)
 
     if colors_md.is_file():
-        copy_file(colors_md, BRAND / "source" / "strawwu-colors.md")
+        colors_dst = BRAND / "source" / "strawwu-colors.md"
+        if colors_md.resolve() != colors_dst.resolve():
+            copy_file(colors_md, colors_dst)
 
     print("ingest complete")
 
