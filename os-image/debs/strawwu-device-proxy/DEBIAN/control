@@ -1,0 +1,10 @@
+Package: strawwu-device-proxy
+Version: __VERSION__
+Section: utils
+Priority: optional
+Architecture: all
+Depends: udev (>= 249)
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU device-proxy rootfs integration (DDP0–3)
+ udev rules, hotplug notifications, and device-proxy manifest for
+ Win32 device enumeration via strawwu-device-proxy.

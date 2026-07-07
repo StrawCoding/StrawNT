@@ -13,6 +13,7 @@
     { "id": "apps", "group": "applications" },
     { "id": "flathub", "group": "applications" },
     { "id": "drivers", "group": "system" },
+    { "id": "devices", "group": "system" },
     { "id": "language", "group": "personalization" },
     { "id": "wincompat", "group": "compatibility" },
     { "id": "system", "group": "shortcuts" },
@@ -49,6 +50,13 @@
     "fixture": "hub/tests/fixtures/drivers-catalog.json",
     "polkit_action": "xyz.wastebase.strawwu.drivers.install",
     "secure_boot_plan": "post-sec-secureboot-route"
+  },
+  "device_proxy": {
+    "cli": "/usr/bin/strawwu",
+    "cli_dev": "components/target/debug/strawwu",
+    "list_command": "devices list --json",
+    "fixture": "hub/tests/fixtures/device-proxy-catalog.json",
+    "udev_rules": "/usr/lib/udev/rules.d/99-strawwu-device-proxy.rules"
   },
   "system_shortcuts": [
     { "id": "wifi", "desktop": "gnome-wifi-panel.desktop" },

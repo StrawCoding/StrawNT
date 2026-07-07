@@ -26,6 +26,10 @@ const $driversPackages = document.getElementById('drivers-packages');
 const $driversMeta = document.getElementById('drivers-meta');
 const $driversStatus = document.getElementById('drivers-status');
 const $driversSecureBoot = document.getElementById('drivers-secure-boot');
+const $devicesList = document.getElementById('devices-list');
+const $devicesTierSummary = document.getElementById('devices-tier-summary');
+const $devicesMeta = document.getElementById('devices-meta');
+const $devicesHotplugStatus = document.getElementById('devices-hotplug-status');
 
 let currentLogs = [];
 let currentTranslations = {};
@@ -744,6 +748,78 @@ async function installDriverPackage(packageName, label, btn) {
 
 document.getElementById('btn-refresh-drivers')?.addEventListener('click', refreshDrivers);
 
+// --- Devices (device-proxy) ---
+function renderDeviceTierSummary(summary) {
+  const tiers = Object.entries(summary || {}).sort(([a], [b]) => a.localeCompare(b));
+  if (!tiers.length) {
+    $devicesTierSummary.innerHTML = `<p class="muted-text">${t('devices.no_tiers')}</p>`;
+    return;
+  }
+  $devicesTierSummary.innerHTML = tiers
+    .map(
+      ([tier, count]) => `
+    <div class="device-tier-card">
+      <span class="device-tier-label">${escapeHtml(tier)}</span>
+      <span class="device-tier-count">${escapeHtml(String(count))}</span>
+    </div>
+  `,
+    )
+    .join('');
+}
+
+function renderDeviceList(devices) {
+  if (!devices.length) {
+    $devicesList.innerHTML = `<p class="muted-text">${t('devices.no_devices')}</p>`;
+    return;
+  }
+  $devicesList.innerHTML = devices
+    .map(
+      (device) => `
+    <div class="device-card" data-tier="${escapeHtml(device.tier || '')}">
+      <div class="device-card-header">
+        <div>
+          <div class="app-name">${escapeHtml(device.class || 'Device')}</div>
+          <div class="app-id">${escapeHtml(device.win32_path || '')}</div>
+        </div>
+        <span class="device-tier-badge">${escapeHtml(device.tier || '')}</span>
+      </div>
+      <div class="device-card-meta">
+        <span>${escapeHtml(device.linux_path || '')}</span>
+        <span class="device-status ${String(device.status || '').toLowerCase()}">${escapeHtml(device.status || '')}</span>
+      </div>
+      <p class="muted-text device-notes">${escapeHtml(device.notes || '')}</p>
+    </div>
+  `,
+    )
+    .join('');
+}
+
+async function refreshDevices() {
+  $devicesHotplugStatus.textContent = '';
+  try {
+    const data = await strawwuHub.getDeviceProxyStatus();
+    const metaParts = [
+      t('devices.device_count', { count: (data.devices || []).length }),
+    ];
+    if (data.mock) metaParts.push(t('devices.dev_fixture'));
+    if (data.source === 'fixture-fallback') metaParts.push(t('devices.cli_fallback'));
+    $devicesMeta.textContent = metaParts.join(' · ');
+    renderDeviceTierSummary(data.tierSummary || {});
+    renderDeviceList(data.devices || []);
+    if ((data.udevTags || []).length) {
+      $devicesHotplugStatus.textContent = t('devices.hotplug_tags', {
+        tags: (data.udevTags || []).join(', '),
+      });
+    }
+  } catch (err) {
+    $devicesList.innerHTML = `<p class="muted-text">${t('devices.load_failed')}</p>`;
+    $devicesTierSummary.innerHTML = '';
+    $devicesHotplugStatus.textContent = err.message || t('devices.load_failed');
+  }
+}
+
+document.getElementById('btn-refresh-devices')?.addEventListener('click', refreshDevices);
+
 // --- Live Updates ---
 strawwuHub.onStatusUpdate((data) => {
   if (data) renderStatus(data);
@@ -775,6 +851,7 @@ initI18n().then(() => {
   refreshApps();
   refreshFlathubStatus().then(refreshFlathubCatalog);
   refreshDrivers();
+  refreshDevices();
 });
 
 setInterval(refreshStatus, 10000);

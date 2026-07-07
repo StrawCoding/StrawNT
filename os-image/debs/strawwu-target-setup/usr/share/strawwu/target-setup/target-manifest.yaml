@@ -4,6 +4,7 @@ packages:
   - strawwu-keyring
   - strawwu-initd
   - strawwu-wincompat
+  - strawwu-device-proxy
   - strawwu-shell
   - strawwu-session
   - strawwu-greeter

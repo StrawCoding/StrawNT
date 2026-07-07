@@ -1,0 +1,57 @@
+{
+  "schema": "strawwu-device-proxy-fixture/v1",
+  "mock": true,
+  "devices": [
+    {
+      "class": "GPU",
+      "win32_path": "\\\\.\\DISPLAY1",
+      "linux_path": "/dev/dri/card0",
+      "tier": "Tier1",
+      "status": "PARTIAL",
+      "notes": "via graphics-stack",
+      "source": "device-proxy"
+    },
+    {
+      "class": "Serial/COM",
+      "win32_path": "\\\\.\\COM1",
+      "linux_path": "/dev/ttyUSB0",
+      "tier": "Tier1",
+      "status": "PARTIAL",
+      "notes": "COM port mapping",
+      "source": "device-proxy"
+    },
+    {
+      "class": "Printer",
+      "win32_path": "\\\\.\\Printer0",
+      "linux_path": "cups://default",
+      "tier": "Tier1",
+      "status": "PARTIAL",
+      "notes": "Win32 spooler→CUPS",
+      "source": "device-proxy"
+    },
+    {
+      "class": "USB HID",
+      "win32_path": "\\\\.\\HID0",
+      "linux_path": "/dev/hidraw0",
+      "tier": "Tier2",
+      "status": "PARTIAL",
+      "notes": "SetupAPI enum stub",
+      "source": "device-proxy"
+    },
+    {
+      "class": "Network",
+      "win32_path": "\\\\.\\Npcap",
+      "linux_path": "N/A",
+      "tier": "Tier3",
+      "status": "FAIL",
+      "notes": "no .sys loaded; probe-only",
+      "source": "device-proxy"
+    }
+  ],
+  "tier_summary": {
+    "Tier1": 3,
+    "Tier2": 1,
+    "Tier3": 1
+  },
+  "udev_tags": ["strawwu-com-port", "strawwu-hid", "strawwu-usb"]
+}

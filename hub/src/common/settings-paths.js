@@ -36,6 +36,10 @@ const DEV_DRIVERS_CLI = path.join(
 const DEV_DRIVERS_FIXTURE = path.join(HUB_ROOT, 'tests/fixtures/drivers-catalog.json');
 const DRIVERS_POLKIT_ACTION = 'xyz.wastebase.strawwu.drivers.install';
 
+const INSTALLED_DEVICE_PROXY_CLI = '/usr/bin/strawwu';
+const DEV_DEVICE_PROXY_CLI = path.join(REPO_ROOT, 'components/target/debug/strawwu');
+const DEV_DEVICE_PROXY_FIXTURE = path.join(HUB_ROOT, 'tests/fixtures/device-proxy-catalog.json');
+
 function firstExisting(...candidates) {
   for (const candidate of candidates) {
     if (candidate && fs.existsSync(candidate)) {
@@ -131,6 +135,24 @@ function resolveDriversFixture() {
   return firstExisting(DEV_DRIVERS_FIXTURE, debFixture);
 }
 
+function resolveDeviceProxyCli() {
+  if (process.env.STRAWWU_DEVICE_PROXY_CLI && fs.existsSync(process.env.STRAWWU_DEVICE_PROXY_CLI)) {
+    return process.env.STRAWWU_DEVICE_PROXY_CLI;
+  }
+  return firstExisting(DEV_DEVICE_PROXY_CLI, INSTALLED_DEVICE_PROXY_CLI);
+}
+
+function resolveDeviceProxyFixture() {
+  if (process.env.STRAWWU_DEVICE_PROXY_FIXTURE_PATH) {
+    return process.env.STRAWWU_DEVICE_PROXY_FIXTURE_PATH;
+  }
+  const debFixture = path.join(
+    REPO_ROOT,
+    'os-image/debs/strawwu-device-proxy/usr/share/strawwu/device-proxy/fixture-catalog.json',
+  );
+  return firstExisting(DEV_DEVICE_PROXY_FIXTURE, debFixture);
+}
+
 module.exports = {
   HUB_ROOT,
   REPO_ROOT,
@@ -146,6 +168,8 @@ module.exports = {
   resolveFlathubFixture,
   resolveDriversCli,
   resolveDriversFixture,
+  resolveDeviceProxyCli,
+  resolveDeviceProxyFixture,
   readVersion,
   readOsPrettyName,
 };

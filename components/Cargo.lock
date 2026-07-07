@@ -344,6 +344,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "strawwu-cli"
+version = "0.4.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "strawwu-device-proxy",
+ "tempfile",
+]
+
+[[package]]
 name = "strawwu-device-proxy"
 version = "0.4.0"
 dependencies = [
@@ -369,6 +379,7 @@ dependencies = [
  "serde_json",
  "strawwu-app-registry",
  "strawwu-bridge",
+ "strawwu-cli",
  "strawwu-nt",
  "strawwu-runtime",
  "tempfile",

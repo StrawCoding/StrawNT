@@ -120,9 +120,22 @@ Win32 App
 ```bash
 make -C components test-device-proxy
 make -C components test-anticheat-matrix   # D4 協同
+make test-ddp-rootfs
+strawwu devices list
+strawwu devices list --json
 ```
 
 證據：`components/tests/device-proxy/output/device-matrix.json`
+
+## Rootfs 整合（DDP0–3 · v0.6）
+
+| 項目 | 路徑 |
+|------|------|
+| CLI `devices list` | `components/strawwu-cli` → `strawwu` binary |
+| udev 規則 | `os-image/debs/strawwu-device-proxy/usr/lib/udev/rules.d/99-strawwu-device-proxy.rules` |
+| hotplug 通知 | `usr/lib/strawwu-device-proxy/hotplug-notify.sh` |
+| Hub 裝置分頁 | `hub/` tab-devices + `device-proxy-service.js` |
+| COM smoke | `tests/device-proxy/test-com-map-smoke.sh` |
 
 ## 風險與誠實邊界
 

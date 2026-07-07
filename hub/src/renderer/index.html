@@ -45,6 +45,10 @@
         <span class="nav-icon">⬢</span>
         <span data-i18n="nav.drivers">Drivers</span>
       </button>
+      <button class="nav-btn" data-tab="devices">
+        <span class="nav-icon">⎔</span>
+        <span data-i18n="nav.devices">Devices</span>
+      </button>
       <button class="nav-btn" data-tab="wincompat">
         <span class="nav-icon">⊞</span>
         <span data-i18n="nav.wincompat">Windows Compat</span>
@@ -177,6 +181,21 @@
         <h3 class="section-subtitle" data-i18n="drivers.packages_title">Available Drivers</h3>
         <div id="drivers-packages" class="drivers-list"></div>
         <div id="drivers-status" class="channel-status"></div>
+      </section>
+
+      <!-- Devices Panel (device-proxy DDP1) -->
+      <section id="tab-devices" class="tab-panel">
+        <h2 data-i18n="devices.title">Devices</h2>
+        <p class="muted-text" data-i18n="devices.description">Win32 device proxy mappings (Tier 1–4) and udev hotplug status.</p>
+        <div class="devices-toolbar">
+          <button id="btn-refresh-devices" class="btn btn-secondary" data-i18n="devices.refresh">Refresh</button>
+        </div>
+        <div id="devices-meta" class="apps-meta muted-text"></div>
+        <h3 class="section-subtitle" data-i18n="devices.tier_title">Tier Summary</h3>
+        <div id="devices-tier-summary" class="devices-tier-grid"></div>
+        <h3 class="section-subtitle" data-i18n="devices.list_title">Device Mappings</h3>
+        <div id="devices-list" class="devices-list"></div>
+        <div id="devices-hotplug-status" class="channel-status muted-text"></div>
       </section>
 
       <!-- Language Panel -->

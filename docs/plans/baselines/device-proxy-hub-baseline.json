@@ -1,0 +1,9 @@
+{
+  "schema": "strawwu-hub-device-proxy-baseline/v1",
+  "stage": "post-ddp-rootfs",
+  "version": "0.6.3.4",
+  "package": "strawwu-hub",
+  "cli": "strawwu devices list",
+  "udev_rules": "99-strawwu-device-proxy.rules",
+  "hub_panel": "devices"
+}

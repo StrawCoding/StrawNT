@@ -1,0 +1,20 @@
+schema: strawwu-device-proxy-manifest/v1
+stage: DDP0-3
+cli:
+  list: strawwu devices list
+  json: strawwu devices list --json
+udev:
+  rules: /usr/lib/udev/rules.d/99-strawwu-device-proxy.rules
+  tags:
+    - strawwu-com-port
+    - strawwu-hid
+    - strawwu-usb
+hotplug:
+  script: /usr/lib/strawwu-device-proxy/hotplug-notify.sh
+  log: /var/log/strawwu/device-proxy.log
+hub:
+  panel: devices
+  fixture: /usr/share/strawwu/device-proxy/fixture-catalog.json
+com_smoke:
+  command: strawwu devices list
+  expect_tier: Tier1

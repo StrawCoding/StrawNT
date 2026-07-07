@@ -1,0 +1,16 @@
+# StrawWU device-proxy udev rules (DDP0)
+# Tag serial/COM, HID, and USB devices for userspace proxy enumeration.
+
+# Tier 1 — Serial/COM ports
+SUBSYSTEM=="tty", KERNEL=="ttyUSB[0-9]*", TAG+="strawwu-com-port", ENV{STRAWWU_DEVICE_CLASS}="SerialCom"
+SUBSYSTEM=="tty", KERNEL=="ttyACM[0-9]*", TAG+="strawwu-com-port", ENV{STRAWWU_DEVICE_CLASS}="SerialCom"
+
+# Tier 2 — USB HID
+SUBSYSTEM=="hidraw", TAG+="strawwu-hid", ENV{STRAWWU_DEVICE_CLASS}="UsbHid"
+
+# Tier 1 — USB devices (printers, generic)
+SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", TAG+="strawwu-usb", ENV{STRAWWU_DEVICE_CLASS}="UsbHid"
+
+# DDP2 — hotplug notification for tagged devices
+ACTION=="add|remove", ENV{TAG}=="strawwu-com-port", RUN+="/usr/lib/strawwu-device-proxy/hotplug-notify.sh"
+ACTION=="add|remove", ENV{TAG}=="strawwu-hid", RUN+="/usr/lib/strawwu-device-proxy/hotplug-notify.sh"

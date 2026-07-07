@@ -17,6 +17,7 @@ die() { echo "ERROR: $*" >&2; exit 1; }
 OS_DEB_PACKAGES=(
     strawwu-initd
     strawwu-wincompat
+    strawwu-device-proxy
     strawwu-shell
     strawwu-session
     strawwu-greeter

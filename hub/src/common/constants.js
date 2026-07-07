@@ -31,6 +31,7 @@ module.exports = {
     GET_DRIVERS_STATUS: 'drivers:get-status',
     LIST_DRIVERS: 'drivers:list',
     INSTALL_DRIVER: 'drivers:install',
+    GET_DEVICE_PROXY_STATUS: 'device-proxy:get-status',
   },
 
   COLORS: {

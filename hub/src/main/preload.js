@@ -24,6 +24,7 @@ const IPC_CHANNELS = {
   GET_DRIVERS_STATUS: 'drivers:get-status',
   LIST_DRIVERS: 'drivers:list',
   INSTALL_DRIVER: 'drivers:install',
+  GET_DEVICE_PROXY_STATUS: 'device-proxy:get-status',
 };
 
 contextBridge.exposeInMainWorld('strawwuHub', {
@@ -48,6 +49,7 @@ contextBridge.exposeInMainWorld('strawwuHub', {
   getDriversStatus: () => ipcRenderer.invoke(IPC_CHANNELS.GET_DRIVERS_STATUS),
   listDrivers: () => ipcRenderer.invoke(IPC_CHANNELS.LIST_DRIVERS),
   installDriver: (packageName) => ipcRenderer.invoke(IPC_CHANNELS.INSTALL_DRIVER, packageName),
+  getDeviceProxyStatus: () => ipcRenderer.invoke(IPC_CHANNELS.GET_DEVICE_PROXY_STATUS),
 
   onStatusUpdate: (callback) => {
     const handler = (_event, data) => callback(data);

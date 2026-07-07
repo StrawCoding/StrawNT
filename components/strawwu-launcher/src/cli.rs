@@ -13,6 +13,7 @@ pub enum Command {
         installer: PathBuf,
     },
     Apps(AppsSubcommand),
+    Devices(DevicesSubcommand),
     Profile(ProfileSubcommand),
     Repair {
         app_id: String,
@@ -35,6 +36,11 @@ pub enum AppsSubcommand {
 }
 
 #[derive(Debug, Clone)]
+pub enum DevicesSubcommand {
+    List { json: bool },
+}
+
+#[derive(Debug, Clone)]
 pub enum ProfileSubcommand {
     Inspect { app_id: String },
     Export { app_id: String },
@@ -49,6 +55,7 @@ pub fn parse_args(args: &[String]) -> Result<Command, String> {
         "run" => parse_run(&args[1..]),
         "install" => parse_install(&args[1..]),
         "apps" => parse_apps(&args[1..]),
+        "devices" => parse_devices(&args[1..]),
         "profile" => parse_profile(&args[1..]),
         "repair" => {
             if args.len() < 2 {
@@ -142,6 +149,24 @@ fn parse_apps(args: &[String]) -> Result<Command, String> {
     match args.first().map(|s| s.as_str()) {
         Some("list") | None => Ok(Command::Apps(AppsSubcommand::List)),
         Some(other) => Err(format!("unknown apps subcommand: {other}")),
+    }
+}
+
+fn parse_devices(args: &[String]) -> Result<Command, String> {
+    let mut json = false;
+    let mut sub = None;
+    let mut i = 0;
+    while i < args.len() {
+        match args[i].as_str() {
+            "--json" => json = true,
+            "list" => sub = Some("list"),
+            other => return Err(format!("unknown devices argument: {other}")),
+        }
+        i += 1;
+    }
+    match sub {
+        Some("list") | None => Ok(Command::Devices(DevicesSubcommand::List { json })),
+        _ => Err("devices requires subcommand: list".into()),
     }
 }
 

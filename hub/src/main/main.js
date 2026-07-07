@@ -5,6 +5,7 @@ const settingsService = require('./settings-service');
 const appRegistryService = require('./app-registry-service');
 const flathubService = require('./flathub-service');
 const driversService = require('./drivers-service');
+const deviceProxyService = require('./device-proxy-service');
 const i18n = require('../common/i18n');
 const { IPC_CHANNELS, UPDATE_CHANNELS } = require('../common/constants');
 
@@ -132,6 +133,9 @@ function setupIpcHandlers() {
   ipcMain.handle(IPC_CHANNELS.LIST_DRIVERS, async () => driversService.listDrivers());
   ipcMain.handle(IPC_CHANNELS.INSTALL_DRIVER, async (_event, packageName) =>
     driversService.installDriver(packageName),
+  );
+  ipcMain.handle(IPC_CHANNELS.GET_DEVICE_PROXY_STATUS, async () =>
+    deviceProxyService.getDeviceProxyStatus(),
   );
 }
 

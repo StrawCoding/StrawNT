@@ -175,6 +175,23 @@ fn main() {
                 }
             },
         },
+        Command::Devices(sub) => match sub {
+            cli::DevicesSubcommand::List { json } => {
+                use strawwu_cli::devices::{ListFormat, list_devices};
+                let format = if json {
+                    ListFormat::Json
+                } else {
+                    ListFormat::Text
+                };
+                match list_devices(format) {
+                    Ok(out) => println!("{out}"),
+                    Err(e) => {
+                        eprintln!("strawwu: devices list failed: {e}");
+                        process::exit(1);
+                    }
+                }
+            }
+        },
         Command::Profile(_) => {
             println!("strawwu: profile (stub)");
         }
@@ -214,6 +231,7 @@ COMMANDS:
     run <binary> [--backend native|container|microvm] [--bundle a,b,c]
     install <installer.exe>
     apps list
+    devices list [--json]
     profile inspect|export <app-id>
     repair <app-id>
     status

@@ -24,6 +24,7 @@ describe('Hub directory structure', () => {
     'src/main/app-registry-service.js',
     'src/main/flathub-service.js',
     'src/main/drivers-service.js',
+    'src/main/device-proxy-service.js',
   ];
 
   for (const file of requiredFiles) {
