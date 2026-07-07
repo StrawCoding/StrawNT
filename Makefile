@@ -178,6 +178,7 @@ preflight:
 	bash tests/preflight/test-hw-matrix.sh
 	bash tests/preflight/test-hw-t1-live-usb.sh
 	bash tests/preflight/test-hw-t2-installed.sh
+	bash tests/preflight/test-hw4-peripherals.sh
 	bash tests/preflight/test-post-mvp-roadmap.sh
 	bash tests/preflight/test-ubuntu-2604-closeout.sh
 	bash tests/preflight/test-fork-f7-closeout.sh

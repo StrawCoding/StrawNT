@@ -1,0 +1,22 @@
+Package: strawwu-laptop
+Version: __VERSION__
+Section: metapackages
+Priority: optional
+Architecture: all
+Depends: tlp,
+         xserver-xorg-input-libinput,
+         libinput-tools,
+         fprintd,
+         libpam-fprintd,
+         v4l-utils,
+         brightnessctl,
+         python3
+Recommends: tlp-rdw,
+            acpid,
+            cheese
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU laptop peripherals meta — touchpad, Fn, TLP, webcam, fingerprint
+ Curated laptop stack: TLP power management, libinput touchpad baseline,
+ Fn key helpers (brightnessctl/acpid), fprintd fingerprint login,
+ PipeWire-compatible webcam tools (v4l-utils), and device_profile curation.
+ Includes strawwu-laptop-peripherals CLI for smoke/probe workflows.

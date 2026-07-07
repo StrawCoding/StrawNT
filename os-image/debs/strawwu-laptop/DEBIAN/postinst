@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+if [ "$1" = "configure" ]; then
+    if command -v tlp >/dev/null 2>&1; then
+        systemctl enable tlp.service 2>/dev/null || true
+    fi
+    if command -v fprintd >/dev/null 2>&1; then
+        systemctl enable fprintd.service 2>/dev/null || true
+    fi
+fi
+exit 0

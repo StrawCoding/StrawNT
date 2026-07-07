@@ -1,0 +1,25 @@
+schema: strawwu-laptop-peripherals/v1
+stage: post-hw4-peripherals
+version: 0.6.0.0-target
+cli: strawwu-laptop-peripherals
+dimensions:
+  - touchpad
+  - fn_keys
+  - tlp
+  - webcam
+  - fingerprint
+packages:
+  power: tlp
+  touchpad: xserver-xorg-input-libinput
+  touchpad_tools: libinput-tools
+  fingerprint: fprintd
+  fingerprint_pam: libpam-fprintd
+  webcam: v4l-utils
+  fn_brightness: brightnessctl
+  fn_acpi: acpid
+device_profiles_dir: /usr/share/strawwu/laptop/device_profiles
+fixture_env: STRAWWU_LAPTOP_FIXTURE
+smoke_commands:
+  - status
+  - smoke
+  - profiles

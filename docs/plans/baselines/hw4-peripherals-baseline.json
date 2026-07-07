@@ -1,0 +1,30 @@
+{
+  "schema": "strawwu-hw4-peripherals-baseline/v1",
+  "stage": "post-hw4-peripherals",
+  "version": "0.6.3.3",
+  "package": "strawwu-laptop",
+  "cli": "/usr/bin/strawwu-laptop-peripherals",
+  "dimensions": [
+    "touchpad",
+    "fn_keys",
+    "tlp",
+    "webcam",
+    "fingerprint"
+  ],
+  "device_profile": "os-image/debs/strawwu-laptop/usr/share/strawwu/laptop/device_profiles/generic-intel-laptop.json",
+  "fixture": "os-image/debs/strawwu-laptop/usr/share/strawwu/laptop/fixture-catalog.json",
+  "smoke_script": "tests/hw/smoke-peripherals.sh",
+  "matrix_runner": "tests/hw/run-hw-peripherals.sh",
+  "results_json": "docs/plans/hw-matrix-results.json",
+  "preflight": "tests/preflight/test-hw4-peripherals.sh",
+  "profiles": [
+    "t2-peripheral-intel-laptop (T2 peripheral-smoke E10/E15)"
+  ],
+  "hermes_workflow": [
+    "install StrawWU release-iso on Intel laptop",
+    "apt install strawwu-laptop",
+    "bash tests/hw/smoke-peripherals.sh --full-hw --environment physical-installed --output /tmp/peripheral.json",
+    "bash tests/hw/merge-entry.sh --entry /tmp/peripheral.json"
+  ],
+  "dod": ">=1 T2 peripheral entry with peripherals PASS in hw-matrix-results.json"
+}

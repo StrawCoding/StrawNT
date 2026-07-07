@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+"""StrawWU laptop peripherals CLI — touchpad/Fn/TLP/webcam/fingerprint smoke."""
+from __future__ import annotations
+
+import argparse
+import importlib.util
+import sys
+from pathlib import Path
+
+_CORE = Path(__file__).resolve().parent.parent / "lib" / "strawwu-laptop" / "core.py"
+_spec = importlib.util.spec_from_file_location("strawwu_laptop_core", _CORE)
+_mod = importlib.util.module_from_spec(_spec)
+assert _spec.loader is not None
+_spec.loader.exec_module(_mod)
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="strawwu-laptop-peripherals",
+        description="StrawWU laptop peripherals probe and smoke (E10/E15).",
+    )
+    parser.add_argument("--json", action="store_true", help="Emit JSON output")
+    sub = parser.add_subparsers(dest="command")
+    sub.add_parser("status", help="Probe touchpad/Fn/TLP/webcam/fingerprint")
+    sub.add_parser("smoke", help="Run peripheral smoke aggregate")
+    sub.add_parser("profiles", help="List device_profile curation entries")
+    sub.add_parser("version", help="Print package version")
+
+    args = parser.parse_args(argv)
+    if args.command == "version":
+        return _mod.cmd_version()
+    if not args.command:
+        parser.print_help()
+        return 1
+    return _mod.run_cli(args.command, as_json=args.json)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

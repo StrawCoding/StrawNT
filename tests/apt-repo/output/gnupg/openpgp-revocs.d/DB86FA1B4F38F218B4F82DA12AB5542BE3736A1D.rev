@@ -1,7 +1,7 @@
 This is a revocation certificate for the OpenPGP key:
 
 pub   rsa2048 2026-07-07 [SCEAR]
-      646084A3091D4716139446339C3CAC3FC29D2AD7
+      DB86FA1B4F38F218B4F82DA12AB5542BE3736A1D
 uid          StrawWU Test Archive <apt@test.strawwu.local>
 
 A revocation certificate is a kind of "kill switch" to publicly
@@ -21,12 +21,12 @@ before importing and publishing this revocation certificate.
 :-----BEGIN PGP PUBLIC KEY BLOCK-----
 Comment: This is a revocation certificate
 
-iQE2BCABCgAgFiEEZGCEowkdRxYTlEYznDysP8KdKtcFAmpNZpsCHQAACgkQnDys
-P8KdKtesgwf/epMTwlf0pAsp7cu6QJdvAaFIKWYnetKYNQLU/8cQY3ngFj9oqf3e
-6RNwf7ToTeuqY8DKsd5isp+iKzSCuE67QPwdzYdow4NFxb59djy5zq1XNn390FM7
-waN3UyfKA+GE1wrOcnrfBqq0/AZT513Fjxs7WyffyEw6uaAjkwfeXWBqTsIr0Rva
-25UdUShbtFDUGb+TRC4uRKny/a56ssIMk1usDoTVyg7Xg0ndtdZ7taJbOKXwXCyi
-kiZi02AZbIkwqqqDWKk2JkC7pNjXNMgg5y6K1jV09Qbgq/OP9NoBxwcRhkb0km3q
-eNsclmS2tUPWqfqNdJ1NWqFe78wNC2E93A==
-=ADYL
+iQE2BCABCgAgFiEE24b6G0848hi0+C2hKrVUK+Nzah0FAmpNcYYCHQAACgkQKrVU
+K+Nzah19bgf/SG2DSMga3sdOpEuqF6ZTKumP1Pg6rYSaNrIXgfDgBkF7Pnab+53L
+g4AXKp/o5ocVsnPX1cxX/OkcH0ZsLFWi17uRxLR9uPKR4G0evgSSyhnyWKkM8a7S
+qYlg6zAdEIaTCAeCZQcU8BV/Z3loQ/6lwORH4a0RRQihJ0SXfKPU1Yg5y2tEzEb0
+P/rVae2dMstnZ3kHih3PwYRiKBjTswvLwERAd7LEGkP37oTGgHJ67QxIR5pMGUw+
+FW4F1+KfLgX8jr7IzNwaiFPAQbIEHkdj0UGEkt8SMsnFgKuUkZ/blTv9Ev4T5xDm
+B5TRSqGfpAh59h40kdq/0aKe81uXqKl06w==
+=kdRP
 -----END PGP PUBLIC KEY BLOCK-----

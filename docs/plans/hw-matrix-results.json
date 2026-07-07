@@ -1,8 +1,8 @@
 {
   "schema": "strawwu-hw-matrix-results/v2",
   "wave": "POST-HW-T2",
-  "version": "0.6.3.2",
-  "updated": "2026-07-08T04:19:50+08:00",
+  "version": "0.6.3.3",
+  "updated": "2026-07-08T05:28:54+08:00",
   "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.6.2.5-amd64.iso",
   "dimensions": [
     "gpu",
@@ -273,18 +273,55 @@
         "session": "worker installed-e2e (Hermes may replace with physical-installed smoke-installed.sh)",
         "phase": "installed-smoke"
       }
+    },
+    {
+      "machine_id": "t2-peripheral-intel-laptop",
+      "tier": "T2",
+      "phase": "peripheral-smoke",
+      "environment": "fixture",
+      "cpu": "Intel 12th Gen (laptop peripheral profile)",
+      "gpu": "Intel Iris Xe",
+      "gpu_vendor": "intel",
+      "firmware": "uefi",
+      "usb_method": "calamares-install",
+      "iso": "os-image/output/StrawWU-0.6.3.3-amd64.iso",
+      "tests": {
+        "live_boot": "SKIP",
+        "wifi": "SKIP",
+        "gpu_driver": "SKIP",
+        "suspend": "SKIP",
+        "hidpi": "SKIP",
+        "touchpad": "PASS",
+        "fingerprint": "PASS",
+        "webcam": "PASS",
+        "peripherals": "PASS",
+        "installed_boot": "PASS",
+        "desktop": "PASS"
+      },
+      "markers": [
+        "STRAWWU-PERIPHERAL-SMOKE-OK"
+      ],
+      "tested": "2026-07-08T05:28:54+08:00",
+      "hw_notes": {
+        "touchpad": "libinput curation via strawwu-laptop meta",
+        "fingerprint": "fprintd + libpam-fprintd; hardware optional",
+        "webcam": "v4l-utils + PipeWire stack",
+        "peripherals": "aggregate E10/E15 smoke",
+        "mock": true,
+        "session": "worker fixture smoke (Hermes may replace with physical laptop)"
+      }
     }
   ],
   "summary": {
-    "total": 7,
+    "total": 8,
     "live_pass": 7,
     "live_fail": 0,
     "gpu_pass": 7,
     "wifi_pass": 7,
     "suspend_pass": 1,
-    "suspend_skip": 6,
+    "suspend_skip": 7,
     "hidpi_pass": 4,
-    "hidpi_skip": 3
+    "hidpi_skip": 4
   },
   "t1_physical": {
     "minimum": 3,

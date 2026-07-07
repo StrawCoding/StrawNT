@@ -1,0 +1,9 @@
+strawwu-laptop — StrawWU laptop peripherals meta (POST-HW4)
+
+Curates TLP power management, libinput touchpad, Fn key helpers
+(brightnessctl/acpid), fprintd fingerprint login, and PipeWire-compatible
+webcam tools. Includes device_profile curation for community PR (Q5).
+
+CLI: strawwu-laptop-peripherals {status|smoke|profiles|version}
+
+See docs/plans/strawwu-hw4-peripherals-plan.md

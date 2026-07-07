@@ -1,0 +1,37 @@
+{
+  "schema": "strawwu-device-profile/v1",
+  "profile_id": "generic-intel-laptop",
+  "label": "Generic Intel laptop (E10/E15 baseline)",
+  "vendor": "generic",
+  "chassis": "laptop",
+  "peripherals": {
+    "touchpad": {
+      "driver": "libinput",
+      "packages": ["xserver-xorg-input-libinput", "libinput-tools"],
+      "notes": "Xorg/Wayland libinput stack; gestures via GNOME defaults"
+    },
+    "fn_keys": {
+      "packages": ["brightnessctl", "acpid"],
+      "notes": "Brightness/volume via acpi/acpid + brightnessctl baseline"
+    },
+    "power": {
+      "packages": ["tlp", "tlp-rdw"],
+      "service": "tlp.service"
+    },
+    "webcam": {
+      "stack": "pipewire",
+      "packages": ["v4l-utils", "pipewire", "wireplumber"],
+      "probe": "v4l2-ctl --list-devices"
+    },
+    "fingerprint": {
+      "packages": ["fprintd", "libpam-fprintd"],
+      "service": "fprintd.service",
+      "pam_stack": "gdm-smartcard-sssd-or-password"
+    }
+  },
+  "community_pr": {
+    "enabled": true,
+    "plan": "Q5",
+    "doc": "docs/decisions-2026-07-02.md"
+  }
+}

@@ -21,6 +21,7 @@ Depends: strawwu-session,
          strawwu-flatpak-setup,
          strawwu-firstboot
 Recommends: strawwu-drivers,
+            strawwu-laptop,
             firefox,
             gnome-terminal,
             gnome-text-editor,

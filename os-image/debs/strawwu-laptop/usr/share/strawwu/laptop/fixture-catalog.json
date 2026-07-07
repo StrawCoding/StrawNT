@@ -1,0 +1,33 @@
+{
+  "schema": "strawwu-laptop-fixture/v1",
+  "mock": true,
+  "profile_id": "generic-intel-laptop",
+  "touchpad": {
+    "present": true,
+    "driver": "libinput",
+    "device": "SynPS/2 Synaptics TouchPad",
+    "status": "PASS"
+  },
+  "fn_keys": {
+    "brightnessctl": true,
+    "acpid": true,
+    "status": "PASS"
+  },
+  "tlp": {
+    "active": true,
+    "status": "PASS"
+  },
+  "webcam": {
+    "present": true,
+    "device": "/dev/video0",
+    "pipewire": true,
+    "status": "PASS"
+  },
+  "fingerprint": {
+    "present": true,
+    "reader": "Goodix MOC Fingerprint Sensor",
+    "enrolled": false,
+    "status": "PASS"
+  },
+  "peripherals": "PASS"
+}
