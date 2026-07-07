@@ -1,0 +1,47 @@
+{
+  "schema": "strawwu-fork-apt-suite-baseline/v1",
+  "stage": "fork-f5-apt-fork-suite",
+  "version": "0.6.2.4",
+  "scripts": {
+    "publish_fork_debs": "scripts/publish-fork-debs.sh",
+    "build_fork_packages": "os-image/scripts/build-fork-packages.sh",
+    "validate": "tests/apt-repo/validate-apt-repo.py"
+  },
+  "registry": {
+    "path": "os-image/fork/packages/packages.json",
+    "publish_suite_field": "publish_suite"
+  },
+  "sources": {
+    "path": "os-image/config/branding/etc/apt/sources.list.d/strawwu-fork.sources",
+    "keyring": "/usr/share/keyrings/strawwu-archive-keyring.gpg"
+  },
+  "repo_layout": {
+    "suite": "strawwu-fork",
+    "component": "main",
+    "arch": "amd64",
+    "dists": "dists/{suite}/Release",
+    "release_sig": "dists/{suite}/Release.gpg",
+    "packages": "dists/{suite}/main/binary-amd64/Packages.gz",
+    "pool": "pool/main/{letter}/{package}/"
+  },
+  "apt_uris": [
+    "https://apt.strawwu.org"
+  ],
+  "integration": {
+    "input_debs": "os-image/fork/packages/output",
+    "output_repo": "os-image/output/apt-fork-repo",
+    "make_targets": [
+      "build-fork-packages",
+      "publish-fork-debs"
+    ]
+  },
+  "gaps_closed": [
+    "strawwu-fork APT suite layout (fork-f5)",
+    "publish-fork-debs.sh pipeline (fork-f5)",
+    "branding strawwu-fork.sources (fork-f5)"
+  ],
+  "deferred": [
+    "fork package registration (gnome-shell/mutter etc.)",
+    "post-d7 software-sources GUI toggle for fork suite"
+  ]
+}

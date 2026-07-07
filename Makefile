@@ -3,7 +3,7 @@
 	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
 	test-install-e2e test-install-firstboot-e2e test-installed-boot test-target-flathub test-wincompat test-wincompat-os test-wincompat-registry test-wincompat-gui test-wincompat-e2e test-hw-live-usb test-hw-matrix test-user-docs test-handbook test-mvp-closeout test-release-manifest test-apt-repo test-ci-baseline test-ci-nightly test-perf-baseline test-perf-legal-gate test-strawwu-shell test-hub test-hub-settings test-apps-page test-flathub-hub test-l10n-ime test-firstboot test-finished-meta test-context-menu test-registry-hooks test-deep-uninstall test-initramfs-hooks test-target-identity test-greeter-session test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-initrd-overlays test-initrd-core test-initrd-bottom test-init-tools test-bug-reporter test-calamares-settings test-app-registry test-security-baseline test-observability test-legal-trademark test-desktop-stack test-live-install-ux test-update-notifier test-target-setup test-meta-audit purge-ubuntu-telemetry \
-	install-flatpak-setup install-bug-reporter install-calamares-settings install-update-notifier install-target-setup install-firstboot install-wincompat nosnap-harden build-debs bump-version check-version-bump generate-release-manifest release-sign publish-debs
+	install-flatpak-setup install-bug-reporter install-calamares-settings install-update-notifier install-target-setup install-firstboot install-wincompat nosnap-harden build-debs bump-version check-version-bump generate-release-manifest release-sign publish-debs publish-fork-debs
 
 REPO_ROOT := $(abspath .)
 SCRIPTS   := os-image/scripts
@@ -26,6 +26,7 @@ help:
 	@echo "  fork-baseline-snapshot    Capture rootfs as fork baseline snapshot (needs root)"
 	@echo "  fork-apply-manifest       Apply fork package lists to rootfs (needs root)"
 	@echo "  build-fork-packages       Build registered fork upstream package overlays"
+	@echo "  publish-fork-debs         Publish fork package debs to strawwu-fork APT suite"
 	@echo "  swap-kernel               Replace kernel in cloned rootfs (needs root)"
 	@echo "  dev-iso                   Build ISO (dev-iso mode, zstd -l 3)"
 	@echo "  release-iso               Build ISO (release-iso mode, xz)"
@@ -100,6 +101,7 @@ help:
 	@echo "  generate-release-manifest     Build os-image/output/release-manifest.json"
 	@echo "  release-sign                  SHA256SUMS + detached GPG for release ISO"
 	@echo "  publish-debs                  Build signed APT repo from strawwu .debs"
+	@echo "  publish-fork-debs             Publish fork upstream debs to strawwu-fork suite"
 	@echo "  test-strawwu-shell            W4-D2 strawwu-shell fork profile + built-in dock"
 	@echo "  test-hub-settings             W4-D3 Hub settings center preflight"
 	@echo "  test-apps-page                W4-R2 Hub Apps page (App Registry UI)"
@@ -559,6 +561,9 @@ release-sign:
 
 publish-debs:
 	bash scripts/publish-debs.sh
+
+publish-fork-debs:
+	bash scripts/publish-fork-debs.sh
 
 install-calamares-settings:
 	sudo bash $(SCRIPTS)/chroot-install-calamares-settings.sh

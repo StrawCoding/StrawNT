@@ -36,7 +36,15 @@ os-image/fork/packages/mutter/
 5. Implement `build-package.sh` (typically `dpkg-buildpackage` or `debuild`).
 6. Run `make build-fork-packages`.
 
-Built debs publish to the **strawwu-fork** APT suite (fork-f5).
+Built debs publish to the **strawwu-fork** APT suite:
+
+```bash
+make build-fork-packages
+make publish-fork-debs
+```
+
+Output repo: `os-image/output/apt-fork-repo/` (`dists/strawwu-fork/`).  
+Branding sources: `os-image/config/branding/etc/apt/sources.list.d/strawwu-fork.sources`.
 
 ## Fork strategies
 
@@ -53,6 +61,8 @@ Built debs publish to the **strawwu-fork** APT suite (fork-f5).
 | `os-image/scripts/build-fork-packages.sh` | Build all registered packages |
 | `os-image/scripts/validate-fork-package.sh` | Static gate for one package dir |
 | `os-image/scripts/lib/fork-packages-env.sh` | Paths from `ubuntu-base-target.json` |
+| `scripts/publish-fork-debs.sh` | Publish `output/*.deb` to strawwu-fork APT suite |
+| `os-image/scripts/lib/fork-apt-env.sh` | Fork APT suite paths from registry + target JSON |
 
 ## Cleanroom policy
 
