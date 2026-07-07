@@ -18,3 +18,11 @@ hub:
 com_smoke:
   command: strawwu devices list
   expect_tier: Tier1
+mfp_smoke:
+  command: strawwu mfp smoke
+  json: strawwu mfp smoke --json
+  fixture: /usr/share/strawwu/device-proxy/mfp-fixture-catalog.json
+  expect:
+    connection: network
+    print: PASS
+    scan: PASS

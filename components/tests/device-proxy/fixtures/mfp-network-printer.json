@@ -1,0 +1,26 @@
+{
+  "schema": "strawwu-mfp-fixture/v1",
+  "mock": true,
+  "printers": [
+    {
+      "id": "net-mfp-001",
+      "name": "StrawWU Lab Network MFP",
+      "win32_printer": "\\\\print-server\\Lab-MFP",
+      "cups_uri": "ipp://lab-mfp.local/ipp/print",
+      "scan_uri": "ipp://lab-mfp.local/ipp/scan",
+      "connection": "network"
+    }
+  ],
+  "print": {
+    "status": "PASS",
+    "backend": "cups",
+    "mock": true,
+    "notes": "Win32 spooler→CUPS IPP print (fixture)"
+  },
+  "scan": {
+    "status": "PASS",
+    "backend": "sane-ipp",
+    "mock": true,
+    "notes": "WIA/Twain proxy→SANE/IPP scan (fixture)"
+  }
+}

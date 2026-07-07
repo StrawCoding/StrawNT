@@ -283,12 +283,9 @@ mod tests {
     fn allowlist_permits_strawwu_prefix() {
         let dir = tempdir().unwrap();
         let prefix = dir.path().join("apps");
-        std::env::set_var(
-            "STRAWWU_DEEP_REMOVE_ALLOW_PREFIXES",
-            prefix.parent().unwrap().to_string_lossy().as_ref(),
-        );
         let target = prefix.join("demo-app");
-        assert!(is_deletable_path(&target, &default_allow_prefixes()));
+        let allow = vec![dir.path().to_path_buf()];
+        assert!(is_deletable_path(&target, &allow));
     }
 
     #[test]
@@ -306,10 +303,6 @@ mod tests {
         let dir = tempdir().unwrap();
         let app_dir = dir.path().join("demo");
         fs::create_dir_all(&app_dir).unwrap();
-        std::env::set_var(
-            "STRAWWU_DEEP_REMOVE_ALLOW_PREFIXES",
-            dir.path().to_string_lossy().as_ref(),
-        );
         let plan = DeepRemovePlan {
             id: "demo".into(),
             paths_to_delete: vec![app_dir.clone()],
@@ -326,10 +319,6 @@ mod tests {
         let dir = tempdir().unwrap();
         let app_dir = dir.path().join("demo");
         fs::create_dir_all(app_dir.join("data")).unwrap();
-        std::env::set_var(
-            "STRAWWU_DEEP_REMOVE_ALLOW_PREFIXES",
-            dir.path().to_string_lossy().as_ref(),
-        );
         let plan = DeepRemovePlan {
             id: "demo".into(),
             paths_to_delete: vec![app_dir.clone()],

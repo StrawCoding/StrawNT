@@ -192,6 +192,24 @@ fn main() {
                 }
             }
         },
+        Command::Mfp(sub) => match sub {
+            cli::MfpSubcommand::Smoke { json } => {
+                use strawwu_cli::mfp::{MfpFormat, mfp_smoke_passed, run_mfp_smoke_command};
+                let format = if json { MfpFormat::Json } else { MfpFormat::Text };
+                match run_mfp_smoke_command(format) {
+                    Ok((out, payload)) => {
+                        println!("{out}");
+                        if !mfp_smoke_passed(&payload) {
+                            process::exit(1);
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("strawwu: mfp smoke failed: {e}");
+                        process::exit(1);
+                    }
+                }
+            }
+        },
         Command::Profile(_) => {
             println!("strawwu: profile (stub)");
         }
@@ -232,6 +250,7 @@ COMMANDS:
     install <installer.exe>
     apps list
     devices list [--json]
+    mfp smoke [--json]
     profile inspect|export <app-id>
     repair <app-id>
     status

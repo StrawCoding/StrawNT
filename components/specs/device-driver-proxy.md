@@ -136,6 +136,7 @@ strawwu devices list --json
 | hotplug 通知 | `usr/lib/strawwu-device-proxy/hotplug-notify.sh` |
 | Hub 裝置分頁 | `hub/` tab-devices + `device-proxy-service.js` |
 | COM smoke | `tests/device-proxy/test-com-map-smoke.sh` |
+| MFP smoke | `tests/device-proxy/test-mfp-smoke.sh` · `strawwu mfp smoke` |
 
 ## 風險與誠實邊界
 

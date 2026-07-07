@@ -4,3 +4,4 @@
 //! in `strawwu-launcher`.
 
 pub mod devices;
+pub mod mfp;

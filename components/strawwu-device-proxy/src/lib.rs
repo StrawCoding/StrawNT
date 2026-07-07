@@ -1,6 +1,7 @@
 pub mod devices;
 pub mod ioctl;
 pub mod matrix;
+pub mod mfp;
 pub mod vfio;
 
 pub use devices::{DeviceClass, VirtualDevice};

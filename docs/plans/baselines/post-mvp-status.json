@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-08T05:37:52.668081",
+  "generated_at": "2026-07-08T06:14:14.389373",
   "target": "0.9.0.0-engineering",
   "total": 21,
-  "passed": 4,
-  "failed": 17,
+  "passed": 5,
+  "failed": 16,
   "all_pass": false,
   "stages": [
     {
@@ -28,8 +28,8 @@
     },
     {
       "id": "post-ddp-rootfs",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "post-q3-mfp-smoke",

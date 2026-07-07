@@ -1,0 +1,17 @@
+{
+  "schema": "strawwu-mfp-smoke-baseline/v1",
+  "stage": "post-q3-mfp-smoke",
+  "version": "0.6.3.5",
+  "cli": "strawwu mfp smoke",
+  "json_cli": "strawwu mfp smoke --json",
+  "fixture": "os-image/debs/strawwu-device-proxy/usr/share/strawwu/device-proxy/mfp-fixture-catalog.json",
+  "smoke_script": "tests/device-proxy/test-mfp-smoke.sh",
+  "preflight": "tests/preflight/test-mfp-smoke.sh",
+  "expect": {
+    "network_printers": 1,
+    "print": "PASS",
+    "scan": "PASS",
+    "aggregate": "PASS"
+  },
+  "dod": "Win app print+scan via CUPS/SANE-IPP mapping; >=1 network MFP PASS (fixture or live)"
+}

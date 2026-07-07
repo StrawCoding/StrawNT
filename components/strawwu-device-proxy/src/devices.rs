@@ -267,7 +267,7 @@ pub fn default_device_map() -> Vec<VirtualDevice> {
             linux_path: "cups://default".into(),
             tier: ProxyTier::Tier1,
             status: DeviceStatus::Partial,
-            notes: "Win32 spooler→CUPS".into(),
+            notes: "Win32 spooler→CUPS; scan→SANE/IPP".into(),
         },
         VirtualDevice {
             class: DeviceClass::UsbHid,

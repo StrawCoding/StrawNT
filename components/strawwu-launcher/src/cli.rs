@@ -14,6 +14,7 @@ pub enum Command {
     },
     Apps(AppsSubcommand),
     Devices(DevicesSubcommand),
+    Mfp(MfpSubcommand),
     Profile(ProfileSubcommand),
     Repair {
         app_id: String,
@@ -41,6 +42,11 @@ pub enum DevicesSubcommand {
 }
 
 #[derive(Debug, Clone)]
+pub enum MfpSubcommand {
+    Smoke { json: bool },
+}
+
+#[derive(Debug, Clone)]
 pub enum ProfileSubcommand {
     Inspect { app_id: String },
     Export { app_id: String },
@@ -56,6 +62,7 @@ pub fn parse_args(args: &[String]) -> Result<Command, String> {
         "install" => parse_install(&args[1..]),
         "apps" => parse_apps(&args[1..]),
         "devices" => parse_devices(&args[1..]),
+        "mfp" => parse_mfp(&args[1..]),
         "profile" => parse_profile(&args[1..]),
         "repair" => {
             if args.len() < 2 {
@@ -167,6 +174,24 @@ fn parse_devices(args: &[String]) -> Result<Command, String> {
     match sub {
         Some("list") | None => Ok(Command::Devices(DevicesSubcommand::List { json })),
         _ => Err("devices requires subcommand: list".into()),
+    }
+}
+
+fn parse_mfp(args: &[String]) -> Result<Command, String> {
+    let mut json = false;
+    let mut sub = None;
+    let mut i = 0;
+    while i < args.len() {
+        match args[i].as_str() {
+            "--json" => json = true,
+            "smoke" => sub = Some("smoke"),
+            other => return Err(format!("unknown mfp argument: {other}")),
+        }
+        i += 1;
+    }
+    match sub {
+        Some("smoke") | None => Ok(Command::Mfp(MfpSubcommand::Smoke { json })),
+        _ => Err("mfp requires subcommand: smoke".into()),
     }
 }
 
