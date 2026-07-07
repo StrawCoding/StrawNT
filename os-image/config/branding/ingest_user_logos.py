@@ -9,7 +9,16 @@ import sys
 from pathlib import Path
 
 BRAND = Path(__file__).resolve().parent
+REPO_ROOT = BRAND.parents[2]
 DEFAULT_SOURCE = Path("/mnt/data/Data/檔案/專案資料/StrawWU")
+
+# User directory may ship legacy (strawwu-logo-*) or current (strawwu-*) names.
+SOURCE_ALIASES: dict[str, tuple[str, ...]] = {
+    "icon": ("strawwu-logo-icon.png", "strawwu-icon.png"),
+    "primary": ("strawwu-logo-primary.png", "strawwu-primary.png", "strawwu-wordmark.png"),
+    "momo": ("strawwu-logo-momo.png", "strawwu-momo.png"),
+    "momo_light": ("strawwu-logo-momo-light.png", "strawwu-momo-light.png"),
+}
 
 COLORS = {
     "bg_deep": "#0A0E14",
@@ -79,6 +88,24 @@ def copy_file(src: Path, dst: Path) -> None:
     dst.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(src, dst)
     print(f"copied {src.name} -> {dst}")
+
+
+def resolve_source(source_dir: Path, role: str) -> Path | None:
+    for name in SOURCE_ALIASES[role]:
+        candidate = source_dir / name
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def canonical_source_name(role: str, resolved: Path) -> str:
+    mapping = {
+        "icon": "strawwu-logo-icon.png",
+        "primary": "strawwu-logo-primary.png",
+        "momo": "strawwu-logo-momo.png",
+        "momo_light": "strawwu-logo-momo-light.png",
+    }
+    return mapping[role]
 
 
 def rasterize(src: Path, dst: Path, size: int, *, rounded: bool = True) -> None:
@@ -238,26 +265,55 @@ def build_preview() -> str:
 """
 
 
+def sync_downstream_assets() -> None:
+    """Mirror hub / component icons from generated branding."""
+    icon_png = BRAND / "logo-icon.png"
+    icon_svg = BRAND / "logo-icon.svg"
+    dist_logo = BRAND / "usr/share/icons/hicolor/scalable/apps/distributor-logo.svg"
+    for dest_dir in (
+        REPO_ROOT / "hub" / "assets",
+        REPO_ROOT / "components" / "strawwu-hub" / "assets",
+    ):
+        if not dest_dir.parent.is_dir():
+            continue
+        dest_dir.mkdir(parents=True, exist_ok=True)
+        copy_file(icon_png, dest_dir / "icon.png")
+        copy_file(icon_svg, dest_dir / "icon.svg")
+    if icon_svg.is_file():
+        copy_file(icon_svg, dist_logo)
+
+
 def ingest(source_dir: Path) -> None:
     source_dir = source_dir.resolve()
-    icon_png = source_dir / "strawwu-logo-icon.png"
-    primary_png = source_dir / "strawwu-logo-primary.png"
-    momo_png = source_dir / "strawwu-logo-momo.png"
+    icon_png = resolve_source(source_dir, "icon")
+    primary_png = resolve_source(source_dir, "primary")
+    momo_png = resolve_source(source_dir, "momo")
+    momo_light_png = resolve_source(source_dir, "momo_light")
     colors_md = source_dir / "strawwu-colors.md"
 
-    for req in (icon_png, primary_png):
-        if not req.is_file():
-            raise SystemExit(f"missing required logo: {req}")
+    if icon_png is None:
+        raise SystemExit(f"missing required icon under {source_dir} (strawwu-icon.png or strawwu-logo-icon.png)")
+
+    if primary_png is None:
+        primary_png = icon_png
+        print(f"note: no wordmark found in {source_dir}; using icon for primary/wordmark assets")
 
     dest_source = BRAND / "source"
     dest_source.mkdir(parents=True, exist_ok=True)
+    for role, resolved in (
+        ("icon", icon_png),
+        ("primary", primary_png),
+        ("momo", momo_png),
+        ("momo_light", momo_light_png),
+    ):
+        if resolved is None:
+            continue
+        copy_file(resolved, dest_source / canonical_source_name(role, resolved))
     for name in (
-        "strawwu-logo-icon.png",
         "strawwu-logo-icon.svg",
-        "strawwu-logo-primary.png",
         "strawwu-logo-primary.svg",
-        "strawwu-logo-momo.png",
         "strawwu-logo-momo.svg",
+        "strawwu-logo-momo-light.svg",
         "strawwu-colors.md",
     ):
         src = source_dir / name
@@ -302,8 +358,12 @@ def ingest(source_dir: Path) -> None:
     wrap_png_as_svg(BRAND / "logo-icon.png", calamares / "strawwu-logo.svg", "StrawWU")
     shutil.copy2(BRAND / "logo-wordmark.png", calamares / "strawwu-logo.png")
 
-    if momo_png.is_file():
+    if momo_png is not None:
         rasterize_width(momo_png, BRAND / "logo-momo.png", 1200)
+    if momo_light_png is not None:
+        rasterize_width(momo_light_png, BRAND / "logo-momo-light.png", 1200)
+
+    sync_downstream_assets()
 
     preview = build_preview()
     write_text(BRAND / "preview.html", preview)
@@ -320,6 +380,7 @@ def ingest(source_dir: Path) -> None:
 | `source/strawwu-logo-icon.png` | 主圖標原始檔 |
 | `source/strawwu-logo-primary.png` | 橫式字標原始檔 |
 | `source/strawwu-logo-momo.png` | Momo 吉祥物（選用） |
+| `source/strawwu-logo-momo-light.png` | Momo 淺色版（選用） |
 | `logo-icon.svg` / `logo-icon-*.png` | Plymouth / 桌面 / ISO |
 | `logo-wordmark.svg` | Calamares / 安裝畫面 |
 | `usr/share/plymouth/themes/strawwu-boot/logo.png` | 開機圓角圖標（Title 顯示 StrawWU） |

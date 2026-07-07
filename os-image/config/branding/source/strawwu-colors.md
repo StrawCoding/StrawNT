@@ -43,3 +43,6 @@
 - `#D4A853`：StrawCoding 品牌識別 / 基底
 - `#60A5FA`：kernel bridge / userspace bridge
 - `#0A0E14`：工程感深色桌面 OS 主題
+
+## GPT 生成
+- https://chatgpt.com/c/6a465d84-1ea8-83ee-9797-e831cde68894

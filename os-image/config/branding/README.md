@@ -9,6 +9,7 @@
 | `source/strawwu-logo-icon.png` | 主圖標原始檔 |
 | `source/strawwu-logo-primary.png` | 橫式字標原始檔 |
 | `source/strawwu-logo-momo.png` | Momo 吉祥物（選用） |
+| `source/strawwu-logo-momo-light.png` | Momo 淺色版（選用） |
 | `logo-icon.svg` / `logo-icon-*.png` | Plymouth / 桌面 / ISO |
 | `logo-wordmark.svg` | Calamares / 安裝畫面 |
 | `usr/share/plymouth/themes/strawwu-boot/logo.png` | 開機圓角圖標（Title 顯示 StrawWU） |
