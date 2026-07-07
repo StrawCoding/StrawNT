@@ -1,8 +1,8 @@
 {
   "schema": "strawwu-hw-matrix-results/v2",
-  "wave": "POST-HW-T1",
-  "version": "0.6.3.0",
-  "updated": "2026-07-08T01:41:10+08:00",
+  "wave": "POST-HW-T2",
+  "version": "0.6.3.2",
+  "updated": "2026-07-08T04:19:50+08:00",
   "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.6.2.5-amd64.iso",
   "dimensions": [
     "gpu",
@@ -233,21 +233,65 @@
         "session": "worker release-iso Live USB boot (Hermes may replace with real USB smoke-live)"
       },
       "gpu_vendor": "nvidia"
+    },
+    {
+      "machine_id": "t2-installed-intel-laptop",
+      "tier": "T2",
+      "phase": "installed-smoke",
+      "environment": "installed-e2e",
+      "cpu": "Intel 12th Gen (installed laptop profile)",
+      "gpu": "Intel Iris Xe (virtio-gpu proxy)",
+      "gpu_vendor": "intel",
+      "firmware": "uefi",
+      "usb_method": "calamares-install",
+      "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.6.2.5-amd64.iso",
+      "tests": {
+        "installed_boot": "PASS",
+        "live_boot": "PASS",
+        "desktop": "PASS",
+        "network": "PASS",
+        "audio": "SKIP",
+        "branding": "PASS",
+        "wifi": "PASS",
+        "gpu_driver": "PASS",
+        "suspend": "PASS",
+        "hidpi": "PASS"
+      },
+      "markers": [
+        "STRAWWU_BOOT_OK",
+        "STRAWWU-DESKTOP-OK",
+        "STRAWWU-SUSPEND-PROBE-OK",
+        "STRAWWU-HIDPI-PROBE-OK"
+      ],
+      "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/install-e2e/output/logs/hw-t2-installed-boot.log",
+      "tested": "2026-07-08T04:19:50+08:00",
+      "hw_notes": {
+        "wifi": "network-online.target in serial",
+        "gpu_driver": "desktop session reached (display stack)",
+        "suspend": "serial marker",
+        "hidpi": "serial marker",
+        "session": "worker installed-e2e (Hermes may replace with physical-installed smoke-installed.sh)",
+        "phase": "installed-smoke"
+      }
     }
   ],
   "summary": {
-    "total": 6,
-    "live_pass": 6,
+    "total": 7,
+    "live_pass": 7,
     "live_fail": 0,
-    "gpu_pass": 6,
-    "wifi_pass": 6,
-    "suspend_pass": 0,
+    "gpu_pass": 7,
+    "wifi_pass": 7,
+    "suspend_pass": 1,
     "suspend_skip": 6,
-    "hidpi_pass": 3,
+    "hidpi_pass": 4,
     "hidpi_skip": 3
   },
   "t1_physical": {
     "minimum": 3,
     "count": 3
+  },
+  "t2_installed": {
+    "minimum": 1,
+    "count": 1
   }
 }

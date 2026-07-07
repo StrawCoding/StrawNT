@@ -1,0 +1,26 @@
+{
+  "schema": "strawwu-hw-t2-installed-baseline/v1",
+  "wave": "POST-HW-T2",
+  "version": "0.6.3.2",
+  "tier": "T2",
+  "minimum_installed_pass": 1,
+  "dimensions_required": [
+    "suspend",
+    "hidpi"
+  ],
+  "smoke_script": "tests/hw/smoke-installed.sh",
+  "matrix_runner": "tests/hw/run-hw-t2-installed.sh",
+  "merge_script": "tests/hw/merge-entry.sh",
+  "results_json": "docs/plans/hw-matrix-results.json",
+  "preflight": "tests/preflight/test-hw-t2-installed.sh",
+  "profiles": [
+    "t2-installed-intel-laptop (installed UEFI + suspend x3 + HiDPI)"
+  ],
+  "hermes_workflow": [
+    "install StrawWU release-iso to disk (Calamares)",
+    "boot installed session",
+    "bash tests/hw/smoke-installed.sh --full-hw --environment physical-installed --output /tmp/smoke.json",
+    "bash tests/hw/merge-entry.sh --entry /tmp/smoke.json"
+  ],
+  "dod": "≥1 T2 installed-smoke entry with suspend PASS + hidpi PASS in hw-matrix-results.json"
+}

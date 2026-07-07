@@ -177,6 +177,7 @@ preflight:
 	bash tests/preflight/test-perf-legal-gate.sh
 	bash tests/preflight/test-hw-matrix.sh
 	bash tests/preflight/test-hw-t1-live-usb.sh
+	bash tests/preflight/test-hw-t2-installed.sh
 	bash tests/preflight/test-post-mvp-roadmap.sh
 	bash tests/preflight/test-ubuntu-2604-closeout.sh
 	bash tests/preflight/test-fork-f7-closeout.sh
@@ -364,6 +365,9 @@ test-hw-t1-live-usb-run:
 
 test-hw-t2-installed:
 	bash tests/preflight/test-hw-t2-installed.sh
+
+test-hw-t2-installed-run:
+	bash tests/hw/run-hw-t2-installed.sh run
 
 test-ddp-rootfs:
 	bash tests/preflight/test-ddp-rootfs.sh

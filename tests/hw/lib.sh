@@ -111,6 +111,9 @@ def suspend_probe():
         return "PASS", "serial marker"
     if env == "qemu-proxy":
         return "SKIP", "suspend not exercised in qemu-proxy (Hermes physical session)"
+    if env in ("installed-e2e", "physical-installed"):
+        if re.search(r"STRAWWU-SUSPEND-CYCLE-[0-9]+-OK", text):
+            return "PASS", "suspend cycles in serial"
     if re.search(r"sleep\.target|suspend\.target", text, re.I):
         return "PROBE", "sleep targets referenced in serial"
     return "SKIP", "suspend probe unavailable"
