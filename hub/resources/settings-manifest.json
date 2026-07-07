@@ -12,6 +12,7 @@
     { "id": "updates", "group": "system" },
     { "id": "apps", "group": "applications" },
     { "id": "flathub", "group": "applications" },
+    { "id": "drivers", "group": "system" },
     { "id": "language", "group": "personalization" },
     { "id": "wincompat", "group": "compatibility" },
     { "id": "system", "group": "shortcuts" },
@@ -41,6 +42,13 @@
     "api": "https://flathub.org/api/v2",
     "flatpak_cli": "/usr/bin/flatpak",
     "fixture": "hub/tests/fixtures/flathub-catalog.json"
+  },
+  "drivers": {
+    "cli": "/usr/bin/strawwu-drivers",
+    "cli_dev": "os-image/debs/strawwu-drivers/usr/bin/strawwu-drivers",
+    "fixture": "hub/tests/fixtures/drivers-catalog.json",
+    "polkit_action": "xyz.wastebase.strawwu.drivers.install",
+    "secure_boot_plan": "post-sec-secureboot-route"
   },
   "system_shortcuts": [
     { "id": "wifi", "desktop": "gnome-wifi-panel.desktop" },

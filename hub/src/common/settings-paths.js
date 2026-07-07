@@ -28,6 +28,14 @@ const DEV_FLATHUB_FIXTURE = path.join(HUB_ROOT, 'tests/fixtures/flathub-catalog.
 const FLATHUB_API = 'https://flathub.org/api/v2';
 const FLATHUB_REMOTE = 'flathub';
 
+const INSTALLED_DRIVERS_CLI = '/usr/bin/strawwu-drivers';
+const DEV_DRIVERS_CLI = path.join(
+  REPO_ROOT,
+  'os-image/debs/strawwu-drivers/usr/bin/strawwu-drivers',
+);
+const DEV_DRIVERS_FIXTURE = path.join(HUB_ROOT, 'tests/fixtures/drivers-catalog.json');
+const DRIVERS_POLKIT_ACTION = 'xyz.wastebase.strawwu.drivers.install';
+
 function firstExisting(...candidates) {
   for (const candidate of candidates) {
     if (candidate && fs.existsSync(candidate)) {
@@ -105,11 +113,30 @@ function resolveFlathubFixture() {
   return firstExisting(DEV_FLATHUB_FIXTURE);
 }
 
+function resolveDriversCli() {
+  if (process.env.STRAWWU_DRIVERS_CLI && fs.existsSync(process.env.STRAWWU_DRIVERS_CLI)) {
+    return process.env.STRAWWU_DRIVERS_CLI;
+  }
+  return firstExisting(INSTALLED_DRIVERS_CLI, DEV_DRIVERS_CLI);
+}
+
+function resolveDriversFixture() {
+  if (process.env.STRAWWU_DRIVERS_FIXTURE_PATH) {
+    return process.env.STRAWWU_DRIVERS_FIXTURE_PATH;
+  }
+  const debFixture = path.join(
+    REPO_ROOT,
+    'os-image/debs/strawwu-drivers/usr/share/strawwu/drivers/fixture-catalog.json',
+  );
+  return firstExisting(DEV_DRIVERS_FIXTURE, debFixture);
+}
+
 module.exports = {
   HUB_ROOT,
   REPO_ROOT,
   FLATHUB_API,
   FLATHUB_REMOTE,
+  DRIVERS_POLKIT_ACTION,
   resolveLegalDir,
   resolveLegalDoc,
   resolveCompatMatrix,
@@ -117,6 +144,8 @@ module.exports = {
   resolveAppRegistryCli,
   resolveFlatpakCli,
   resolveFlathubFixture,
+  resolveDriversCli,
+  resolveDriversFixture,
   readVersion,
   readOsPrettyName,
 };

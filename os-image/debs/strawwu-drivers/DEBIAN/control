@@ -1,0 +1,15 @@
+Package: strawwu-drivers
+Version: __VERSION__
+Section: admin
+Priority: optional
+Architecture: all
+Depends: python3,
+         ubuntu-drivers-common,
+         pkexec,
+         polkitd
+Recommends: ubuntu-drivers
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU driver manager — GPU/firmware curation CLI
+ Branded wrapper around ubuntu-drivers for NVIDIA/AMD/Intel GPU
+ detection, recommended driver listing, and one-click install.
+ Includes polkit policy for privileged install operations.

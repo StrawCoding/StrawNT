@@ -1,0 +1,18 @@
+schema: strawwu-drivers/v1
+stage: post-d1-strawwu-drivers
+version: 0.6.0.0-target
+cli: strawwu-drivers
+commands:
+  - list
+  - status
+  - install
+  - devices
+vendors:
+  - nvidia
+  - amd
+  - intel
+secure_boot:
+  plan: post-sec-secureboot-route
+  doc: docs/plans/kickoff/POST-SEC-secureboot-route.md
+  warning_key: drivers.secure_boot_warning
+fixture_env: STRAWWU_DRIVERS_FIXTURE

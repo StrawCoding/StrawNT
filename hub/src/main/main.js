@@ -4,6 +4,7 @@ const RuntimeClient = require('./runtime-client');
 const settingsService = require('./settings-service');
 const appRegistryService = require('./app-registry-service');
 const flathubService = require('./flathub-service');
+const driversService = require('./drivers-service');
 const i18n = require('../common/i18n');
 const { IPC_CHANNELS, UPDATE_CHANNELS } = require('../common/constants');
 
@@ -126,6 +127,11 @@ function setupIpcHandlers() {
   ipcMain.handle(IPC_CHANNELS.GET_FLATHUB_STATUS, async () => flathubService.getFlathubStatus());
   ipcMain.handle(IPC_CHANNELS.INSTALL_FLATHUB, async (_event, appId) =>
     flathubService.installApp(appId),
+  );
+  ipcMain.handle(IPC_CHANNELS.GET_DRIVERS_STATUS, async () => driversService.getDriverStatus());
+  ipcMain.handle(IPC_CHANNELS.LIST_DRIVERS, async () => driversService.listDrivers());
+  ipcMain.handle(IPC_CHANNELS.INSTALL_DRIVER, async (_event, packageName) =>
+    driversService.installDriver(packageName),
   );
 }
 

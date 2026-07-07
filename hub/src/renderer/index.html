@@ -41,6 +41,10 @@
         <span class="nav-icon">⬡</span>
         <span data-i18n="nav.flathub">Flathub</span>
       </button>
+      <button class="nav-btn" data-tab="drivers">
+        <span class="nav-icon">⬢</span>
+        <span data-i18n="nav.drivers">Drivers</span>
+      </button>
       <button class="nav-btn" data-tab="wincompat">
         <span class="nav-icon">⊞</span>
         <span data-i18n="nav.wincompat">Windows Compat</span>
@@ -157,6 +161,22 @@
         <div id="flathub-meta" class="apps-meta muted-text"></div>
         <div id="flathub-list" class="flathub-list"></div>
         <div id="flathub-status" class="channel-status"></div>
+      </section>
+
+      <!-- Drivers Panel -->
+      <section id="tab-drivers" class="tab-panel">
+        <h2 data-i18n="drivers.title">Drivers</h2>
+        <p class="muted-text" data-i18n="drivers.description">View GPU hardware, recommended drivers, and install proprietary NVIDIA/AMD packages.</p>
+        <div id="drivers-secure-boot" class="drivers-secure-boot hidden"></div>
+        <div class="drivers-toolbar">
+          <button id="btn-refresh-drivers" class="btn btn-secondary" data-i18n="drivers.refresh">Refresh</button>
+        </div>
+        <div id="drivers-meta" class="apps-meta muted-text"></div>
+        <h3 class="section-subtitle" data-i18n="drivers.devices_title">Graphics Hardware</h3>
+        <div id="drivers-devices" class="drivers-list"></div>
+        <h3 class="section-subtitle" data-i18n="drivers.packages_title">Available Drivers</h3>
+        <div id="drivers-packages" class="drivers-list"></div>
+        <div id="drivers-status" class="channel-status"></div>
       </section>
 
       <!-- Language Panel -->

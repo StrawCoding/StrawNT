@@ -950,3 +950,113 @@ body {
   font-family: var(--font-mono);
 }
 
+/* --- Drivers panel (POST-D1) --- */
+.drivers-toolbar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.drivers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.driver-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.driver-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.driver-vendor-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.driver-vendor-nvidia {
+  background: rgba(118, 185, 0, 0.15);
+  color: #86efac;
+}
+
+.driver-vendor-amd {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
+
+.driver-vendor-intel {
+  background: rgba(96, 165, 250, 0.15);
+  color: #93c5fd;
+}
+
+.driver-vendor-unknown {
+  background: rgba(169, 182, 195, 0.15);
+  color: var(--muted);
+}
+
+.driver-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.driver-recommended {
+  color: var(--teal);
+  font-weight: 600;
+}
+
+.drivers-secure-boot {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.drivers-secure-boot.hidden {
+  display: none;
+}
+
+.drivers-warning-icon {
+  font-size: 20px;
+  color: var(--amber);
+  line-height: 1;
+}
+
+.drivers-warning-title {
+  font-weight: 600;
+  color: var(--amber);
+  margin-bottom: 4px;
+}
+
+.drivers-warning-text {
+  font-size: 13px;
+  color: var(--text);
+  margin: 0 0 4px;
+}
+
+.drivers-warning-plan {
+  font-size: 11px;
+  margin: 0;
+}
+

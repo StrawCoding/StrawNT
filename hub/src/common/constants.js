@@ -28,6 +28,9 @@ module.exports = {
     SEARCH_FLATHUB: 'flathub:search',
     GET_FLATHUB_STATUS: 'flathub:get-status',
     INSTALL_FLATHUB: 'flathub:install',
+    GET_DRIVERS_STATUS: 'drivers:get-status',
+    LIST_DRIVERS: 'drivers:list',
+    INSTALL_DRIVER: 'drivers:install',
   },
 
   COLORS: {

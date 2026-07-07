@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+"""StrawWU driver manager CLI — list, status, install GPU drivers."""
+from __future__ import annotations
+
+import argparse
+import importlib.util
+import sys
+from pathlib import Path
+
+_CORE = Path(__file__).resolve().parent.parent / "lib" / "strawwu-drivers" / "core.py"
+_spec = importlib.util.spec_from_file_location("strawwu_drivers_core", _CORE)
+_mod = importlib.util.module_from_spec(_spec)
+assert _spec.loader is not None
+_spec.loader.exec_module(_mod)
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="strawwu-drivers",
+        description="StrawWU GPU driver manager (ubuntu-drivers wrapper).",
+    )
+    parser.add_argument("--json", action="store_true", help="Emit JSON output")
+    parser.add_argument("--dry-run", action="store_true", help="Simulate install without changes")
+    sub = parser.add_subparsers(dest="command")
+    sub.add_parser("list", help="List available/recommended drivers")
+    sub.add_parser("status", help="Show GPU devices and driver state")
+    sub.add_parser("devices", help="List detected GPU devices")
+    install_p = sub.add_parser("install", help="Install a driver package")
+    install_p.add_argument("package", help="Driver package name (e.g. nvidia-driver-550)")
+    sub.add_parser("version", help="Print package version")
+
+    args = parser.parse_args(argv)
+    if args.command == "version":
+        return _mod.cmd_version()
+
+    return _mod.run_cli(
+        args.command,
+        package=getattr(args, "package", "") or "",
+        as_json=args.json,
+        dry_run=args.dry_run,
+    )
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

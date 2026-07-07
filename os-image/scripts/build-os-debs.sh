@@ -22,6 +22,7 @@ OS_DEB_PACKAGES=(
     strawwu-greeter
     strawwu-update-notifier
     strawwu-bug-reporter
+    strawwu-drivers
     strawwu-flatpak-setup
     strawwu-l10n-ime
     strawwu-firstboot

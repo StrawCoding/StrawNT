@@ -1,0 +1,28 @@
+{
+  "schema": "strawwu-drivers-baseline/v1",
+  "stage": "post-d1-strawwu-drivers",
+  "version": "0.6.2.7",
+  "package": "strawwu-drivers",
+  "hub_panel": "drivers",
+  "cli": "/usr/bin/strawwu-drivers",
+  "polkit_action": "xyz.wastebase.strawwu.drivers.install",
+  "secure_boot_plan": "post-sec-secureboot-route",
+  "vendors": [
+    "nvidia",
+    "amd",
+    "intel"
+  ],
+  "fixture": "os-image/debs/strawwu-drivers/usr/share/strawwu/drivers/fixture-catalog.json",
+  "hub_fixture": "hub/tests/fixtures/drivers-catalog.json",
+  "ipc_channels": [
+    "drivers:get-status",
+    "drivers:list",
+    "drivers:install"
+  ],
+  "i18n_keys": [
+    "nav.drivers",
+    "drivers.title",
+    "drivers.install",
+    "drivers.secure_boot_title"
+  ]
+}

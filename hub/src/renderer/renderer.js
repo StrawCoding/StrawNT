@@ -21,6 +21,11 @@ const $flathubList = document.getElementById('flathub-list');
 const $flathubSearch = document.getElementById('flathub-search');
 const $flathubMeta = document.getElementById('flathub-meta');
 const $flathubStatus = document.getElementById('flathub-status');
+const $driversDevices = document.getElementById('drivers-devices');
+const $driversPackages = document.getElementById('drivers-packages');
+const $driversMeta = document.getElementById('drivers-meta');
+const $driversStatus = document.getElementById('drivers-status');
+const $driversSecureBoot = document.getElementById('drivers-secure-boot');
 
 let currentLogs = [];
 let currentTranslations = {};
@@ -579,6 +584,166 @@ if ($flathubSearch) {
 }
 document.getElementById('btn-refresh-flathub')?.addEventListener('click', refreshFlathubCatalog);
 
+// --- Drivers (GPU / firmware) ---
+const VENDOR_LABELS = {
+  nvidia: 'drivers.vendor.nvidia',
+  amd: 'drivers.vendor.amd',
+  intel: 'drivers.vendor.intel',
+  unknown: 'drivers.vendor.unknown',
+};
+
+const STATUS_LABELS = {
+  available: 'drivers.status.available',
+  installed: 'drivers.status.installed',
+  'in-kernel': 'drivers.status.in_kernel',
+  unknown: 'drivers.status.unknown',
+};
+
+function vendorBadgeClass(vendor) {
+  if (vendor === 'nvidia') return 'driver-vendor-nvidia';
+  if (vendor === 'amd') return 'driver-vendor-amd';
+  if (vendor === 'intel') return 'driver-vendor-intel';
+  return 'driver-vendor-unknown';
+}
+
+function renderSecureBootWarning(secureBoot) {
+  if (!secureBoot?.enabled || !secureBoot?.warning) {
+    $driversSecureBoot.classList.add('hidden');
+    $driversSecureBoot.innerHTML = '';
+    return;
+  }
+  $driversSecureBoot.classList.remove('hidden');
+  $driversSecureBoot.innerHTML = `
+    <div class="drivers-warning-icon">⚠</div>
+    <div>
+      <div class="drivers-warning-title">${t('drivers.secure_boot_title')}</div>
+      <p class="drivers-warning-text">${escapeHtml(secureBoot.warning)}</p>
+      <p class="muted-text drivers-warning-plan">${t('drivers.secure_boot_plan', { plan: secureBoot.plan || 'post-sec-secureboot-route' })}</p>
+    </div>
+  `;
+}
+
+function renderDriverDevices(devices) {
+  if (!devices.length) {
+    $driversDevices.innerHTML = `<p class="muted-text">${t('drivers.no_devices')}</p>`;
+    return;
+  }
+
+  $driversDevices.innerHTML = devices
+    .map(
+      (device) => `
+    <div class="driver-card" data-pci="${escapeHtml(device.pci_id || '')}">
+      <div class="driver-card-header">
+        <div>
+          <div class="app-name">${escapeHtml(device.model || device.pci_id || 'GPU')}</div>
+          <div class="app-id">${escapeHtml(device.pci_id || '')}</div>
+        </div>
+        <span class="driver-vendor-badge ${vendorBadgeClass(device.vendor)}">${t(VENDOR_LABELS[device.vendor] || VENDOR_LABELS.unknown)}</span>
+      </div>
+      <div class="driver-meta-row">
+        <span>${t('drivers.current_driver')}: ${escapeHtml(device.driver_label || device.driver || t('drivers.none'))}</span>
+        <span>${t(STATUS_LABELS[device.status] || STATUS_LABELS.unknown)}</span>
+      </div>
+    </div>
+  `,
+    )
+    .join('');
+}
+
+function renderDriverPackages(drivers) {
+  if (!drivers.length) {
+    $driversPackages.innerHTML = `<p class="muted-text">${t('drivers.no_packages')}</p>`;
+    return;
+  }
+
+  $driversPackages.innerHTML = drivers
+    .map(
+      (driver) => `
+    <div class="driver-card" data-package="${escapeHtml(driver.package)}">
+      <div class="driver-card-header">
+        <div>
+          <div class="app-name">${escapeHtml(driver.label || driver.package)}</div>
+          <div class="app-id">${escapeHtml(driver.package)}</div>
+        </div>
+        <span class="driver-vendor-badge ${vendorBadgeClass(driver.vendor)}">${t(VENDOR_LABELS[driver.vendor] || VENDOR_LABELS.unknown)}</span>
+      </div>
+      <div class="driver-meta-row">
+        ${driver.recommended ? `<span class="driver-recommended">${t('drivers.recommended')}</span>` : ''}
+        <span>${driver.installed ? t('drivers.status.installed') : t('drivers.status.available')}</span>
+      </div>
+      <div class="app-actions">
+        ${
+          driver.installed
+            ? `<button class="btn btn-secondary" disabled>${t('drivers.installed')}</button>`
+            : `<button class="btn btn-primary btn-install-driver" data-package="${escapeHtml(driver.package)}" data-label="${escapeHtml(driver.label || driver.package)}">${t('drivers.install')}</button>`
+        }
+      </div>
+    </div>
+  `,
+    )
+    .join('');
+
+  $driversPackages.querySelectorAll('.btn-install-driver').forEach((btn) => {
+    btn.addEventListener('click', () => installDriverPackage(btn.dataset.package, btn.dataset.label, btn));
+  });
+}
+
+async function refreshDrivers() {
+  $driversStatus.textContent = '';
+  try {
+    const data = await strawwuHub.getDriversStatus();
+    const metaParts = [
+      t('drivers.device_count', { count: (data.devices || []).length }),
+      t('drivers.package_count', { count: (data.drivers || []).length }),
+    ];
+    if (data.mock) metaParts.push(t('drivers.dev_fixture'));
+    if (data.source === 'fixture-fallback') metaParts.push(t('drivers.cli_fallback'));
+    $driversMeta.textContent = metaParts.join(' · ');
+    renderSecureBootWarning(data.secureBoot);
+    renderDriverDevices(data.devices || []);
+    renderDriverPackages(data.drivers || []);
+  } catch {
+    $driversDevices.innerHTML = `<p class="muted-text">${t('drivers.load_failed')}</p>`;
+    $driversPackages.innerHTML = '';
+  }
+}
+
+async function installDriverPackage(packageName, label, btn) {
+  if (!window.confirm(t('drivers.install_confirm', { name: label }))) return;
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = t('drivers.installing');
+  }
+  $driversStatus.textContent = '';
+  try {
+    const result = await strawwuHub.installDriver(packageName);
+    if (result.mock) {
+      $driversStatus.textContent = t('drivers.install_mock', { name: label });
+    } else if (result.success) {
+      $driversStatus.textContent = t('drivers.installed_success', { name: label });
+    } else {
+      throw new Error(result.message || 'install failed');
+    }
+    await refreshDrivers();
+    setTimeout(() => {
+      $driversStatus.textContent = '';
+    }, 4000);
+  } catch {
+    $driversStatus.textContent = t('drivers.install_failed', { name: label });
+    $driversStatus.classList.add('status-error');
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = t('drivers.install');
+    }
+    setTimeout(() => {
+      $driversStatus.textContent = '';
+      $driversStatus.classList.remove('status-error');
+    }, 4000);
+  }
+}
+
+document.getElementById('btn-refresh-drivers')?.addEventListener('click', refreshDrivers);
+
 // --- Live Updates ---
 strawwuHub.onStatusUpdate((data) => {
   if (data) renderStatus(data);
@@ -609,6 +774,7 @@ initI18n().then(() => {
   renderAbout();
   refreshApps();
   refreshFlathubStatus().then(refreshFlathubCatalog);
+  refreshDrivers();
 });
 
 setInterval(refreshStatus, 10000);

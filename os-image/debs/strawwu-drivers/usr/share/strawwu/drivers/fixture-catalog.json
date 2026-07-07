@@ -1,0 +1,65 @@
+{
+  "schema": "strawwu-drivers-fixture/v1",
+  "mock": true,
+  "devices": [
+    {
+      "pci_id": "10de:2484",
+      "vendor": "nvidia",
+      "model": "NVIDIA GeForce RTX 3070",
+      "driver": "nvidia-driver-550",
+      "driver_label": "NVIDIA driver 550 (proprietary)",
+      "recommended": true,
+      "installed": false,
+      "status": "available"
+    },
+    {
+      "pci_id": "1002:73bf",
+      "vendor": "amd",
+      "model": "AMD Radeon RX 6800 XT",
+      "driver": "xserver-xorg-video-amdgpu",
+      "driver_label": "AMDGPU open-source driver",
+      "recommended": true,
+      "installed": true,
+      "status": "installed"
+    },
+    {
+      "pci_id": "8086:9a49",
+      "vendor": "intel",
+      "model": "Intel Iris Xe Graphics",
+      "driver": "i915",
+      "driver_label": "Intel i915 (in-kernel)",
+      "recommended": true,
+      "installed": true,
+      "status": "in-kernel"
+    }
+  ],
+  "drivers": [
+    {
+      "package": "nvidia-driver-550",
+      "vendor": "nvidia",
+      "label": "NVIDIA driver 550 (proprietary)",
+      "recommended": true,
+      "installed": false
+    },
+    {
+      "package": "xserver-xorg-video-amdgpu",
+      "vendor": "amd",
+      "label": "AMDGPU open-source driver",
+      "recommended": true,
+      "installed": true
+    },
+    {
+      "package": "firmware-amd-graphics",
+      "vendor": "amd",
+      "label": "AMD GPU firmware (linux-firmware)",
+      "recommended": false,
+      "installed": true
+    }
+  ],
+  "secure_boot": {
+    "enabled": true,
+    "state": "enabled",
+    "warning": "Secure Boot is enabled. Proprietary NVIDIA kernel modules may require MOK enrollment before they load. See POST-SEC-secureboot-route.",
+    "plan": "post-sec-secureboot-route"
+  }
+}
