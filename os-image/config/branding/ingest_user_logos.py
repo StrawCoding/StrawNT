@@ -15,12 +15,35 @@ BRAND = Path(__file__).resolve().parent
 REPO_ROOT = BRAND.parents[2]
 DEFAULT_SOURCE = Path("/mnt/data/Data/檔案/專案資料/StrawWU")
 
-# User directory may ship legacy (strawwu-logo-*) or current (strawwu-*) names.
+# User directory may ship legacy PNG, current PNG, or vector SVG names.
 SOURCE_ALIASES: dict[str, tuple[str, ...]] = {
-    "icon": ("strawwu-logo-icon.png", "strawwu-icon.png"),
-    "primary": ("strawwu-logo-primary.png", "strawwu-primary.png", "strawwu-wordmark.png"),
-    "momo": ("strawwu-logo-momo.png", "strawwu-momo.png"),
-    "momo_light": ("strawwu-logo-momo-light.png", "strawwu-momo-light.png"),
+    "icon": (
+        "StrawWU-icon.svg",
+        "strawwu-icon.svg",
+        "strawwu-logo-icon.svg",
+        "strawwu-logo-icon.png",
+        "strawwu-icon.png",
+    ),
+    "primary": (
+        "StrawWU-lockup.svg",
+        "strawwu-lockup.svg",
+        "strawwu-logo-primary.svg",
+        "strawwu-logo-primary.png",
+        "strawwu-primary.png",
+        "strawwu-wordmark.png",
+    ),
+    "momo": (
+        "StrawWU-lockup.svg",
+        "strawwu-lockup.svg",
+        "strawwu-logo-momo.svg",
+        "strawwu-logo-momo.png",
+        "strawwu-momo.png",
+    ),
+    "momo_light": (
+        "strawwu-logo-momo-light.svg",
+        "strawwu-logo-momo-light.png",
+        "strawwu-momo-light.png",
+    ),
 }
 
 COLORS = {
@@ -167,12 +190,44 @@ def copy_file(src: Path, dst: Path) -> None:
     print(f"copied {src.name} -> {dst}")
 
 
+def rasterize_svg(src: Path, dst: Path) -> Path:
+    """Render SVG to PNG for downstream PIL/ImageMagick pipelines."""
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    run(
+        [
+            "convert",
+            "-background",
+            "none",
+            str(src),
+            str(dst),
+        ]
+    )
+    print(f"rasterized {src.name} -> {dst.name}")
+    return dst
+
+
+def lockup_light_variant(lockup_svg: Path, dst: Path) -> Path:
+    """Dark-text lockup for light-theme surfaces (hero on pale background)."""
+    text = lockup_svg.read_text(encoding="utf-8")
+    text = text.replace('fill="#FFFFFF"', 'fill="#0A0E14"')
+    text = text.replace("fill='#FFFFFF'", "fill='#0A0E14'")
+    dst.write_text(text, encoding="utf-8")
+    print(f"wrote light lockup variant {dst.name}")
+    return dst
+
+
 def resolve_source(source_dir: Path, role: str) -> Path | None:
     for name in SOURCE_ALIASES[role]:
         candidate = source_dir / name
         if candidate.is_file():
             return candidate
     return None
+
+
+def as_raster_source(src: Path, cache_dir: Path) -> Path:
+    if src.suffix.lower() != ".svg":
+        return src
+    return rasterize_svg(src, cache_dir / f"{src.stem}.png")
 
 
 def canonical_source_name(role: str, resolved: Path) -> str:
@@ -369,7 +424,10 @@ def ingest(source_dir: Path) -> None:
     colors_md = source_dir / "strawwu-colors.md"
 
     if icon_png is None:
-        raise SystemExit(f"missing required icon under {source_dir} (strawwu-icon.png or strawwu-logo-icon.png)")
+        raise SystemExit(
+            f"missing required icon under {source_dir} "
+            "(StrawWU-icon.svg, strawwu-icon.png, or strawwu-logo-icon.png)"
+        )
 
     if primary_png is None:
         primary_png = icon_png
@@ -377,6 +435,17 @@ def ingest(source_dir: Path) -> None:
 
     dest_source = BRAND / "source"
     dest_source.mkdir(parents=True, exist_ok=True)
+
+    lockup_svg = resolve_source(source_dir, "primary")
+    if momo_png is None and lockup_svg is not None and lockup_svg.suffix.lower() == ".svg":
+        momo_png = lockup_svg
+    if momo_light_png is None and lockup_svg is not None and lockup_svg.suffix.lower() == ".svg":
+        light_svg = dest_source / "strawwu-logo-momo-light.svg"
+        momo_light_png = lockup_light_variant(lockup_svg, light_svg)
+
+    raster_cache = dest_source / ".raster-cache"
+    raster_cache.mkdir(parents=True, exist_ok=True)
+
     stripped_sources: dict[str, Path] = {}
     for role, resolved in (
         ("icon", icon_png),
@@ -386,9 +455,10 @@ def ingest(source_dir: Path) -> None:
     ):
         if resolved is None:
             continue
+        raster = as_raster_source(resolved, raster_cache)
         dest = dest_source / canonical_source_name(role, resolved)
         strip_white_gray_background(
-            resolved,
+            raster,
             dest,
             preserve_white_logo=(role == "momo_light"),
         )
@@ -398,6 +468,10 @@ def ingest(source_dir: Path) -> None:
     momo_png = stripped_sources.get("momo", momo_png)
     momo_light_png = stripped_sources.get("momo_light", momo_light_png)
     for name in (
+        "StrawWU-icon.svg",
+        "StrawWU-lockup.svg",
+        "strawwu-icon.svg",
+        "strawwu-lockup.svg",
         "strawwu-logo-icon.svg",
         "strawwu-logo-primary.svg",
         "strawwu-logo-momo.svg",
