@@ -32,7 +32,7 @@
 | RE0 | 盤點現有 CI/release 腳本 | `docs/plans/release-baseline.json` |
 | RE1 | 統一 artifact 命名 + manifest schema | `release-manifest.json` |
 | RE2 | SHA256SUMS + GPG 簽章 SOP | `scripts/release-sign.sh` |
-| RE3 | APT repo 結構 + strawwu-keyring | `apt.strawwu.wastebase.xyz` 或 self-hosted |
+| RE3 | APT repo 結構 + strawwu-keyring | `apt.strawwu.org` |
 | RE4 | package publish SOP（deb 上傳） | `scripts/publish-debs.sh` |
 | RE5 | release checklist + notes 模板 | `docs/release-checklist.md` |
 | RE6 | rollback policy + artifact retention | 90d nightly / ∞ stable |
@@ -54,7 +54,7 @@ pool/
 ## 6. strawwu-keyring
 
 - 套件：`strawwu-keyring` deb，安裝 `/usr/share/keyrings/strawwu-archive-keyring.gpg`
-- sources.list：`deb [signed-by=...] https://apt.strawwu.wastebase.xyz noble main`
+- sources.list：`deb [signed-by=...] https://apt.strawwu.org resolute main`
 - 金鑰輪替：主金鑰 + 子金鑰；舊 Release 保留驗證路徑
 
 ## 7. release-manifest.json

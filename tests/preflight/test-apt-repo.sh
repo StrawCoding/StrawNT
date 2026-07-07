@@ -176,8 +176,7 @@ data = {
         "pool": "pool/main/{letter}/{package}/",
     },
     "apt_uris": [
-        "https://strawcoding.github.io/strawwu-apt",
-        "https://apt.strawwu.wastebase.xyz",
+        "https://apt.strawwu.org",
     ],
     "gaps_closed": [
         "APT repo dists/ + pool/ structure (RE3)",

@@ -1,5 +1,5 @@
 Types: deb
-URIs: https://strawcoding.github.io/strawwu-apt
+URIs: https://apt.strawwu.org
 Suites: resolute
 Components: main
 Signed-By: /usr/share/keyrings/strawwu-archive-keyring.gpg
