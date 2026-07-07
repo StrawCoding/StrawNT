@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-08T00:40:49.106258",
+  "generated_at": "2026-07-08T02:00:45.092844",
   "target": "0.9.0.0-engineering",
   "total": 21,
-  "passed": 1,
-  "failed": 20,
+  "passed": 2,
+  "failed": 19,
   "all_pass": false,
   "stages": [
     {
@@ -13,8 +13,8 @@
     },
     {
       "id": "post-hw-t1-live-usb",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "post-hw-t2-installed",
