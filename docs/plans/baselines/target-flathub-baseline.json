@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-target-flathub-baseline/v1",
   "wave": "W6-F5",
-  "version": "0.6.2.2",
+  "version": "0.6.2.3",
   "flathub_marker": "TARGET_FLATHUB_OK",
   "runner": "tests/install-e2e/run-target-flathub.sh",
   "result_json": "tests/install-e2e/output/target-flathub-result.json",

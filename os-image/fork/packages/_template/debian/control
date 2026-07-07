@@ -1,0 +1,14 @@
+Source: example-package
+Section: misc
+Priority: optional
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+
+Package: example-package
+Architecture: any
+Depends: ${misc:Depends}
+Description: StrawWU fork scaffold (template only)
+ Placeholder control file for fork package overlay scaffolding.
+ Copy _template/ to a real package directory and replace metadata.

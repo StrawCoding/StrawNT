@@ -1,0 +1,5 @@
+example-package (0.0.0-0strawwu1) resolute; urgency=medium
+
+  * StrawWU fork package scaffold template (fork-f4).
+
+ -- StrawCoding <apt@wastebase.xyz>  Tue, 07 Jul 2026 12:00:00 +0800

@@ -1,0 +1,22 @@
+{
+  "schema": "strawwu-fork-packages/v1",
+  "updated_at": "2026-07-07",
+  "publish_suite": "strawwu-fork",
+  "output_subdir": "output",
+  "scaffold_dir": "_template",
+  "directory_layout": {
+    "required": [
+      "PACKAGE.yaml",
+      "debian/control",
+      "build-package.sh"
+    ],
+    "optional": [
+      "debian/rules",
+      "debian/changelog",
+      "debian/patches",
+      "upstream"
+    ]
+  },
+  "packages": [],
+  "notes": "Register forked upstream packages here after copying _template/. Built debs publish to strawwu-fork APT suite (fork-f5)."
+}

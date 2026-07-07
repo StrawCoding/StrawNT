@@ -1,0 +1,14 @@
+# Upstream tarballs and vendor trees (fetch at build time)
+upstream/
+*.orig.tar.*
+*.debian.tar.*
+
+# Per-package build artifacts
+*/output/
+output/
+
+# Debian build scratch
+*/debian/files
+*/debian/.debhelper/
+*/debian/*.substvars
+*/debian/*.debhelper.log

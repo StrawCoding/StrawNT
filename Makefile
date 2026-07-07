@@ -1,4 +1,4 @@
-.PHONY: help preflight preflight-iso-before-boot preflight-dev-vm clone-ubuntu-base sync-base fork-sync-base fork-baseline-snapshot fork-apply-manifest swap-kernel \
+.PHONY: help preflight preflight-iso-before-boot preflight-dev-vm clone-ubuntu-base sync-base fork-sync-base fork-baseline-snapshot fork-apply-manifest build-fork-packages swap-kernel \
 	build-iso dev-iso release-iso repack-iso validate-rootfs boot-test-iso boot-test-dev-iso \
 	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
@@ -25,6 +25,7 @@ help:
 	@echo "  fork-sync-base            Restore/seed fork base from snapshot or clone (needs root)"
 	@echo "  fork-baseline-snapshot    Capture rootfs as fork baseline snapshot (needs root)"
 	@echo "  fork-apply-manifest       Apply fork package lists to rootfs (needs root)"
+	@echo "  build-fork-packages       Build registered fork upstream package overlays"
 	@echo "  swap-kernel               Replace kernel in cloned rootfs (needs root)"
 	@echo "  dev-iso                   Build ISO (dev-iso mode, zstd -l 3)"
 	@echo "  release-iso               Build ISO (release-iso mode, xz)"
@@ -196,6 +197,9 @@ fork-baseline-snapshot: preflight
 
 fork-apply-manifest: preflight
 	sudo bash $(SCRIPTS)/fork-apply-manifest.sh
+
+build-fork-packages:
+	bash $(SCRIPTS)/build-fork-packages.sh
 
 kernel-build:
 	$(MAKE) -C kernel build

@@ -1,0 +1,13 @@
+schema: strawwu-fork-package/v1
+upstream:
+  name: example-package
+  version: 0.0.0
+  source: debian
+fork:
+  binary_name: example-package
+  strategy: debian-source
+  status: template
+notes: |
+  Copy os-image/fork/packages/_template/ to <pkgname>/ and customize.
+  Register the package name in packages.json before building.
+  Do not commit upstream tarballs — fetch via apt source or upstream URL at build time.
