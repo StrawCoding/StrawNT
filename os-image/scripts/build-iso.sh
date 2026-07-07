@@ -6,6 +6,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 # shellcheck source=lib/ubuntu-base-env.sh
 source "${SCRIPT_DIR}/lib/ubuntu-base-env.sh"
+# shellcheck source=lib/base-marker.sh
+source "${SCRIPT_DIR}/lib/base-marker.sh"
 load_ubuntu_base_env "${REPO_ROOT}"
 read_repo_version() {
     tr -d '[:space:]' < "${REPO_ROOT}/VERSION" 2>/dev/null || echo "0.4.0.0"
@@ -621,13 +623,7 @@ __build_iso_main() {
     iso_mode_resolve
     iso_mode_log "squashfs processors=${STRAWWU_MKSQUASHFS_PROCESSORS} skip_squashfs=${STRAWWU_SKIP_SQUASHFS}"
 
-    if [[ -f "${WORK_DIR}/.fork-sync-base-ok" ]]; then
-        :
-    elif [[ -f "${WORK_DIR}/.clone-ubuntu-base-ok" ]]; then
-        :
-    else
-        die "run make clone-ubuntu-base or make fork-sync-base first"
-    fi
+    die_unless_base_marker "${WORK_DIR}"
     [[ -d "${ROOTFS_DIR}" ]] || die "rootfs missing: ${ROOTFS_DIR}"
 
     local kernel_deb="${STRAWWU_KERNEL_DEB:-}"

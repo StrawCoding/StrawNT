@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-install-firstboot-e2e-baseline/v1",
   "wave": "W6-N5",
-  "version": "0.6.2.1",
+  "version": "0.6.2.2",
   "firstboot_marker": "FIRSTBOOT_OK",
   "runner": "tests/install-e2e/run-firstboot-e2e.sh",
   "overlay_sync": "tests/install-e2e/sync-firstboot-overlay.sh",

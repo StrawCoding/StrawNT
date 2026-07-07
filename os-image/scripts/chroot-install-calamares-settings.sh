@@ -7,11 +7,12 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+# shellcheck source=lib/base-marker.sh
+source "${SCRIPT_DIR}/lib/base-marker.sh"
 WORK_DIR="${STRAWWU_WORK_DIR:-${REPO_ROOT}/os-image/work}"
 ROOTFS_DIR="${WORK_DIR}/rootfs"
 SQUASH_SRC="${WORK_DIR}/squashfs-root"
 MARKER="${WORK_DIR}/.calamares-settings-ok"
-CLONE_MARKER="${WORK_DIR}/.clone-ubuntu-base-ok"
 DEB_BUILD="${REPO_ROOT}/os-image/debs/strawwu-calamares-settings/build-deb.sh"
 
 log() { echo "==> $*" >&2; }
@@ -44,7 +45,7 @@ chroot_run() {
 }
 
 verify_prerequisites() {
-    [[ -f "${CLONE_MARKER}" ]] || die "run clone-ubuntu-base first (${CLONE_MARKER} missing)"
+    die_unless_base_marker "${WORK_DIR}"
     [[ -d "${ROOTFS_DIR}/etc" ]] || die "rootfs missing: ${ROOTFS_DIR}"
     [[ -x "${DEB_BUILD}" ]] || die "missing build script: ${DEB_BUILD}"
     unmount_chroot

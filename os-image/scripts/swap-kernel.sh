@@ -7,6 +7,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+# shellcheck source=lib/base-marker.sh
+source "${SCRIPT_DIR}/lib/base-marker.sh"
 WORK_DIR="${STRAWWU_WORK_DIR:-${REPO_ROOT}/os-image/work}"
 ROOTFS_DIR="${ROOTFS_DIR:-${WORK_DIR}/rootfs}"
 MARKER="${WORK_DIR}/.swap-kernel-ok"
@@ -35,7 +37,8 @@ chroot_run() {
 }
 
 main() {
-    [[ -d "${ROOTFS_DIR}" ]] || die "rootfs missing; run clone-ubuntu-base.sh first"
+    die_unless_base_marker "${WORK_DIR}"
+    [[ -d "${ROOTFS_DIR}" ]] || die "rootfs missing: ${ROOTFS_DIR}"
     [[ "${EUID:-$(id -u)}" -eq 0 ]] || die "run as root"
 
     local kernel_deb="${STRAWWU_KERNEL_DEB:-}"
