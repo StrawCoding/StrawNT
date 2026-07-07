@@ -1,32 +1,115 @@
 {
-  "generated_at": "2026-07-06T00:00:00",
+  "generated_at": "2026-07-08T00:40:49.106258",
   "target": "0.9.0.0-engineering",
   "total": 21,
-  "passed": 0,
-  "failed": 21,
+  "passed": 1,
+  "failed": 20,
   "all_pass": false,
-  "note": "Auto-updated by make test-post-mvp-all-pass",
   "stages": [
-    {"id": "post-d1-strawwu-drivers", "status": "PENDING", "pass": false},
-    {"id": "post-hw-t1-live-usb", "status": "PENDING", "pass": false},
-    {"id": "post-hw-t2-installed", "status": "PENDING", "pass": false},
-    {"id": "post-hw4-peripherals", "status": "PENDING", "pass": false},
-    {"id": "post-ddp-rootfs", "status": "PENDING", "pass": false},
-    {"id": "post-q3-mfp-smoke", "status": "PENDING", "pass": false},
-    {"id": "post-i2-calamares-luks", "status": "PENDING", "pass": false},
-    {"id": "post-d7-software-sources", "status": "PENDING", "pass": false},
-    {"id": "post-ux-theme-curation", "status": "PENDING", "pass": false},
-    {"id": "post-v06-closeout", "status": "PENDING", "pass": false},
-    {"id": "post-upg-rollback", "status": "PENDING", "pass": false},
-    {"id": "post-sec-secureboot-route", "status": "PENDING", "pass": false},
-    {"id": "post-sec-cve-policy", "status": "PENDING", "pass": false},
-    {"id": "post-perf-boot-regression", "status": "PENDING", "pass": false},
-    {"id": "post-ci-kernel-selfhosted", "status": "PENDING", "pass": false},
-    {"id": "post-w7-anticheat-substantive", "status": "PENDING", "pass": false},
-    {"id": "post-hw-t3-wincompat", "status": "PENDING", "pass": false},
-    {"id": "post-q8-golden-apps", "status": "PENDING", "pass": false},
-    {"id": "post-hw5-stable-gate", "status": "PENDING", "pass": false},
-    {"id": "post-backup-timeshift", "status": "PENDING", "pass": false},
-    {"id": "post-v09-engineering-closeout", "status": "PENDING", "pass": false}
+    {
+      "id": "post-d1-strawwu-drivers",
+      "status": "PASS",
+      "pass": true
+    },
+    {
+      "id": "post-hw-t1-live-usb",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "post-hw-t2-installed",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "post-hw4-peripherals",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "post-ddp-rootfs",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "post-q3-mfp-smoke",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "post-i2-calamares-luks",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "post-d7-software-sources",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "post-ux-theme-curation",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "post-v06-closeout",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "post-upg-rollback",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "post-sec-secureboot-route",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "post-sec-cve-policy",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "post-perf-boot-regression",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "post-ci-kernel-selfhosted",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "post-w7-anticheat-substantive",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "post-hw-t3-wincompat",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "post-q8-golden-apps",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "post-hw5-stable-gate",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "post-backup-timeshift",
+      "status": "PENDING",
+      "pass": false
+    },
+    {
+      "id": "post-v09-engineering-closeout",
+      "status": "PENDING",
+      "pass": false
+    }
   ]
 }
