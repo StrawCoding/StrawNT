@@ -2,7 +2,9 @@
   "schema": "strawwu-fork-replace/v1",
   "replacements": {
     "calamares-settings-ubuntu-common": "strawwu-calamares-settings",
+    "ubuntu-minimal": "strawwu-minimal",
+    "ubuntu-desktop": "strawwu-desktop",
     "ubuntu-desktop-minimal": "strawwu-desktop",
-    "ubuntu-minimal": "strawwu-minimal"
+    "update-notifier": "strawwu-update-notifier"
   }
 }

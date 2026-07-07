@@ -1,4 +1,9 @@
 # Extra packages to ensure in fork base (one per line)
-# Populated/curated in fork-f2-manifest-repo
+# Curated fork-f2-manifest-repo — firmware, flatpak stack, essentials
 linux-firmware
 firmware-sof-signed
+flatpak
+gnome-software-plugin-flatpak
+ca-certificates
+curl
+wget

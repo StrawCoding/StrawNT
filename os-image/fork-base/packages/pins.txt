@@ -1,5 +1,6 @@
-# APT pin preferences for fork base
-# Format: package pin priority
+# APT pin preferences for fork base (written to /etc/apt/preferences.d/strawwu-fork-pins)
+# StrawWU packages and kernel take priority over Ubuntu archive.
+
 Package: linux-image-*-strawwu
 Pin: release o=StrawWU
 Pin-Priority: 1001
@@ -7,3 +8,8 @@ Pin-Priority: 1001
 Package: strawwu-*
 Pin: release o=StrawWU
 Pin-Priority: 1001
+
+# W1-F2 — block snapd re-install via ubuntu-desktop Recommends.
+Package: snapd snap-confine ubuntu-core*
+Pin: release *
+Pin-Priority: -1

@@ -19,5 +19,10 @@
     "replace": "packages/replace.json",
     "pins": "packages/pins.txt"
   },
-  "notes": "Populated by fork-f1-baseline-snapshot; status=active after fork-f7-closeout"
+  "curation": {
+    "stage": "fork-f2-manifest-repo",
+    "curated_at": "2026-07-07T12:00:00Z",
+    "strawwu_version": "0.6.2.1"
+  },
+  "notes": "Snapshot from fork-f1; package manifests curated in fork-f2; status=active after fork-f7-closeout"
 }

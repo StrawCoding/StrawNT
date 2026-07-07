@@ -1,0 +1,4 @@
+# StrawWU W1-F2 — block snapd re-install via ubuntu-desktop Recommends.
+Package: snapd snap-confine ubuntu-core*
+Pin: release *
+Pin-Priority: -1

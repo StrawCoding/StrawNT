@@ -1,8 +1,18 @@
 # Packages to purge from fork base (one per line)
-# Inherited from W1 purge + fork curation
+# W1-B1 telemetry/pro/snap + W5-B4 upstream desktop metas + W6-B5 meta audit
 snapd
-ubuntu-advantage-tools
+snap-confine
 apport
+apport-core-dump-handler
 apport-symptoms
 whoopsie
 ubuntu-report
+ubuntu-pro-client
+ubuntu-pro-client-l10n
+ubuntu-advantage-tools
+ubuntu-advantage-desktop-daemon
+ubuntu-desktop
+ubuntu-desktop-minimal
+ubuntu-session
+ubuntu-standard
+update-notifier
