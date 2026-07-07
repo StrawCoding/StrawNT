@@ -1,13 +1,13 @@
 {
   "schema": "strawwu-perf-baseline/v1",
   "generated_at": "2026-07-06",
-  "version": "0.6.1.5",
+  "version": "0.6.1.6",
   "measurements": {
     "latest_iso_bytes": 5096314880,
     "latest_iso_gb": 4.75,
     "latest_iso_file": "StrawWU-0.6.1.5-amd64.iso",
-    "squashfs_bytes": 6982759539,
-    "squashfs_gb": 6.5,
+    "squashfs_bytes": 7030249824,
+    "squashfs_gb": 6.55,
     "live_boot_to_plymouth_sec": null,
     "installed_idle_ram_mb": null,
     "firstboot_complete_sec": null

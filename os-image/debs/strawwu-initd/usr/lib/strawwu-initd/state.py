@@ -17,6 +17,7 @@ DEFAULT_LOG_PATH = Path("/var/log/strawwu/initd.log")
 LIFECYCLE_DEFAULTS = {
     "install": "pending",
     "target_setup": "pending",
+    "initramfs_hooks": "pending",
     "target_identity": "pending",
     "upstream_init_disabled": "pending",
     "boot_selfcheck": "pending",
@@ -26,6 +27,7 @@ LIFECYCLE_DEFAULTS = {
 LIFECYCLE_ENUMS = {
     "install": {"pending", "installing", "installed", "failed"},
     "target_setup": {"pending", "running", "done", "failed", "skipped"},
+    "initramfs_hooks": {"pending", "running", "done", "failed", "skipped"},
     "target_identity": {"pending", "running", "done", "failed", "skipped"},
     "upstream_init_disabled": {"pending", "running", "done", "failed", "skipped"},
     "boot_selfcheck": {"pending", "running", "done", "failed"},

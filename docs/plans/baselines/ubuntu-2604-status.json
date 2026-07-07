@@ -1,18 +1,48 @@
 {
-  "generated_at": "2026-07-06T00:00:00",
+  "generated_at": "2026-07-07T10:46:54+00:00",
   "target": "26.04.0-resolute",
+  "version": "0.6.1.5",
+  "evidence_version": "0.6.1.5",
   "total": 7,
-  "passed": 0,
-  "failed": 7,
-  "all_pass": false,
+  "passed": 7,
+  "failed": 0,
+  "all_pass": true,
   "note": "Auto-updated by make test-ubuntu-2604-all-pass",
   "stages": [
-    {"id": "u26-m1-base-clone", "status": "PENDING", "pass": false},
-    {"id": "u26-m2-kernel-rebase", "status": "PENDING", "pass": false},
-    {"id": "u26-m3-debs-rebuild", "status": "PENDING", "pass": false},
-    {"id": "u26-m4-suite-migrate", "status": "PENDING", "pass": false},
-    {"id": "u26-m5-techrefs-refresh", "status": "PENDING", "pass": false},
-    {"id": "u26-m6-regression-e2e", "status": "PENDING", "pass": false},
-    {"id": "u26-m7-closeout", "status": "PENDING", "pass": false}
+    {
+      "id": "u26-m1-base-clone",
+      "status": "PASS",
+      "pass": true
+    },
+    {
+      "id": "u26-m2-kernel-rebase",
+      "status": "PASS",
+      "pass": true
+    },
+    {
+      "id": "u26-m3-debs-rebuild",
+      "status": "PASS",
+      "pass": true
+    },
+    {
+      "id": "u26-m4-suite-migrate",
+      "status": "PASS",
+      "pass": true
+    },
+    {
+      "id": "u26-m5-techrefs-refresh",
+      "status": "PASS",
+      "pass": true
+    },
+    {
+      "id": "u26-m6-regression-e2e",
+      "status": "PASS",
+      "pass": true
+    },
+    {
+      "id": "u26-m7-closeout",
+      "status": "PASS",
+      "pass": true
+    }
   ]
 }

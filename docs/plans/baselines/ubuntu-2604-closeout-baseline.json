@@ -1,0 +1,20 @@
+{
+  "schema": "strawwu-ubuntu-2604-closeout/v1",
+  "stage": "u26-m7-closeout",
+  "version": "0.6.1.6",
+  "target": "26.04.0-resolute",
+  "migration_stages": 7,
+  "dod_markdown": "docs/plans/ubuntu-2604-closeout/ubuntu-2604-dod.md",
+  "html": "docs/plans/ubuntu-2604-closeout/html/ubuntu-2604-closeout-report.html",
+  "validate": "tests/ubuntu-2604-closeout/validate-ubuntu-2604-closeout.py",
+  "render": "tests/ubuntu-2604-closeout/render-html.py",
+  "preflight": "tests/preflight/test-ubuntu-2604-closeout.sh",
+  "stage_report": "docs/plans/stage-reports/U26-M7-closeout-report.md",
+  "status": "docs/plans/baselines/ubuntu-2604-status.json",
+  "gates": [
+    "make test-ubuntu-2604-all-pass",
+    "make preflight"
+  ],
+  "dod": "Ubuntu 26.04 resolute migration 7 stages + HTML hermes-deliver",
+  "post_migration_next": "post-d1-strawwu-drivers"
+}

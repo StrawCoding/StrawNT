@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrawWU Ubuntu 26.04 Migration Closeout</title>
+  <style>
+:root {
+  --bg: #0f1419;
+  --surface: #1a2332;
+  --text: #e8eef4;
+  --muted: #8b9cb3;
+  --accent: #14b8a6;
+  --accent-dim: #0d9488;
+  --border: #2d3a4d;
+  --code-bg: #0d1117;
+  --pass: #34d399;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  margin: 0;
+  padding: 2rem 1rem 4rem;
+}
+.wrap { max-width: 56rem; margin: 0 auto; }
+header {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+.brand { color: var(--accent); font-weight: 600; letter-spacing: 0.02em; }
+h1 { color: var(--text); font-size: 1.85rem; margin: 0.5rem 0 0.25rem; }
+.meta { color: var(--muted); font-size: 0.9rem; }
+h2 {
+  color: var(--accent);
+  font-size: 1.25rem;
+  margin-top: 2rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.35rem;
+}
+h3 { color: var(--text); font-size: 1.05rem; margin-top: 1.5rem; }
+p { margin: 0.75rem 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 1.4rem; }
+li { margin: 0.35rem 0; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.92rem;
+}
+th, td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+}
+th { background: var(--surface); color: var(--accent); }
+tr:nth-child(even) td { background: rgba(26, 35, 50, 0.5); }
+code {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.88em;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+}
+pre code { border: none; padding: 0; background: transparent; }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1rem 0;
+  padding: 0.25rem 1rem;
+  color: var(--muted);
+}
+footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">StrawWU Ubuntu 26.04 Migration</div>
+      <h1>Resolute 遷移 — 全 7 段 PASS 驗收</h1>
+      <p class="meta">版本 0.6.1.6 · u26-m7-closeout · hermes-deliver</p>
+    </header>
+    <main>
+<h1>StrawWU Ubuntu 26.04 遷移 Definition of Done</h1>
+<table>
+<tr><th>欄位</th><th>值</th></tr>
+<tr><td>------</td><td>-----</td></tr>
+<tr><td>產品目標</td><td>v0.6.0.0-target（Resolute 基底）</td></tr>
+<tr><td>建置版本</td><td>見 VERSION</td></tr>
+<tr><td>遷移段數</td><td>7（u26-m1 → u26-m7-closeout）</td></tr>
+<tr><td>基線</td><td>Ubuntu 26.04 LTS Resolute Raccoon + StrawWU cleanroom</td></tr>
+</table>
+<h2>1. 遷移目標（migration-plan §1）</h2>
+<table>
+<tr><th>#</th><th>項目</th><th>狀態</th><th>證據</th></tr>
+<tr><td>---</td><td>------</td><td>------</td><td>------</td></tr>
+<tr><td>1</td><td>active 基底切換至 26.04 resolute</td><td>✅</td><td>ubuntu-base-target.json、test-u26-base-clone</td></tr>
+<tr><td>2</td><td>kernel rebase 至 resolute 6.14+ / 7.0.0-strawwu</td><td>✅</td><td>linux-image-strawwu deb、test-u26-kernel-rebase</td></tr>
+<tr><td>3</td><td>全部 strawwu-* deb 對 resolute 重編</td><td>✅</td><td>.debs-rebuild-ok、test-u26-debs-rebuild</td></tr>
+<tr><td>4</td><td>APT suite noble→resolute</td><td>✅</td><td>apt-repo-baseline、strawwu.sources、test-u26-suite-migrate</td></tr>
+<tr><td>5</td><td>technical-references 刷新</td><td>✅</td><td>catalog.json resolute、test-u26-techrefs-refresh</td></tr>
+<tr><td>6</td><td>release-iso boot + install-firstboot E2E</td><td>✅</td><td>boot-result、firstboot-e2e、test-u26-regression-e2e</td></tr>
+<tr><td>7</td><td>closeout 報告 + VERSION bump</td><td>✅</td><td>本文件、HTML、ubuntu-2604-status.json</td></tr>
+</table>
+<h2>2. 各段摘要</h2>
+<table>
+<tr><th>段</th><th>ID</th><th>重點</th></tr>
+<tr><td>----</td><td>-----</td><td>------</td></tr>
+<tr><td>M1</td><td>u26-m1-base-clone</td><td>ISO 下載、layered rootfs、active 切換</td></tr>
+<tr><td>M2</td><td>u26-m2-kernel-rebase</td><td>linux 7.0.0-strawwu、strawwu_ipc.ko</td></tr>
+<tr><td>M3</td><td>u26-m3-debs-rebuild</td><td>22 strawwu-* deb @ VERSION</td></tr>
+<tr><td>M4</td><td>u26-m4-suite-migrate</td><td>dists/resolute、publish-debs</td></tr>
+<tr><td>M5</td><td>u26-m5-techrefs-refresh</td><td>catalog ubuntu_release=resolute</td></tr>
+<tr><td>M6</td><td>u26-m6-regression-e2e</td><td>release-iso BIOS+UEFI、FIRSTBOOT_OK</td></tr>
+<tr><td>M7</td><td>u26-m7-closeout</td><td>全段 PASS 彙整、HTML hermes-deliver</td></tr>
+</table>
+<h2>3. 對比基線更新（migration-plan §6）</h2>
+<p>遷移完成後發行版對比統一為：</p>
+<ul>
+<li><strong>主基線</strong>：Ubuntu 26.04 LTS Resolute</li>
+<li><strong>對照</strong>：Mint 22.x / Pop!_OS / Zorin 18 / elementary OS 8</li>
+</ul>
+<h2>4. 風險緩解驗收</h2>
+<table>
+<tr><th>風險</th><th>緩解驗收</th></tr>
+<tr><td>------</td><td>----------</td></tr>
+<tr><td>Calamares 3.x API</td><td>shellprocess_initramfs-resolute.conf、install-firstboot E2E PASS</td></tr>
+<tr><td>layered squashfs</td><td>clone-ubuntu-base unsquashfs、M1 PASS</td></tr>
+<tr><td>kernel 6.14 模組 ABI</td><td>M2 deb + initrd splice</td></tr>
+<tr><td>noble→resolute 套件更名</td><td>meta-audit resolute wallpapers、M3 PASS</td></tr>
+</table>
+<h2>5. 驗收閘門</h2>
+<pre><code>
+make test-ubuntu-2604-all-pass   # 7/7 stages + active resolute
+make preflight                   # 全 Wave + Post-MVP 基礎設施
+</code></pre>
+<h2>6. 產物索引</h2>
+<table>
+<tr><th>類型</th><th>路徑</th></tr>
+<tr><td>------</td><td>------</td></tr>
+<tr><td>遷移狀態</td><td><code>docs/plans/baselines/ubuntu-2604-status.json</code></td></tr>
+<tr><td>Stage reports</td><td><code>docs/plans/stage-reports/U26-M*.md</code>（7 份）</td></tr>
+<tr><td>HTML 報告</td><td><code>docs/plans/ubuntu-2604-closeout/html/ubuntu-2604-closeout-report.html</code></td></tr>
+<tr><td>遷移計畫</td><td><code>docs/plans/strawwu-ubuntu-2604-migration-plan.md</code></td></tr>
+<tr><td>release ISO</td><td><code>os-image/output/StrawWU-&lt;VERSION&gt;-amd64.iso</code></td></tr>
+</table>
+<h2>7. 後續</h2>
+<p><code>u26-m7-closeout</code> PASS → 自動啟動 <strong>post-d1-strawwu-drivers</strong>（Post-MVP 12+2 track）。</p>
+    </main>
+    <footer>
+      StrawWU v0.6 Resolute · 7 migration stages · Post-MVP → post-d1-strawwu-drivers
+    </footer>
+  </div>
+</body>
+</html>

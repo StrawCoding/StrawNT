@@ -195,6 +195,7 @@ assert data["schema_version"] == "1.0"
 assert set(data["lifecycle"]) == {
     "install",
     "target_setup",
+    "initramfs_hooks",
     "target_identity",
     "upstream_init_disabled",
     "boot_selfcheck",

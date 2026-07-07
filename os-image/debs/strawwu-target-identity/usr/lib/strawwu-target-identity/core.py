@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -116,7 +117,10 @@ def configure_plymouth(*, dry_run: bool = False) -> bool:
             log_event("warn", "update-alternatives plymouth", stderr=proc.stderr.strip())
 
     if not dry_run:
-        run_cmd(["plymouth-set-default-theme", "strawwu-boot"], dry_run=False)
+        if shutil.which("plymouth-set-default-theme"):
+            run_cmd(["plymouth-set-default-theme", "strawwu-boot"], dry_run=False)
+        else:
+            log_event("warn", "plymouth-set-default-theme missing (chroot/live rootfs skip)")
 
     plymouth_conf = Path("/etc/plymouth/plymouthd.conf")
     if plymouth_conf.is_file() and not dry_run:

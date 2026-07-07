@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
-# Gate: all 7 Ubuntu 26.04 migration stages must be PASS (run after u26-m7).
+# Gate: all 7 Ubuntu 26.04 migration stages must be PASS (u26-m7 closeout).
 set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 source "${REPO_ROOT}/tests/preflight/lib/common.sh"
+VALIDATE="${REPO_ROOT}/tests/ubuntu-2604-closeout/validate-ubuntu-2604-closeout.py"
 STATUS="${PLANS_DIR}/baselines/ubuntu-2604-status.json"
 
 echo "=== Ubuntu 26.04 migration all-pass gate ==="
+require_file "${VALIDATE}" "validate-ubuntu-2604-closeout.py"
+chmod +x "${VALIDATE}" 2>/dev/null || true
+
+python3 "${VALIDATE}" --skip-stage-tests
+
 require_file "${STATUS}" "ubuntu-2604-status.json"
 
 python3 - "${STATUS}" <<'PY'

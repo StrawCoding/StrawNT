@@ -60,6 +60,7 @@ class StateTests(unittest.TestCase):
 
     def test_target_identity_and_upstream_init_lifecycle(self) -> None:
         data = default_state()
+        set_nested(data, "lifecycle.initramfs_hooks", "done")
         set_nested(data, "lifecycle.target_identity", "done")
         set_nested(data, "lifecycle.upstream_init_disabled", "done")
         self.assertEqual([], validate_state(data))
