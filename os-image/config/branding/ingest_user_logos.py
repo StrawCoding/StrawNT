@@ -417,7 +417,20 @@ def ingest(source_dir: Path) -> None:
     wrap_png_as_svg(icon_png, BRAND / "logo-icon.svg", "StrawWU icon")
     wrap_png_as_svg(icon_png, BRAND / "favicon.svg", "StrawWU favicon", size=64)
     wrap_png_as_svg(primary_png, BRAND / "logo-wordmark.svg", "StrawWU wordmark")
-    wrap_png_as_svg(primary_png, BRAND / "logo-wordmark-light.svg", "StrawWU wordmark light")
+    wordmark_light_src = momo_light_png
+    if wordmark_light_src is not None:
+        lw, lh = image_size(wordmark_light_src)
+        if lw <= lh * 1.1:
+            wordmark_light_src = None
+    if wordmark_light_src is not None:
+        rasterize_width(wordmark_light_src, BRAND / "logo-wordmark-light.png", 1200)
+        wrap_png_as_svg(
+            BRAND / "logo-wordmark-light.png",
+            BRAND / "logo-wordmark-light.svg",
+            "StrawWU wordmark light",
+        )
+    else:
+        wrap_png_as_svg(primary_png, BRAND / "logo-wordmark-light.svg", "StrawWU wordmark light")
 
     mono_light = BRAND / "logo-icon-mono.png"
     mono_dark = BRAND / "logo-icon-mono-dark.png"

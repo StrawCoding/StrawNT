@@ -1,6 +1,6 @@
 # StrawWU Branding Assets (使用者 Logo)
 
-來源目錄：`/mnt/data/code/project/StrawCoding/StrawWU/os-image/config/branding/source`
+來源目錄：`/mnt/data/Data/檔案/專案資料/StrawWU`
 
 ## 檔案
 
