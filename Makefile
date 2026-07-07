@@ -178,6 +178,7 @@ preflight:
 	bash tests/preflight/test-hw-matrix.sh
 	bash tests/preflight/test-post-mvp-roadmap.sh
 	bash tests/preflight/test-ubuntu-2604-closeout.sh
+	bash tests/preflight/test-fork-f7-closeout.sh
 
 preflight-dev-vm:
 	bash tests/preflight/test-dev-vm-ready.sh
@@ -339,6 +340,10 @@ test-fork-all-pass:
 test-fork-f1-baseline-snapshot test-fork-f2-manifest-repo test-fork-f3-build-pipeline \
 test-fork-f4-package-overlays test-fork-f5-apt-fork-suite test-fork-f6-regression-e2e:
 	bash tests/preflight/test-$(subst test-,,$@).sh
+
+test-fork-f7-closeout:
+	bash tests/preflight/test-fork-f7-closeout.sh
+	python3 tests/fork-closeout/validate-fork-closeout.py --skip-stage-tests
 
 test-u26-base-clone test-u26-kernel-rebase test-u26-debs-rebuild test-u26-suite-migrate \
 test-u26-techrefs-refresh test-u26-regression-e2e:

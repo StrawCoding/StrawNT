@@ -7,8 +7,8 @@
     "fork-f2-manifest-repo": {"status": "PASS"},
     "fork-f3-build-pipeline": {"status": "PASS"},
     "fork-f4-package-overlays": {"status": "PASS"},
-    "fork-f5-apt-fork-suite": {"status": "PENDING"},
-    "fork-f6-regression-e2e": {"status": "PENDING"},
-    "fork-f7-closeout": {"status": "PENDING"}
+    "fork-f5-apt-fork-suite": {"status": "PASS"},
+    "fork-f6-regression-e2e": {"status": "PASS"},
+    "fork-f7-closeout": {"status": "PASS"}
   }
 }

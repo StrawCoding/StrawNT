@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "updated_at": "2026-07-06",
-  "base_mode": "clone",
-  "base_mode_note": "clone until fork-f7-closeout; then fork (Mint-style persistent base)",
+  "updated_at": "2026-07-07",
+  "base_mode": "fork",
+  "base_mode_note": "fork default since fork-f7-closeout (Mint-style persistent base); override STRAWWU_BASE_MODE=clone for legacy path",
   "fork": {
     "manifest": "os-image/fork-base/manifest.json",
     "snapshots_dir": "os-image/fork-base/snapshots",

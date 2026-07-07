@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrawWU Fork Migration Closeout</title>
+  <style>
+:root {
+  --bg: #0f1419;
+  --surface: #1a2332;
+  --text: #e8eef4;
+  --muted: #8b9cb3;
+  --accent: #14b8a6;
+  --accent-dim: #0d9488;
+  --border: #2d3a4d;
+  --code-bg: #0d1117;
+  --pass: #34d399;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  margin: 0;
+  padding: 2rem 1rem 4rem;
+}
+.wrap { max-width: 56rem; margin: 0 auto; }
+header {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+.brand { color: var(--accent); font-weight: 600; letter-spacing: 0.02em; }
+h1 { color: var(--text); font-size: 1.85rem; margin: 0.5rem 0 0.25rem; }
+.meta { color: var(--muted); font-size: 0.9rem; }
+h2 {
+  color: var(--accent);
+  font-size: 1.25rem;
+  margin-top: 2rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.35rem;
+}
+h3 { color: var(--text); font-size: 1.05rem; margin-top: 1.5rem; }
+p { margin: 0.75rem 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 1.4rem; }
+li { margin: 0.35rem 0; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.92rem;
+}
+th, td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+}
+th { background: var(--surface); color: var(--accent); }
+tr:nth-child(even) td { background: rgba(26, 35, 50, 0.5); }
+code {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.88em;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+}
+pre code { border: none; padding: 0; background: transparent; }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1rem 0;
+  padding: 0.25rem 1rem;
+  color: var(--muted);
+}
+footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">StrawWU Fork Migration</div>
+      <h1>Fork 基底遷移 — 全 7 段 PASS 驗收</h1>
+      <p class="meta">版本 0.6.2.6 · fork-f7-closeout · hermes-deliver · base_mode=fork</p>
+    </header>
+    <main>
+<h1>StrawWU Fork 基底遷移 Definition of Done</h1>
+<table>
+<tr><th>欄位</th><th>值</th></tr>
+<tr><td>------</td><td>-----</td></tr>
+<tr><td>產品目標</td><td>v0.6.2.0-target（fork 基底預設）</td></tr>
+<tr><td>建置版本</td><td>見 VERSION</td></tr>
+<tr><td>遷移段數</td><td>7（fork-f1 → fork-f7-closeout）</td></tr>
+<tr><td>基線</td><td>Ubuntu 26.04 LTS Resolute + StrawWU fork snapshot</td></tr>
+</table>
+<h2>1. 遷移目標（fork-migration-plan §1）</h2>
+<table>
+<tr><th>#</th><th>項目</th><th>狀態</th><th>證據</th></tr>
+<tr><td>---</td><td>------</td><td>------</td><td>------</td></tr>
+<tr><td>1</td><td>fork baseline snapshot（F1）</td><td>✅</td><td>fork-base/manifest.json、snapshots/*.tar.zst</td></tr>
+<tr><td>2</td><td>manifest repo（include/remove/replace/pin）</td><td>✅</td><td>fork-base/packages/、test-fork-f2</td></tr>
+<tr><td>3</td><td>build pipeline 支援 fork-sync-base</td><td>✅</td><td>sync-base.sh、test-fork-f3</td></tr>
+<tr><td>4</td><td>fork package overlays</td><td>✅</td><td>os-image/fork/packages/、test-fork-f4</td></tr>
+<tr><td>5</td><td>strawwu-fork APT suite</td><td>✅</td><td>publish-fork-debs.sh、test-fork-f5</td></tr>
+<tr><td>6</td><td>fork base boot + install-firstboot E2E</td><td>✅</td><td>boot-result、firstboot-e2e、test-fork-f6</td></tr>
+<tr><td>7</td><td>base_mode=fork 預設 + closeout 報告</td><td>✅</td><td>ubuntu-base-target.json、HTML、fork-status.json</td></tr>
+</table>
+<h2>2. 各段摘要</h2>
+<table>
+<tr><th>段</th><th>ID</th><th>重點</th></tr>
+<tr><td>----</td><td>-----</td><td>------</td></tr>
+<tr><td>F1</td><td>fork-f1-baseline-snapshot</td><td>u26 驗證 rootfs → fork snapshot</td></tr>
+<tr><td>F2</td><td>fork-f2-manifest-repo</td><td>packages manifest 進 repo</td></tr>
+<tr><td>F3</td><td>fork-f3-build-pipeline</td><td>sync-base 路由、fork marker</td></tr>
+<tr><td>F4</td><td>fork-f4-package-overlays</td><td>fork/packages debian/ 原始碼</td></tr>
+<tr><td>F5</td><td>fork-f5-apt-fork-suite</td><td>strawwu-fork APT suite 發佈</td></tr>
+<tr><td>F6</td><td>fork-f6-regression-e2e</td><td>release-iso BIOS+UEFI、FIRSTBOOT_OK</td></tr>
+<tr><td>F7</td><td>fork-f7-closeout</td><td>base_mode=fork 預設、全段 PASS 彙整、HTML</td></tr>
+</table>
+<h2>3. 基底模式切換（fork-migration-plan §3）</h2>
+<table>
+<tr><th>模式</th><th>環境變數</th><th>marker</th><th>狀態</th></tr>
+<tr><td>------</td><td>----------</td><td>--------</td><td>------</td></tr>
+<tr><td>clone</td><td><code>STRAWWU_BASE_MODE=clone</code></td><td><code>.clone-ubuntu-base-ok</code></td><td>覆寫用（舊路徑）</td></tr>
+<tr><td>fork</td><td>預設</td><td><code>.fork-sync-base-ok</code></td><td><strong>F7 後預設</strong></td></tr>
+</table>
+<p>配置：<code>docs/plans/ubuntu-base-target.json</code> → <code>base_mode: fork</code></p>
+<h2>4. 風險緩解驗收</h2>
+<table>
+<tr><th>風險</th><th>緩解驗收</th></tr>
+<tr><td>------</td><td>----------</td></tr>
+<tr><td>snapshot 還原失敗</td><td>fork-sync-base marker + manifest sha256</td></tr>
+<tr><td>fork 與 clone 管線分歧</td><td>sync-base 分派、base-marker.sh 共用</td></tr>
+<tr><td>APT suite 隔離</td><td>strawwu-fork 獨立 dists、GPG 簽章</td></tr>
+<tr><td>回歸退化</td><td>F6 boot+install E2E on fork base PASS</td></tr>
+</table>
+<h2>5. 驗收閘門</h2>
+<pre><code>
+make test-fork-all-pass   # 7/7 fork stages PASS
+make test-fork-f7-closeout
+make preflight            # 全 Wave + 基礎設施
+</code></pre>
+<h2>6. 產物索引</h2>
+<table>
+<tr><th>類型</th><th>路徑</th></tr>
+<tr><td>------</td><td>------</td></tr>
+<tr><td>Fork 狀態</td><td><code>docs/plans/baselines/fork-status.json</code></td></tr>
+<tr><td>基底配置</td><td><code>docs/plans/ubuntu-base-target.json</code></td></tr>
+<tr><td>Stage reports</td><td><code>docs/plans/stage-reports/FORK-F*.md</code>（7 份）</td></tr>
+<tr><td>HTML 報告</td><td><code>docs/plans/fork-closeout/html/fork-closeout-report.html</code></td></tr>
+<tr><td>Fork 計畫</td><td><code>docs/plans/strawwu-fork-migration-plan.md</code></td></tr>
+<tr><td>release ISO</td><td><code>os-image/output/StrawWU-&lt;VERSION&gt;-amd64.iso</code></td></tr>
+</table>
+<h2>7. 後續</h2>
+<p><code>fork-f7-closeout</code> PASS → 自動啟動 <strong>post-d1-strawwu-drivers</strong>（Post-MVP 12+2 track）。</p>
+    </main>
+    <footer>
+      StrawWU v0.6 Resolute · 7 fork stages · Post-MVP → post-d1-strawwu-drivers
+    </footer>
+  </div>
+</body>
+</html>

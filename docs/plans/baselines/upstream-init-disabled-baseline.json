@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-upstream-init-disabled-baseline/v1",
   "wave": "W5-B4",
-  "version": "0.6.2.5",
+  "version": "0.6.2.6",
   "package": "strawwu-disable-upstream-init",
   "log_path": "/var/log/strawwu/disable-upstream-init.log",
   "marker_path": "/var/lib/strawwu/setup/upstream-init-disabled.ok",

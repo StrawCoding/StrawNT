@@ -1,6 +1,6 @@
 {
   "schema": "strawwu-fork-base/v1",
-  "status": "snapshot",
+  "status": "active",
   "created_at": "2026-07-07T11:23:02Z",
   "ubuntu": {
     "version": "26.04.0",

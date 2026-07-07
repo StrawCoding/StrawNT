@@ -1,0 +1,23 @@
+{
+  "schema": "strawwu-fork-closeout/v1",
+  "stage": "fork-f7-closeout",
+  "version": "0.6.2.6",
+  "target": "26.04.0-resolute-fork",
+  "migration_stages": 7,
+  "base_mode": "fork",
+  "dod_markdown": "docs/plans/fork-closeout/fork-dod.md",
+  "html": "docs/plans/fork-closeout/html/fork-closeout-report.html",
+  "validate": "tests/fork-closeout/validate-fork-closeout.py",
+  "render": "tests/fork-closeout/render-html.py",
+  "preflight": "tests/preflight/test-fork-f7-closeout.sh",
+  "stage_report": "docs/plans/stage-reports/FORK-F7-closeout-report.md",
+  "status": "docs/plans/baselines/fork-status.json",
+  "ubuntu_base_target": "docs/plans/ubuntu-base-target.json",
+  "gates": [
+    "make test-fork-all-pass",
+    "make test-fork-f7-closeout",
+    "make preflight"
+  ],
+  "dod": "Fork 7 stages + base_mode=fork default + HTML hermes-deliver",
+  "post_fork_next": "post-d1-strawwu-drivers"
+}
