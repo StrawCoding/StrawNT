@@ -178,6 +178,7 @@ preflight:
 	bash tests/preflight/test-release-manifest.sh
 	bash tests/preflight/test-apt-repo.sh
 	bash tests/preflight/test-ci-nightly.sh
+	bash tests/preflight/test-ci-kernel-selfhosted.sh
 	bash tests/preflight/test-perf-baseline.sh
 	bash tests/preflight/test-perf-legal-gate.sh
 	bash tests/preflight/test-perf-boot-regression.sh

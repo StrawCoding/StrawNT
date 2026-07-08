@@ -1,12 +1,13 @@
 {
   "schema": "strawwu-ci-baseline/v1",
   "wave": "W7-CI2+CI3+CI4",
-  "version": "0.7.0.3",
+  "version": "0.7.0.4",
   "plan": "docs/plans/strawwu-ci-build-plan.md",
   "workflows": {
     "ci": ".github/workflows/ci.yml",
     "nightly": ".github/workflows/nightly.yml",
-    "release": ".github/workflows/release.yml"
+    "release": ".github/workflows/release.yml",
+    "kernel_build": ".github/workflows/kernel-build.yml"
   },
   "make_targets": [
     "preflight",
@@ -22,7 +23,10 @@
     "test-legal-trademark",
     "test-perf-legal-gate",
     "test-perf-boot-regression",
-    "measure-boot-time"
+    "measure-boot-time",
+    "kernel-build",
+    "test-ci-kernel-selfhosted",
+    "test-phase2"
   ],
   "phases": {
     "CI0": {
@@ -64,35 +68,44 @@
         "STRAWWU_GPG_KEY_ID",
         "APT_DISPATCH_TOKEN"
       ]
+    },
+    "Q6": {
+      "status": "complete",
+      "workflow": "kernel-build.yml",
+      "runner": "self-hosted",
+      "trigger": "cron 02:00 UTC Sunday + workflow_dispatch",
+      "artifact": "linux-image-strawwu .deb + SHA256SUMS + kernel-manifest.json",
+      "script": "scripts/ci-kernel-artifact.sh"
     }
   },
   "workflow_files": [
     "ci.yml",
+    "kernel-build.yml",
     "nightly.yml",
     "release.yml"
   ],
   "scripts": {
     "ci_import_gpg": "scripts/ci-import-gpg.sh",
     "release_sign": "scripts/release-sign.sh",
-    "manifest_generator": "scripts/generate-release-manifest.sh"
+    "manifest_generator": "scripts/generate-release-manifest.sh",
+    "ci_kernel_artifact": "scripts/ci-kernel-artifact.sh"
   },
   "wave0_gaps": [
     "CI1 rootfs reproducibility hash gate",
-    "production archive signing key deployment on runner",
-    "kernel-build.yml self-hosted workflow (Phase 2 Q6)"
+    "production archive signing key deployment on runner"
   ],
   "gaps_closed": [
     "CI2 nightly pipeline (cron → dev-iso → SHA256 → manifest draft)",
     "CI3 PR gate (preflight + wincompat + calamares + version bump)",
     "CI4 self-hosted runner wiring (nightly + release + GPG secrets)",
+    "Q6 kernel-build.yml self-hosted workflow (Phase 2 kernel CI)",
     "PERF1 ISO size gate in release CI (w7-perf-legal-gate)",
     "LEG4 release compliance gate in CI (w7-perf-legal-gate)",
     "PERF2 boot-time regression gate (post-perf-boot-regression)"
   ],
   "deferred": [
     "CI1 rootfs reproducibility hash gate",
-    "production archive signing key deployment on runner",
-    "kernel-build.yml self-hosted workflow (Phase 2 Q6)"
+    "production archive signing key deployment on runner"
   ],
   "perf_legal_gates": {
     "PERF1": {

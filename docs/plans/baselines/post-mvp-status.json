@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-08T11:28:26.543010",
+  "generated_at": "2026-07-08T12:03:40.357995",
   "target": "0.9.0.0-engineering",
   "total": 21,
-  "passed": 13,
-  "failed": 8,
+  "passed": 14,
+  "failed": 7,
   "all_pass": false,
   "stages": [
     {
@@ -73,8 +73,8 @@
     },
     {
       "id": "post-perf-boot-regression",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "post-ci-kernel-selfhosted",

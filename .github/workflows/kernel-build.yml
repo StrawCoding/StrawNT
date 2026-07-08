@@ -1,0 +1,57 @@
+name: Kernel Build
+
+on:
+  schedule:
+    # Sunday 02:00 UTC — weekly kernel rebuild (Q6 self-hosted, independent of nightly ISO)
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+    inputs:
+      kernel_abi:
+        description: 'Override STRAWWU_KERNEL_ABI (optional, e.g. 7.0.0-14)'
+        required: false
+        type: string
+
+concurrency:
+  group: strawwu-kernel-build
+  cancel-in-progress: false
+
+jobs:
+  kernel-build:
+    runs-on: self-hosted
+    env:
+      STRAWWU_WORK_DIR: /opt/strawwu-build/work
+      STRAWWU_KERNEL_JOBS: ${{ vars.STRAWWU_KERNEL_JOBS || '8' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse version
+        id: ver
+        run: |
+          VERSION=$(tr -d '[:space:]' < VERSION)
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Apply kernel ABI override
+        if: inputs.kernel_abi != ''
+        run: echo "STRAWWU_KERNEL_ABI=${{ inputs.kernel_abi }}" >> "$GITHUB_ENV"
+
+      - name: Build linux-image-strawwu .deb
+        run: make kernel-build
+
+      - name: Verify kernel package
+        run: make -C kernel test
+
+      - name: Generate kernel artifact manifest
+        env:
+          STRAWWU_VERSION: ${{ steps.ver.outputs.version }}
+        run: bash scripts/ci-kernel-artifact.sh
+
+      - name: Upload kernel artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: strawwu-kernel-${{ steps.ver.outputs.version }}-${{ github.run_number }}
+          path: |
+            kernel/output/linux-image-strawwu_*.deb
+            kernel/output/SHA256SUMS
+            kernel/output/kernel-manifest.json
+          retention-days: 90
+          if-no-files-found: error
