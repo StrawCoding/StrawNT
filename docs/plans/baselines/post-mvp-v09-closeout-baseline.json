@@ -1,0 +1,21 @@
+{
+  "schema": "strawwu-post-mvp-v09-closeout/v1",
+  "stage": "post-v09-engineering-closeout",
+  "version": "0.7.0.11",
+  "target": "0.9.0.0-target",
+  "v09_stages": 11,
+  "dod_markdown": "docs/plans/post-mvp-v09-closeout/post-mvp-v09-dod.md",
+  "html": "docs/plans/post-mvp-v09-closeout/html/post-mvp-v09-closeout-report.html",
+  "validate": "tests/post-mvp-v09-closeout/validate-post-mvp-v09-closeout.py",
+  "render": "tests/post-mvp-v09-closeout/render-html.py",
+  "preflight": "tests/preflight/test-post-mvp-v09-closeout.sh",
+  "stage_report": "docs/plans/stage-reports/POST-V09-engineering-closeout-report.md",
+  "status": "docs/plans/baselines/post-mvp-status.json",
+  "gates": [
+    "make test-post-mvp-v09-closeout",
+    "make test-post-mvp-all-pass",
+    "make preflight"
+  ],
+  "dod": "Post-MVP v0.9 engineering 11 stages + HTML hermes-deliver",
+  "post_v09_next": "official-release"
+}

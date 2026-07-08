@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrawWU Post-MVP v0.9 Engineering Closeout — Definition of Done</title>
+  <style>
+:root {
+  --bg: #0f1419;
+  --surface: #1a2332;
+  --text: #e8eef4;
+  --muted: #8b9cb3;
+  --accent: #14b8a6;
+  --accent-dim: #0d9488;
+  --border: #2d3a4d;
+  --code-bg: #0d1117;
+  --pass: #34d399;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  margin: 0;
+  padding: 2rem 1rem 4rem;
+}
+.wrap { max-width: 56rem; margin: 0 auto; }
+header {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+.brand { color: var(--accent); font-weight: 600; letter-spacing: 0.02em; }
+h1 { color: var(--text); font-size: 1.85rem; margin: 0.5rem 0 0.25rem; }
+.meta { color: var(--muted); font-size: 0.9rem; }
+h2 {
+  color: var(--accent);
+  font-size: 1.25rem;
+  margin-top: 2rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.35rem;
+}
+h3 { color: var(--text); font-size: 1.05rem; margin-top: 1.5rem; }
+p { margin: 0.75rem 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 1.4rem; }
+li { margin: 0.35rem 0; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.92rem;
+}
+th, td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+}
+th { background: var(--surface); color: var(--accent); }
+tr:nth-child(even) td { background: rgba(26, 35, 50, 0.5); }
+code {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.88em;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+}
+pre code { border: none; padding: 0; background: transparent; }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1rem 0;
+  padding: 0.25rem 1rem;
+  color: var(--muted);
+}
+footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">StrawWU Post-MVP v0.9 Engineering Closeout</div>
+      <h1>v0.7–v0.9 工程 track — DoD 驗收</h1>
+      <p class="meta">版本 0.7.0.11 · post-v09-engineering-closeout · hermes-deliver</p>
+    </header>
+    <main>
+<h1>StrawWU Post-MVP v0.9 Engineering Definition of Done</h1>
+<table>
+<tr><th>欄位</th><th>值</th></tr>
+<tr><td>------</td><td>-----</td></tr>
+<tr><td>產品目標</td><td>0.9.0.0-target（v0.7–v0.9 工程 track）</td></tr>
+<tr><td>建置版本</td><td>見 VERSION</td></tr>
+<tr><td>Post-MVP 段數</td><td>21（post-d1 → post-v09-engineering-closeout）</td></tr>
+<tr><td>工程子集</td><td>11（post-upg-rollback → post-v09-engineering-closeout）</td></tr>
+<tr><td>基線</td><td>Ubuntu 26.04 LTS Resolute + StrawWU fork 基底</td></tr>
+</table>
+<h2>1. v0.9 工程目標（post-mvp-roadmap §5）</h2>
+<table>
+<tr><th>#</th><th>項目</th><th>狀態</th><th>證據</th></tr>
+<tr><td>---</td><td>------</td><td>------</td><td>------</td></tr>
+<tr><td>1</td><td>升級與 rollback（UPG）</td><td>✅</td><td>strawwu-upgrade deb、upgrade-rollback-baseline</td></tr>
+<tr><td>2</td><td>Secure Boot 路線（SEC）</td><td>✅</td><td>secureboot-route-baseline、SB shim 文件</td></tr>
+<tr><td>3</td><td>CVE/USN 修補政策（H6）</td><td>✅</td><td>cve-policy-baseline、strawwu-cve-policy</td></tr>
+<tr><td>4</td><td>開機時間 CI 回歸（H5）</td><td>✅</td><td>boot-time-baseline、perf-boot-regression gate</td></tr>
+<tr><td>5</td><td>self-hosted CI kernel build（Q6）</td><td>✅</td><td>ci-baseline、kernel CI workflow</td></tr>
+<tr><td>6</td><td>反作弊實質等級（G8）</td><td>✅</td><td>anticheat-substantive-baseline（誠實 PARTIAL）</td></tr>
+<tr><td>7</td><td>HW T3 wincompat 實機 smoke</td><td>✅</td><td>hw-t3-wincompat-baseline</td></tr>
+<tr><td>8</td><td>黃金應用啟動器（Q8）</td><td>✅</td><td>golden-apps-launch-baseline（launcher only）</td></tr>
+<tr><td>9</td><td>HW5 穩定度 ≥80%（F9）</td><td>✅</td><td>hw5-stable-gate-baseline</td></tr>
+<tr><td>10</td><td>時光機/系統備份（H13）</td><td>✅</td><td>backup-timeshift-baseline、strawwu-backup</td></tr>
+<tr><td>11</td><td>v0.9 engineering closeout 報告 + HTML</td><td>✅</td><td>本文件、post-mvp-status.json、HTML hermes-deliver</td></tr>
+</table>
+<h2>2. 工程段摘要（post-upg → post-v09）</h2>
+<table>
+<tr><th>段</th><th>ID</th><th>重點</th></tr>
+<tr><td>----</td><td>-----</td><td>------</td></tr>
+<tr><td>UPG</td><td>post-upg-rollback</td><td>strawwu-upgrade + snapshot rollback + Rescue ISO</td></tr>
+<tr><td>SEC1</td><td>post-sec-secureboot-route</td><td>Secure Boot shim/MOK 路線文件與 preflight</td></tr>
+<tr><td>SEC2</td><td>post-sec-cve-policy</td><td>CVE/USN 修補政策與 Hub 通知</td></tr>
+<tr><td>PERF</td><td>post-perf-boot-regression</td><td>開機時間 CI 回歸閘門</td></tr>
+<tr><td>CI</td><td>post-ci-kernel-selfhosted</td><td>self-hosted kernel build workflow（Q6）</td></tr>
+<tr><td>W7</td><td>post-w7-anticheat-substantive</td><td>反作弊實質等級（可正常運行，誠實 PARTIAL）</td></tr>
+<tr><td>HW3</td><td>post-hw-t3-wincompat</td><td>Win compat 硬體實機 smoke</td></tr>
+<tr><td>Q8</td><td>post-q8-golden-apps</td><td>Office/Steam/Epic/三角洲 launcher 驗證</td></tr>
+<tr><td>HW5</td><td>post-hw5-stable-gate</td><td>T1+T2 穩定率 ≥80%</td></tr>
+<tr><td>BACKUP</td><td>post-backup-timeshift</td><td>strawwu-backup 時光機 PoC + Hub 分頁</td></tr>
+<tr><td>V09</td><td>post-v09-engineering-closeout</td><td>全 21 段 PASS 彙整、HTML、VERSION bump</td></tr>
+</table>
+<h2>3. 產品決策對齊（Q1–Q8）</h2>
+<table>
+<tr><th>決策</th><th>v0.9 工程範圍</th><th>驗收</th></tr>
+<tr><td>------</td><td>---------------</td><td>------</td></tr>
+<tr><td>Q2 Tier4 VFIO+microvm</td><td>Phase6.12 PoC（Post-MVP 後 / 1.0 前）</td><td>不在 v0.9 blocking</td></tr>
+<tr><td>Q3 MFP 列印+掃描</td><td>v0.6 post-q3-mfp-smoke</td><td>已 PASS</td></tr>
+<tr><td>Q4 裝置代理預設開放</td><td>v0.6 post-ddp-rootfs</td><td>已 PASS</td></tr>
+<tr><td>Q5 社群 device_profile PR</td><td>DDP manifest 可擴展</td><td>device_profile schema</td></tr>
+<tr><td>Q6 self-hosted CI kernel</td><td>post-ci-kernel-selfhosted</td><td>ci-baseline PASS</td></tr>
+<tr><td>Q7 反作弊=可正常運行</td><td>post-w7-anticheat-substantive</td><td>PARTIAL 誠實等級</td></tr>
+<tr><td>Q8 Office/Steam/Epic launcher</td><td>post-q8-golden-apps</td><td>launcher only，禁止宣稱登入/遊玩</td></tr>
+<tr><td>Q1 預發布範圍</td><td>待使用者另行提出</td><td>deferred</td></tr>
+</table>
+<h2>4. Phase 6 政策摘要</h2>
+<ul>
+<li>預設 <strong>SubsystemSession（native）</strong> — 禁止 WinBox / strawwu-box</li>
+<li>container / microvm 僅覆寫路徑</li>
+<li>Q2 Tier4 VFIO+microvm 納入 Phase6.12 PoC（Post-MVP 後段）</li>
+</ul>
+<h2>5. 全 Post-MVP 管線（21 段）</h2>
+<p>v0.6 驅動與硬體（10 段）+ v0.7–v0.9 工程（11 段）= <strong>21 段全 PASS</strong> 為 Post-MVP 終點。</p>
+<table>
+<tr><th>區間</th><th>段數</th><th>closeout</th></tr>
+<tr><td>------</td><td>------</td><td>----------</td></tr>
+<tr><td>v0.6 drivers/HW</td><td>10</td><td>post-v06-closeout</td></tr>
+<tr><td>v0.7–v0.9 engineering</td><td>11</td><td>post-v09-engineering-closeout</td></tr>
+</table>
+<h2>6. 驗收閘門</h2>
+<pre><code>
+make test-post-mvp-v09-closeout   # v0.9 DoD + 10 prerequisite gates + HTML
+make test-post-mvp-all-pass       # Hermes 21/21 stage PASS
+make preflight                    # 全 Wave + Post-MVP 基礎設施
+</code></pre>
+<p>Hermes state 20/20 prerequisite stages PASS 後，closeout stage 由 Hermes mark。</p>
+<h2>7. 產物索引</h2>
+<table>
+<tr><th>類型</th><th>路徑</th></tr>
+<tr><td>------</td><td>------</td></tr>
+<tr><td>Post-MVP 狀態</td><td><code>docs/plans/baselines/post-mvp-status.json</code></td></tr>
+<tr><td>Stage reports</td><td><code>docs/plans/stage-reports/POST-*.md</code>（21 份）</td></tr>
+<tr><td>HTML 報告</td><td><code>docs/plans/post-mvp-v09-closeout/html/post-mvp-v09-closeout-report.html</code></td></tr>
+<tr><td>路線圖</td><td><code>docs/plans/strawwu-post-mvp-roadmap.md</code></td></tr>
+<tr><td>HW 矩陣</td><td><code>docs/plans/hw-matrix-results.json</code></td></tr>
+<tr><td>release ISO</td><td><code>os-image/output/StrawWU-&lt;VERSION&gt;-amd64.iso</code></td></tr>
+</table>
+<h2>8. 後續</h2>
+<p><code>post-v09-engineering-closeout</code> PASS → Post-MVP 管線完成；下一階段為 <strong>official-release</strong>（需 <code>.official-release-authorized</code> 與 Q9 1.0.0 授權）。</p>
+    </main>
+    <footer>
+      StrawWU v0.9 engineering · 21 Post-MVP stages · Next → official-release (Q9 1.0.0)
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-08T13:46:08.166711",
+  "generated_at": "2026-07-08T14:23:07.651488",
   "target": "0.9.0.0-engineering",
   "total": 21,
-  "passed": 19,
-  "failed": 2,
+  "passed": 20,
+  "failed": 1,
   "all_pass": false,
   "stages": [
     {
@@ -103,12 +103,12 @@
     },
     {
       "id": "post-backup-timeshift",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "post-v09-engineering-closeout",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "pass": false
     }
   ]

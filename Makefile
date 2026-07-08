@@ -53,6 +53,7 @@ help:
 	@echo "  test-fork-roadmap             Fork base migration infrastructure gate"
 	@echo "  test-post-mvp-all-pass        Verify all 21 post-MVP stages PASS"
 	@echo "  test-post-mvp-v06-closeout    v0.6 drivers/HW closeout gate"
+	@echo "  test-post-mvp-v09-closeout    v0.9 engineering closeout gate"
 	@echo "  test-ubuntu-2604-roadmap      Ubuntu 26.04 migration infrastructure gate"
 	@echo "  test-ubuntu-2604-all-pass     Verify all 7 Ubuntu 26.04 migration stages PASS"
 	@echo "  test-ubuntu-2604-closeout     U26-M7 closeout DoD + HTML + status JSON"
@@ -193,6 +194,7 @@ preflight:
 	bash tests/preflight/test-ubuntu-2604-closeout.sh
 	bash tests/preflight/test-fork-f7-closeout.sh
 	bash tests/preflight/test-post-mvp-v06-closeout.sh
+	bash tests/preflight/test-post-mvp-v09-closeout.sh
 
 preflight-dev-vm:
 	bash tests/preflight/test-dev-vm-ready.sh
@@ -334,7 +336,9 @@ test-post-mvp-all-pass:
 
 test-post-mvp-v06-closeout:
 	bash tests/preflight/test-post-mvp-v06-closeout.sh
-	python3 tests/post-mvp-v06-closeout/validate-post-mvp-v06-closeout.py
+
+test-post-mvp-v09-closeout:
+	bash tests/preflight/test-post-mvp-v09-closeout.sh
 
 test-ubuntu-2604-roadmap:
 	bash tests/preflight/test-ubuntu-2604-roadmap.sh
