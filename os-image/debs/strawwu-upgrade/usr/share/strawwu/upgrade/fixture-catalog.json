@@ -1,0 +1,29 @@
+{
+  "schema": "strawwu-upgrade-fixture/v1",
+  "mock": true,
+  "from_version": "0.6.3.11",
+  "to_version": "0.7.0.0",
+  "state": {
+    "schema_version": "1.0",
+    "lifecycle": {
+      "install": "installed",
+      "target_setup": "done",
+      "initramfs_hooks": "done",
+      "target_identity": "done",
+      "upstream_init_disabled": "done",
+      "boot_selfcheck": "done",
+      "firstboot": "done"
+    },
+    "flags": {
+      "firstboot_required": false
+    }
+  },
+  "packages": {
+    "strawwu-initd": "0.6.3.11",
+    "strawwu-desktop": "0.6.3.11"
+  },
+  "boot": {
+    "vmlinuz": "vmlinuz-6.8.0-strawwu",
+    "initrd": "initrd.img-6.8.0-strawwu"
+  }
+}

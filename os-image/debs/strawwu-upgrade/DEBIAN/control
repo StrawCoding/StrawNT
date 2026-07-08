@@ -1,0 +1,13 @@
+Package: strawwu-upgrade
+Version: __VERSION__
+Section: admin
+Priority: optional
+Architecture: all
+Depends: python3,
+         strawwu-initd,
+         strawwu-target-setup
+Recommends: strawwu-update-notifier
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU in-place upgrade and snapshot rollback CLI
+ Pre-upgrade snapshot, apt meta upgrade orchestration, and
+ one-shot rollback to the previous StrawWU release state.

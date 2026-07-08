@@ -1,0 +1,12 @@
+[Unit]
+Description=StrawWU Live rescue mode banner
+After=graphical.target
+ConditionKernelCommandLine=strawwu_rescue=1
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/strawwu-rescue-mode
+RemainAfterExit=yes
+
+[Install]
+WantedBy=graphical.target

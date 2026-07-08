@@ -1,0 +1,20 @@
+{
+  "schema": "strawwu-stage-baseline/v1",
+  "stage": "post-upg-rollback",
+  "version": "0.7.0.0",
+  "packages": [
+    "strawwu-upgrade"
+  ],
+  "cli": [
+    "strawwu-upgrade preflight",
+    "strawwu-upgrade snapshot",
+    "strawwu-upgrade upgrade --dry-run",
+    "strawwu-upgrade --rollback"
+  ],
+  "rescue": {
+    "grub_label": "StrawWU Rescue",
+    "kernel_param": "strawwu_rescue=1",
+    "patch_script": "os-image/scripts/patch-iso-rescue-entry.sh"
+  },
+  "dod": "strawwu-upgrade + pre-upgrade snapshot rollback + rescue ISO GRUB entry"
+}

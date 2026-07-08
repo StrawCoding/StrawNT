@@ -1,0 +1,143 @@
+#!/usr/bin/env python3
+"""StrawWU upgrade CLI — preflight, snapshot, upgrade, rollback."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+_CORE = Path(__file__).resolve().parent.parent / "lib" / "strawwu-upgrade" / "core.py"
+import importlib.util
+
+_spec = importlib.util.spec_from_file_location("strawwu_upgrade_core", _CORE)
+_mod = importlib.util.module_from_spec(_spec)
+assert _spec.loader is not None
+_spec.loader.exec_module(_mod)
+
+
+def _print_json(data: object) -> None:
+    print(json.dumps(data, indent=2, ensure_ascii=False))
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="strawwu-upgrade",
+        description="StrawWU in-place upgrade with pre-upgrade snapshot rollback.",
+    )
+    parser.add_argument(
+        "--rollback",
+        action="store_true",
+        help="Rollback to the latest pre-upgrade snapshot",
+    )
+    parser.add_argument(
+        "--snapshot",
+        metavar="NAME",
+        help="Snapshot name for rollback (default: latest)",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Simulate actions without modifying the system",
+    )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit machine-readable JSON",
+    )
+    parser.add_argument(
+        "--target-version",
+        metavar="VER",
+        help="Target StrawWU version for upgrade/snapshot",
+    )
+
+    sub = parser.add_subparsers(dest="command")
+
+    def add_common(sp: argparse.ArgumentParser) -> None:
+        sp.add_argument("--dry-run", action="store_true", help="Simulate without modifying the system")
+        sp.add_argument("--json", action="store_true", help="Emit machine-readable JSON")
+        sp.add_argument("--target-version", metavar="VER", help="Target StrawWU version")
+
+    preflight_p = sub.add_parser("preflight", help="Validate disk, state, and package readiness")
+    add_common(preflight_p)
+
+    snapshot_p = sub.add_parser("snapshot", help="Create a pre-upgrade snapshot")
+    add_common(snapshot_p)
+
+    upgrade_p = sub.add_parser("upgrade", help="Preflight + snapshot + apt dist-upgrade")
+    add_common(upgrade_p)
+
+    sub.add_parser("list-snapshots", help="List available pre-upgrade snapshots")
+    sub.add_parser("version", help="Print package version")
+
+    rollback_p = sub.add_parser("rollback", help="Rollback to a pre-upgrade snapshot")
+    add_common(rollback_p)
+    rollback_p.add_argument(
+        "snapshot_name",
+        nargs="?",
+        help="Snapshot name (default: latest)",
+    )
+
+    args = parser.parse_args(argv)
+
+    if args.rollback:
+        args.command = "rollback"
+
+    try:
+        if args.command == "version":
+            return _mod.cmd_version()
+        if args.command == "preflight":
+            result = _mod.run_preflight(target_version=args.target_version)
+            if args.json:
+                _print_json(result)
+            else:
+                status = "OK" if result["ok"] else "FAIL"
+                print(f"{status}: preflight from={result['from_version']} free={result['disk_free_mb']}MB")
+                for issue in result["issues"]:
+                    print(f"  - {issue}", file=sys.stderr)
+            return 0 if result["ok"] else 1
+        if args.command == "snapshot":
+            result = _mod.create_snapshot(args.target_version)
+            if args.json:
+                _print_json(result)
+            else:
+                print(f"OK: snapshot {result['snapshot']} at {result['path']}")
+            return 0
+        if args.command == "list-snapshots":
+            snaps = _mod.list_snapshots()
+            if args.json:
+                _print_json(snaps)
+            else:
+                for snap in snaps:
+                    print(f"{snap['name']}\t{snap.get('from_version', '')}\t{snap.get('created_at', '')}")
+            return 0
+        if args.command == "upgrade":
+            result = _mod.run_upgrade(target_version=args.target_version, dry_run=args.dry_run)
+            if args.json:
+                _print_json(result)
+            else:
+                print(f"OK: upgrade dry_run={result['dry_run']}")
+                for action in result["actions"]:
+                    print(f"  - {action}")
+            return 0
+        if args.command == "rollback":
+            snap_name = args.snapshot or getattr(args, "snapshot_name", None)
+            result = _mod.rollback(snap_name, dry_run=args.dry_run)
+            if args.json:
+                _print_json(result)
+            else:
+                print(f"OK: rolled back to {result['snapshot']} (from {result.get('from_version')})")
+                for action in result["actions"]:
+                    print(f"  - {action}")
+            return 0 if result.get("repair_rc", 0) == 0 else 1
+
+        parser.print_help()
+        return 0
+    except (FileNotFoundError, FileExistsError, RuntimeError, ValueError) as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

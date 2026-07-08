@@ -94,11 +94,11 @@ footer {
     <header>
       <div class="brand">StrawWU Handbook</div>
       <h1>升級與救援指南</h1>
-      <p class="meta">版本 0.6.3.11 · W8-DOC · hermes-deliver</p>
+      <p class="meta">版本 0.7.0.0 · W8-DOC · hermes-deliver</p>
     </header>
     <main>
 <h1>StrawWU 升級與救援指南</h1>
-<p>本指南（<strong>DOC3</strong>）說明系統升級失敗、rollback 規劃與救援流程的<strong>誠實邊界</strong>。基礎 Live chroot 救援見 <a href="../rescue-guide.md">rescue-guide.md</a>；本文件聚焦升級情境與 UPG 路線圖。</p>
+<p>本指南（<strong>DOC3</strong>）說明系統升級、snapshot rollback 與救援流程。基礎 Live chroot 救援見 <a href="../rescue-guide.md">rescue-guide.md</a>。</p>
 <h2>1. 文件層級</h2>
 <table>
 <tr><th>層級</th><th>文件</th><th>涵蓋</th></tr>
@@ -106,27 +106,26 @@ footer {
 <tr><td>升級／rollback</td><td>本文件</td><td>UPG 規劃、<code>strawwu-upgrade</code>、kernel 保留策略</td></tr>
 <tr><td>管理維運</td><td><a href="admin-handbook.md">admin-handbook.md</a></td><td>APT、發佈、initramfs</td></tr>
 </table>
-<h2>2. v0.5 已實作能力</h2>
+<h2>2. v0.7 已實作能力</h2>
 <table>
 <tr><th>能力</th><th>狀態</th><th>說明</th></tr>
 <tr><td>Live + chroot 修復</td><td><strong>可用</strong></td><td>見 rescue-guide §3–§4</td></tr>
 <tr><td><code>strawwu-initd repair</code></td><td><strong>可用</strong></td><td>狀態與 lifecycle 修復</td></tr>
 <tr><td><code>strawwu-target-setup --repair-only</code></td><td><strong>可用</strong></td><td>meta 套件還原</td></tr>
-<tr><td>GRUB 舊 kernel entry</td><td><strong>視安裝</strong></td><td>若存在可手動選擇</td></tr>
-<tr><td>apt 失敗後手動修復</td><td><strong>可用</strong></td><td><code>apt install --fix-broken</code> 等</td></tr>
+<tr><td><code>strawwu-upgrade preflight</code></td><td><strong>可用</strong></td><td>磁碟空間、state.json 檢查</td></tr>
+<tr><td><code>strawwu-upgrade snapshot</code></td><td><strong>可用</strong></td><td><code>/var/lib/strawwu/backups/pre-upgrade-&lt;ver&gt;</code></td></tr>
+<tr><td><code>strawwu-upgrade --rollback</code></td><td><strong>可用</strong></td><td>還原 snapshot（state + initrd.old）</td></tr>
+<tr><td>專用「StrawWU Rescue」GRUB 項目</td><td><strong>可用</strong></td><td>Live ISO，<code>strawwu_rescue=1</code></td></tr>
 <tr><td><code>strawwu-bug-report</code></td><td><strong>可用</strong></td><td>收集升級失敗證據</td></tr>
 </table>
-<h2>3. v0.5 尚未實作（UPG 路線圖）</h2>
+<h2>3. 尚未完整實作（後續 UPG）</h2>
 <table>
 <tr><th>能力</th><th>規劃</th><th>說明</th></tr>
-<tr><td><code>strawwu-upgrade --rollback</code></td><td>UPG4+</td><td>一鍵回滾至前一版本</td></tr>
-<tr><td>保留 ≥2 個 kernel</td><td>UPG4</td><td>升級失敗時 GRUB 回退</td></tr>
-<tr><td><code>initrd.img.old</code> symlink</td><td>UPG</td><td>搭配 kernel 保留</td></tr>
-<tr><td>專用「StrawWU Rescue」GRUB 項目</td><td>UPG5</td><td>目前使用標準 Live</td></tr>
+<tr><td>保留 ≥2 個 kernel（自動）</td><td>UPG4</td><td>升級失敗時 GRUB 回退強化</td></tr>
 <tr><td>Btrfs/ZFS snapshot rollback</td><td>評估中</td><td>見 upgrade-recovery-plan</td></tr>
-<tr><td>compat-db 升級後重建</td><td>UPG</td><td>保留 user profiles</td></tr>
+<tr><td>compat-db 升級後自動重建</td><td>UPG</td><td>保留 user profiles</td></tr>
+<tr><td>無人值守 major 升級</td><td>v1.0</td><td>需備份提示與 migration hooks</td></tr>
 </table>
-<p><strong>請勿期待</strong> v0.5 具備一鍵 rollback；升級前請備份重要資料。</p>
 <h2>4. 升級失敗處理流程</h2>
 <pre><code>
 升級中斷或開機失敗
@@ -167,21 +166,40 @@ footer {
 <li>備份 <code>/home</code> 與重要設定。</li>
 <li>記錄目前 <code>VERSION</code> 與已安裝 <code>strawwu-*</code> 套件版本（<code>dpkg -l &#x27;strawwu-*&#x27;</code>）。</li>
 </ol>
-<h2>6. Live 救援與 UPG5</h2>
-<p>目前救援使用<strong>標準 StrawWU Live USB</strong>（與安裝相同 ISO），非獨立 Rescue 映像：</p>
+<h2>6. Live 救援（StrawWU Rescue）</h2>
+<p>Live ISO 提供專用 <strong>StrawWU Rescue</strong> GRUB 項目（<code>strawwu_rescue=1</code>）：</p>
 <ol>
-<li>Live 開機 → 掛載根分割區（rescue-guide §3）</li>
-<li>chroot 執行修復指令</li>
-<li>UPG5 將新增專用 GRUB「StrawWU Rescue」項目與精簡救援環境</li>
+<li>Rescue 開機 → 桌面顯示救援提示</li>
+<li>掛載根分割區（rescue-guide §3）</li>
+<li>chroot 執行 <code>strawwu-upgrade --rollback</code>、<code>strawwu-initd repair</code>、<code>strawwu-target-setup --repair-only</code></li>
 </ol>
-<h2>7. rollback 設計預覽（未實作）</h2>
-<p>依 <code>docs/plans/strawwu-upgrade-recovery-plan.md</code>：</p>
-<ul>
-<li>升級前建立 snapshot 或保留前一 rootfs 標記</li>
-<li><code>strawwu-upgrade --rollback</code> 還原 kernel + initrd + staged debs</li>
-<li>compat-db 重建並保留使用者 app profiles</li>
-</ul>
-<p>實作完成後本文件將更新為操作步驟。</p>
+<p>標準 Live 項目亦可用于相同 chroot 流程。</p>
+<h2>7. rollback 操作步驟</h2>
+<pre><code>
+# 升級前（建議）
+
+sudo strawwu-upgrade preflight
+
+sudo strawwu-upgrade snapshot
+
+
+
+# 升級（乾跑測試）
+
+sudo strawwu-upgrade upgrade --dry-run
+
+
+
+# 升級失敗回滾
+
+sudo strawwu-upgrade --rollback
+
+sudo strawwu-initd repair
+
+sudo strawwu-target-setup --repair-only
+
+</code></pre>
+<p>Snapshot 儲存於 <code>/var/lib/strawwu/backups/pre-upgrade-&lt;version&gt;/</code>，含 <code>state.json</code> 與 <code>manifest.json</code>。</p>
 <h2>8. 與其他元件的關聯</h2>
 <table>
 <tr><th>元件</th><th>升級／救援角色</th></tr>

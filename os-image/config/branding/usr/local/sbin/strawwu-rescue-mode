@@ -1,0 +1,32 @@
+#!/bin/sh
+# strawwu-rescue-mode — Live session rescue entrypoint when strawwu_rescue=1 on cmdline.
+set -eu
+
+if ! grep -q 'strawwu_rescue=1' /proc/cmdline 2>/dev/null; then
+    exit 0
+fi
+
+LOG=/var/log/strawwu/rescue-mode.log
+mkdir -p "$(dirname "$LOG")"
+
+{
+    echo "=== StrawWU Rescue mode ==="
+    date -Is
+    echo "cmdline: $(cat /proc/cmdline)"
+    echo
+    echo "Available tools:"
+    echo "  - mount installed root, then chroot"
+    echo "  - strawwu-initd repair"
+    echo "  - strawwu-target-setup --repair-only"
+    echo "  - strawwu-upgrade --rollback"
+    echo
+    echo "See docs/user/rescue-guide.md and handbook/upgrade-rescue-guide.md"
+} | tee -a "$LOG"
+
+if command -v notify-send >/dev/null 2>&1 && [ -n "${DISPLAY:-}" ]; then
+    notify-send "StrawWU Rescue" \
+        "Rescue mode active. Open Terminal for chroot repair steps." \
+        -i distributor-logo 2>/dev/null || true
+fi
+
+exit 0

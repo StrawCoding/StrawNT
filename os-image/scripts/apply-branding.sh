@@ -45,6 +45,9 @@ overlay_rootfs() {
     log "overlaying branding into rootfs"
     cp -a "${BRANDING_DIR}/." "${ROOTFS_DIR}/"
     chmod 755 "${ROOTFS_DIR}/usr/local/sbin/strawwu-boot-selfcheck"
+    if [[ -f "${ROOTFS_DIR}/usr/local/sbin/strawwu-rescue-mode" ]]; then
+        chmod 755 "${ROOTFS_DIR}/usr/local/sbin/strawwu-rescue-mode"
+    fi
 
     # Version-specific os-release fields (preserve active Ubuntu base from ubuntu-base-target.json)
     local ubuntu_series="${STRAWWU_UBUNTU_VERSION%.*}"
@@ -72,6 +75,9 @@ configure_chroot_branding() {
         /usr/share/plymouth/themes/strawwu-boot/strawwu-boot.plymouth
     chroot_run plymouth-set-default-theme strawwu-boot 2>/dev/null || true
     chroot_run systemctl enable strawwu-boot-selfcheck.service
+    if [[ -f "${ROOTFS_DIR}/etc/systemd/system/strawwu-rescue-mode.service" ]]; then
+        chroot_run systemctl enable strawwu-rescue-mode.service
+    fi
     if [[ -f "${ROOTFS_DIR}/etc/calamares/settings.conf" ]]; then
         if grep -q '^branding:' "${ROOTFS_DIR}/etc/calamares/settings.conf"; then
             sed -i 's/^branding:.*/branding: strawwu/' "${ROOTFS_DIR}/etc/calamares/settings.conf"
@@ -167,6 +173,9 @@ patch_iso_staging() {
     fi
     if [[ -f "${ISO_STAGING}/README.diskdefines" ]]; then
         sed -i 's/Ubuntu/StrawWU/g' "${ISO_STAGING}/README.diskdefines" || true
+    fi
+    if [[ -x "${SCRIPT_DIR}/patch-iso-rescue-entry.sh" ]]; then
+        bash "${SCRIPT_DIR}/patch-iso-rescue-entry.sh"
     fi
     if [[ -f "${ISO_STAGING}/casper/initrd" ]]; then
         if [[ -f "${WORK_DIR}/.swap-kernel-ok" ]] && grep -q strawwu-kernel "${WORK_DIR}/.swap-kernel-ok" 2>/dev/null; then

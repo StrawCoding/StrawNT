@@ -94,11 +94,11 @@ footer {
     <header>
       <div class="brand">StrawWU User Docs</div>
       <h1>救援與修復指南</h1>
-      <p class="meta">版本 0.6.3.11 · DOC1 · hermes-deliver</p>
+      <p class="meta">版本 0.7.0.0 · DOC1 · hermes-deliver</p>
     </header>
     <main>
 <h1>StrawWU 救援與修復指南</h1>
-<p>本指南說明當已安裝系統無法正常開機、設定損毀或安裝中斷時的<strong>基礎救援</strong>流程。v0.5 完整升級 rollback（<code>strawwu-upgrade --rollback</code>）屬 UPG 計畫，此處說明<strong>目前已實作</strong>的能力。</p>
+<p>本指南說明當已安裝系統無法正常開機、設定損毀或安裝中斷時的<strong>救援</strong>流程。v0.7 起提供 <code>strawwu-upgrade --rollback</code> 與 Live ISO「StrawWU Rescue」GRUB 項目；本文件涵蓋基礎 chroot 修復與升級回滾。</p>
 <h2>1. 何時使用本指南</h2>
 <table>
 <tr><th>情境</th><th>建議路徑</th></tr>
@@ -110,11 +110,11 @@ footer {
 </table>
 <h2>2. 從 Live ISO 進入救援</h2>
 <ol>
-<li>使用與安裝相同的 <strong>StrawWU Live USB</strong> 開機。</li>
-<li>在 GRUB 選單選擇 <strong>Live</strong>（非「安全圖形」除非必要）。</li>
-<li>Live 桌面載入後開啟終端機。</li>
+<li>使用 <strong>StrawWU Live USB</strong> 開機。</li>
+<li>在 GRUB 選單選擇 <strong>StrawWU Rescue</strong>（或標準 Live 項目）。</li>
+<li>Rescue 模式會在桌面顯示提示；開啟終端機執行 chroot 修復。</li>
 </ol>
-<blockquote><p><strong>v0.5 說明：</strong> 專用「StrawWU Rescue」GRUB 項目規劃於 UPG5；目前使用標準 Live 環境掛載已安裝分割區進行修復。</p></blockquote>
+<blockquote><p><strong>v0.7：</strong> ISO 已含專用「StrawWU Rescue」GRUB 項目（<code>strawwu_rescue=1</code>）。亦可使用標準 Live 項目掛載已安裝分割區。</p></blockquote>
 <h2>3. 掛載已安裝系統</h2>
 <p>假設根分割區為 <code>/dev/sda2</code>、EFI 為 <code>/dev/sda1</code>（請依 <code>lsblk</code> 調整）：</p>
 <pre><code>
@@ -185,16 +185,34 @@ efibootmgr -v
 
 </code></pre>
 <p><strong>已知案例：</strong> 部分 UEFI 環境需確保 <code>EFI/BOOT/grub.cfg</code> 與 <code>EFI/strawwu/grub.cfg</code> 一致（見 W6-I4 報告）。</p>
-<h2>5. 升級失敗與 rollback（誠實邊界）</h2>
+<h2>5. 升級失敗與 rollback</h2>
 <table>
-<tr><th>能力</th><th>v0.5 狀態</th></tr>
-<tr><td>保留 ≥2 個 kernel</td><td>規劃於 UPG4</td></tr>
-<tr><td><code>initrd.img.old</code> symlink</td><td>規劃於 UPG</td></tr>
-<tr><td><code>strawwu-upgrade --rollback</code></td><td><strong>未實作</strong> — 見 <code>strawwu-upgrade-recovery-plan.md</code></td></tr>
+<tr><th>能力</th><th>v0.7 狀態</th></tr>
+<tr><td>保留 ≥2 個 kernel</td><td><strong>部分</strong> — snapshot 記錄 kernel 清單；GRUB 多 kernel 策略持續強化</td></tr>
+<tr><td><code>initrd.img.old</code> symlink</td><td><strong>可用</strong> — rollback 時還原 symlink</td></tr>
+<tr><td><code>strawwu-upgrade --rollback</code></td><td><strong>可用</strong> — 還原 pre-upgrade snapshot（state + boot 標記）</td></tr>
+<tr><td><code>strawwu-upgrade preflight</code></td><td><strong>可用</strong> — 升級前磁碟／state 檢查</td></tr>
 <tr><td>apt 失敗後手動 <code>apt install</code> 修復</td><td>可用</td></tr>
 <tr><td>Live chroot + repair 指令</td><td><strong>可用（本指南）</strong></td></tr>
 </table>
-<p>升級失敗時請先嘗試 GRUB 舊 kernel（若存在），否則以 Live + chroot + §4 修復。</p>
+<p>升級失敗時優先嘗試：</p>
+<pre><code>
+# 已開機進系統
+
+sudo strawwu-upgrade --rollback
+
+
+
+# 或 Live Rescue → chroot 後
+
+strawwu-upgrade --rollback
+
+strawwu-initd repair
+
+strawwu-target-setup --repair-only
+
+</code></pre>
+<p>詳見 <a href="handbook/upgrade-rescue-guide.md">handbook/upgrade-rescue-guide.md</a>。</p>
 <h2>6. 問題回報與日誌</h2>
 <table>
 <tr><th>路徑</th><th>內容</th></tr>

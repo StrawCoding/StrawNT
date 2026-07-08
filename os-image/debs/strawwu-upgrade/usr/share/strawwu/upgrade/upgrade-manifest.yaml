@@ -1,0 +1,9 @@
+schema: strawwu-upgrade/v1
+stage: post-upg-rollback
+cli: strawwu-upgrade
+backup_root: /var/lib/strawwu/backups
+snapshot_prefix: pre-upgrade
+min_free_mb: 512
+kernel_keep_count: 2
+rescue_kernel_param: strawwu_rescue=1
+rescue_grub_label: StrawWU Rescue

@@ -1,0 +1,4 @@
+#!/bin/sh
+set -e
+install -d -m 0750 /var/lib/strawwu/backups
+#DEBHELPER#

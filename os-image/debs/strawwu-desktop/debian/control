@@ -22,6 +22,7 @@ Depends: strawwu-session,
          strawwu-firstboot
 Recommends: strawwu-gtk-theme,
             strawwu-icon-theme,
+            strawwu-upgrade,
             strawwu-drivers,
             strawwu-software-sources,
             strawwu-device-proxy,
