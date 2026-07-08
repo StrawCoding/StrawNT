@@ -53,6 +53,7 @@
     "Calamares/GRUB/Plymouth compliance audit (LEG3)"
   ],
   "gaps_closed": [
+    "release compliance gate CI (LEG4)",
     "release compliance gate CI (LEG4)"
   ]
 }
