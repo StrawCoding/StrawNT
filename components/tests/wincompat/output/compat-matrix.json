@@ -100,7 +100,7 @@
     "schema": "strawwu-anticheat-substantive/v1",
     "verification_stage": "post-w7-anticheat-substantive",
     "overall": "PARTIAL",
-    "generated_at": "2026-07-08T04:28:13Z",
+    "generated_at": "2026-07-08T04:36:44Z",
     "cases": [
       {
         "name": "eac_driver_probe",
@@ -111,7 +111,7 @@
         "notes": "driver stub via strawwu_ipc; DLL integrity partial",
         "substantive_verified": true,
         "evidence": {
-          "verified_at": "2026-07-08T04:28:13Z",
+          "verified_at": "2026-07-08T04:36:44Z",
           "verification_method": "ProbeEngine integration (cargo test + probe suite)",
           "verification_stage": "post-w7-anticheat-substantive",
           "probe_pass": 7,
@@ -187,7 +187,7 @@
         "notes": "kernel scan intercepted; process not crash",
         "substantive_verified": true,
         "evidence": {
-          "verified_at": "2026-07-08T04:28:13Z",
+          "verified_at": "2026-07-08T04:36:44Z",
           "verification_method": "ProbeEngine integration (cargo test + probe suite)",
           "verification_stage": "post-w7-anticheat-substantive",
           "probe_pass": 8,
@@ -263,7 +263,7 @@
         "notes": "TPM stub partial; kernel driver not loaded \u2014 policy deny",
         "substantive_verified": true,
         "evidence": {
-          "verified_at": "2026-07-08T04:28:13Z",
+          "verified_at": "2026-07-08T04:36:44Z",
           "verification_method": "ProbeEngine integration (cargo test + probe suite)",
           "verification_stage": "post-w7-anticheat-substantive",
           "probe_pass": 6,

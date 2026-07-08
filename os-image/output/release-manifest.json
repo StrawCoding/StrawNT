@@ -3,7 +3,7 @@
   "version": "0.7.0.5",
   "channel": "beta",
   "git_tag": null,
-  "git_sha": "af6589ea308a264beae942d7a5cb67f023c6fe04",
+  "git_sha": "c6e0c9dabf0fb3932d650e1ed31d3c9a1d761e0f",
   "artifacts": [
     {
       "name": "StrawWU-0.6.2.5-amd64.iso",
@@ -118,5 +118,5 @@
     "file": "SHA256SUMS",
     "gpg_sig": null
   },
-  "published_at": "2026-07-08T04:28:55Z"
+  "published_at": "2026-07-08T04:40:54Z"
 }

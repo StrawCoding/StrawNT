@@ -6,8 +6,9 @@
 | 版本 | `0.7.0.5`（`0.7.0.4` → `0.7.0.5`） |
 | 版本目標 | `0.8.0.0-target` |
 | 狀態 | **待 Hermes 驗收**（worker 不自宣稱 PASS） |
-| 完成時間 | 2026-07-08T12:30+08:00 |
+| 完成時間 | 2026-07-08T12:33+08:00 |
 | Worker 回合 | 階段 1/8（post-w7-anticheat-substantive） |
+| 驗證回合 | worker 本回合重跑 gate（2026-07-08T12:28–12:33+08:00） |
 
 ## 摘要
 
@@ -84,8 +85,8 @@ compat-matrix.json → anticheat_matrix.cases[]
 
 ```bash
 cd /mnt/data/code/project/StrawCoding/StrawWU
-make test-anticheat-substantive   # exit 0 — 2026-07-08T12:22+08:00
-make preflight                    # exit 0 — ~274s，2026-07-08T12:27+08:00
+make test-anticheat-substantive   # exit 0 — 2026-07-08T12:28+08:00
+make preflight                    # exit 0 — ~249s，2026-07-08T12:33+08:00
 ```
 
 ### `make test-anticheat-substantive` — exit 0
@@ -94,20 +95,30 @@ Log: `/tmp/post-w7-test-anticheat-substantive.log`
 
 ```
 === POST-W7 anticheat substantive preflight ===
+PASS: plan strawwu-post-mvp-roadmap.md
+PASS: kickoff POST-W7
+PASS: anticheat-compat spec
+PASS: substantive module
+PASS: run-substantive-verify.sh
+PASS: Makefile exposes test-anticheat-substantive
+PASS: cargo test strawwu-anticheat (24 tests)
+PASS: merged 3/3 substantive anticheat cases
 PASS: substantive anticheat evidence 3/3
 PASS: honest PARTIAL grades (no PASS claims)
 PASS: anticheat-substantive baseline
 === POST-W7 anticheat substantive done: PASS ===
 ```
 
-### `make preflight` — exit 0（~274s）
+證據 JSON 時間戳：`anticheat-substantive.json` → `generated_at: 2026-07-08T04:28:13Z`
 
-Log: `/tmp/post-w7-preflight.log`（`grep FAIL:` **0** 行）
+### `make preflight` — exit 0（~249s）
+
+Log: `/tmp/post-w7-preflight.log`（`grep FAIL:` **0** 行；結尾 `=== POST-V06 closeout done: PASS ===`）
 
 ## 限制與誠實聲明
 
 1. **非實機遊戲驗證**：本階段為 ProbeEngine 整合驗證（模擬探測），非真實 EAC/BE/Vanguard 遊戲 client 實機。
-2. **Vanguard grade F**：TPM attestation 與核心驅動載入無法完整模擬，policy deny 為正確行為。
+2. **Vanguard grade C（非 A/B）**：TPM attestation 與核心驅動載入探測失敗為預期；probe 6/9，policy deny 為正確行為。
 3. **不得宣稱排位對戰**：compat-db grade A 保留給未來實機 golden-app 驗證；本階段最高 BattlEye grade B。
 4. **Phase 6 native 預設**：EAC/BE 使用 SubsystemSession native；Vanguard 建議 microvm 覆寫。
 

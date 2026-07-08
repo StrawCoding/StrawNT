@@ -98,10 +98,7 @@
     "CI2 nightly pipeline (cron → dev-iso → SHA256 → manifest draft)",
     "CI3 PR gate (preflight + wincompat + calamares + version bump)",
     "CI4 self-hosted runner wiring (nightly + release + GPG secrets)",
-    "Q6 kernel-build.yml self-hosted workflow (Phase 2 kernel CI)",
-    "PERF1 ISO size gate in release CI (w7-perf-legal-gate)",
-    "LEG4 release compliance gate in CI (w7-perf-legal-gate)",
-    "PERF2 boot-time regression gate (post-perf-boot-regression)"
+    "Q6 kernel-build.yml self-hosted workflow (Phase 2 kernel CI)"
   ],
   "deferred": [
     "CI1 rootfs reproducibility hash gate",

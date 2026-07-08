@@ -32,11 +32,8 @@
     },
     "PERF2": {
       "status": "complete",
-      "gate_mode": "advisory",
       "artifact": "boot-time-baseline.json",
-      "measure_script": "tests/perf/measure-boot-time.sh",
-      "ci_workflow": "nightly.yml (STRAWWU_PERF2_GATE=advisory)",
-      "release_hook": "release.yml (STRAWWU_PERF2_GATE=strict after boot-test)"
+      "note": "boot-time regression gate (managed by test-perf-boot-regression)"
     }
   },
   "wave0_gaps": [
