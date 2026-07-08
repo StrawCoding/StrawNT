@@ -1,0 +1,11 @@
+Package: strawwu-secureboot
+Version: __VERSION__
+Section: admin
+Priority: optional
+Architecture: all
+Depends: python3
+Recommends: mokutil, sbsigntool
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU Secure Boot route status and signing skeleton
+ Documents the shim + signed kernel/initrd route. Not enforced by default;
+ provides status, route, and preflight helpers for post-sec-secureboot-route.

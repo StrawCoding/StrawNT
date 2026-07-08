@@ -18,8 +18,42 @@ StrawWU 同時是 Linux 發行版 + Windows compat 宿主。信任邊界：
 | 階段 | 策略 |
 |------|------|
 | v0.4–0.5 | **不強制 SB**；文件誠實標「未簽 SB shim」 |
-| v0.6+ | 自建或第三方 shim + signed kernel + signed initrd |
+| v0.6–0.7 | **路線文件 + 骨架**（`post-sec-secureboot-route`）；預設仍不強制啟用 |
+| v0.8+ | 自建或第三方 shim + **signed kernel** + **signed initrd** 可選啟用 |
 | 金鑰 | 獨立 StrawWU UEFI DB；不混用 Ubuntu shim（商標+信任） |
+
+### 2.1 Boot chain（目標）
+
+```
+UEFI firmware (DB/DBX)
+    → shim.efi（StrawWU 或第三方簽章，PE/COFF）
+    → grubx64.efi（由 shim 驗證）
+    → signed kernel（vmlinuz，sbsign / pesign）
+    → signed initrd（initrd.img，可選 UKI 合併）
+    → rootfs（dm-verity 留待 v1.0）
+```
+
+### 2.2 v0.7 骨架（不強制）
+
+| 元件 | 路徑 | 說明 |
+|------|------|------|
+| CLI | `strawwu-secureboot` | `status` / `route` / `preflight`；fixture 模式可離線測 |
+| 簽章腳本 | `os-image/scripts/secureboot-route/sign-boot-artifacts.sh` | 預設 `--dry-run`；`STRAWWU_SB_SIGN=1` + 金鑰才實簽 |
+| 驗證腳本 | `os-image/scripts/secureboot-route/verify-boot-chain.sh` | `mokutil` / `sbverify` 可用性 + 產物 hash |
+| 清單 | `usr/share/strawwu/secureboot/secureboot-manifest.yaml` | 路線、金鑰槽、啟用旗標 |
+| Hub 警告 | `strawwu-drivers` | SB 啟用時誠實標未簽模組；連結本計畫 |
+
+**預設旗標**：`STRAWWU_SECURE_BOOT_ENFORCE=0`（安裝與 ISO 不強制 SB）。Calamares 仍可選裝 `shim-signed` 作過渡，但 StrawWU 正式路線使用獨立 DB。
+
+### 2.3 金鑰與簽章（規劃）
+
+| 金鑰 | 用途 | 儲存 |
+|------|------|------|
+| StrawWU-SB-DB | shim + grub + kernel PE 簽章 | CI secret / 離線 HSM（v0.8+） |
+| StrawWU-MOK | 第三方 DKMS 模組 MOK 註冊 | 使用者本機 `mokutil` |
+| StrawWU-APT | deb/ISO GPG（見 SEC1/RE2） | `strawwu-keyring` |
+
+Kernel 目標：`CONFIG_MODULE_SIG=y`、`CONFIG_MODULE_SIG_FORCE` 預設 **關**（與 Hub 驅動警告一致）；啟用 SB 時改由發行版 policy 文件化。
 
 ## 3. Kernel / Module Signing
 
@@ -83,4 +117,13 @@ StrawWU 同時是 Linux 發行版 + Windows compat 宿主。信任邊界：
 | SEC2 | bug-reporter 隱私過濾 + consent UI |
 | SEC3 | Registry protected list + polkit |
 | SEC4 | compat session 權限審計 |
-| SEC5 | Secure Boot 路線圖 PoC（可選） |
+| SEC5 | Secure Boot 路線圖 PoC（可選）— `strawwu-secureboot` + `secureboot-route/` 骨架；**signed kernel** + **signed initrd** 腳本 dry-run |
+
+## 11. SEC5 交付對照（v0.7.0）
+
+| 檢查 | 命令 / 路徑 |
+|------|-------------|
+| 路線文件 | 本節 §2 + `docs/plans/kickoff/POST-SEC-secureboot-route.md` |
+| 靜態閘門 | `make test-secureboot-route` |
+| Baseline | `docs/plans/baselines/secureboot-route-baseline.json` |
+| Stage report | `docs/plans/stage-reports/POST-SEC-secureboot-route-report.md` |

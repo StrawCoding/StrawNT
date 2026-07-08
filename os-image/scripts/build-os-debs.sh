@@ -25,6 +25,7 @@ OS_DEB_PACKAGES=(
     strawwu-greeter
     strawwu-update-notifier
     strawwu-upgrade
+    strawwu-secureboot
     strawwu-software-sources
     strawwu-bug-reporter
     strawwu-drivers

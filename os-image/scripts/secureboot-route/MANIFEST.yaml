@@ -1,0 +1,28 @@
+schema: strawwu-secureboot-route/v1
+stage: post-sec-secureboot-route
+enforced_default: false
+boot_chain:
+  - firmware_db
+  - shim.efi
+  - grubx64.efi
+  - vmlinuz
+  - initrd.img
+scripts:
+  sign: sign-boot-artifacts.sh
+  verify: verify-boot-chain.sh
+signing:
+  dry_run_default: true
+  sign_env: STRAWWU_SB_SIGN
+  tools:
+    - sbsign
+    - sbverify
+    - pesign
+  artifacts:
+    - shim.efi
+    - grubx64.efi
+    - vmlinuz
+    - initrd.img
+keys:
+  uefi_db: StrawWU-SB-DB
+  mok: StrawWU-MOK
+doc: docs/plans/kickoff/POST-SEC-secureboot-route.md

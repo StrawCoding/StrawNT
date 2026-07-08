@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-wincompat-e2e-baseline/v1",
   "wave": "W6-W6",
-  "version": "0.7.0.0",
+  "version": "0.7.0.1",
   "flow": [
     "install",
     "icon",

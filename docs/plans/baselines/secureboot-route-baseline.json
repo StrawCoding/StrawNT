@@ -1,0 +1,32 @@
+{
+  "schema": "strawwu-stage-baseline/v1",
+  "stage": "post-sec-secureboot-route",
+  "version": "0.7.0.1",
+  "enforced_default": false,
+  "packages": [
+    "strawwu-secureboot"
+  ],
+  "cli": [
+    "strawwu-secureboot status",
+    "strawwu-secureboot route",
+    "strawwu-secureboot preflight"
+  ],
+  "scripts": {
+    "sign": "os-image/scripts/secureboot-route/sign-boot-artifacts.sh",
+    "verify": "os-image/scripts/secureboot-route/verify-boot-chain.sh",
+    "manifest": "os-image/scripts/secureboot-route/MANIFEST.yaml"
+  },
+  "boot_chain": [
+    "firmware_db",
+    "shim.efi",
+    "grubx64.efi",
+    "vmlinuz",
+    "initrd.img"
+  ],
+  "signing": {
+    "dry_run_default": true,
+    "sign_env": "STRAWWU_SB_SIGN",
+    "enforce_env": "STRAWWU_SECURE_BOOT_ENFORCE"
+  },
+  "dod": "shim + signed kernel/initrd route docs + skeleton (not enforced)"
+}

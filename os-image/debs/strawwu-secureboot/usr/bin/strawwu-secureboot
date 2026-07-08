@@ -1,0 +1,89 @@
+#!/usr/bin/env python3
+"""StrawWU Secure Boot route CLI — status, route, preflight (skeleton)."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+_CORE = Path(__file__).resolve().parent.parent / "lib" / "strawwu-secureboot" / "core.py"
+import importlib.util
+
+_spec = importlib.util.spec_from_file_location("strawwu_secureboot_core", _CORE)
+_mod = importlib.util.module_from_spec(_spec)
+assert _spec.loader is not None
+_spec.loader.exec_module(_mod)
+
+
+def _print_json(data: object) -> None:
+    print(json.dumps(data, indent=2, ensure_ascii=False))
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="strawwu-secureboot",
+        description="StrawWU Secure Boot route status and preflight (not enforced by default).",
+    )
+    parser.add_argument("--json", action="store_true", help="Emit machine-readable JSON")
+
+    sub = parser.add_subparsers(dest="command")
+
+    def add_common(sp: argparse.ArgumentParser) -> None:
+        sp.add_argument("--json", action="store_true", help="Emit machine-readable JSON")
+
+    add_common(sub.add_parser("status", help="Firmware SB state and enforcement flag"))
+    add_common(sub.add_parser("route", help="Documented boot chain and signing skeleton status"))
+    add_common(sub.add_parser("preflight", help="Validate SB route readiness"))
+    sub.add_parser("version", help="Print package version")
+
+    args = parser.parse_args(argv)
+
+    try:
+        if args.command == "version":
+            return _mod.cmd_version()
+        if args.command == "status":
+            result = _mod.detect_sb_state()
+            if args.json:
+                _print_json(result)
+            else:
+                print(
+                    f"SB {result['state']} enforced={result['enforced']} plan={result['plan']}"
+                )
+                if result.get("warning"):
+                    print(result["warning"], file=sys.stderr)
+            return 0
+        if args.command == "route":
+            result = _mod.route_info()
+            if args.json:
+                _print_json(result)
+            else:
+                chain = " → ".join(result.get("boot_chain", []))
+                print(f"route: {chain}")
+                print(
+                    f"signed_kernel={result.get('signed_kernel')} "
+                    f"signed_initrd={result.get('signed_initrd')} "
+                    f"dry_run={result.get('dry_run_signing')}"
+                )
+            return 0
+        if args.command == "preflight":
+            result = _mod.run_preflight()
+            if args.json:
+                _print_json(result)
+            else:
+                status = "OK" if result["ok"] else "FAIL"
+                print(f"{status}: enforced={result['enforced']} fixture={result.get('fixture')}")
+                for issue in result.get("issues", []):
+                    print(f"  - {issue}", file=sys.stderr)
+            return 0 if result["ok"] else 1
+
+        parser.print_help()
+        return 0
+    except (RuntimeError, ValueError) as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

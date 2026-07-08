@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-ux-theme-curation-baseline/v1",
   "stage": "post-ux-theme-curation",
-  "version": "0.7.0.0",
+  "version": "0.7.0.1",
   "default_mode": "dark",
   "packages": {
     "gtk": "strawwu-gtk-theme",

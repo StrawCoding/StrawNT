@@ -1,0 +1,33 @@
+{
+  "schema": "strawwu-secureboot-fixture/v1",
+  "mock": true,
+  "secure_boot": {
+    "enabled": true,
+    "state": "enabled",
+    "enforced": false,
+    "warning": "Secure Boot is enabled in fixture mode. StrawWU signed kernel/initrd route is documented but not enforced in v0.7.",
+    "plan": "post-sec-secureboot-route"
+  },
+  "route": {
+    "boot_chain": [
+      "firmware_db",
+      "shim.efi",
+      "grubx64.efi",
+      "vmlinuz",
+      "initrd.img"
+    ],
+    "signed_kernel": false,
+    "signed_initrd": false,
+    "shim_source": "strawwu-skeleton",
+    "dry_run_signing": true
+  },
+  "tools": {
+    "mokutil": true,
+    "sbsign": false,
+    "sbverify": false
+  },
+  "preflight": {
+    "ok": true,
+    "issues": []
+  }
+}

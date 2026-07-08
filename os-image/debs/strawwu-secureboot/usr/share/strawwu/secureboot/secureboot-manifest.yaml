@@ -1,0 +1,35 @@
+schema: strawwu-secureboot/v1
+stage: post-sec-secureboot-route
+version: 0.7.0.0-target
+cli: strawwu-secureboot
+commands:
+  - status
+  - route
+  - preflight
+enforced_default: false
+enforce_env: STRAWWU_SECURE_BOOT_ENFORCE
+boot_chain:
+  - firmware_db
+  - shim.efi
+  - grubx64.efi
+  - vmlinuz
+  - initrd.img
+scripts:
+  sign: os-image/scripts/secureboot-route/sign-boot-artifacts.sh
+  verify: os-image/scripts/secureboot-route/verify-boot-chain.sh
+  manifest: os-image/scripts/secureboot-route/MANIFEST.yaml
+signing:
+  dry_run_default: true
+  sign_env: STRAWWU_SB_SIGN
+  tools:
+    - sbsign
+    - sbverify
+    - pesign
+keys:
+  uefi_db: StrawWU-SB-DB
+  mok: StrawWU-MOK
+drivers_integration:
+  package: strawwu-drivers
+  plan: post-sec-secureboot-route
+doc: docs/plans/kickoff/POST-SEC-secureboot-route.md
+fixture_env: STRAWWU_SECUREBOOT_FIXTURE
