@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-08T13:01:24.547929",
+  "generated_at": "2026-07-08T13:21:43.645534",
   "target": "0.9.0.0-engineering",
   "total": 21,
-  "passed": 17,
-  "failed": 4,
+  "passed": 18,
+  "failed": 3,
   "all_pass": false,
   "stages": [
     {
@@ -93,8 +93,8 @@
     },
     {
       "id": "post-q8-golden-apps",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "post-hw5-stable-gate",

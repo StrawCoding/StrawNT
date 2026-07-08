@@ -1,0 +1,23 @@
+{
+  "schema": "strawwu-hw5-stable-gate-baseline/v1",
+  "stage": "post-hw5-stable-gate",
+  "version": "0.7.0.9",
+  "minimum_stable_rate": 0.8,
+  "scope": "T1+T2 real-hardware (physical-live, physical-installed, installed-e2e)",
+  "compute_script": "tests/hw/compute-stable-summary.py",
+  "matrix_runner": "tests/hw/run-hw5-stable-gate.sh",
+  "results_json": "docs/plans/hw-matrix-results.json",
+  "preflight": "tests/preflight/test-hw5-stable-gate.sh",
+  "profiles": [
+    "t1-live-intel-laptop (T1 physical-live)",
+    "t1-live-amd-desktop (T1 physical-live)",
+    "t1-live-nvidia-desktop (T1 physical-live)",
+    "t2-installed-intel-laptop (T2 installed-e2e)"
+  ],
+  "hermes_workflow": [
+    "maintain T1 Live USB + T2 installed matrix via smoke-live.sh / smoke-installed.sh",
+    "bash tests/hw/run-hw5-stable-gate.sh",
+    "make test-hw5-stable-gate && make preflight"
+  ],
+  "dod": "hw-matrix stable_summary stable_rate >= 0.8 on T1+T2 real-hardware entries"
+}

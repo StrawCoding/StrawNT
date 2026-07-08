@@ -1,8 +1,8 @@
 {
   "schema": "strawwu-hw-matrix-results/v2",
-  "wave": "POST-HW-T3",
-  "version": "0.7.0.7",
-  "updated": "2026-07-08T13:00:57+08:00",
+  "wave": "POST-HW5",
+  "version": "0.7.0.9",
+  "updated": "2026-07-08T13:30:00+08:00",
   "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.6.2.5-amd64.iso",
   "dimensions": [
     "gpu",
@@ -379,5 +379,22 @@
     "minimum": 1,
     "count": 1,
     "honest_partial": 1
+  },
+  "stable_summary": {
+    "scope": "T1+T2 real-hardware (physical-live, physical-installed, installed-e2e)",
+    "minimum_rate": 0.8,
+    "stable_rate": 1.0,
+    "stable_count": 4,
+    "total": 4,
+    "t1_count": 3,
+    "t2_count": 1,
+    "stable_machine_ids": [
+      "t1-live-intel-laptop",
+      "t1-live-amd-desktop",
+      "t1-live-nvidia-desktop",
+      "t2-installed-intel-laptop"
+    ],
+    "unstable_machine_ids": [],
+    "gate": "PASS"
   }
 }

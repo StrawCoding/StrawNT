@@ -66,6 +66,7 @@ help:
 	@echo "  test-sec-cve-policy           POST-SEC CVE/USN policy"
 	@echo "  test-ci-kernel-selfhosted     POST-CI self-hosted kernel"
 	@echo "  test-hw-t3-wincompat          POST-HW-T3 Win compat HW smoke"
+	@echo "  test-hw5-stable-gate          POST-HW5 T1+T2 stable rate >=80%"
 	@echo "  test-golden-apps              POST-Q8 golden apps launch"
 	@echo "  test-purge-baseline           W1-B1 telemetry/pro/snap purge verification"
 	@echo "  test-flatpak                  W1-F1 flatpak + flathub remote verification"
@@ -187,6 +188,7 @@ preflight:
 	bash tests/preflight/test-hw-t2-installed.sh
 	bash tests/preflight/test-hw4-peripherals.sh
 	bash tests/preflight/test-hw-t3-wincompat.sh
+	bash tests/preflight/test-hw5-stable-gate.sh
 	bash tests/preflight/test-post-mvp-roadmap.sh
 	bash tests/preflight/test-ubuntu-2604-closeout.sh
 	bash tests/preflight/test-fork-f7-closeout.sh
@@ -420,6 +422,10 @@ test-anticheat-substantive:
 	bash tests/preflight/test-anticheat-substantive.sh
 
 test-hw5-stable-gate:
+	bash tests/preflight/test-hw5-stable-gate.sh
+
+test-hw5-stable-gate-run:
+	bash tests/hw/run-hw5-stable-gate.sh
 	bash tests/preflight/test-hw5-stable-gate.sh
 
 test-backup-timeshift:

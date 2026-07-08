@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-hw-live-usb-baseline/v1",
   "wave": "W6-HW1",
-  "version": "0.7.0.8",
+  "version": "0.7.0.9",
   "minimum_live_pass": 3,
   "tier": "T1",
   "smoke_script": "tests/hw/smoke-live.sh",

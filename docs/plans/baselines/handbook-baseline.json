@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-handbook-baseline/v1",
   "wave": "W8-DOC-handbook",
-  "version": "0.7.0.8",
+  "version": "0.7.0.9",
   "docs_root": "docs/user/handbook",
   "volumes": [
     {

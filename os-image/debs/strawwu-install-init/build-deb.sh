@@ -60,6 +60,9 @@ DEB_TMP="$(mktemp "/tmp/strawwu-install-init_${VERSION}.XXXXXX.deb")"
 dpkg-deb --build "${PKG_DIR}" "${DEB_TMP}"
 mkdir -p "${OUTPUT_DIR}"
 mv -f "${DEB_TMP}" "${DEB_FILE}"
+if [[ ! -f "${DEB_FILE}" ]]; then
+    echo "ERROR: deb missing after mv: ${DEB_FILE}" >&2
+    exit 1
+fi
 
 echo "=== Built ${DEB_FILE} ==="
-ls -lh "${DEB_FILE}"
