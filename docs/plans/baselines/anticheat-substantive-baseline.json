@@ -1,0 +1,37 @@
+{
+  "schema": "strawwu-anticheat-substantive-baseline/v1",
+  "stage": "post-w7-anticheat-substantive",
+  "version": "0.7.0.5",
+  "verify_script": "tests/anticheat/run-substantive-verify.sh",
+  "preflight": "tests/preflight/test-anticheat-substantive.sh",
+  "compat_matrix": "components/tests/wincompat/output/compat-matrix.json",
+  "evidence_json": "components/tests/wincompat/output/anticheat-substantive.json",
+  "cases": [
+    {
+      "name": "eac_driver_probe",
+      "grade": "B",
+      "status": "PARTIAL",
+      "backend": "native",
+      "probe_pass": 7,
+      "probe_total": 9
+    },
+    {
+      "name": "battleye_init",
+      "grade": "B",
+      "status": "PARTIAL",
+      "backend": "native",
+      "probe_pass": 8,
+      "probe_total": 9
+    },
+    {
+      "name": "vanguard_tpm_probe",
+      "grade": "C",
+      "status": "PARTIAL",
+      "backend": "microvm",
+      "probe_pass": 6,
+      "probe_total": 9
+    }
+  ],
+  "overall": "PARTIAL",
+  "dod": "Q7: EAC/BE/Vanguard ProbeEngine integration; honest PARTIAL; no ranked-play claim"
+}

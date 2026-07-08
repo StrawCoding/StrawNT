@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-fork-closeout/v1",
   "stage": "fork-f7-closeout",
-  "version": "0.7.0.3",
+  "version": "0.7.0.4",
   "target": "26.04.0-resolute-fork",
   "migration_stages": 7,
   "base_mode": "fork",

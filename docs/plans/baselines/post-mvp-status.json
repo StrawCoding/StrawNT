@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-08T12:03:40.357995",
+  "generated_at": "2026-07-08T12:20:41.460686",
   "target": "0.9.0.0-engineering",
   "total": 21,
-  "passed": 14,
-  "failed": 7,
+  "passed": 15,
+  "failed": 6,
   "all_pass": false,
   "stages": [
     {
@@ -78,8 +78,8 @@
     },
     {
       "id": "post-ci-kernel-selfhosted",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "post-w7-anticheat-substantive",

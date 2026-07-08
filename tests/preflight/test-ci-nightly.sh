@@ -184,7 +184,6 @@ data.update({
     "deferred": [
         "CI1 rootfs reproducibility hash gate",
         "production archive signing key deployment on runner",
-        "kernel-build.yml self-hosted workflow (Phase 2 Q6)",
     ],
 })
 data["wave0_gaps"] = data.get("deferred", [])

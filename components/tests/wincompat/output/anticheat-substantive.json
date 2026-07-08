@@ -1,0 +1,230 @@
+{
+  "schema": "strawwu-anticheat-substantive/v1",
+  "project_version": "0.7.0.5",
+  "generated_at": "2026-07-08T04:22:53Z",
+  "cases": [
+    {
+      "name": "eac_driver_probe",
+      "anticheat_type": "EasyAntiCheat",
+      "backend": "native",
+      "status": "PARTIAL",
+      "grade": "B",
+      "substantive_verified": true,
+      "notes": "driver stub via strawwu_ipc; DLL integrity partial",
+      "evidence": {
+        "verified_at": "2026-07-08T04:22:53Z",
+        "verification_method": "ProbeEngine integration (cargo test + probe suite)",
+        "verification_stage": "post-w7-anticheat-substantive",
+        "probe_pass": 7,
+        "probe_total": 9,
+        "probes": [
+          {
+            "probe_name": "eac_driver_loaded",
+            "category": "DriverSignature",
+            "passed": true,
+            "response": "stub driver present via strawwu_ipc"
+          },
+          {
+            "probe_name": "eac_kernel_callback",
+            "category": "KernelCallback",
+            "passed": true,
+            "response": "callback stub registered"
+          },
+          {
+            "probe_name": "eac_dll_integrity",
+            "category": "DllIntegrity",
+            "passed": false,
+            "response": "DLL hash mismatch expected — PARTIAL"
+          },
+          {
+            "probe_name": "hidden_window_check",
+            "category": "WindowEnumeration",
+            "passed": true,
+            "response": "no suspicious hidden windows detected in enum"
+          },
+          {
+            "probe_name": "overlay_window_check",
+            "category": "WindowEnumeration",
+            "passed": true,
+            "response": "overlay windows filtered from enumeration"
+          },
+          {
+            "probe_name": "tool_window_visibility",
+            "category": "WindowEnumeration",
+            "passed": false,
+            "response": "debug tool window visible — PARTIAL"
+          },
+          {
+            "probe_name": "process_list_filter",
+            "category": "ProcessScan",
+            "passed": true,
+            "response": "host-side processes hidden from guest enumeration"
+          },
+          {
+            "probe_name": "module_list_filter",
+            "category": "ProcessScan",
+            "passed": true,
+            "response": "injected modules not visible in LDR list"
+          },
+          {
+            "probe_name": "thread_enumeration",
+            "category": "ProcessScan",
+            "passed": true,
+            "response": "bridge threads excluded from NtQuerySystemInformation"
+          }
+        ],
+        "cargo_crate": "strawwu-anticheat",
+        "honest_disclaimer": "PARTIAL only — does not guarantee ranked play or official AC signature pass"
+      }
+    },
+    {
+      "name": "battleye_init",
+      "anticheat_type": "BattlEye",
+      "backend": "native",
+      "status": "PARTIAL",
+      "grade": "B",
+      "substantive_verified": true,
+      "notes": "kernel scan intercepted; process not crash",
+      "evidence": {
+        "verified_at": "2026-07-08T04:22:53Z",
+        "verification_method": "ProbeEngine integration (cargo test + probe suite)",
+        "verification_stage": "post-w7-anticheat-substantive",
+        "probe_pass": 8,
+        "probe_total": 9,
+        "probes": [
+          {
+            "probe_name": "be_kernel_scan",
+            "category": "KernelModuleScan",
+            "passed": true,
+            "response": "scan intercepted by bridge"
+          },
+          {
+            "probe_name": "be_dll_check",
+            "category": "DllIntegrity",
+            "passed": true,
+            "response": "DLL integrity stub pass"
+          },
+          {
+            "probe_name": "be_debugger_check",
+            "category": "DebuggerDetection",
+            "passed": true,
+            "response": "NtQueryInformationProcess returns no debugger"
+          },
+          {
+            "probe_name": "hidden_window_check",
+            "category": "WindowEnumeration",
+            "passed": true,
+            "response": "no suspicious hidden windows detected in enum"
+          },
+          {
+            "probe_name": "overlay_window_check",
+            "category": "WindowEnumeration",
+            "passed": true,
+            "response": "overlay windows filtered from enumeration"
+          },
+          {
+            "probe_name": "tool_window_visibility",
+            "category": "WindowEnumeration",
+            "passed": false,
+            "response": "debug tool window visible — PARTIAL"
+          },
+          {
+            "probe_name": "process_list_filter",
+            "category": "ProcessScan",
+            "passed": true,
+            "response": "host-side processes hidden from guest enumeration"
+          },
+          {
+            "probe_name": "module_list_filter",
+            "category": "ProcessScan",
+            "passed": true,
+            "response": "injected modules not visible in LDR list"
+          },
+          {
+            "probe_name": "thread_enumeration",
+            "category": "ProcessScan",
+            "passed": true,
+            "response": "bridge threads excluded from NtQuerySystemInformation"
+          }
+        ],
+        "cargo_crate": "strawwu-anticheat",
+        "honest_disclaimer": "PARTIAL only — does not guarantee ranked play or official AC signature pass"
+      }
+    },
+    {
+      "name": "vanguard_tpm_probe",
+      "anticheat_type": "Vanguard",
+      "backend": "microvm",
+      "status": "PARTIAL",
+      "grade": "C",
+      "substantive_verified": true,
+      "notes": "TPM stub partial; kernel driver not loaded — policy deny",
+      "evidence": {
+        "verified_at": "2026-07-08T04:22:53Z",
+        "verification_method": "ProbeEngine integration (cargo test + probe suite)",
+        "verification_stage": "post-w7-anticheat-substantive",
+        "probe_pass": 6,
+        "probe_total": 9,
+        "probes": [
+          {
+            "probe_name": "vanguard_tpm_probe",
+            "category": "TpmCheck",
+            "passed": false,
+            "response": "TPM stub — PARTIAL, no real TPM attestation"
+          },
+          {
+            "probe_name": "vanguard_kernel_driver",
+            "category": "DriverSignature",
+            "passed": false,
+            "response": "kernel-mode driver not loaded — policy deny"
+          },
+          {
+            "probe_name": "vanguard_process_scan",
+            "category": "ProcessScan",
+            "passed": true,
+            "response": "process list filtered"
+          },
+          {
+            "probe_name": "hidden_window_check",
+            "category": "WindowEnumeration",
+            "passed": true,
+            "response": "no suspicious hidden windows detected in enum"
+          },
+          {
+            "probe_name": "overlay_window_check",
+            "category": "WindowEnumeration",
+            "passed": true,
+            "response": "overlay windows filtered from enumeration"
+          },
+          {
+            "probe_name": "tool_window_visibility",
+            "category": "WindowEnumeration",
+            "passed": false,
+            "response": "debug tool window visible — PARTIAL"
+          },
+          {
+            "probe_name": "process_list_filter",
+            "category": "ProcessScan",
+            "passed": true,
+            "response": "host-side processes hidden from guest enumeration"
+          },
+          {
+            "probe_name": "module_list_filter",
+            "category": "ProcessScan",
+            "passed": true,
+            "response": "injected modules not visible in LDR list"
+          },
+          {
+            "probe_name": "thread_enumeration",
+            "category": "ProcessScan",
+            "passed": true,
+            "response": "bridge threads excluded from NtQuerySystemInformation"
+          }
+        ],
+        "cargo_crate": "strawwu-anticheat",
+        "honest_disclaimer": "PARTIAL only — does not guarantee ranked play or official AC signature pass"
+      }
+    }
+  ],
+  "overall": "PARTIAL"
+}
