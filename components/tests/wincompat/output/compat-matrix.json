@@ -1,7 +1,7 @@
 {
   "matrix_version": "1",
   "generated_at": "2026-07-08",
-  "project_version": "0.7.0.5",
+  "project_version": "0.7.0.8",
   "phase": "6",
   "sub_stages": [
     {
@@ -339,6 +339,246 @@
     "partial": 0,
     "fail": 0,
     "overall": "PASS",
-    "anticheat_overall": "PARTIAL"
+    "anticheat_overall": "PARTIAL",
+    "golden_apps_overall": "PARTIAL"
+  },
+  "golden_apps_matrix": {
+    "schema": "strawwu-golden-apps-launch/v1",
+    "verification_stage": "post-q8-golden-apps",
+    "manifest_version": "0.7.0.8",
+    "overall": "PARTIAL",
+    "generated_at": "2026-07-08T05:17:04Z",
+    "cases": [
+      {
+        "id": "office",
+        "name": "Microsoft Office (suite)",
+        "scope": "launch_and_basic_edit",
+        "backend": "native",
+        "status": "PARTIAL",
+        "grade": "C",
+        "notes": "Word/Excel \u57fa\u672c\u958b\u6a94\u8207\u7de8\u8f2f",
+        "launch_verified": true,
+        "evidence": {
+          "verified_at": "2026-07-08T05:17:04Z",
+          "verification_method": "LaunchProbeEngine (cargo test + in-process simulation)",
+          "verification_stage": "post-q8-golden-apps",
+          "probe_pass": 5,
+          "probe_total": 5,
+          "probes": [
+            {
+              "probe_name": "profile_validate",
+              "category": "profile",
+              "passed": true,
+              "response": "AppProfile valid backend=native"
+            },
+            {
+              "probe_name": "pe_execute",
+              "category": "runtime",
+              "passed": true,
+              "response": "state=Running pid=1000 session=default"
+            },
+            {
+              "probe_name": "gui_smoke",
+              "category": "gui",
+              "passed": true,
+              "response": "hwnd=65536 compositor=mutter frames=1"
+            },
+            {
+              "probe_name": "com_stub",
+              "category": "office",
+              "passed": true,
+              "response": "CoInitializeEx=Success CoCreateInstance=Success"
+            },
+            {
+              "probe_name": "vfs_doc_open",
+              "category": "office",
+              "passed": true,
+              "response": "write=true read=true path=C:\\Users\\test\\Documents\\office-smoke.docx"
+            }
+          ],
+          "cargo_crate": "strawwu-runtime",
+          "honest_disclaimer": "PARTIAL only \u2014 simulated launch probes; no real Office/Steam/Epic/\u4e09\u89d2\u6d32 binaries",
+          "cargo_tests_passed": 6,
+          "project_version": "0.7.0.8"
+        }
+      },
+      {
+        "id": "steam-launcher",
+        "name": "Steam Client",
+        "scope": "launcher_only",
+        "backend": "native",
+        "status": "PARTIAL",
+        "grade": "B",
+        "notes": "\u555f\u52d5\u8207\u767b\u5165 UI\uff1b\u4e0d\u9a57\u904a\u6232\u57f7\u884c",
+        "launch_verified": true,
+        "evidence": {
+          "verified_at": "2026-07-08T05:17:04Z",
+          "verification_method": "LaunchProbeEngine (cargo test + in-process simulation)",
+          "verification_stage": "post-q8-golden-apps",
+          "probe_pass": 6,
+          "probe_total": 6,
+          "probes": [
+            {
+              "probe_name": "profile_validate",
+              "category": "profile",
+              "passed": true,
+              "response": "AppProfile valid backend=native"
+            },
+            {
+              "probe_name": "pe_execute",
+              "category": "runtime",
+              "passed": true,
+              "response": "state=Running pid=1000 session=default"
+            },
+            {
+              "probe_name": "gui_smoke",
+              "category": "gui",
+              "passed": true,
+              "response": "hwnd=65536 compositor=mutter frames=1"
+            },
+            {
+              "probe_name": "cooperation_group",
+              "category": "launcher",
+              "passed": true,
+              "response": "group=steam-launcher-bundle pid=1000 members=[1000]"
+            },
+            {
+              "probe_name": "ipc_pipe",
+              "category": "launcher",
+              "passed": true,
+              "response": "pipe=\\\\.\\pipe\\steam-launcher-launcher created=true connected=true"
+            },
+            {
+              "probe_name": "launcher_window",
+              "category": "launcher",
+              "passed": true,
+              "response": "class=steamlauncherLauncherWnd title=Steam Client \u2014 Login visible=true"
+            }
+          ],
+          "cargo_crate": "strawwu-runtime",
+          "honest_disclaimer": "PARTIAL only \u2014 simulated launch probes; no real Office/Steam/Epic/\u4e09\u89d2\u6d32 binaries",
+          "cargo_tests_passed": 6,
+          "project_version": "0.7.0.8"
+        }
+      },
+      {
+        "id": "epic-launcher",
+        "name": "Epic Games Launcher",
+        "scope": "launcher_only",
+        "backend": "native",
+        "status": "PARTIAL",
+        "grade": "B",
+        "notes": "\u555f\u52d5\u8207\u767b\u5165 UI\uff1b\u4e0d\u9a57\u904a\u6232\u57f7\u884c",
+        "launch_verified": true,
+        "evidence": {
+          "verified_at": "2026-07-08T05:17:04Z",
+          "verification_method": "LaunchProbeEngine (cargo test + in-process simulation)",
+          "verification_stage": "post-q8-golden-apps",
+          "probe_pass": 6,
+          "probe_total": 6,
+          "probes": [
+            {
+              "probe_name": "profile_validate",
+              "category": "profile",
+              "passed": true,
+              "response": "AppProfile valid backend=native"
+            },
+            {
+              "probe_name": "pe_execute",
+              "category": "runtime",
+              "passed": true,
+              "response": "state=Running pid=1000 session=default"
+            },
+            {
+              "probe_name": "gui_smoke",
+              "category": "gui",
+              "passed": true,
+              "response": "hwnd=65536 compositor=mutter frames=1"
+            },
+            {
+              "probe_name": "cooperation_group",
+              "category": "launcher",
+              "passed": true,
+              "response": "group=epic-launcher-bundle pid=1000 members=[1000]"
+            },
+            {
+              "probe_name": "ipc_pipe",
+              "category": "launcher",
+              "passed": true,
+              "response": "pipe=\\\\.\\pipe\\epic-launcher-launcher created=true connected=true"
+            },
+            {
+              "probe_name": "launcher_window",
+              "category": "launcher",
+              "passed": true,
+              "response": "class=epiclauncherLauncherWnd title=Epic Games Launcher \u2014 Login visible=true"
+            }
+          ],
+          "cargo_crate": "strawwu-runtime",
+          "honest_disclaimer": "PARTIAL only \u2014 simulated launch probes; no real Office/Steam/Epic/\u4e09\u89d2\u6d32 binaries",
+          "cargo_tests_passed": 6,
+          "project_version": "0.7.0.8"
+        }
+      },
+      {
+        "id": "delta-force-launcher",
+        "name": "\u4e09\u89d2\u6d32\u884c\u52d5\u555f\u52d5\u5668",
+        "scope": "launcher_only",
+        "backend": "native",
+        "status": "PARTIAL",
+        "grade": "B",
+        "notes": "\u50c5\u555f\u52d5\u5668\uff1b\u4e0d\u9a57\u904a\u6232\u672c\u9ad4\u8207\u53cd\u4f5c\u5f0a\u9023\u7dda",
+        "launch_verified": true,
+        "evidence": {
+          "verified_at": "2026-07-08T05:17:04Z",
+          "verification_method": "LaunchProbeEngine (cargo test + in-process simulation)",
+          "verification_stage": "post-q8-golden-apps",
+          "probe_pass": 6,
+          "probe_total": 6,
+          "probes": [
+            {
+              "probe_name": "profile_validate",
+              "category": "profile",
+              "passed": true,
+              "response": "AppProfile valid backend=native"
+            },
+            {
+              "probe_name": "pe_execute",
+              "category": "runtime",
+              "passed": true,
+              "response": "state=Running pid=1000 session=default"
+            },
+            {
+              "probe_name": "gui_smoke",
+              "category": "gui",
+              "passed": true,
+              "response": "hwnd=65536 compositor=mutter frames=1"
+            },
+            {
+              "probe_name": "cooperation_group",
+              "category": "launcher",
+              "passed": true,
+              "response": "group=delta-force-launcher-bundle pid=1000 members=[1000]"
+            },
+            {
+              "probe_name": "ipc_pipe",
+              "category": "launcher",
+              "passed": true,
+              "response": "pipe=\\\\.\\pipe\\delta-force-launcher-launcher created=true connected=true"
+            },
+            {
+              "probe_name": "launcher_window",
+              "category": "launcher",
+              "passed": true,
+              "response": "class=deltaforcelauncherLauncherWnd title=\u4e09\u89d2\u6d32\u884c\u52d5\u555f\u52d5\u5668 \u2014 Login visible=true"
+            }
+          ],
+          "cargo_crate": "strawwu-runtime",
+          "honest_disclaimer": "PARTIAL only \u2014 simulated launch probes; no real Office/Steam/Epic/\u4e09\u89d2\u6d32 binaries",
+          "cargo_tests_passed": 6,
+          "project_version": "0.7.0.8"
+        }
+      }
+    ]
   }
 }

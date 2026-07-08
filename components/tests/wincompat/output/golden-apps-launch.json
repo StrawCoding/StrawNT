@@ -1,0 +1,231 @@
+{
+  "schema": "strawwu-golden-apps-launch/v1",
+  "project_version": "0.7.0.8",
+  "generated_at": "2026-07-08T05:17:04Z",
+  "manifest_version": "0.7.0.8",
+  "cases": [
+    {
+      "id": "office",
+      "name": "Microsoft Office (suite)",
+      "scope": "launch_and_basic_edit",
+      "backend": "native",
+      "status": "PARTIAL",
+      "grade": "C",
+      "launch_verified": true,
+      "notes": "Word/Excel 基本開檔與編輯",
+      "evidence": {
+        "verified_at": "2026-07-08T05:17:04Z",
+        "verification_method": "LaunchProbeEngine (cargo test + in-process simulation)",
+        "verification_stage": "post-q8-golden-apps",
+        "probe_pass": 5,
+        "probe_total": 5,
+        "probes": [
+          {
+            "probe_name": "profile_validate",
+            "category": "profile",
+            "passed": true,
+            "response": "AppProfile valid backend=native"
+          },
+          {
+            "probe_name": "pe_execute",
+            "category": "runtime",
+            "passed": true,
+            "response": "state=Running pid=1000 session=default"
+          },
+          {
+            "probe_name": "gui_smoke",
+            "category": "gui",
+            "passed": true,
+            "response": "hwnd=65536 compositor=mutter frames=1"
+          },
+          {
+            "probe_name": "com_stub",
+            "category": "office",
+            "passed": true,
+            "response": "CoInitializeEx=Success CoCreateInstance=Success"
+          },
+          {
+            "probe_name": "vfs_doc_open",
+            "category": "office",
+            "passed": true,
+            "response": "write=true read=true path=C:\\Users\\test\\Documents\\office-smoke.docx"
+          }
+        ],
+        "cargo_crate": "strawwu-runtime",
+        "honest_disclaimer": "PARTIAL only — simulated launch probes; no real Office/Steam/Epic/三角洲 binaries"
+      }
+    },
+    {
+      "id": "steam-launcher",
+      "name": "Steam Client",
+      "scope": "launcher_only",
+      "backend": "native",
+      "status": "PARTIAL",
+      "grade": "B",
+      "launch_verified": true,
+      "notes": "啟動與登入 UI；不驗遊戲執行",
+      "evidence": {
+        "verified_at": "2026-07-08T05:17:04Z",
+        "verification_method": "LaunchProbeEngine (cargo test + in-process simulation)",
+        "verification_stage": "post-q8-golden-apps",
+        "probe_pass": 6,
+        "probe_total": 6,
+        "probes": [
+          {
+            "probe_name": "profile_validate",
+            "category": "profile",
+            "passed": true,
+            "response": "AppProfile valid backend=native"
+          },
+          {
+            "probe_name": "pe_execute",
+            "category": "runtime",
+            "passed": true,
+            "response": "state=Running pid=1000 session=default"
+          },
+          {
+            "probe_name": "gui_smoke",
+            "category": "gui",
+            "passed": true,
+            "response": "hwnd=65536 compositor=mutter frames=1"
+          },
+          {
+            "probe_name": "cooperation_group",
+            "category": "launcher",
+            "passed": true,
+            "response": "group=steam-launcher-bundle pid=1000 members=[1000]"
+          },
+          {
+            "probe_name": "ipc_pipe",
+            "category": "launcher",
+            "passed": true,
+            "response": "pipe=\\\\.\\pipe\\steam-launcher-launcher created=true connected=true"
+          },
+          {
+            "probe_name": "launcher_window",
+            "category": "launcher",
+            "passed": true,
+            "response": "class=steamlauncherLauncherWnd title=Steam Client — Login visible=true"
+          }
+        ],
+        "cargo_crate": "strawwu-runtime",
+        "honest_disclaimer": "PARTIAL only — simulated launch probes; no real Office/Steam/Epic/三角洲 binaries"
+      }
+    },
+    {
+      "id": "epic-launcher",
+      "name": "Epic Games Launcher",
+      "scope": "launcher_only",
+      "backend": "native",
+      "status": "PARTIAL",
+      "grade": "B",
+      "launch_verified": true,
+      "notes": "啟動與登入 UI；不驗遊戲執行",
+      "evidence": {
+        "verified_at": "2026-07-08T05:17:04Z",
+        "verification_method": "LaunchProbeEngine (cargo test + in-process simulation)",
+        "verification_stage": "post-q8-golden-apps",
+        "probe_pass": 6,
+        "probe_total": 6,
+        "probes": [
+          {
+            "probe_name": "profile_validate",
+            "category": "profile",
+            "passed": true,
+            "response": "AppProfile valid backend=native"
+          },
+          {
+            "probe_name": "pe_execute",
+            "category": "runtime",
+            "passed": true,
+            "response": "state=Running pid=1000 session=default"
+          },
+          {
+            "probe_name": "gui_smoke",
+            "category": "gui",
+            "passed": true,
+            "response": "hwnd=65536 compositor=mutter frames=1"
+          },
+          {
+            "probe_name": "cooperation_group",
+            "category": "launcher",
+            "passed": true,
+            "response": "group=epic-launcher-bundle pid=1000 members=[1000]"
+          },
+          {
+            "probe_name": "ipc_pipe",
+            "category": "launcher",
+            "passed": true,
+            "response": "pipe=\\\\.\\pipe\\epic-launcher-launcher created=true connected=true"
+          },
+          {
+            "probe_name": "launcher_window",
+            "category": "launcher",
+            "passed": true,
+            "response": "class=epiclauncherLauncherWnd title=Epic Games Launcher — Login visible=true"
+          }
+        ],
+        "cargo_crate": "strawwu-runtime",
+        "honest_disclaimer": "PARTIAL only — simulated launch probes; no real Office/Steam/Epic/三角洲 binaries"
+      }
+    },
+    {
+      "id": "delta-force-launcher",
+      "name": "三角洲行動啟動器",
+      "scope": "launcher_only",
+      "backend": "native",
+      "status": "PARTIAL",
+      "grade": "B",
+      "launch_verified": true,
+      "notes": "僅啟動器；不驗遊戲本體與反作弊連線",
+      "evidence": {
+        "verified_at": "2026-07-08T05:17:04Z",
+        "verification_method": "LaunchProbeEngine (cargo test + in-process simulation)",
+        "verification_stage": "post-q8-golden-apps",
+        "probe_pass": 6,
+        "probe_total": 6,
+        "probes": [
+          {
+            "probe_name": "profile_validate",
+            "category": "profile",
+            "passed": true,
+            "response": "AppProfile valid backend=native"
+          },
+          {
+            "probe_name": "pe_execute",
+            "category": "runtime",
+            "passed": true,
+            "response": "state=Running pid=1000 session=default"
+          },
+          {
+            "probe_name": "gui_smoke",
+            "category": "gui",
+            "passed": true,
+            "response": "hwnd=65536 compositor=mutter frames=1"
+          },
+          {
+            "probe_name": "cooperation_group",
+            "category": "launcher",
+            "passed": true,
+            "response": "group=delta-force-launcher-bundle pid=1000 members=[1000]"
+          },
+          {
+            "probe_name": "ipc_pipe",
+            "category": "launcher",
+            "passed": true,
+            "response": "pipe=\\\\.\\pipe\\delta-force-launcher-launcher created=true connected=true"
+          },
+          {
+            "probe_name": "launcher_window",
+            "category": "launcher",
+            "passed": true,
+            "response": "class=deltaforcelauncherLauncherWnd title=三角洲行動啟動器 — Login visible=true"
+          }
+        ],
+        "cargo_crate": "strawwu-runtime",
+        "honest_disclaimer": "PARTIAL only — simulated launch probes; no real Office/Steam/Epic/三角洲 binaries"
+      }
+    }
+  ],
+  "overall": "PARTIAL"
+}

@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-meta-audit-baseline/v1",
   "wave": "W6-B5",
-  "version": "0.7.0.7",
+  "version": "0.7.0.8",
   "package": "strawwu-minimal",
   "manifest": "usr/share/strawwu/meta-audit/meta-audit-manifest.yaml",
   "forbidden_ubuntu_metas": [

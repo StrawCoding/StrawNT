@@ -1,0 +1,46 @@
+{
+  "schema": "strawwu-golden-apps-launch-baseline/v1",
+  "stage": "post-q8-golden-apps",
+  "version": "0.7.0.8",
+  "verify_script": "tests/wincompat/run-golden-apps-verify.sh",
+  "preflight": "tests/preflight/test-golden-apps.sh",
+  "manifest": "components/tests/wincompat/golden-apps.json",
+  "evidence_json": "components/tests/wincompat/output/golden-apps-launch.json",
+  "compat_matrix": "components/tests/wincompat/output/compat-matrix.json",
+  "cases": [
+    {
+      "id": "office",
+      "scope": "launch_and_basic_edit",
+      "grade": "C",
+      "status": "PARTIAL",
+      "probe_pass": 5,
+      "probe_total": 5
+    },
+    {
+      "id": "steam-launcher",
+      "scope": "launcher_only",
+      "grade": "B",
+      "status": "PARTIAL",
+      "probe_pass": 6,
+      "probe_total": 6
+    },
+    {
+      "id": "epic-launcher",
+      "scope": "launcher_only",
+      "grade": "B",
+      "status": "PARTIAL",
+      "probe_pass": 6,
+      "probe_total": 6
+    },
+    {
+      "id": "delta-force-launcher",
+      "scope": "launcher_only",
+      "grade": "B",
+      "status": "PARTIAL",
+      "probe_pass": 6,
+      "probe_total": 6
+    }
+  ],
+  "overall": "PARTIAL",
+  "dod": "Q8: Office/Steam/Epic/三角洲 launcher launch probes; honest PARTIAL; no gameplay/login claim"
+}

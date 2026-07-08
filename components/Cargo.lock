@@ -401,6 +401,7 @@ dependencies = [
 name = "strawwu-runtime"
 version = "0.4.0"
 dependencies = [
+ "chrono",
  "serde",
  "serde_json",
  "strawwu-bridge",
