@@ -104,6 +104,21 @@ data = {
         "firstboot duration not measured yet (PERF2)",
     ],
 }
+boot_baseline = Path(out).parent / "boot-time-baseline.json"
+if boot_baseline.is_file():
+    boot = json.loads(boot_baseline.read_text(encoding="utf-8"))
+    plymouth = (boot.get("baseline") or {}).get("plymouth_sec")
+    if plymouth is not None:
+        data["measurements"]["live_boot_to_plymouth_sec"] = plymouth
+        data["phases"]["PERF2"] = {
+            "status": "complete",
+            "artifact": "boot-time-baseline.json",
+            "note": "boot-time regression gate (managed by test-perf-boot-regression)",
+        }
+        data["wave0_gaps"] = [
+            g for g in data["wave0_gaps"]
+            if "boot-time" not in g
+        ]
 Path(out).parent.mkdir(parents=True, exist_ok=True)
 Path(out).write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 PY

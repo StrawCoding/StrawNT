@@ -1,0 +1,40 @@
+{
+  "schema": "strawwu-boot-time-baseline/v1",
+  "stage": "post-perf-boot-regression",
+  "version": "0.7.0.3",
+  "generated_at": "2026-07-08",
+  "qemu_profile": {
+    "memory_mb": 4096,
+    "smp": 2,
+    "accel": "kvm:tcg",
+    "mode": "bios",
+    "marker": "plymouth-start.service",
+    "kvm_recommended": true,
+    "note": "45s budget assumes KVM; TCG-only hosts use advisory gate"
+  },
+  "budgets": {
+    "live_boot_to_plymouth_max_sec": 45,
+    "regression_ratio_max": 1.15
+  },
+  "baseline": {
+    "plymouth_sec": 18,
+    "measured_at": "2026-07-08",
+    "iso_file": "StrawWU-0.6.2.5-amd64.iso",
+    "method": "serial-line-ratio",
+    "source": "tests/boot/output/serial-bios.log + boot-result.json",
+    "note": "QEMU BIOS tcg 4GiB; nightly may refresh via measure-boot-time.sh"
+  },
+  "phases": {
+    "PERF2": {
+      "status": "complete",
+      "gate_mode_default": "advisory",
+      "gate_mode_nightly": "advisory",
+      "gate_mode_release": "strict",
+      "artifact": "boot-time-baseline.json",
+      "measure_script": "tests/perf/measure-boot-time.sh",
+      "check_script": "tests/perf/check-boot-regression.py",
+      "ci_workflow": "nightly.yml (test-perf-boot-regression after dev-iso)"
+    }
+  },
+  "measurement_artifact": "tests/perf/output/boot-time-measurement.json"
+}

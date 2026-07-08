@@ -99,6 +99,8 @@ help:
 	@echo "  test-ci-nightly               W7-CI2+CI3+CI4 nightly + PR gate + self-hosted"
 	@echo "  test-perf-baseline            W7-PERF0+PERF1 ISO size baseline + budget gate"
 	@echo "  test-perf-legal-gate          W7 PERF1+LEG4 CI workflow wiring gate"
+	@echo "  measure-boot-time             PERF2 QEMU boot-to-Plymouth measurement"
+	@echo "  test-perf-boot-regression     POST-PERF PERF2 boot-time regression gate"
 	@echo "  generate-release-manifest     Build os-image/output/release-manifest.json"
 	@echo "  release-sign                  SHA256SUMS + detached GPG for release ISO"
 	@echo "  publish-debs                  Build signed APT repo from strawwu .debs"
@@ -178,6 +180,7 @@ preflight:
 	bash tests/preflight/test-ci-nightly.sh
 	bash tests/preflight/test-perf-baseline.sh
 	bash tests/preflight/test-perf-legal-gate.sh
+	bash tests/preflight/test-perf-boot-regression.sh
 	bash tests/preflight/test-hw-matrix.sh
 	bash tests/preflight/test-hw-t1-live-usb.sh
 	bash tests/preflight/test-hw-t2-installed.sh
@@ -404,6 +407,9 @@ test-sec-cve-policy:
 
 test-perf-boot-regression:
 	bash tests/preflight/test-perf-boot-regression.sh
+
+measure-boot-time:
+	bash tests/perf/measure-boot-time.sh
 
 test-anticheat-substantive:
 	bash tests/preflight/test-anticheat-substantive.sh

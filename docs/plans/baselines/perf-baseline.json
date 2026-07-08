@@ -1,14 +1,14 @@
 {
   "schema": "strawwu-perf-baseline/v1",
   "generated_at": "2026-07-06",
-  "version": "0.7.0.2",
+  "version": "0.7.0.3",
   "measurements": {
     "latest_iso_bytes": 5096343552,
     "latest_iso_gb": 4.75,
     "latest_iso_file": "StrawWU-0.6.2.5-amd64.iso",
     "squashfs_bytes": 7030249824,
     "squashfs_gb": 6.55,
-    "live_boot_to_plymouth_sec": null,
+    "live_boot_to_plymouth_sec": 18,
     "installed_idle_ram_mb": null,
     "firstboot_complete_sec": null
   },
@@ -31,12 +31,15 @@
       "ci_workflow": "release.yml (STRAWWU_PERF_GATE=strict after release-iso)"
     },
     "PERF2": {
-      "status": "deferred",
-      "note": "boot-time regression gate"
+      "status": "complete",
+      "gate_mode": "advisory",
+      "artifact": "boot-time-baseline.json",
+      "measure_script": "tests/perf/measure-boot-time.sh",
+      "ci_workflow": "nightly.yml (STRAWWU_PERF2_GATE=advisory)",
+      "release_hook": "release.yml (STRAWWU_PERF2_GATE=strict after boot-test)"
     }
   },
   "wave0_gaps": [
-    "boot-time not measured yet (PERF2)",
     "idle RAM not measured yet (PERF2)",
     "firstboot duration not measured yet (PERF2)"
   ]

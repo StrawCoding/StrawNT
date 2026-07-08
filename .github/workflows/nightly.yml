@@ -44,6 +44,11 @@ jobs:
           STRAWWU_ISO_MODE: dev-iso
         run: make preflight-iso-before-boot
 
+      - name: PERF2 boot-time regression (advisory)
+        env:
+          STRAWWU_PERF2_GATE: advisory
+        run: make test-perf-boot-regression
+
       - name: Generate SHA256SUMS
         working-directory: os-image/output
         run: |

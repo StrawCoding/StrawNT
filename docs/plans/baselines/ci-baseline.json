@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-ci-baseline/v1",
   "wave": "W7-CI2+CI3+CI4",
-  "version": "0.7.0.2",
+  "version": "0.7.0.3",
   "plan": "docs/plans/strawwu-ci-build-plan.md",
   "workflows": {
     "ci": ".github/workflows/ci.yml",
@@ -20,7 +20,9 @@
     "release-sign",
     "test-perf-baseline",
     "test-legal-trademark",
-    "test-perf-legal-gate"
+    "test-perf-legal-gate",
+    "test-perf-boot-regression",
+    "measure-boot-time"
   ],
   "phases": {
     "CI0": {
@@ -84,7 +86,8 @@
     "CI3 PR gate (preflight + wincompat + calamares + version bump)",
     "CI4 self-hosted runner wiring (nightly + release + GPG secrets)",
     "PERF1 ISO size gate in release CI (w7-perf-legal-gate)",
-    "LEG4 release compliance gate in CI (w7-perf-legal-gate)"
+    "LEG4 release compliance gate in CI (w7-perf-legal-gate)",
+    "PERF2 boot-time regression gate (post-perf-boot-regression)"
   ],
   "deferred": [
     "CI1 rootfs reproducibility hash gate",
@@ -105,6 +108,16 @@
         "ci.yml",
         "release.yml"
       ]
+    }
+  },
+  "perf_boot_gates": {
+    "PERF2": {
+      "status": "complete",
+      "target": "test-perf-boot-regression",
+      "measure": "measure-boot-time",
+      "advisory_env": "STRAWWU_PERF2_GATE=advisory",
+      "strict_env": "STRAWWU_PERF2_GATE=strict",
+      "workflow": "nightly.yml"
     }
   }
 }

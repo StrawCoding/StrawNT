@@ -58,6 +58,8 @@ nightly_checks=(
     'make preflight'
     'make dev-iso'
     'STRAWWU_RELEASE_CHANNEL: nightly'
+    'make test-perf-boot-regression'
+    'STRAWWU_PERF2_GATE'
     'sha256sum'
     'generate-release-manifest'
     'upload-artifact'

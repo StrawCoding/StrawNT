@@ -1,0 +1,18 @@
+{
+  "version": "0.7.0.3",
+  "status": "PASS",
+  "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.6.2.5-amd64.iso",
+  "measured": "2026-07-08T11:44:37+08:00",
+  "measurement": {
+    "mode": "bios",
+    "status": "PASS",
+    "marker": "plymouth-start.service",
+    "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.6.2.5-amd64.iso",
+    "start": "2026-07-08T11:40:02+08:00",
+    "end": "2026-07-08T11:44:37+08:00",
+    "plymouth_sec": 273,
+    "qemu_exit": 0,
+    "timeout_sec": 600,
+    "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/perf/output/serial-perf-bios.log"
+  }
+}

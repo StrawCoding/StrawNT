@@ -1,0 +1,64 @@
+hostname: Name or service not known
+make-ssl-cert: Could not get FQDN, using '(none)'.
+make-ssl-cert: You may want to fix your /etc/hosts and/or DNS setup and run
+make-ssl-cert: 'make-ssl-cert generate-default-snakeoil --force-overwrite'
+make-ssl-cert: again.
+passwd: password changed.
+Failed to create stream fd: No such file or directory
+Failed to create stream fd: No such file or directory
+Failed to create stream fd: No such file or directory
+dbus-daemon[544]: [session uid=1000 pid=18446744073709551615 pidfd=5] Activating service name='org.gtk.vfs.Daemon' requested by ':1.0' (uid=1000 label="unconfined")
+dbus-daemon[544]: [session uid=1000 pid=18446744073709551615 pidfd=5] Successfully activated service 'org.gtk.vfs.Daemon'
+dbus-daemon[544]: [session uid=1000 pid=18446744073709551615 pidfd=5] Activating service name='org.gtk.vfs.Metadata' requested by ':1.0' (uid=1000 label="unconfined")
+fuse: device /dev/fuse not found. Kernel module not loaded?
+dbus-daemon[544]: [session uid=1000 pid=18446744073709551615 pidfd=5] Successfully activated service 'org.gtk.vfs.Metadata'
+A connection to the bus can't be made
+Using CD-ROM mount point /cdrom/
+Identifying... [bee949c3d268cd1a05b348dacc04462d-2]
+Scanning disc for index files...
+Found 2 package indexes, 0 source indexes, 0 translation indexes and 1 signatures
+Found label 'StrawWU 0.6.2.5 amd64'
+This disc is called: 
+'StrawWU 0.6.2.5 amd64'
+Copying package lists...gpgv: Signature made Thu Apr 23 01:56:49 2026 UTC
+gpgv:                using EDDSA key 6501BC1735F31F5FBD9A66331BC4DB0A475955C8
+gpgv: Can't check signature: No public key
+Sub-process /usr/bin/gpgv returned an error code (2)Reading Package Indexes... 0%Reading Package Indexes... 0%Reading Package Indexes... Error!
+Writing new source list
+Source list entries for this disc are:
+deb cdrom:[StrawWU 0.6.2.5 amd64]/ resolute main restricted
+Repeat this process for the rest of the CDs in your set.
+E: Sub-process gpgv returned an error code (2)
+W: Signature verification failed for: /cdrom/dists/resolute/Release.gpg
+chown: warning: '.' should be ':': 'ubuntu.ubuntu'
+chown: warning: '.' should be ':': 'ubuntu.ubuntu'
+P+q6E616D65\[6n[32766;32766H[6n[!p]104\[0m[?7h[1G[0J]3008;start=3721cfa49d3442b2adefdcf8cfe82871;user=root;hostname=strawwu;machineid=4689eca92e88477193407ee21f046953;bootid=5dda3a76034f4366b8f7defde010e9e2;pid=1;pidfdid=1;comm=systemd;type=boot\-.mount
+cdrom.mount
+rofs.mount
+dev-hugepages.mount
+dev-mqueue.mount
+sys-kernel-debug.mount
+sys-kernel-tracing.mount
+sys-kernel-config.mount
+sys-fs-fuse-connections.mount
+kmod-static-nodes.service
+blk-availability.service
+systemd-remount-fs.service
+lvm2-monitor.service
+systemd-udev-load-credentials.service
+systemd-random-seed.service
+systemd-journald.service
+systemd-tmpfiles-setup-dev-early.service
+systemd-modules-load.service
+keyboard-setup.service
+systemd-journal-flush.service
+systemd-sysusers.service
+systemd-udev-trigger.service
+systemd-sysctl.service
+systemd-tmpfiles-setup-dev.service
+tmp.mount
+snap-ubuntu\x2ddesktop\x2dbootstrap-589.mount
+systemd-oomd.service
+systemd-resolved.service
+systemd-udevd.service
+plymouth-start.service

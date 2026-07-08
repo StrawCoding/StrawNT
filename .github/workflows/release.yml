@@ -87,6 +87,13 @@ jobs:
       - name: LEG4 release legal compliance gate
         run: make test-legal-trademark
 
+      - name: PERF2 boot-time regression (strict)
+        env:
+          STRAWWU_PERF2_GATE: strict
+        run: |
+          make measure-boot-time || true
+          make test-perf-boot-regression
+
       - name: Generate SHA256SUMS and GPG signatures
         env:
           STRAWWU_GPG_PRIVATE_KEY: ${{ secrets.STRAWWU_GPG_PRIVATE_KEY }}
