@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-perf-baseline/v1",
   "generated_at": "2026-07-06",
-  "version": "0.7.0.5",
+  "version": "0.7.0.7",
   "measurements": {
     "latest_iso_bytes": 5096343552,
     "latest_iso_gb": 4.75,
@@ -32,8 +32,11 @@
     },
     "PERF2": {
       "status": "complete",
+      "gate_mode": "advisory",
       "artifact": "boot-time-baseline.json",
-      "note": "boot-time regression gate (managed by test-perf-boot-regression)"
+      "measure_script": "tests/perf/measure-boot-time.sh",
+      "ci_workflow": "nightly.yml (STRAWWU_PERF2_GATE=advisory)",
+      "release_hook": "release.yml (STRAWWU_PERF2_GATE=strict after boot-test)"
     }
   },
   "wave0_gaps": [

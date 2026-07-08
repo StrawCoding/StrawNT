@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-hw-t2-installed-baseline/v1",
   "wave": "POST-HW-T2",
-  "version": "0.7.0.5",
+  "version": "0.7.0.7",
   "tier": "T2",
   "minimum_installed_pass": 1,
   "dimensions_required": [

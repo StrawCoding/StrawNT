@@ -1,14 +1,17 @@
 {
   "schema": "strawwu-hw-matrix-results/v2",
-  "wave": "POST-HW-T2",
-  "version": "0.6.3.3",
-  "updated": "2026-07-08T05:28:54+08:00",
+  "wave": "POST-HW-T3",
+  "version": "0.7.0.7",
+  "updated": "2026-07-08T13:00:57+08:00",
   "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.6.2.5-amd64.iso",
   "dimensions": [
     "gpu",
     "wifi",
     "suspend",
-    "hidpi"
+    "hidpi",
+    "wincompat_status",
+    "wincompat_gui",
+    "wincompat_game"
   ],
   "minimum_live_pass": 3,
   "minimum_hw_pass": {
@@ -310,18 +313,59 @@
         "mock": true,
         "session": "worker fixture smoke (Hermes may replace with physical laptop)"
       }
+    },
+    {
+      "machine_id": "t3-wincompat-nvidia-desktop",
+      "tier": "T3",
+      "phase": "wincompat-smoke",
+      "environment": "fixture",
+      "cpu": "Intel Core + NVIDIA (wincompat dGPU profile)",
+      "gpu": "NVIDIA GeForce",
+      "gpu_vendor": "nvidia",
+      "firmware": "uefi",
+      "usb_method": "calamares-install",
+      "iso": "os-image/output/StrawWU-0.7.0.7-amd64.iso",
+      "tests": {
+        "live_boot": "SKIP",
+        "wifi": "SKIP",
+        "gpu_driver": "SKIP",
+        "suspend": "SKIP",
+        "hidpi": "SKIP",
+        "wincompat_status": "PASS",
+        "wincompat_gui": "PASS",
+        "wincompat_game": "PARTIAL",
+        "wincompat_session": "PASS",
+        "wincompat_aggregate": "PARTIAL",
+        "installed_boot": "PASS",
+        "desktop": "PASS"
+      },
+      "markers": [
+        "STRAWWU-WINCOMPAT-SMOKE-OK"
+      ],
+      "tested": "2026-07-08T13:00:57+08:00",
+      "hw_notes": {
+        "status": "strawwu status session probe",
+        "gui_smoke": "notepad.exe strawwu run gui-smoke=PASS",
+        "game_path": "compat-matrix 6.6=PASS; anticheat overall=PARTIAL",
+        "game_honest": "PARTIAL — cargo game path only; no physical Steam/Epic title on worker",
+        "anticheat": "PARTIAL",
+        "mock": true,
+        "session": "worker fixture smoke (Hermes may replace with physical dGPU gaming session)"
+      }
     }
   ],
   "summary": {
-    "total": 8,
+    "total": 9,
     "live_pass": 7,
     "live_fail": 0,
     "gpu_pass": 7,
     "wifi_pass": 7,
     "suspend_pass": 1,
-    "suspend_skip": 7,
+    "suspend_skip": 8,
     "hidpi_pass": 4,
-    "hidpi_skip": 4
+    "hidpi_skip": 5,
+    "wincompat_pass": 0,
+    "wincompat_partial": 1
   },
   "t1_physical": {
     "minimum": 3,
@@ -330,5 +374,10 @@
   "t2_installed": {
     "minimum": 1,
     "count": 1
+  },
+  "t3_wincompat": {
+    "minimum": 1,
+    "count": 1,
+    "honest_partial": 1
   }
 }

@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-08T12:29:21.451232",
+  "generated_at": "2026-07-08T12:41:09.744063",
   "target": "0.9.0.0-engineering",
   "total": 21,
-  "passed": 15,
-  "failed": 6,
+  "passed": 16,
+  "failed": 5,
   "all_pass": false,
   "stages": [
     {
@@ -83,8 +83,8 @@
     },
     {
       "id": "post-w7-anticheat-substantive",
-      "status": "IN_PROGRESS",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "post-hw-t3-wincompat",

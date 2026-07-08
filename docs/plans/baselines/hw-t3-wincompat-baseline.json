@@ -1,0 +1,29 @@
+{
+  "schema": "strawwu-hw-t3-wincompat-baseline/v1",
+  "wave": "POST-HW-T3",
+  "version": "0.7.0.7",
+  "tier": "T3",
+  "minimum_wincompat_pass": 1,
+  "dimensions_required": [
+    "wincompat_status",
+    "wincompat_gui",
+    "wincompat_game"
+  ],
+  "honest_game_grade": "PARTIAL",
+  "smoke_script": "tests/hw/smoke-wincompat.sh",
+  "matrix_runner": "tests/hw/run-hw-t3-wincompat.sh",
+  "merge_script": "tests/hw/merge-entry.sh",
+  "compat_matrix": "components/tests/wincompat/output/compat-matrix.json",
+  "results_json": "docs/plans/hw-matrix-results.json",
+  "preflight": "tests/preflight/test-hw-t3-wincompat.sh",
+  "profiles": [
+    "t3-wincompat-nvidia-desktop (T3 wincompat-smoke dGPU fixture)"
+  ],
+  "hermes_workflow": [
+    "install StrawWU release-iso on dGPU desktop",
+    "install a Windows game or launcher (Steam/Epic per Q8)",
+    "bash tests/hw/smoke-wincompat.sh --environment physical-installed --gpu-vendor nvidia --output /tmp/wincompat.json",
+    "bash tests/hw/merge-entry.sh --entry /tmp/wincompat.json"
+  ],
+  "dod": ">=1 T3 entry with wincompat_gui PASS + honest wincompat_game PARTIAL in hw-matrix-results.json"
+}

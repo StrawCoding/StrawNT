@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-ci-baseline/v1",
   "wave": "W7-CI2+CI3+CI4",
-  "version": "0.7.0.5",
+  "version": "0.7.0.7",
   "plan": "docs/plans/strawwu-ci-build-plan.md",
   "workflows": {
     "ci": ".github/workflows/ci.yml",
@@ -98,7 +98,10 @@
     "CI2 nightly pipeline (cron → dev-iso → SHA256 → manifest draft)",
     "CI3 PR gate (preflight + wincompat + calamares + version bump)",
     "CI4 self-hosted runner wiring (nightly + release + GPG secrets)",
-    "Q6 kernel-build.yml self-hosted workflow (Phase 2 kernel CI)"
+    "Q6 kernel-build.yml self-hosted workflow (Phase 2 kernel CI)",
+    "PERF1 ISO size gate in release CI (w7-perf-legal-gate)",
+    "LEG4 release compliance gate in CI (w7-perf-legal-gate)",
+    "PERF2 boot-time regression gate (post-perf-boot-regression)"
   ],
   "deferred": [
     "CI1 rootfs reproducibility hash gate",

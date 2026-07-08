@@ -186,6 +186,7 @@ preflight:
 	bash tests/preflight/test-hw-t1-live-usb.sh
 	bash tests/preflight/test-hw-t2-installed.sh
 	bash tests/preflight/test-hw4-peripherals.sh
+	bash tests/preflight/test-hw-t3-wincompat.sh
 	bash tests/preflight/test-post-mvp-roadmap.sh
 	bash tests/preflight/test-ubuntu-2604-closeout.sh
 	bash tests/preflight/test-fork-f7-closeout.sh
@@ -396,6 +397,9 @@ test-ci-kernel-selfhosted:
 
 test-hw-t3-wincompat:
 	bash tests/preflight/test-hw-t3-wincompat.sh
+
+test-hw-t3-wincompat-run:
+	bash tests/hw/run-hw-t3-wincompat.sh
 
 test-hw4-peripherals:
 	bash tests/preflight/test-hw4-peripherals.sh

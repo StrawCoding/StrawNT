@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-firstboot-baseline/v1",
   "wave": "W5-N3",
-  "version": "0.7.0.5",
+  "version": "0.7.0.7",
   "package": "strawwu-firstboot",
   "log_path": "/var/log/strawwu/firstboot.log",
   "prefs_path": "/var/lib/strawwu/setup/firstboot-prefs.json",
