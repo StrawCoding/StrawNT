@@ -3,9 +3,9 @@
   "generated_at": "2026-07-06",
   "version": "0.7.0.12",
   "measurements": {
-    "latest_iso_bytes": 5087315968,
-    "latest_iso_gb": 4.74,
-    "latest_iso_file": "StrawWU-1.0.0.0-amd64.iso",
+    "latest_iso_bytes": 5645195264,
+    "latest_iso_gb": 5.26,
+    "latest_iso_file": "StrawWU-0.7.0.12-amd64.iso",
     "squashfs_bytes": 7030249824,
     "squashfs_gb": 6.55,
     "live_boot_to_plymouth_sec": 18,
