@@ -287,6 +287,68 @@ CRITICAL_MAIN_MODULES = (
     "kernel/fs/squashfs/squashfs.ko",
 )
 
+# Casper early initrd only mirrors upstream QEMU virtio/bochs GPU modules.
+# Physical Intel/AMD/NVIDIA need explicit injection or Plymouth two-step stays black.
+EARLY_PHYSICAL_GPU_MODULES = (
+    "kernel/drivers/gpu/drm/i915/i915.ko",
+    "kernel/drivers/gpu/drm/amd/amdgpu/amdgpu.ko",
+    "kernel/drivers/gpu/drm/amd/amdgpu/amdxcp/amdxcp.ko",
+    "kernel/drivers/gpu/drm/nouveau/nouveau.ko",
+    "kernel/drivers/gpu/drm/radeon/radeon.ko",
+    "kernel/drivers/gpu/drm/scheduler/gpu-sched.ko",
+    "kernel/drivers/gpu/drm/drm_buddy.ko",
+    "kernel/drivers/gpu/drm/drm_exec.ko",
+    "kernel/drivers/gpu/drm/drm_suballoc_helper.ko",
+    "kernel/drivers/gpu/drm/drm_panel_backlight_quirks.ko",
+    "kernel/drivers/media/cec/core/cec.ko",
+    "kernel/drivers/i2c/algos/i2c-algo-bit.ko",
+)
+
+
+def resolve_module_source(modules_src: Path, rel: str) -> Path | None:
+    """Find a kernel module under modules_src for a kernel/.../*.ko relative path."""
+    zst = modules_src / f"{rel}.zst"
+    if zst.is_file():
+        return zst
+    plain = modules_src / rel
+    if plain.is_file():
+        return plain
+    stem = Path(rel).name
+    matches = sorted(
+        mod
+        for mod in modules_src.rglob(stem)
+        if mod.is_file() and ".ko" in mod.name
+    )
+    return matches[0] if matches else None
+
+
+def inject_early_physical_gpu_modules(
+    modules_root: Path,
+    new_kver: str,
+    modules_src: Path,
+) -> int:
+    """Add real GPU DRM modules missing from upstream casper early module set."""
+    import shutil
+
+    new_dir = modules_root / new_kver
+    if not new_dir.is_dir() or not modules_src.is_dir():
+        return 0
+    injected = 0
+    for rel in EARLY_PHYSICAL_GPU_MODULES:
+        dest = new_dir / f"{rel}.zst"
+        if dest.is_file():
+            continue
+        src = resolve_module_source(modules_src, rel)
+        if src is None:
+            continue
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        if src.name.endswith(".zst"):
+            shutil.copy2(src, dest)
+        else:
+            write_module_payload(src, dest)
+        injected += 1
+    return injected
+
 
 def mirror_critical_modules_to_main(
     main_dir: Path,
@@ -571,6 +633,9 @@ def replace_early3_modules(
         raise ValueError(f"{phase_name} initrd has no module version directory")
     old_kver = old_kvers[0]
     replace_modules_tree(modules_root, old_kver, new_kver, modules_src)
+    injected = inject_early_physical_gpu_modules(modules_root, new_kver, modules_src)
+    if injected:
+        print(f"injected {injected} physical GPU modules into {phase_name}", file=sys.stderr)
     # Remove any leftover upstream kver trees (prevents dual 6.11 + 6.8.12 trees).
     for extra in old_kvers[1:]:
         extra_dir = modules_root / extra

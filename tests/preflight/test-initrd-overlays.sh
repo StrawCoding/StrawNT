@@ -17,10 +17,12 @@ require_file "${SPLICE}" "initrd-splice.py"
 
 require_file "${OVERLAYS}/scripts/casper-premount/05strawwu-wait-live-media" "premount wait-live-media"
 require_file "${OVERLAYS}/scripts/casper-premount/20iso_scan" "iso-scan overlay"
+require_file "${OVERLAYS}/scripts/init-top/05strawwu-early-gpu" "init-top early-gpu"
 
 for script in \
 	"${OVERLAYS}/scripts/casper-premount/05strawwu-wait-live-media" \
-	"${OVERLAYS}/scripts/casper-premount/20iso_scan"; do
+	"${OVERLAYS}/scripts/casper-premount/20iso_scan" \
+	"${OVERLAYS}/scripts/init-top/05strawwu-early-gpu"; do
 	if [[ -x "${script}" ]]; then
 		pass "$(basename "${script}") executable"
 	else

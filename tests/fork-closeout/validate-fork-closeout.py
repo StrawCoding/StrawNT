@@ -9,6 +9,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from lib.version_policy import check_version_policy
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CLOSEOUT_DIR = REPO_ROOT / "docs" / "plans" / "fork-closeout"
 STAGE_REPORTS = REPO_ROOT / "docs" / "plans" / "stage-reports"
@@ -180,10 +183,11 @@ def main() -> int:
     require_file(REPO_ROOT / "docs" / "plans" / "kickoff" / "FORK-F7-closeout.md", "kickoff FORK-F7-closeout.md")
     require_file(REPO_ROOT / "docs" / "plans" / "strawwu-fork-migration-plan.md", "fork migration plan")
 
-    if not re.match(r"^0\.\d+\.\d+\.\d+$", VERSION):
-        fail(f"VERSION semver MAJOR must be 0 before 1.0.0: {VERSION}")
+    policy_ok, policy_msg = check_version_policy(REPO_ROOT, VERSION)
+    if policy_ok:
+        ok(policy_msg)
     else:
-        ok(f"VERSION MAJOR=0 policy: {VERSION}")
+        fail(policy_msg)
 
     verify_base_mode_fork()
     verify_manifest_active()

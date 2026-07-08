@@ -220,6 +220,21 @@ if [[ -n "${CASPER_DIR}" && -d "${CASPER_DIR}" ]]; then
           echo "FAIL: initrd ${modules_phase} missing isofs/iso9660 module (CD mount will fail)" >&2
           FAIL=1
         fi
+        gpu_ok=0
+        if [[ -n "${modules_dir}" ]]; then
+          for gpu_mod in i915 amdgpu nouveau radeon; do
+            if find "${modules_dir}" -name "${gpu_mod}.ko*" 2>/dev/null | grep -q .; then
+              gpu_ok=1
+              break
+            fi
+          done
+        fi
+        if [[ "${gpu_ok}" -eq 1 ]]; then
+          echo "PASS: initrd ${modules_phase} has physical GPU module (i915/amdgpu/nouveau/radeon)"
+        elif [[ -n "${modules_dir}" ]]; then
+          echo "FAIL: initrd ${modules_phase} missing physical GPU modules — Plymouth black screen on real hardware" >&2
+          FAIL=1
+        fi
       else
         warn "unmkinitramfs failed — skipping initrd module checks"
       fi

@@ -1,98 +1,82 @@
 # Stage Report — official-release (Phase 8/8)
 
-**版本目標**: 1.0.0  
-**當前 semver**: 0.4.0.0  
+**版本目標**: 1.0.0.0（Q9）  
+**當前 semver**: 1.0.0.0  
 **階段**: 8/8 (official-release)  
-**日期**: 2026-07-04  
-**最後檢查**: 2026-07-04T03:35 UTC-4 (worker-TICK)  
-**狀態**: BLOCKED — 待使用者授權
+**日期**: 2026-07-08  
+**狀態**: IN_PROGRESS — `test-install-e2e` 重跑中（第 1 次於 bootloader 階段被 Terminated）  
+**續跑狀態**: `docs/plans/official-release/RESUME.md`
 
 ---
 
-## 阻塞原因
-
-本階段為最終正式版發布，設計上 BLOCKED 直到以下條件全部滿足：
+## 解除阻塞
 
 | # | 條件 | 狀態 | 說明 |
 |---|------|------|------|
-| 1 | Phase 0（skeleton）PASS | ✅ | 已通過 |
-| 2 | Phase 1（ubuntu-clone）PASS | ✅ | 已通過 |
-| 3 | Phase 2（custom-kernel）PASS | ✅ | 已通過 |
-| 4 | Phase 3（calamares-e2e）PASS | ✅ | 已通過 |
-| 5 | Phase 4（greenfield）PASS | ✅ | 已通過 |
-| 6 | Phase 5（hub）PASS | ✅ | 已通過 |
-| 7 | Phase 6（wincompat）PASS | ✅ | 已通過（122 unit tests，所有子階段 PARTIAL） |
-| 8 | **使用者明確授權正式版** | ❌ | `.official-release-authorized` 不存在 |
+| 1–7 | Phase 0–6 PASS | ✅ | 前置階段全 PASS |
+| 8 | Post-MVP 21/21 | ✅ | post-v09-engineering-closeout PASS |
+| 9 | 使用者授權正式版 | ✅ | `.official-release-authorized`（2026-07-08） |
 
 ---
 
-## 驗證命令狀態
+## Hermes 驗證命令
 
-| 驗證命令 | 結果 | 說明 |
-|---------|------|------|
-| `test -f .official-release-authorized` | ❌ BLOCKED | 使用者尚未授權 |
-| `make build-iso` | ⏸ 未執行 | 等待授權後以 VERSION=1.0.0 建置 |
-| `make test-install-e2e` | ⏸ 未執行 | 等待 ISO 建置完成 |
-| `sha256sum -c SHA256SUMS` | ⏸ 未執行 | 等待 ISO 產出 |
+| 命令 | 結果 | 輸出摘要 |
+|------|------|----------|
+| `test -f .official-release-authorized` | ✅ | `authorized: 2026-07-08` / `target: 1.0.0.0` |
+| `make build-iso` | ✅ | `BUILD_ISO_EXIT=0`；`StrawWU-1.0.0.0-amd64.iso`（4.8G） |
+| `sha256sum -c SHA256SUMS` | ✅ | `os-image/output/StrawWU-1.0.0.0-amd64.iso: OK` |
+| `make test-install-e2e` | ⏳ | 重跑中，log：`/tmp/test-install-e2e-1.0.0.0-rerun.log` |
 
----
+### build-iso 證據
 
-## 解除阻塞所需動作
+```
+6e272f6d8ce9306c70a2712f87f0deb0c9fc6ffb48153540da03dc88e41ed691  StrawWU-1.0.0.0-amd64.iso
+==> build complete (release-iso)
+```
 
-使用者須明確表達「可發正式版」，worker 將執行以下流程：
+### preflight 證據
 
-1. 建立 `.official-release-authorized` 標記檔
-2. 設定 `VERSION=1.0.0` 並更新所有版本引用
-3. `make build-iso`（release-iso 模式，xz 壓縮）
-4. 產出 `SHA256SUMS` 並驗證
-5. `make test-install-e2e`（BIOS + UEFI 雙韌體）
-6. 產出 boot/install 證據 JSON
-7. HTML 報告 hermes-deliver
-8. 建議 Hermes trigger-verify
-
----
-
-## 版本政策參照
-
-- `.official-release-target` 內容：`1.0.0`
-- `docs/versioning.md`：MAJOR >= 1 僅在使用者明確通知後
-- Makefile `VERSION ?= 0.4.0.0`
-- Preflight 閘門：檢查 MAJOR=0 除非 `STRAWWU_OFFICIAL_RELEASE=1` 且 `.official-release-authorized` 存在
+```
+STRAWWU_OFFICIAL_RELEASE=1 STRAWWU_VERSION=1.0.0.0 make preflight
+PREFLIGHT_EXIT=0
+PASS: VERSION official release authorized: 1.0.0.0
+```
 
 ---
 
-## 技術就緒度（供使用者參考）
+## 本階段交付物
 
-所有 7 個前置階段已通過，元件基礎已建立：
-
-- **OS 基礎**: Ubuntu Noble clone + 自訂 kernel + Calamares 安裝器
-- **元件**: 8 crates（runtime/bridge/nt/graphics/audio/anticheat/device-proxy/launcher），122 unit tests
-- **Windows 相容層**: 所有 13 個子階段 PARTIAL（stub/mock 層，尚未接入真實 Windows 二進位）
-- **裝置代理**: 10 類裝置映射 + IOCTL handler
-- **圖形棧**: Vulkan ICD + DXGI + OpenGL WGL + D3D11→VK
-- **反作弊**: EAC/BE C 級、Vanguard F 級
-
----
-
-## Q 系列路線圖注意事項
-
-Phase 6 的所有子階段均為 PARTIAL 狀態（誠實報告），以下 Q 項目在正式版前可能需要進一步迭代：
-
-| Q | 項目 | 當前狀態 |
-|---|------|----------|
-| Q7 | 反作弊驗收=可正常運行 | EAC/BE C 級、Vanguard F 級 |
-| Q8 | Office/Steam/Epic/三角洲啟動器 | stub 基礎完成 |
-| Q1 | 預發布範圍 | 待使用者另行提出 |
+| 項目 | 路徑 |
+|------|------|
+| 授權標記 | `.official-release-authorized` |
+| VERSION | `1.0.0.0` |
+| ISO | `os-image/output/StrawWU-1.0.0.0-amd64.iso` |
+| SHA256SUMS | 根目錄 + `os-image/output/SHA256SUMS` |
+| DoD | `docs/plans/official-release/official-release-dod.md` |
+| HTML hermes-deliver | `docs/plans/official-release/html/official-release-report.html` |
+| validate | `tests/official-release/validate-official-release.py` |
+| preflight 閘門 | `tests/preflight/test-official-release.sh` |
+| 版本政策庫 | `tests/lib/version_policy.py` |
+| 續跑狀態 | `docs/plans/official-release/RESUME.md` |
 
 ---
 
-## 產品決策阻塞
+## 事件紀錄
 
-**是，本階段存在產品決策阻塞：需要使用者明確授權才能進行正式版發布。**
+1. 首次 E2E 跑約 93 分鐘至 `e2e-bootloader-setup`，shell 被 Terminated（無 `install-e2e-result.json`）。
+2. 工作區曾出現 VERSION 回退至 `0.7.0.11`、`.official-release-authorized` 被刪除；已恢復。
+3. 2026-07-08 17:14+08 以 nohup 重啟 `test-install-e2e`。
 
-在使用者授權前，worker 不會：
-- 將 MAJOR 版本號設為 >= 1
-- 建置正式版 ISO
-- 推送任何 release tag
+---
 
-**等待使用者指示。**
+## 建議 Hermes
+
+E2E exit 0 後執行：
+
+```bash
+sha256sum -c SHA256SUMS
+STRAWWU_OFFICIAL_RELEASE=1 make test-official-release
+```
+
+再 mark `official-release`。**本報告不自行宣稱 PASS/FAIL。**

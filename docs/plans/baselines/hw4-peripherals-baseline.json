@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-hw4-peripherals-baseline/v1",
   "stage": "post-hw4-peripherals",
-  "version": "0.7.0.11",
+  "version": "0.7.0.12",
   "package": "strawwu-laptop",
   "cli": "/usr/bin/strawwu-laptop-peripherals",
   "dimensions": [

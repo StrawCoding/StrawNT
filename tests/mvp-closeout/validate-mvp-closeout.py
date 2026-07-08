@@ -8,6 +8,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from lib.version_policy import check_version_policy
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 MVP_DIR = REPO_ROOT / "docs" / "plans" / "mvp-closeout"
 STAGE_REPORTS = REPO_ROOT / "docs" / "plans" / "stage-reports"
@@ -79,10 +82,11 @@ def main() -> int:
     for path, patterns in PRD_PATTERNS:
         require_in_text(path, patterns, "mvp-dod.md PRD coverage")
 
-    if not re.match(r"^0\.\d+\.\d+\.\d+$", VERSION):
-        fail(f"VERSION semver MAJOR must be 0 before 1.0.0: {VERSION}")
+    policy_ok, policy_msg = check_version_policy(REPO_ROOT, VERSION)
+    if policy_ok:
+        ok(policy_msg)
     else:
-        ok(f"VERSION MAJOR=0 policy: {VERSION}")
+        fail(policy_msg)
 
     for name in MVP_BASELINES:
         require_file(BASELINES / name, f"baseline {name}")

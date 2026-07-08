@@ -195,6 +195,7 @@ preflight:
 	bash tests/preflight/test-fork-f7-closeout.sh
 	bash tests/preflight/test-post-mvp-v06-closeout.sh
 	bash tests/preflight/test-post-mvp-v09-closeout.sh
+	bash tests/preflight/test-official-release.sh
 
 preflight-dev-vm:
 	bash tests/preflight/test-dev-vm-ready.sh
@@ -339,6 +340,10 @@ test-post-mvp-v06-closeout:
 
 test-post-mvp-v09-closeout:
 	bash tests/preflight/test-post-mvp-v09-closeout.sh
+
+test-official-release:
+	bash tests/preflight/test-official-release.sh
+	python3 tests/official-release/validate-official-release.py
 
 test-ubuntu-2604-roadmap:
 	bash tests/preflight/test-ubuntu-2604-roadmap.sh

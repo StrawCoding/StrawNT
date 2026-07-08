@@ -1,11 +1,11 @@
 {
   "schema": "strawwu-perf-baseline/v1",
   "generated_at": "2026-07-06",
-  "version": "0.7.0.11",
+  "version": "0.7.0.12",
   "measurements": {
-    "latest_iso_bytes": 5096343552,
-    "latest_iso_gb": 4.75,
-    "latest_iso_file": "StrawWU-0.6.2.5-amd64.iso",
+    "latest_iso_bytes": 5087315968,
+    "latest_iso_gb": 4.74,
+    "latest_iso_file": "StrawWU-1.0.0.0-amd64.iso",
     "squashfs_bytes": 7030249824,
     "squashfs_gb": 6.55,
     "live_boot_to_plymouth_sec": 18,
@@ -27,7 +27,7 @@
       "status": "complete",
       "gate_mode": "advisory",
       "last_result": "pass",
-      "note": "ISO 4.75 GB within 7GB budget",
+      "note": "ISO 4.74 GB within 7GB budget",
       "ci_workflow": "release.yml (STRAWWU_PERF_GATE=strict after release-iso)"
     },
     "PERF2": {

@@ -1,0 +1,22 @@
+#!/bin/sh
+# Load physical GPU DRM before Plymouth (casper early only ships virtio/bochs modules).
+PREREQ="udev"
+
+prereqs()
+{
+	echo "${PREREQ}"
+}
+
+case ${1} in
+prereqs)
+	prereqs
+	exit 0
+	;;
+esac
+
+for drv in simpledrm i915 amdgpu nouveau radeon; do
+	modprobe -q -b "${drv}" 2>/dev/null || true
+done
+udevadm settle 2>/dev/null || true
+
+exit 0

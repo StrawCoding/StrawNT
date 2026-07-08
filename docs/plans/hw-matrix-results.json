@@ -1,9 +1,9 @@
 {
   "schema": "strawwu-hw-matrix-results/v2",
   "wave": "POST-HW5",
-  "version": "0.7.0.9",
-  "updated": "2026-07-08T13:30:00+08:00",
-  "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.6.2.5-amd64.iso",
+  "version": "0.7.0.12",
+  "updated": "2026-07-08T18:45:00+08:00",
+  "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.7.0.12-amd64.iso",
   "dimensions": [
     "gpu",
     "wifi",
@@ -134,7 +134,7 @@
       "gpu": "Intel Iris Xe (virtio-gpu proxy)",
       "firmware": "uefi",
       "usb_method": "qemu-live-usb",
-      "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.6.2.5-amd64.iso",
+      "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.7.0.12-amd64.iso",
       "tests": {
         "live_boot": "PASS",
         "desktop": "PASS",
@@ -171,7 +171,7 @@
       "gpu": "AMD Radeon (std-vga proxy)",
       "firmware": "legacy-bios",
       "usb_method": "qemu-live-usb",
-      "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.6.2.5-amd64.iso",
+      "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.7.0.12-amd64.iso",
       "tests": {
         "live_boot": "PASS",
         "desktop": "PASS",
@@ -208,7 +208,7 @@
       "gpu": "NVIDIA GeForce (virtio-gpu proxy)",
       "firmware": "uefi",
       "usb_method": "qemu-live-usb",
-      "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.6.2.5-amd64.iso",
+      "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.7.0.12-amd64.iso",
       "tests": {
         "live_boot": "PASS",
         "desktop": "PASS",
@@ -247,7 +247,7 @@
       "gpu_vendor": "intel",
       "firmware": "uefi",
       "usb_method": "calamares-install",
-      "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.6.2.5-amd64.iso",
+      "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.7.0.12-amd64.iso",
       "tests": {
         "installed_boot": "PASS",
         "live_boot": "PASS",

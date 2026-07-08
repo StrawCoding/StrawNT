@@ -65,6 +65,12 @@ else
     fail "grub drop-in missing GRUB_DISTRIBUTOR"
 fi
 
+if grep -q 'console=tty0' "${GRUB_DROPIN}"; then
+    pass "grub drop-in console=tty0 (physical display)"
+else
+    fail "grub drop-in missing console=tty0 for installed boot"
+fi
+
 if grep -q 'GRUB_DISTRIBUTOR: "StrawWU"' "${GRUBCFG}"; then
     pass "grubcfg.conf defaults GRUB_DISTRIBUTOR"
 else

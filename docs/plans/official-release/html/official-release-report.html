@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrawWU Official Release 1.0.0 — DoD</title>
+  <style>
+:root {
+  --bg: #0f1419;
+  --surface: #1a2332;
+  --text: #e8eef4;
+  --muted: #8b9cb3;
+  --accent: #14b8a6;
+  --border: #2d3a4d;
+  --code-bg: #0d1117;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  margin: 0;
+  padding: 2rem 1rem 4rem;
+}
+.wrap { max-width: 56rem; margin: 0 auto; }
+header { border-bottom: 1px solid var(--border); margin-bottom: 2rem; padding-bottom: 1rem; }
+.brand { color: var(--accent); font-weight: 600; }
+h1 { font-size: 1.85rem; margin: 0.5rem 0; }
+.meta { color: var(--muted); font-size: 0.9rem; }
+h2 { color: var(--accent); font-size: 1.25rem; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35rem; }
+h3 { font-size: 1.05rem; margin-top: 1.5rem; }
+table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.92rem; }
+th, td { border: 1px solid var(--border); padding: 0.5rem 0.65rem; text-align: left; }
+th { background: var(--surface); color: var(--accent); }
+code { background: var(--code-bg); border: 1px solid var(--border); border-radius: 4px; padding: 0.1rem 0.35rem; }
+pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; padding: 1rem; overflow-x: auto; }
+footer { margin-top: 3rem; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); padding-top: 1rem; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">StrawWU Official Release</div>
+      <h1>Q9 正式版 1.0.0 — Definition of Done</h1>
+      <p class="meta">版本 1.0.0.0 · official-release · hermes-deliver</p>
+    </header>
+    <main>
+<h1>StrawWU Official Release Definition of Done (Q9)</h1>
+<table>
+<tr><th>欄位</th><th>值</th></tr>
+<tr><td>產品目標</td><td>1.0.0-target（Q9 正式版授權發布）</td></tr>
+<tr><td>建置版本</td><td>見 VERSION（<code>1.0.0.0</code>）</td></tr>
+<tr><td>前置階段</td><td>phase0 → phase6 + Post-MVP 全段 PASS</td></tr>
+<tr><td>授權標記</td><td><code>.official-release-authorized</code></td></tr>
+</table>
+<h2>1. 硬性閘門</h2>
+<table>
+<tr><th>#</th><th>項目</th><th>驗收</th></tr>
+<tr><td>1</td><td>全 7 前置 Phase PASS</td><td>Hermes state</td></tr>
+<tr><td>2</td><td>Post-MVP 21 段 PASS</td><td>post-mvp-status.json</td></tr>
+<tr><td>3</td><td>使用者授權正式版</td><td><code>.official-release-authorized</code></td></tr>
+<tr><td>4</td><td>preflight PASS</td><td><code>STRAWWU_OFFICIAL_RELEASE=1 make preflight</code></td></tr>
+<tr><td>5</td><td>release-iso 建置</td><td><code>make build-iso</code> → <code>os-image/output/StrawWU-1.0.0.0-amd64.iso</code></td></tr>
+<tr><td>6</td><td>SHA256SUMS 驗證</td><td><code>sha256sum -c SHA256SUMS</code></td></tr>
+<tr><td>7</td><td>Calamares install E2E</td><td><code>make test-install-e2e</code></td></tr>
+<tr><td>8</td><td>HTML hermes-deliver</td><td><code>docs/plans/official-release/html/official-release-report.html</code></td></tr>
+</table>
+<h2>2. 驗證命令（Hermes trigger-verify）</h2>
+<pre><code>
+test -f .official-release-authorized
+make build-iso
+make test-install-e2e
+sha256sum -c SHA256SUMS
+</code></pre>
+<h2>3. 證據路徑</h2>
+<table>
+<tr><th>證據</th><th>路徑</th></tr>
+<tr><td>授權標記</td><td><code>.official-release-authorized</code></td></tr>
+<tr><td>目標版本</td><td><code>.official-release-target</code></td></tr>
+<tr><td>ISO</td><td><code>os-image/output/*.iso</code></td></tr>
+<tr><td>校驗和</td><td><code>SHA256SUMS</code>（repo 根目錄 + os-image/output/）</td></tr>
+<tr><td>boot/install</td><td><code>tests/install-e2e/output/</code></td></tr>
+<tr><td>CI</td><td><code>.github/workflows/release.yml</code></td></tr>
+</table>
+<h2>4. 版本政策</h2>
+<p>- 預發布：MAJOR=0（<code>0.a.b.d</code>）</p>
+<p>- 正式版：MAJOR=1 僅在 <code>.official-release-authorized</code> 存在後</p>
+<p>- ISO 檔名：<code>StrawWU-1.0.0.0-amd64.iso</code></p>
+<p>- Git tag：<code>v1.0.0.0</code></p>
+<h2>5. 產品範圍備註</h2>
+<table>
+<tr><th>Q</th><th>項目</th><th>1.0.0 狀態</th></tr>
+<tr><td>Q7</td><td>反作弊=可正常運行</td><td>PARTIAL（誠實報告）</td></tr>
+<tr><td>Q8</td><td>Office/Steam/Epic/三角洲 launcher</td><td>stub + golden-apps gate</td></tr>
+<tr><td>Q1</td><td>預發布範圍</td><td>待使用者另行提出</td></tr>
+</table>
+    </main>
+    <footer>
+      StrawWU v1.0.0.0 official release · Phase 8/8 · Hermes stage report
+    </footer>
+  </div>
+</body>
+</html>
