@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+"""StrawWU CVE/USN policy CLI — status, track, notify, preflight (skeleton)."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+_CORE = Path(__file__).resolve().parent.parent / "lib" / "strawwu-security" / "core.py"
+import importlib.util
+
+_spec = importlib.util.spec_from_file_location("strawwu_security_core", _CORE)
+_mod = importlib.util.module_from_spec(_spec)
+assert _spec.loader is not None
+_spec.loader.exec_module(_mod)
+
+
+def _print_json(data: object) -> None:
+    print(json.dumps(data, indent=2, ensure_ascii=False))
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="strawwu-security",
+        description="StrawWU CVE/USN tracking and notification skeleton (not auto-patching).",
+    )
+    parser.add_argument("--json", action="store_true", help="Emit machine-readable JSON")
+
+    sub = parser.add_subparsers(dest="command")
+
+    def add_common(sp: argparse.ArgumentParser) -> None:
+        sp.add_argument("--json", action="store_true", help="Emit machine-readable JSON")
+
+    add_common(sub.add_parser("status", help="CVE policy state and notify flag"))
+    add_common(sub.add_parser("track", help="USN/CVE tracking summary"))
+    add_common(sub.add_parser("notify", help="Notification payload skeleton status"))
+    add_common(sub.add_parser("preflight", help="Validate CVE policy readiness"))
+    sub.add_parser("version", help="Print package version")
+
+    args = parser.parse_args(argv)
+
+    try:
+        if args.command == "version":
+            return _mod.cmd_version()
+        if args.command == "status":
+            result = _mod.policy_status()
+            if args.json:
+                _print_json(result)
+            else:
+                print(
+                    f"series={result['ubuntu_series']} "
+                    f"notify={result['notify_enabled']} "
+                    f"plan={result['plan']}"
+                )
+            return 0
+        if args.command == "track":
+            result = _mod.track_info()
+            if args.json:
+                _print_json(result)
+            else:
+                summary = result.get("summary", {})
+                print(
+                    f"mode={result.get('mode')} "
+                    f"total={summary.get('total', 0)} "
+                    f"needs_eval={summary.get('needs_eval', 0)}"
+                )
+            return 0
+        if args.command == "notify":
+            result = _mod.notify_info()
+            if args.json:
+                _print_json(result)
+            else:
+                print(
+                    f"dry_run={result.get('dry_run')} "
+                    f"channel={result.get('channel')} "
+                    f"webhook={result.get('webhook_configured')}"
+                )
+            return 0
+        if args.command == "preflight":
+            result = _mod.run_preflight()
+            if args.json:
+                _print_json(result)
+            else:
+                status = "OK" if result["ok"] else "FAIL"
+                print(f"{status}: notify={result['notify_enabled']} fixture={result.get('fixture')}")
+                for issue in result.get("issues", []):
+                    print(f"  - {issue}", file=sys.stderr)
+            return 0 if result["ok"] else 1
+
+        parser.print_help()
+        return 0
+    except (RuntimeError, ValueError) as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

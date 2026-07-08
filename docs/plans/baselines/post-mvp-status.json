@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-08T10:42:27.868655",
+  "generated_at": "2026-07-08T11:03:02.287806",
   "target": "0.9.0.0-engineering",
   "total": 21,
-  "passed": 11,
-  "failed": 10,
+  "passed": 12,
+  "failed": 9,
   "all_pass": false,
   "stages": [
     {
@@ -63,8 +63,8 @@
     },
     {
       "id": "post-sec-secureboot-route",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "post-sec-cve-policy",

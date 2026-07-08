@@ -63,6 +63,7 @@ help:
 	@echo "  test-mfp-smoke                POST-Q3 MFP print/scan"
 	@echo "  test-upgrade-rollback         POST-UPG rollback"
 	@echo "  test-secureboot-route         POST-SEC Secure Boot route"
+	@echo "  test-sec-cve-policy           POST-SEC CVE/USN policy"
 	@echo "  test-ci-kernel-selfhosted     POST-CI self-hosted kernel"
 	@echo "  test-hw-t3-wincompat          POST-HW-T3 Win compat HW smoke"
 	@echo "  test-golden-apps              POST-Q8 golden apps launch"

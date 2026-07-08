@@ -1,0 +1,51 @@
+name: Security Advisory
+
+on:
+  schedule:
+    # 04:00 UTC every Monday — USN/CVE tracking skeleton (H6 post-sec-cve-policy)
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: strawwu-security-advisory
+  cancel-in-progress: false
+
+jobs:
+  cve-policy-scan:
+    runs-on: ubuntu-latest
+    env:
+      STRAWWU_CVE_FIXTURE: "1"
+      STRAWWU_CVE_NOTIFY: "0"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: CVE policy static gate
+        run: make test-sec-cve-policy
+
+      - name: USN track skeleton (dry-run)
+        run: |
+          chmod +x os-image/scripts/cve-policy/*.sh
+          bash os-image/scripts/cve-policy/track-usn.sh --dry-run --json \
+            | tee tests/ci/output/cve-track.json
+
+      - name: Notification payload skeleton (dry-run)
+        run: |
+          mkdir -p tests/ci/output
+          bash os-image/scripts/cve-policy/notify-cve-policy.sh --dry-run \
+            --output tests/ci/output/cve-notify.json
+          python3 -c "import json; d=json.load(open('tests/ci/output/cve-notify.json')); assert d['schema']=='strawwu-cve-notify/v1'"
+
+      - name: strawwu-security CLI fixture smoke
+        run: |
+          export STRAWWU_CVE_FIXTURE=1
+          export STRAWWU_CVE_FIXTURE_PATH=os-image/debs/strawwu-security/usr/share/strawwu/security/fixture-catalog.json
+          export STRAWWU_CVE_USN_FIXTURE_PATH=os-image/debs/strawwu-security/usr/share/strawwu/security/fixture-usn.json
+          python3 os-image/debs/strawwu-security/usr/bin/strawwu-security preflight --json
+
+      - name: Upload advisory artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: strawwu-cve-advisory-${{ github.run_number }}
+          path: tests/ci/output/cve-*.json
+          retention-days: 30
+          if-no-files-found: error

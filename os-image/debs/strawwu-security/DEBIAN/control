@@ -1,0 +1,11 @@
+Package: strawwu-security
+Version: __VERSION__
+Section: admin
+Priority: optional
+Architecture: all
+Depends: python3
+Recommends: curl
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU CVE/USN tracking and notification skeleton
+ Documents Ubuntu noble USN/CVE patch policy. Not auto-patching by default;
+ provides status, track, notify, and preflight helpers for post-sec-cve-policy.

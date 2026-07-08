@@ -1,0 +1,32 @@
+This is a revocation certificate for the OpenPGP key:
+
+pub   rsa2048 2026-07-08 [SCEAR]
+      1D4DA19F0ADB313A667F018CE3196156B851D305
+uid          StrawWU Test Archive <apt@test.strawwu.local>
+
+A revocation certificate is a kind of "kill switch" to publicly
+declare that a key shall not anymore be used.  It is not possible
+to retract such a revocation certificate once it has been published.
+
+Use it to revoke this key in case of a compromise or loss of
+the secret key.  However, if the secret key is still accessible,
+it is better to generate a new revocation certificate and give
+a reason for the revocation.  For details see the description of
+of the gpg command "--generate-revocation" in the GnuPG manual.
+
+To avoid an accidental use of this file, a colon has been inserted
+before the 5 dashes below.  Remove this colon with a text editor
+before importing and publishing this revocation certificate.
+
+:-----BEGIN PGP PUBLIC KEY BLOCK-----
+Comment: This is a revocation certificate
+
+iQE2BCABCgAgFiEEHU2hnwrbMTpmfwGM4xlhVrhR0wUFAmpNw7MCHQAACgkQ4xlh
+VrhR0wWCcAgAqb3cZ3KhP1YY+tOdxFAfm0kjMOrcse6Q7ST8Q/3Z9iy+GseoMyzE
+ZxxuKitmd1YRKjgw8fn04YS2vAAY3R/WxmsmZuWhXKWXUW6pHA+ets+HPcnfDXG8
+KzvGlyFtwe6XFicdKsr6yWp5qYOQTNg/i1gTBDrr8DAC+ANPkZQgK/CVBExj3Olo
+OFMHcmywCYtLDbM7BXk7OtD0BF4e+jBq0GaZXjeLRP+tmnHFqCaeLznuhWLZ1KZ4
+UIxuftxlyqrOv+4iQu58LrIKlF6S+3dxPtrcA6691oWVWYpugihuhVA7pN6SZy30
+LLvHOZ+Caq0uZShZXKnyzVc+up/Gt/UZBQ==
+=gkTH
+-----END PGP PUBLIC KEY BLOCK-----

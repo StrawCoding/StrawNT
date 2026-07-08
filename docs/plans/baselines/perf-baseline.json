@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-perf-baseline/v1",
   "generated_at": "2026-07-06",
-  "version": "0.7.0.1",
+  "version": "0.7.0.2",
   "measurements": {
     "latest_iso_bytes": 5096343552,
     "latest_iso_gb": 4.75,

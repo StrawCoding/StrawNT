@@ -1,0 +1,20 @@
+schema: strawwu-security/v1
+stage: post-sec-cve-policy
+ubuntu_series: noble
+notify_default: false
+sla:
+  custom_eval_hours: 72
+  custom_critical_days: 7
+sources:
+  - usn
+  - cve
+  - cargo-audit
+scripts:
+  track: os-image/scripts/cve-policy/track-usn.sh
+  notify: os-image/scripts/cve-policy/notify-cve-policy.sh
+env:
+  fixture: STRAWWU_CVE_FIXTURE
+  notify: STRAWWU_CVE_NOTIFY
+  webhook: STRAWWU_CVE_WEBHOOK_URL
+ci_workflow: security-advisory.yml
+doc: docs/plans/kickoff/POST-SEC-cve-policy.md

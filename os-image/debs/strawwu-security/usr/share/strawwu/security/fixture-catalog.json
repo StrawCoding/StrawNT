@@ -1,0 +1,36 @@
+{
+  "schema": "strawwu-security-fixture/v1",
+  "mock": true,
+  "policy": {
+    "ubuntu_series": "noble",
+    "notify_enabled": false,
+    "plan": "post-sec-cve-policy"
+  },
+  "track": {
+    "mode": "fixture",
+    "notices": [
+      {
+        "usn": "USN-7000-1",
+        "title": "Example kernel vulnerability (fixture)",
+        "packages": ["linux-image-generic-hwe-24.04"],
+        "severity": "high",
+        "action": "evaluate"
+      }
+    ],
+    "summary": {
+      "total": 1,
+      "critical": 0,
+      "high": 1,
+      "needs_eval": 1
+    }
+  },
+  "notify": {
+    "dry_run": true,
+    "sent": false,
+    "channel": "security-advisory"
+  },
+  "preflight": {
+    "ok": true,
+    "issues": []
+  }
+}

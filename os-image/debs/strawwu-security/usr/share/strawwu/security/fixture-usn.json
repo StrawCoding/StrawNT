@@ -1,0 +1,22 @@
+{
+  "schema": "strawwu-usn-track/v1",
+  "mode": "fixture",
+  "ubuntu_series": "noble",
+  "scanned_at": "2026-07-08T00:00:00Z",
+  "notices": [
+    {
+      "usn": "USN-7000-1",
+      "title": "Example kernel vulnerability (fixture)",
+      "packages": ["linux-image-generic-hwe-24.04"],
+      "severity": "high",
+      "action": "evaluate"
+    }
+  ],
+  "strawwu_packages": [],
+  "summary": {
+    "total": 1,
+    "critical": 0,
+    "high": 1,
+    "needs_eval": 1
+  }
+}

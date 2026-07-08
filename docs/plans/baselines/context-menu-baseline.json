@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-desktop-context-menu-baseline/v1",
   "wave": "W5-D4",
-  "version": "0.7.0.1",
+  "version": "0.7.0.2",
   "package": "strawwu-desktop-actions",
   "registry_path": "/var/lib/strawwu/app-registry.json",
   "registry_cli": "/usr/bin/strawwu-app-registry",
