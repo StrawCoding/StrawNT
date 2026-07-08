@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrawWU — 系統更新使用手冊</title>
+  <style>
+:root {
+  --bg: #0f1419;
+  --surface: #1a2332;
+  --text: #e8eef4;
+  --muted: #8b9cb3;
+  --accent: #14b8a6;
+  --accent-dim: #0d9488;
+  --border: #2d3a4d;
+  --code-bg: #0d1117;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  margin: 0;
+  padding: 2rem 1rem 4rem;
+}
+.wrap { max-width: 52rem; margin: 0 auto; }
+header {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+.brand { color: var(--accent); font-weight: 600; letter-spacing: 0.02em; }
+h1 { color: var(--text); font-size: 1.85rem; margin: 0.5rem 0 0.25rem; }
+.meta { color: var(--muted); font-size: 0.9rem; }
+h2 {
+  color: var(--accent);
+  font-size: 1.25rem;
+  margin-top: 2rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.35rem;
+}
+h3 { color: var(--text); font-size: 1.05rem; margin-top: 1.5rem; }
+p { margin: 0.75rem 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 1.4rem; }
+li { margin: 0.35rem 0; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.92rem;
+}
+th, td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+}
+th { background: var(--surface); color: var(--accent); }
+tr:nth-child(even) td { background: rgba(26, 35, 50, 0.5); }
+code {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.88em;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+}
+pre code { border: none; padding: 0; background: none; }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1rem 0;
+  padding: 0.25rem 0 0.25rem 1rem;
+  color: var(--muted);
+}
+footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">StrawWU Handbook</div>
+      <h1>系統更新使用手冊</h1>
+      <p class="meta">版本 1.0.0.0 · W8-DOC · hermes-deliver</p>
+    </header>
+    <main>
+<h1>StrawWU 系統更新使用手冊</h1>
+<p>本手冊說明安裝完成後如何更新 StrawWU 系統與應用程式。適用版本：StrawWU 1.0.0.0 及之後（基底 Ubuntu 26.04 LTS Resolute Raccoon）。</p>
+<p>升級失敗與救援流程見 <a href="upgrade-rescue-guide.md">upgrade-rescue-guide.md</a>。</p>
+<h2>1. 更新方式總覽</h2>
+<p>StrawWU 的系統更新分為三條路徑：</p>
+<table>
+<tr><th>類型</th><th>方式</th><th>內容</th></tr>
+<tr><td>日常小更新</td><td>Hub 或 <code>apt upgrade</code></td><td>安全修補、套件小版本、strawwu-* 元件更新</td></tr>
+<tr><td>重大版本升級</td><td><code>strawwu-upgrade</code></td><td>跨大版本（如 0.6 → 1.0），含 snapshot 與 rollback</td></tr>
+<tr><td>應用程式</td><td>Flatpak / Hub Apps</td><td>Flathub 與已安裝應用，獨立於系統核心更新</td></tr>
+</table>
+<pre><code>
+日常安全更新 ──► apt / Hub「軟體源」→「檢查更新」
+
+重大版本升級 ──► strawwu-upgrade preflight → snapshot → upgrade
+
+Flatpak 應用   ──► flatpak update 或 Hub Apps 頁面
+
+</code></pre>
+<h2>2. 日常更新（APT / Hub）</h2>
+<h3>2.1 StrawWU Hub（圖形介面，推薦）</h3>
+<ol>
+<li>從 Dock 或應用程式選單開啟 <strong>StrawWU Hub</strong></li>
+<li>進入左側 <strong>「軟體源」</strong> 分頁</li>
+<li>按 <strong>「檢查更新」</strong></li>
+<li>若有可用更新，依畫面提示套用（會透過 APT 安裝）</li>
+</ol>
+<p>Hub 會顯示「有 N 個可用更新」或「系統已是最新狀態」。唯讀軟體源（Flathub、Ubuntu 安全性更新）無法停用，確保基本安全修補持續可用。</p>
+<h3>2.2 終端機</h3>
+<pre><code>
+sudo apt update
+
+sudo apt upgrade
+
+</code></pre>
+<p>若需一併處理相依變更（例如核心版本切換）：</p>
+<pre><code>
+sudo apt update
+
+sudo apt full-upgrade
+
+</code></pre>
+<h3>2.3 更新來源</h3>
+<table>
+<tr><th>來源</th><th>內容</th><th>簽章</th></tr>
+<tr><td><strong>StrawWU 官方 APT</strong> (<code>https://apt.strawwu.org</code>)</td><td>全部 <code>strawwu-*</code> 自製套件、meta 套件、驅動策展</td><td><code>strawwu-keyring</code> GPG 驗證</td></tr>
+<tr><td><strong>Ubuntu 安全性更新</strong>（有限 allowlist）</td><td>核心安全修補、基礎系統函式庫</td><td>Ubuntu 官方簽章</td></tr>
+<tr><td><strong>Flathub</strong></td><td>Flatpak 應用（獨立更新通道）</td><td>Flathub 簽章</td></tr>
+</table>
+<p>APT suite 名稱：<code>resolute</code>（對應 Ubuntu 26.04 LTS）。元件：<code>main</code>，架構：<code>amd64</code>。</p>
+<h2>3. 更新通道</h2>
+<p>Hub 左側 <strong>「更新通道」</strong> 分頁可選擇 StrawWU 官方套件的發布節奏。變更後將在<strong>下次更新檢查</strong>時生效。</p>
+<table>
+<tr><th>通道</th><th>說明</th><th>適合對象</th></tr>
+<tr><td><strong>Stable</strong>（推薦）</td><td>穩定版 — 經過完整測試的正式版本，含 SHA256 + GPG 簽章</td><td>一般使用者、生產環境</td></tr>
+<tr><td><strong>Beta</strong></td><td>測試版 — 包含即將發布的新功能，preview 標記</td><td>願意搶先體驗新功能的使用者</td></tr>
+<tr><td><strong>Nightly</strong></td><td>每日建置 — 最新但可能不穩定，僅供開發者</td><td>開發者、測試人員</td></tr>
+</table>
+<blockquote><p>切換通道<strong>不會</strong>自動升級系統；需手動在「軟體源」按「檢查更新」或執行 <code>apt update</code> 後才會看到新通道的套件。</p></blockquote>
+<h2>4. 軟體源管理</h2>
+<p>Hub「軟體源」分頁可檢視與管理 APT 來源。部分來源為<strong>唯讀</strong>（不可停用），以確保系統安全。</p>
+<table>
+<tr><th>軟體源</th><th>類型</th><th>可切換</th><th>說明</th></tr>
+<tr><td>StrawWU 官方</td><td>APT</td><td>是</td><td>自製套件與 meta 套件</td></tr>
+<tr><td>Ubuntu 安全性</td><td>APT</td><td>唯讀</td><td>有限 allowlist 的安全修補</td></tr>
+<tr><td>Flathub</td><td>Flatpak</td><td>唯讀</td><td>預設 Flatpak 應用來源</td></tr>
+<tr><td>第三方 APT</td><td>APT</td><td>是（需管理員驗證）</td><td>使用者自行新增的來源</td></tr>
+</table>
+<p>終端機查詢軟體源狀態：</p>
+<pre><code>
+strawwu-software-sources status
+
+strawwu-software-sources check-updates
+
+</code></pre>
+<h2>5. 更新通知</h2>
+<p>StrawWU 以 <strong>strawwu-update-notifier</strong> 取代 Ubuntu 的 <code>update-notifier</code>，登入後背景執行：</p>
+<ul>
+<li>偵測到可用更新時，顯示<strong>桌面通知</strong></li>
+<li>升級前顯示提醒：<strong>「升級前請先備份」</strong>（繁中）</li>
+<li>APT 操作後透過 hook 觸發重新檢查（<code>99strawwu-update-notifier</code>）</li>
+<li><strong>不會</strong>自動執行 major 大版本無人值守升級</li>
+</ul>
+<p>手動觸發檢查：</p>
+<pre><code>
+strawwu-update-notifier check
+
+</code></pre>
+<p>日誌位置：<code>/var/log/strawwu/update.log</code></p>
+<h2>6. 重大版本升級</h2>
+<p>跨大版本（例如 0.6.x → 1.0.0）請使用 <strong>strawwu-upgrade</strong>，內建升級前檢查、snapshot 與 rollback，不要只靠 <code>apt dist-upgrade</code>。</p>
+<h3>6.1 建議流程</h3>
+<pre><code>
+# 1. 升級前檢查（磁碟空間、state.json 等）
+
+sudo strawwu-upgrade preflight
+
+
+
+# 2. 建立還原點
+
+sudo strawwu-upgrade snapshot
+
+# 還原點位置：/var/lib/strawwu/backups/pre-upgrade-&lt;版本&gt;/
+
+
+
+# 3. 乾跑測試
+
+sudo strawwu-upgrade upgrade --dry-run
+
+
+
+# 4. 正式升級
+
+sudo strawwu-upgrade upgrade
+
+</code></pre>
+<p><code>strawwu-upgrade upgrade</code> 會自動依序執行：preflight 檢查 → 建立 snapshot → APT dist-upgrade。任一步驟失敗會中止並保留 rollback 路徑。</p>
+<h3>6.2 指令參考</h3>
+<table>
+<tr><th>指令</th><th>用途</th></tr>
+<tr><td><code>strawwu-upgrade preflight</code></td><td>檢查磁碟空間、lifecycle state、套件就緒狀態</td></tr>
+<tr><td><code>strawwu-upgrade snapshot</code></td><td>建立升級前還原點（含 state.json + manifest）</td></tr>
+<tr><td><code>strawwu-upgrade upgrade</code></td><td>完整升級流程</td></tr>
+<tr><td><code>strawwu-upgrade upgrade --dry-run</code></td><td>模擬升級，不修改系統</td></tr>
+<tr><td><code>strawwu-upgrade rollback</code></td><td>還原至最新 pre-upgrade snapshot</td></tr>
+<tr><td><code>strawwu-upgrade list-snapshots</code></td><td>列出既有還原點</td></tr>
+<tr><td><code>strawwu-upgrade --json</code></td><td>輸出機器可讀 JSON（腳本整合用）</td></tr>
+</table>
+<h2>7. Flatpak 應用更新</h2>
+<p>Flatpak 應用與系統核心更新<strong>獨立</strong>，需另外更新。</p>
+<pre><code>
+flatpak update
+
+</code></pre>
+<p>StrawWU Hub：</p>
+<ul>
+<li><strong>Apps</strong> 分頁 — 管理已安裝應用（啟動、移除）</li>
+<li><strong>Flathub</strong> 分頁 — 瀏覽與安裝新應用</li>
+</ul>
+<p>Flatpak 無法啟動時可嘗試修復：</p>
+<pre><code>
+flatpak repair
+
+flatpak remote-list    # 確認 flathub remote 存在
+
+</code></pre>
+<h2>8. 備份與還原</h2>
+<p>重大升級前強烈建議備份。StrawWU 提供兩層備份機制：</p>
+<table>
+<tr><th>機制</th><th>位置 / 指令</th><th>用途</th></tr>
+<tr><td>升級前 snapshot</td><td><code>strawwu-upgrade snapshot</code> / <code>/var/lib/strawwu/backups/pre-upgrade-*</code></td><td>升級失敗時 rollback</td></tr>
+<tr><td>Hub 備份分頁</td><td>Hub →「備份與還原」</td><td>rsync / Btrfs / Timeshift 系統快照</td></tr>
+</table>
+<p>Hub 備份操作：</p>
+<ol>
+<li>開啟 Hub → <strong>「備份與還原」</strong></li>
+<li>按 <strong>「建立快照」</strong> 建立系統快照</li>
+<li>升級前快照會自動與 <code>strawwu-upgrade snapshot</code> 共用同一 backup root</li>
+<li>需要時按 <strong>「預覽還原」</strong> 查看還原計畫</li>
+</ol>
+<blockquote><p>建議重大升級前同時做：<strong>Hub 備份</strong>（保護 /home 與個人資料）+ <strong>strawwu-upgrade snapshot</strong>（保護系統狀態與 lifecycle）。</p></blockquote>
+<h2>9. 升級失敗與救援</h2>
+<p>升級失敗處理流程：</p>
+<pre><code>
+升級中斷或開機失敗
+
+    │
+
+    ├─► GRUB 有舊 kernel？ ──是──► 選舊 entry 開機 → apt 修復
+
+    │
+
+    └─► 否 ──► Live USB 開機
+
+                │
+
+                ├─► 選「StrawWU Rescue」GRUB 項目
+
+                ├─► chroot → strawwu-upgrade rollback
+
+                ├─► chroot → strawwu-initd repair
+
+                ├─► chroot → strawwu-target-setup --repair-only
+
+                └─► apt update &amp;&amp; apt install -f
+
+</code></pre>
+<p>Rollback 指令：</p>
+<pre><code>
+sudo strawwu-upgrade rollback
+
+sudo strawwu-initd repair
+
+sudo strawwu-target-setup --repair-only
+
+</code></pre>
+<p>詳見 <a href="upgrade-rescue-guide.md">upgrade-rescue-guide.md</a>。</p>
+<h3>9.1 日誌與證據收集</h3>
+<table>
+<tr><th>路徑</th><th>內容</th></tr>
+<tr><td><code>/var/log/apt/history.log</code></td><td>APT 升級記錄</td></tr>
+<tr><td><code>/var/log/dpkg.log</code></td><td>套件解壓與設定</td></tr>
+<tr><td><code>/var/log/strawwu/update.log</code></td><td>StrawWU 更新通知日誌</td></tr>
+<tr><td><code>/var/log/strawwu/</code></td><td>其他 StrawWU 元件日誌</td></tr>
+<tr><td><code>/var/lib/strawwu/setup/state.json</code></td><td>lifecycle 狀態</td></tr>
+</table>
+<p>升級失敗時執行 <code>strawwu-bug-report-gtk</code> 收集證據，並附註升級前後版本。</p>
+<h2>10. 常見問題</h2>
+<p><strong>Q：多久該更新一次？</strong></p>
+<p>建議每 1～2 週檢查一次安全更新。有桌面通知時盡快套用安全修補；功能更新可擇時進行。</p>
+<p><strong>Q：更新會重開機嗎？</strong></p>
+<p>若更新包含<strong>核心（kernel）</strong>或底層驅動，需要重開機才會生效。Hub / apt 完成後若提示 reboot，請存檔後重開。</p>
+<p><strong>Q：可以只更新 StrawWU 元件、不更新 Ubuntu 基底嗎？</strong></p>
+<p>日常 <code>apt upgrade</code> 會同時處理已啟用來源中的套件。Ubuntu 安全性來源為唯讀且建議保持啟用。若只想確認 strawwu 套件：</p>
+<pre><code>
+apt list --upgradable 2&gt;/dev/null | grep strawwu
+
+</code></pre>
+<p><strong>Q：Stable 和 Beta 可以隨時切換嗎？</strong></p>
+<p>可以，在 Hub「更新通道」切換後，下次「檢查更新」即會對應新通道。不建議在生產環境長期使用 Nightly。</p>
+<p><strong>Q：無人值守自動大版本升級何時支援？</strong></p>
+<p>規劃於 v1.0 提供，需搭配備份提示與 migration hooks。目前 major 升級需手動執行 <code>strawwu-upgrade</code>。</p>
+<h2>11. 速查表</h2>
+<table>
+<tr><th>我想…</th><th>這樣做</th></tr>
+<tr><td>平常補安全更新</td><td>Hub → 軟體源 → 檢查更新；或 <code>sudo apt update &amp;&amp; sudo apt upgrade</code></td></tr>
+<tr><td>換 Beta / Nightly 通道</td><td>Hub → 更新通道 → 選擇後再檢查更新</td></tr>
+<tr><td>大版本升級</td><td><code>strawwu-upgrade preflight</code> → <code>snapshot</code> → <code>upgrade</code></td></tr>
+<tr><td>升級搞壞了</td><td><code>strawwu-upgrade rollback</code>；或 Live USB → StrawWU Rescue</td></tr>
+<tr><td>更新 Flatpak 軟體</td><td><code>flatpak update</code></td></tr>
+<tr><td>升級前備份</td><td>Hub → 備份與還原 → 建立快照</td></tr>
+<tr><td>看更新日誌</td><td><code>/var/log/strawwu/update.log</code></td></tr>
+<tr><td>回報升級問題</td><td><code>strawwu-bug-report-gtk</code></td></tr>
+</table>
+<h2>12. 目前能力邊界（誠實標示）</h2>
+<table>
+<tr><th>能力</th><th>狀態</th></tr>
+<tr><td>日常 APT 安全 / 套件更新</td><td>可用</td></tr>
+<tr><td>Hub 檢查更新 + 通道切換</td><td>可用</td></tr>
+<tr><td>升級前備份提醒</td><td>可用</td></tr>
+<tr><td>strawwu-upgrade + rollback</td><td>可用</td></tr>
+<tr><td>StrawWU Rescue GRUB 項目</td><td>可用</td></tr>
+<tr><td>Hub 備份 / Timeshift 整合</td><td>可用</td></tr>
+<tr><td>無人值守 major 自動升級</td><td>規劃 v1.0</td></tr>
+<tr><td>Btrfs / ZFS 一鍵 snapshot rollback</td><td>評估中</td></tr>
+<tr><td>自動保留 ≥2 個 kernel 回退</td><td>規劃中</td></tr>
+</table>
+    </main>
+    <footer>
+      StrawWU v0.5 完整手冊 · 支援渠道 TBD · 問題回報：strawwu-bug-report-gtk
+    </footer>
+  </div>
+</body>
+</html>

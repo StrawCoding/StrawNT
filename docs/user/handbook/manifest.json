@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-handbook-manifest/v1",
   "wave": "W8-DOC-handbook",
-  "version": "0.5.0.8",
+  "version": "1.0.0.0",
   "locale_primary": "zh_TW",
   "audiences": ["user", "admin"],
   "volumes": [
@@ -32,6 +32,13 @@
       "markdown": "upgrade-rescue-guide.md",
       "html": "html/upgrade-rescue-guide.html",
       "topics": ["rollback", "upg", "live-rescue", "chroot-repair"]
+    },
+    {
+      "id": "update",
+      "title": "系統更新使用手冊",
+      "markdown": "update-guide.md",
+      "html": "html/update-guide.html",
+      "topics": ["apt", "hub-updates", "channels", "notifier", "flatpak", "backup"]
     }
   ],
   "index": "README.md",

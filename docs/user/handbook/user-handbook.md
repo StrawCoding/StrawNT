@@ -80,7 +80,9 @@ Hub「Windows 相容」顯示 `strawwu status` 摘要與 compat-db 等級。詳�
 - Ubuntu security/base（有限 allowlist，見 meta-audit）
 - StrawWU 官方 APT 倉庫（`strawwu-keyring` 簽章）
 
-建議定期套用更新；重大升級前請參閱 [upgrade-rescue-guide.md](upgrade-rescue-guide.md)。
+日常更新：Hub「軟體源」→「檢查更新」，或 `sudo apt update && sudo apt upgrade`。重大升級請用 `strawwu-upgrade`。
+
+完整說明見 **[update-guide.md](update-guide.md)**（系統更新使用手冊）；升級失敗與救援見 [upgrade-rescue-guide.md](upgrade-rescue-guide.md)。
 
 ## 6. 問題回報
 

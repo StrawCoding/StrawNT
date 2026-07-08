@@ -50,6 +50,7 @@ def main() -> int:
     admin_md = HANDBOOK / "admin-handbook.md"
     wincompat_md = HANDBOOK / "wincompat-guide.md"
     upgrade_md = HANDBOOK / "upgrade-rescue-guide.md"
+    update_md = HANDBOOK / "update-guide.md"
     manifest = HANDBOOK / "manifest.json"
 
     for p, label in [
@@ -58,6 +59,7 @@ def main() -> int:
         (admin_md, "docs/user/handbook/admin-handbook.md"),
         (wincompat_md, "docs/user/handbook/wincompat-guide.md"),
         (upgrade_md, "docs/user/handbook/upgrade-rescue-guide.md"),
+        (update_md, "docs/user/handbook/update-guide.md"),
         (manifest, "docs/user/handbook/manifest.json"),
         (RENDER, "tests/handbook/render-html.py"),
     ]:
@@ -70,6 +72,7 @@ def main() -> int:
             r"admin-handbook\.md",
             r"wincompat-guide\.md",
             r"upgrade-rescue-guide\.md",
+            r"update-guide\.md",
             r"TBD",
         ],
         "handbook index",
@@ -124,6 +127,18 @@ def main() -> int:
         "upgrade-rescue-guide",
     )
 
+    require_in_text(
+        update_md,
+        [
+            r"strawwu-update-notifier",
+            r"strawwu-upgrade",
+            r"apt upgrade",
+            r"flatpak update",
+            r"Stable",
+        ],
+        "update-guide",
+    )
+
     parent_readme = USER_DOCS / "README.md"
     if parent_readme.is_file():
         text = parent_readme.read_text(encoding="utf-8")
@@ -141,10 +156,10 @@ def main() -> int:
         else:
             ok("manifest schema v1")
         volumes = data.get("volumes", [])
-        if len(volumes) < 4:
-            fail("manifest volumes < 4")
+        if len(volumes) < 5:
+            fail("manifest volumes < 5")
         else:
-            ok("manifest has 4 handbook volumes")
+            ok("manifest has 5 handbook volumes")
         if data.get("support", {}).get("community_url") != "TBD":
             fail("manifest community_url must be TBD (deferred scope)")
         else:
@@ -173,6 +188,7 @@ def main() -> int:
         "admin-handbook.html",
         "wincompat-guide.html",
         "upgrade-rescue-guide.html",
+        "update-guide.html",
     ):
         html_path = HANDBOOK / "html" / html_name
         require_file(html_path, f"html/{html_name}")

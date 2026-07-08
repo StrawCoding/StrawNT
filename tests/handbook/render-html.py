@@ -236,6 +236,7 @@ VOLUMES = [
     ("admin-handbook.md", "admin-handbook.html", "管理員手冊"),
     ("wincompat-guide.md", "wincompat-guide.html", "Windows 相容分級指南"),
     ("upgrade-rescue-guide.md", "upgrade-rescue-guide.html", "升級與救援指南"),
+    ("update-guide.md", "update-guide.html", "系統更新使用手冊"),
 ]
 
 
