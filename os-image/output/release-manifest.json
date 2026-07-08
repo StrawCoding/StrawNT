@@ -1,9 +1,9 @@
 {
   "schema": "strawwu-release-manifest/v1",
-  "version": "0.7.0.4",
+  "version": "0.7.0.5",
   "channel": "beta",
   "git_tag": null,
-  "git_sha": "8de3cb220222710c07238729bcc905dfcf93ab22",
+  "git_sha": "af6589ea308a264beae942d7a5cb67f023c6fe04",
   "artifacts": [
     {
       "name": "StrawWU-0.6.2.5-amd64.iso",
@@ -19,75 +19,75 @@
     },
     {
       "name": "strawwu-bug-reporter",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     },
     {
       "name": "strawwu-calamares-settings",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     },
     {
       "name": "strawwu-desktop",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     },
     {
       "name": "strawwu-desktop-actions",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     },
     {
       "name": "strawwu-disable-upstream-init",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     },
     {
       "name": "strawwu-firstboot",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     },
     {
       "name": "strawwu-flatpak-setup",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     },
     {
       "name": "strawwu-greeter",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     },
     {
       "name": "strawwu-initd",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     },
     {
       "name": "strawwu-initramfs-hooks",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     },
     {
       "name": "strawwu-install-init",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     },
     {
       "name": "strawwu-keyring",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     },
     {
       "name": "strawwu-l10n-ime",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     },
     {
       "name": "strawwu-live-install-ux",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     },
     {
       "name": "strawwu-minimal",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     },
     {
       "name": "strawwu-registry-hooks",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     },
     {
       "name": "strawwu-session",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     },
     {
       "name": "strawwu-shell",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     },
     {
       "name": "strawwu-system",
@@ -95,19 +95,19 @@
     },
     {
       "name": "strawwu-target-identity",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     },
     {
       "name": "strawwu-target-setup",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     },
     {
       "name": "strawwu-update-notifier",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     },
     {
       "name": "strawwu-wincompat",
-      "version": "0.7.0.4"
+      "version": "0.7.0.5"
     }
   ],
   "boot_test": {
@@ -118,5 +118,5 @@
     "file": "SHA256SUMS",
     "gpg_sig": null
   },
-  "published_at": "2026-07-08T04:24:04Z"
+  "published_at": "2026-07-08T04:28:55Z"
 }

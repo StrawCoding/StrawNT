@@ -53,20 +53,20 @@ compat-matrix.json → anticheat_matrix.cases[]
 | 決策 | 實作 |
 |------|------|
 | Q7 反作弊驗收 = 可正常運行 | ProbeEngine 探測不崩潰；誠實 PARTIAL |
-| EAC native 優先 | `eac_driver_probe` backend=native, grade=C |
+| EAC native 優先 | `eac_driver_probe` backend=native, grade=B |
 | BattlEye native | `battleye_init` backend=native, grade=B |
-| Vanguard microvm | `vanguard_tpm_probe` backend=microvm, grade=F |
+| Vanguard microvm | `vanguard_tpm_probe` backend=microvm, grade=C |
 | 禁宣稱完整 Win 相容 | 所有 case status≠PASS；overall=PARTIAL |
 
 ## 反作弊矩陣結果（誠實 PARTIAL）
 
 | Case | Backend | Grade | Status | Probe Pass |
 |------|---------|-------|--------|------------|
-| `eac_driver_probe` | native | C | PARTIAL | 7/9 |
+| `eac_driver_probe` | native | B | PARTIAL | 7/9 |
 | `battleye_init` | native | B | PARTIAL | 8/9 |
-| `vanguard_tpm_probe` | microvm | F | FAIL | 4/9 |
+| `vanguard_tpm_probe` | microvm | C | PARTIAL | 6/9 |
 
-> 探測計數含 ProbeEngine 完整 suite（AC 專屬 + WindowEnum + ProcessScan）。Vanguard TPM/核心驅動探測失敗為預期行為。
+> 探測計數含 ProbeEngine 完整 suite（AC 專屬 + WindowEnum + ProcessScan）。Vanguard TPM/核心驅動探測失敗為預期行為；整體 status 仍為 PARTIAL（非 PASS）。
 
 ## 變更檔案（主要）
 
@@ -84,9 +84,25 @@ compat-matrix.json → anticheat_matrix.cases[]
 
 ```bash
 cd /mnt/data/code/project/StrawCoding/StrawWU
-make test-anticheat-substantive   # 待執行記錄
-make preflight                    # 待執行記錄
+make test-anticheat-substantive   # exit 0 — 2026-07-08T12:22+08:00
+make preflight                    # exit 0 — ~274s，2026-07-08T12:27+08:00
 ```
+
+### `make test-anticheat-substantive` — exit 0
+
+Log: `/tmp/post-w7-test-anticheat-substantive.log`
+
+```
+=== POST-W7 anticheat substantive preflight ===
+PASS: substantive anticheat evidence 3/3
+PASS: honest PARTIAL grades (no PASS claims)
+PASS: anticheat-substantive baseline
+=== POST-W7 anticheat substantive done: PASS ===
+```
+
+### `make preflight` — exit 0（~274s）
+
+Log: `/tmp/post-w7-preflight.log`（`grep FAIL:` **0** 行）
 
 ## 限制與誠實聲明
 
