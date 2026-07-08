@@ -28,6 +28,10 @@ const IPC_CHANNELS = {
   GET_SOFTWARE_SOURCES_STATUS: 'software-sources:get-status',
   TOGGLE_SOFTWARE_SOURCE: 'software-sources:toggle',
   CHECK_SOFTWARE_UPDATES: 'software-sources:check-updates',
+  GET_BACKUP_STATUS: 'backup:get-status',
+  LIST_BACKUP_SNAPSHOTS: 'backup:list-snapshots',
+  CREATE_BACKUP_SNAPSHOT: 'backup:create-snapshot',
+  PREVIEW_BACKUP_RESTORE: 'backup:preview-restore',
 };
 
 contextBridge.exposeInMainWorld('strawwuHub', {
@@ -57,6 +61,10 @@ contextBridge.exposeInMainWorld('strawwuHub', {
   toggleSoftwareSource: (sourceId, enabled) =>
     ipcRenderer.invoke(IPC_CHANNELS.TOGGLE_SOFTWARE_SOURCE, sourceId, enabled),
   checkSoftwareUpdates: () => ipcRenderer.invoke(IPC_CHANNELS.CHECK_SOFTWARE_UPDATES),
+  getBackupStatus: () => ipcRenderer.invoke(IPC_CHANNELS.GET_BACKUP_STATUS),
+  listBackupSnapshots: () => ipcRenderer.invoke(IPC_CHANNELS.LIST_BACKUP_SNAPSHOTS),
+  createBackupSnapshot: (label) => ipcRenderer.invoke(IPC_CHANNELS.CREATE_BACKUP_SNAPSHOT, label),
+  previewBackupRestore: (name) => ipcRenderer.invoke(IPC_CHANNELS.PREVIEW_BACKUP_RESTORE, name),
 
   onStatusUpdate: (callback) => {
     const handler = (_event, data) => callback(data);

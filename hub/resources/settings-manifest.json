@@ -10,6 +10,7 @@
     { "id": "status", "group": "system" },
     { "id": "logs", "group": "system" },
     { "id": "updates", "group": "system" },
+    { "id": "backup", "group": "system" },
     { "id": "software-sources", "group": "system" },
     { "id": "apps", "group": "applications" },
     { "id": "flathub", "group": "applications" },
@@ -51,6 +52,13 @@
     "fixture": "hub/tests/fixtures/drivers-catalog.json",
     "polkit_action": "xyz.wastebase.strawwu.drivers.install",
     "secure_boot_plan": "post-sec-secureboot-route"
+  },
+  "backup": {
+    "cli": "/usr/bin/strawwu-backup",
+    "cli_dev": "os-image/debs/strawwu-backup/usr/bin/strawwu-backup",
+    "fixture": "hub/tests/fixtures/backup-catalog.json",
+    "upgrade_hook": "strawwu-upgrade snapshot",
+    "shared_root": "/var/lib/strawwu/backups"
   },
   "software_sources": {
     "cli": "/usr/bin/strawwu-software-sources",

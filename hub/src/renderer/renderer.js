@@ -33,6 +33,9 @@ const $devicesHotplugStatus = document.getElementById('devices-hotplug-status');
 const $sourcesList = document.getElementById('sources-list');
 const $sourcesMeta = document.getElementById('sources-meta');
 const $sourcesStatus = document.getElementById('sources-status');
+const $backupList = document.getElementById('backup-list');
+const $backupMeta = document.getElementById('backup-meta');
+const $backupStatus = document.getElementById('backup-status');
 
 let currentLogs = [];
 let currentTranslations = {};
@@ -881,6 +884,112 @@ async function checkSoftwareUpdates() {
 document.getElementById('btn-refresh-sources')?.addEventListener('click', refreshSoftwareSources);
 document.getElementById('btn-check-updates')?.addEventListener('click', checkSoftwareUpdates);
 
+// --- Backup ---
+function renderBackupCard(snap) {
+  const kind = snap.kind || 'system';
+  const kindKey = kind === 'upgrade' ? 'backup.kind_upgrade' : 'backup.kind_system';
+  const version =
+    kind === 'upgrade' && snap.from_version
+      ? t('backup.from_version', { version: snap.from_version })
+      : snap.label || '';
+  return `
+    <article class="source-card backup-card" data-snapshot="${escapeHtml(snap.name)}">
+      <div class="source-info">
+        <div class="source-title-row">
+          <span class="source-label">${escapeHtml(snap.name)}</span>
+          <span class="source-category-badge">${t(kindKey)}</span>
+        </div>
+        <div class="source-desc muted-text">
+          ${escapeHtml(snap.backend || '')}
+          ${version ? ` · ${escapeHtml(version)}` : ''}
+          ${snap.created_at ? ` · ${escapeHtml(snap.created_at)}` : ''}
+        </div>
+      </div>
+      <div class="source-toggle">
+        <button class="btn btn-secondary btn-preview-restore" data-snapshot="${escapeHtml(snap.name)}">
+          ${t('backup.preview_restore')}
+        </button>
+      </div>
+    </article>
+  `;
+}
+
+function renderBackupList(snapshots) {
+  if (!snapshots.length) {
+    $backupList.innerHTML = `<p class="muted-text">${t('backup.no_snapshots')}</p>`;
+    return;
+  }
+  $backupList.innerHTML = snapshots.map(renderBackupCard).join('');
+  $backupList.querySelectorAll('.btn-preview-restore').forEach((btn) => {
+    btn.addEventListener('click', () => handlePreviewRestore(btn.dataset.snapshot));
+  });
+}
+
+async function refreshBackup() {
+  $backupStatus.textContent = '';
+  $backupStatus.classList.remove('status-error');
+  try {
+    const [status, listed] = await Promise.all([
+      strawwuHub.getBackupStatus(),
+      strawwuHub.listBackupSnapshots(),
+    ]);
+    const metaParts = [
+      t('backup.snapshot_count', { count: status.snapshotCount ?? 0 }),
+      t('backup.backend', { name: status.backends?.preferred || 'rsync' }),
+    ];
+    if (status.mock) metaParts.push(t('backup.dev_fixture'));
+    if (status.source === 'fixture-fallback') metaParts.push(t('backup.cli_fallback'));
+    metaParts.push(t('backup.upgrade_hook'));
+    $backupMeta.textContent = metaParts.join(' · ');
+    renderBackupList(listed.snapshots || []);
+  } catch (err) {
+    $backupList.innerHTML = `<p class="muted-text">${t('backup.load_failed')}</p>`;
+    $backupStatus.textContent = err.message || t('backup.load_failed');
+    $backupStatus.classList.add('status-error');
+  }
+}
+
+async function handleCreateBackup() {
+  const btn = document.getElementById('btn-create-backup');
+  if (btn) btn.disabled = true;
+  $backupStatus.textContent = '';
+  $backupStatus.classList.remove('status-error');
+  try {
+    const result = await strawwuHub.createBackupSnapshot('hub-manual');
+    if (!result.success && result.error) {
+      throw new Error(result.error);
+    }
+    $backupStatus.textContent = t('backup.created', {
+      name: result.snapshot || 'snapshot',
+    });
+    await refreshBackup();
+  } catch (err) {
+    $backupStatus.textContent = err.message || t('backup.create_failed');
+    $backupStatus.classList.add('status-error');
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function handlePreviewRestore(name) {
+  $backupStatus.textContent = '';
+  $backupStatus.classList.remove('status-error');
+  try {
+    const result = await strawwuHub.previewBackupRestore(name);
+    if (!result.success) {
+      throw new Error(result.error || t('backup.restore_failed'));
+    }
+    const actions = (result.actions || []).join('\n');
+    window.alert(`${t('backup.restore_plan', { name })}\n\n${actions}`);
+  } catch (err) {
+    $backupStatus.textContent = err.message || t('backup.restore_failed');
+    $backupStatus.classList.add('status-error');
+  }
+}
+
+document.getElementById('btn-refresh-backup')?.addEventListener('click', refreshBackup);
+document.getElementById('btn-create-backup')?.addEventListener('click', handleCreateBackup);
+
 // --- Devices (device-proxy) ---
 function renderDeviceTierSummary(summary) {
   const tiers = Object.entries(summary || {}).sort(([a], [b]) => a.localeCompare(b));
@@ -985,6 +1094,7 @@ initI18n().then(() => {
   refreshFlathubStatus().then(refreshFlathubCatalog);
   refreshDrivers();
   refreshSoftwareSources();
+  refreshBackup();
   refreshDevices();
 });
 

@@ -25,6 +25,7 @@ describe('Hub directory structure', () => {
     'src/main/flathub-service.js',
     'src/main/drivers-service.js',
     'src/main/software-sources-service.js',
+    'src/main/backup-service.js',
     'src/main/device-proxy-service.js',
   ];
 

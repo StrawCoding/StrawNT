@@ -1,0 +1,15 @@
+Package: strawwu-backup
+Version: __VERSION__
+Section: admin
+Priority: optional
+Architecture: all
+Depends: python3,
+         rsync,
+         strawwu-initd
+Recommends: strawwu-upgrade,
+            timeshift | btrfs-progs
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU system backup and timeshift PoC
+ Unified backup CLI: rsync snapshots, Btrfs subvolume wrapper,
+ Timeshift integration, and Hub restore entry points. Shares
+ /var/lib/strawwu/backups with strawwu-upgrade pre-upgrade snapshots.

@@ -1,0 +1,16 @@
+{
+  "schema": "strawwu-backup-timeshift-baseline/v1",
+  "stage": "post-backup-timeshift",
+  "version": "0.7.0.10",
+  "package": "strawwu-backup",
+  "hub_panel": "backup",
+  "backup_root": "/var/lib/strawwu/backups",
+  "upgrade_hook": "strawwu-upgrade snapshot",
+  "backends": [
+    "rsync",
+    "btrfs",
+    "timeshift"
+  ],
+  "cli": "usr/bin/strawwu-backup",
+  "manifest": "usr/share/strawwu/backup/backup-manifest.yaml"
+}

@@ -1,0 +1,28 @@
+schema: strawwu-backup/v1
+stage: post-backup-timeshift
+backup_root: /var/lib/strawwu/backups
+system_dir: system
+upgrade_prefix: pre-upgrade-
+min_free_mb: 1024
+snapshot_schema: strawwu-backup-snapshot/v1
+rsync_paths:
+  - /etc/strawwu
+  - /var/lib/strawwu/setup
+backends:
+  rsync:
+    enabled: true
+    description: File-level rsync snapshot (default PoC)
+  btrfs:
+    enabled: true
+    description: Btrfs subvolume snapshot when root is btrfs
+  timeshift:
+    enabled: true
+    cli: /usr/bin/timeshift
+    description: Mint Timeshift wrapper when installed
+upgrade_hook:
+  cli: strawwu-upgrade
+  subcommand: snapshot
+  shared_root: /var/lib/strawwu/backups
+hub:
+  panel: backup
+  cli: strawwu-backup

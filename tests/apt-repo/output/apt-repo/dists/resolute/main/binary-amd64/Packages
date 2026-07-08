@@ -3,10 +3,10 @@ Version: 9.9.9.9
 Architecture: all
 Maintainer: StrawCoding <apt@wastebase.xyz>
 Filename: pool/main/s/strawwu-keyring/strawwu-keyring_9.9.9.9_all.deb
-Size: 1580
-MD5sum: f8a9025db5456e33fa1b4e0966156b1d
-SHA1: 8fa36a8177edd0382690654786d5833f3e223555
-SHA256: 9983e786d66b862214516e9964d0a56f978bf3247919b9f4f65d2929f04b922b
+Size: 1582
+MD5sum: 637236a8e666a603dd2a8478bca86e4c
+SHA1: a2b42793dcb8bcc6e5e0cc9eb1d2ad1585e35f07
+SHA256: e7d53db2b439bdfe025fdca7800f7dd68bb6ca28bca0f9905d257faba05d4056
 Section: misc
 Priority: important
 Description: GnuPG archive key for the StrawWU APT repository

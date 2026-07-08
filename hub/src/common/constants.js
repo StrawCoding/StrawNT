@@ -35,6 +35,10 @@ module.exports = {
     GET_SOFTWARE_SOURCES_STATUS: 'software-sources:get-status',
     TOGGLE_SOFTWARE_SOURCE: 'software-sources:toggle',
     CHECK_SOFTWARE_UPDATES: 'software-sources:check-updates',
+    GET_BACKUP_STATUS: 'backup:get-status',
+    LIST_BACKUP_SNAPSHOTS: 'backup:list-snapshots',
+    CREATE_BACKUP_SNAPSHOT: 'backup:create-snapshot',
+    PREVIEW_BACKUP_RESTORE: 'backup:preview-restore',
   },
 
   COLORS: {

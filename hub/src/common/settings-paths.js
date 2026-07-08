@@ -51,6 +51,13 @@ const DEV_SOFTWARE_SOURCES_FIXTURE = path.join(
 );
 const SOFTWARE_SOURCES_POLKIT_ACTION = 'xyz.wastebase.strawwu.software-sources.toggle';
 
+const INSTALLED_BACKUP_CLI = '/usr/bin/strawwu-backup';
+const DEV_BACKUP_CLI = path.join(
+  REPO_ROOT,
+  'os-image/debs/strawwu-backup/usr/bin/strawwu-backup',
+);
+const DEV_BACKUP_FIXTURE = path.join(HUB_ROOT, 'tests/fixtures/backup-catalog.json');
+
 function firstExisting(...candidates) {
   for (const candidate of candidates) {
     if (candidate && fs.existsSync(candidate)) {
@@ -185,6 +192,24 @@ function resolveSoftwareSourcesFixture() {
   return firstExisting(DEV_SOFTWARE_SOURCES_FIXTURE, debFixture);
 }
 
+function resolveBackupCli() {
+  if (process.env.STRAWWU_BACKUP_CLI && fs.existsSync(process.env.STRAWWU_BACKUP_CLI)) {
+    return process.env.STRAWWU_BACKUP_CLI;
+  }
+  return firstExisting(INSTALLED_BACKUP_CLI, DEV_BACKUP_CLI);
+}
+
+function resolveBackupFixture() {
+  if (process.env.STRAWWU_BACKUP_FIXTURE_PATH) {
+    return process.env.STRAWWU_BACKUP_FIXTURE_PATH;
+  }
+  const debFixture = path.join(
+    REPO_ROOT,
+    'os-image/debs/strawwu-backup/usr/share/strawwu/backup/fixture-catalog.json',
+  );
+  return firstExisting(DEV_BACKUP_FIXTURE, debFixture);
+}
+
 module.exports = {
   HUB_ROOT,
   REPO_ROOT,
@@ -205,6 +230,8 @@ module.exports = {
   resolveDeviceProxyFixture,
   resolveSoftwareSourcesCli,
   resolveSoftwareSourcesFixture,
+  resolveBackupCli,
+  resolveBackupFixture,
   readVersion,
   readOsPrettyName,
 };

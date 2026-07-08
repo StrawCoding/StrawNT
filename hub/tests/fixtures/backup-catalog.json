@@ -1,0 +1,47 @@
+{
+  "schema": "strawwu-backup-hub-fixture/v1",
+  "mock": true,
+  "status": {
+    "schema": "strawwu-backup-status/v1",
+    "backup_root": "/var/lib/strawwu/backups",
+    "system_root": "/var/lib/strawwu/backups/system",
+    "backends": {
+      "rsync": true,
+      "btrfs": false,
+      "timeshift": true,
+      "preferred": "rsync"
+    },
+    "timeshift_snapshots": [
+      {
+        "id": "2026-07-08_12-00-01",
+        "tags": "daily",
+        "description": "Fixture daily snapshot"
+      }
+    ],
+    "snapshot_count": 2,
+    "system_count": 1,
+    "upgrade_count": 1,
+    "upgrade_hook": "strawwu-upgrade snapshot",
+    "hub_panel": "backup",
+    "fixture": true
+  },
+  "snapshots": [
+    {
+      "name": "system-20260708T040000Z-daily",
+      "kind": "system",
+      "backend": "rsync",
+      "created_at": "2026-07-08T04:00:00+00:00",
+      "label": "daily",
+      "path": "/var/lib/strawwu/backups/system/system-20260708T040000Z-daily"
+    },
+    {
+      "name": "pre-upgrade-0.7.0.9",
+      "kind": "upgrade",
+      "backend": "strawwu-upgrade",
+      "created_at": "2026-07-08T03:30:00+00:00",
+      "from_version": "0.7.0.8",
+      "path": "/var/lib/strawwu/backups/pre-upgrade-0.7.0.9",
+      "restore_cli": "strawwu-upgrade --rollback"
+    }
+  ]
+}

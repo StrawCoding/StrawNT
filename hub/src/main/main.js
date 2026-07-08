@@ -7,6 +7,7 @@ const flathubService = require('./flathub-service');
 const driversService = require('./drivers-service');
 const deviceProxyService = require('./device-proxy-service');
 const softwareSourcesService = require('./software-sources-service');
+const backupService = require('./backup-service');
 const i18n = require('../common/i18n');
 const { IPC_CHANNELS, UPDATE_CHANNELS } = require('../common/constants');
 
@@ -146,6 +147,14 @@ function setupIpcHandlers() {
   );
   ipcMain.handle(IPC_CHANNELS.CHECK_SOFTWARE_UPDATES, async () =>
     softwareSourcesService.checkForUpdates(),
+  );
+  ipcMain.handle(IPC_CHANNELS.GET_BACKUP_STATUS, async () => backupService.getBackupStatus());
+  ipcMain.handle(IPC_CHANNELS.LIST_BACKUP_SNAPSHOTS, async () => backupService.listSnapshots());
+  ipcMain.handle(IPC_CHANNELS.CREATE_BACKUP_SNAPSHOT, async (_event, label) =>
+    backupService.createSnapshot(label),
+  );
+  ipcMain.handle(IPC_CHANNELS.PREVIEW_BACKUP_RESTORE, async (_event, name) =>
+    backupService.previewRestore(name),
   );
 }
 

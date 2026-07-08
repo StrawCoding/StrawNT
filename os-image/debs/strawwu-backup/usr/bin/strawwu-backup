@@ -1,0 +1,125 @@
+#!/usr/bin/env python3
+"""StrawWU system backup CLI — rsync / Btrfs / Timeshift PoC."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+_CORE = Path(__file__).resolve().parent.parent / "lib" / "strawwu-backup" / "core.py"
+import importlib.util
+
+_spec = importlib.util.spec_from_file_location("strawwu_backup_core", _CORE)
+_mod = importlib.util.module_from_spec(_spec)
+assert _spec.loader is not None
+_spec.loader.exec_module(_mod)
+
+
+def _print_json(data: object) -> None:
+    print(json.dumps(data, indent=2, ensure_ascii=False))
+
+
+def main(argv: list[str] | None = None) -> int:
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument("--json", action="store_true", help="Emit machine-readable JSON")
+
+    parser = argparse.ArgumentParser(
+        prog="strawwu-backup",
+        description="StrawWU system backup and timeshift PoC (rsync / btrfs / timeshift).",
+    )
+    parser.add_argument("--json", action="store_true", help="Emit machine-readable JSON")
+
+    sub = parser.add_subparsers(dest="command")
+
+    sub.add_parser("status", parents=[common], help="Backup backends and snapshot summary")
+    sub.add_parser("list", parents=[common], help="List system and upgrade snapshots")
+    sub.add_parser("preflight", parents=[common], help="Validate backup readiness")
+
+    snap = sub.add_parser("snapshot", parents=[common], help="Create a system snapshot")
+    snap.add_argument("action", nargs="?", default="create", choices=["create"])
+    snap.add_argument("--label", default="manual", help="Snapshot label")
+    snap.add_argument(
+        "--backend",
+        choices=["rsync", "btrfs", "timeshift"],
+        help="Force backend (default: auto-detect)",
+    )
+
+    restore = sub.add_parser("restore", parents=[common], help="Restore from a snapshot (dry-run by default)")
+    restore.add_argument("name", help="Snapshot name")
+    restore.add_argument(
+        "--apply",
+        action="store_true",
+        help="Apply restore (destructive; default is dry-run)",
+    )
+
+    sub.add_parser("version", help="Print package version")
+
+    args = parser.parse_args(argv)
+    raw_argv = list(argv if argv is not None else sys.argv[1:])
+    emit_json = bool(getattr(args, "json", False)) or "--json" in raw_argv
+
+    try:
+        if args.command == "version":
+            return _mod.cmd_version()
+        if args.command == "status":
+            result = _mod.backup_status()
+            if emit_json:
+                _print_json(result)
+            else:
+                print(
+                    f"root={result['backup_root']} "
+                    f"snapshots={result['snapshot_count']} "
+                    f"backend={result['backends'].get('preferred')}"
+                )
+            return 0
+        if args.command == "list":
+            result = {"snapshots": _mod.list_snapshots()}
+            if emit_json:
+                _print_json(result)
+            else:
+                for snap in result["snapshots"]:
+                    print(
+                        f"{snap.get('name')} kind={snap.get('kind')} "
+                        f"backend={snap.get('backend')}"
+                    )
+            return 0
+        if args.command == "preflight":
+            result = _mod.run_preflight()
+            if emit_json:
+                _print_json(result)
+            else:
+                status = "OK" if result["ok"] else "FAIL"
+                print(f"{status}: free={result['disk_free_mb']}MB")
+                for issue in result.get("issues", []):
+                    print(f"  - {issue}", file=sys.stderr)
+            return 0 if result["ok"] else 1
+        if args.command == "snapshot":
+            result = _mod.create_snapshot(label=args.label, backend=args.backend)
+            if emit_json:
+                _print_json(result)
+            else:
+                print(f"created {result['snapshot']} backend={result['backend']}")
+            return 0
+        if args.command == "restore":
+            dry_run = not args.apply
+            result = _mod.restore_snapshot(args.name, dry_run=dry_run)
+            if emit_json:
+                _print_json(result)
+            else:
+                mode = "dry-run" if dry_run else "apply"
+                print(f"{mode} restore {args.name}:")
+                for action in result.get("actions", []):
+                    print(f"  {action}")
+            return 0
+
+        parser.print_help()
+        return 0
+    except (RuntimeError, ValueError, FileNotFoundError, FileExistsError, OSError) as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

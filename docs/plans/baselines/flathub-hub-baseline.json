@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-hub-flathub-baseline/v1",
   "wave": "W4-F3",
-  "version": "0.7.0.9",
+  "version": "0.7.0.10",
   "package": "strawwu-hub",
   "panel": "flathub",
   "remote": "flathub",

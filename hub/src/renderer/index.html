@@ -33,6 +33,10 @@
         <span class="nav-icon">⟳</span>
         <span data-i18n="nav.updates">Update Channel</span>
       </button>
+      <button class="nav-btn" data-tab="backup">
+        <span class="nav-icon">⏱</span>
+        <span data-i18n="nav.backup">Backup &amp; Restore</span>
+      </button>
       <button class="nav-btn" data-tab="software-sources">
         <span class="nav-icon">⎙</span>
         <span data-i18n="nav.software_sources">Software Sources</span>
@@ -135,6 +139,19 @@
           </label>
         </div>
         <div id="channel-status" class="channel-status"></div>
+      </section>
+
+      <!-- Backup Panel -->
+      <section id="tab-backup" class="tab-panel">
+        <h2 data-i18n="backup.title">Backup &amp; Restore</h2>
+        <p class="muted-text" data-i18n="backup.description">System snapshots (rsync / Btrfs / Timeshift) and pre-upgrade rollback points from strawwu-upgrade.</p>
+        <div class="sources-toolbar">
+          <button id="btn-refresh-backup" class="btn btn-secondary" data-i18n="backup.refresh">Refresh</button>
+          <button id="btn-create-backup" class="btn btn-primary" data-i18n="backup.create">Create Snapshot</button>
+        </div>
+        <div id="backup-meta" class="apps-meta muted-text"></div>
+        <div id="backup-list" class="sources-list"></div>
+        <div id="backup-status" class="channel-status"></div>
       </section>
 
       <!-- Software Sources Panel -->
