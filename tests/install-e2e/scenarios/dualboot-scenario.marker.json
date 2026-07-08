@@ -1,0 +1,14 @@
+{
+  "schema": "strawwu-install-e2e-scenario/v1",
+  "id": "dualboot",
+  "stage": "post-i2-calamares-luks",
+  "marker": "STRAWWU-DUALBOOT-SCENARIO-OK",
+  "description": "Dual-boot detection UX (os-prober + alongside partition choice + zh_TW copy)",
+  "config_refs": [
+    "os-image/debs/strawwu-calamares-settings/etc/calamares/modules/partition.conf",
+    "os-image/debs/strawwu-calamares-settings/etc/calamares/modules/welcome.conf",
+    "os-image/debs/strawwu-calamares-settings/etc/calamares/modules/grubcfg.conf",
+    "os-image/debs/strawwu-calamares-settings/usr/local/lib/calamares/strawwu-dualboot-detect.sh"
+  ],
+  "e2e_note": "install-e2e guest disables os-prober for deterministic boot; production installer enables dual-boot menu."
+}

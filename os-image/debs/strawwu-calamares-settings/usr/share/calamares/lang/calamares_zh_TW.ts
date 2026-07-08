@@ -52,4 +52,35 @@
         <translation>結束(&amp;Q)</translation>
     </message>
 </context>
+<context>
+    <name>PartitionPage</name>
+    <message>
+        <source>Install alongside them</source>
+        <translation>與現有系統並存安裝</translation>
+    </message>
+    <message>
+        <source>Replace a partition with %1</source>
+        <translation>以 %1 取代分割區</translation>
+    </message>
+    <message>
+        <source>Erase disk and install %1</source>
+        <translation>清除磁碟並安裝 %1</translation>
+    </message>
+    <message>
+        <source>Something else</source>
+        <translation>自訂分割（進階）</translation>
+    </message>
+    <message>
+        <source>Encrypt system</source>
+        <translation>加密系統磁碟（LUKS）</translation>
+    </message>
+    <message>
+        <source>Please enter a passphrase to encrypt your system.</source>
+        <translation>請輸入 LUKS 加密密碼以保護您的系統。</translation>
+    </message>
+    <message>
+        <source>Existing operating systems have been detected on this machine.</source>
+        <translation>偵測到此電腦上已有其他作業系統。</translation>
+    </message>
+</context>
 </TS>

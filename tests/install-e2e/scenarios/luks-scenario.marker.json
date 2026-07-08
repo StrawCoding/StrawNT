@@ -1,0 +1,13 @@
+{
+  "schema": "strawwu-install-e2e-scenario/v1",
+  "id": "luks",
+  "stage": "post-i2-calamares-luks",
+  "marker": "STRAWWU-LUKS-SCENARIO-OK",
+  "description": "Calamares LUKS encrypted root path (luks1 + GRUB cryptodisk + crypttab keyscript)",
+  "config_refs": [
+    "os-image/debs/strawwu-calamares-settings/etc/calamares/modules/partition.conf",
+    "os-image/debs/strawwu-calamares-settings/etc/calamares/modules/fstab.conf",
+    "os-image/debs/strawwu-calamares-settings/etc/calamares/modules/grubcfg.conf"
+  ],
+  "e2e_note": "Full QEMU LUKS install deferred to Hermes release-iso boot-test; static gate validates config."
+}

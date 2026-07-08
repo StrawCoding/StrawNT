@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-08T07:35:26.656960",
+  "generated_at": "2026-07-08T07:35:52.288380",
   "target": "0.9.0.0-engineering",
   "total": 21,
   "passed": 6,
@@ -38,7 +38,7 @@
     },
     {
       "id": "post-i2-calamares-luks",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "pass": false
     },
     {

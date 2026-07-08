@@ -50,7 +50,11 @@ License: MIT
 EOF
 
 DEB_FILE="${OUTPUT_DIR}/strawwu-calamares-settings_${VERSION}_all.deb"
-dpkg-deb --build "${PKG_DIR}" "${DEB_FILE}"
+# Build in /tmp — preflight tests rm -rf output/ in parallel (race-safe).
+DEB_TMP="$(mktemp "/tmp/strawwu-calamares-settings_${VERSION}.XXXXXX.deb")"
+dpkg-deb --build "${PKG_DIR}" "${DEB_TMP}"
+mkdir -p "${OUTPUT_DIR}"
+mv -f "${DEB_TMP}" "${DEB_FILE}"
 
 echo "=== Built ${DEB_FILE} ==="
 ls -lh "${DEB_FILE}"

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -37,18 +38,18 @@ def test_ts_aligns_with_finished_copy() -> None:
 
 
 def test_lrelease_builds_qm() -> None:
-    qm = TS.with_suffix(".qm")
-    if qm.exists():
-        qm.unlink()
-    proc = subprocess.run(
-        ["lrelease", str(TS), "-qm", str(qm)],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if proc.returncode != 0:
-        raise AssertionError(f"lrelease failed: {proc.stderr or proc.stdout}")
-    assert qm.is_file() and qm.stat().st_size > 0
+    # Build in a temp dir — never mutate tracked source-tree .qm (preflight race).
+    with tempfile.TemporaryDirectory() as tmp:
+        qm = Path(tmp) / "calamares_zh_TW.qm"
+        proc = subprocess.run(
+            ["lrelease", str(TS), "-qm", str(qm)],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if proc.returncode != 0:
+            raise AssertionError(f"lrelease failed: {proc.stderr or proc.stdout}")
+        assert qm.is_file() and qm.stat().st_size > 0
 
 
 def test_build_script_compiles_lang() -> None:

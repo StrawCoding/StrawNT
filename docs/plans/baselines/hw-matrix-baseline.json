@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-hw-matrix-baseline/v1",
   "wave": "W8-HW-MATRIX",
-  "version": "0.6.3.5",
+  "version": "0.6.3.8",
   "tier": "T1+HW3",
   "dimensions": [
     "gpu",
