@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StrawWU Post-MVP v0.6 Closeout — Definition of Done</title>
+  <style>
+:root {
+  --bg: #0f1419;
+  --surface: #1a2332;
+  --text: #e8eef4;
+  --muted: #8b9cb3;
+  --accent: #14b8a6;
+  --accent-dim: #0d9488;
+  --border: #2d3a4d;
+  --code-bg: #0d1117;
+  --pass: #34d399;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  margin: 0;
+  padding: 2rem 1rem 4rem;
+}
+.wrap { max-width: 56rem; margin: 0 auto; }
+header {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+.brand { color: var(--accent); font-weight: 600; letter-spacing: 0.02em; }
+h1 { color: var(--text); font-size: 1.85rem; margin: 0.5rem 0 0.25rem; }
+.meta { color: var(--muted); font-size: 0.9rem; }
+h2 {
+  color: var(--accent);
+  font-size: 1.25rem;
+  margin-top: 2rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.35rem;
+}
+h3 { color: var(--text); font-size: 1.05rem; margin-top: 1.5rem; }
+p { margin: 0.75rem 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 1.4rem; }
+li { margin: 0.35rem 0; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.92rem;
+}
+th, td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+}
+th { background: var(--surface); color: var(--accent); }
+tr:nth-child(even) td { background: rgba(26, 35, 50, 0.5); }
+code {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.88em;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+}
+pre code { border: none; padding: 0; background: transparent; }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1rem 0;
+  padding: 0.25rem 1rem;
+  color: var(--muted);
+}
+footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">StrawWU Post-MVP v0.6 Closeout</div>
+      <h1>驅動與硬體 — v0.6 DoD 驗收</h1>
+      <p class="meta">版本 0.6.3.11 · post-v06-closeout · hermes-deliver</p>
+    </header>
+    <main>
+<h1>StrawWU Post-MVP v0.6 Definition of Done</h1>
+<table>
+<tr><th>欄位</th><th>值</th></tr>
+<tr><td>------</td><td>-----</td></tr>
+<tr><td>產品目標</td><td>v0.6.0.0-target（驅動與硬體）</td></tr>
+<tr><td>建置版本</td><td>見 VERSION</td></tr>
+<tr><td>Post-MVP 段數</td><td>10（post-d1 → post-v06-closeout）</td></tr>
+<tr><td>基線</td><td>Ubuntu 26.04 LTS Resolute + StrawWU fork 基底</td></tr>
+</table>
+<h2>1. v0.6 目標（post-mvp-roadmap §5）</h2>
+<table>
+<tr><th>#</th><th>項目</th><th>狀態</th><th>證據</th></tr>
+<tr><td>---</td><td>------</td><td>------</td><td>------</td></tr>
+<tr><td>1</td><td>Linux GPU/firmware 驅動管理（D1）</td><td>✅</td><td>strawwu-drivers deb、Hub 驅動分頁、drivers-hub-baseline</td></tr>
+<tr><td>2</td><td>HW T1 Live USB 矩陣（≥3 physical-live）</td><td>✅</td><td>hw-t1-live-usb-baseline、hw-matrix-results.json</td></tr>
+<tr><td>3</td><td>HW T2 已安裝系統矩陣</td><td>✅</td><td>hw-t2-installed-baseline</td></tr>
+<tr><td>4</td><td>筆電周邊（觸控板/Fn、webcam、指紋）</td><td>✅</td><td>hw4-peripherals-baseline</td></tr>
+<tr><td>5</td><td>Device Driver Proxy rootfs 整合（DDP）</td><td>✅</td><td>device-proxy-hub-baseline、strawwu-device-proxy</td></tr>
+<tr><td>6</td><td>印表機 MFP 列印+掃描 smoke（Q3）</td><td>✅</td><td>mfp-smoke-baseline</td></tr>
+<tr><td>7</td><td>Calamares LUKS + 雙系統安裝（I2）</td><td>✅</td><td>calamares-luks-dualboot-baseline</td></tr>
+<tr><td>8</td><td>軟體源 UI（D7）</td><td>✅</td><td>software-sources-hub-baseline、strawwu-software-sources</td></tr>
+<tr><td>9</td><td>深色主題策展（UX）</td><td>✅</td><td>ux-theme-curation-baseline、strawwu-gtk-theme</td></tr>
+<tr><td>10</td><td>v0.6 closeout 報告 + HTML</td><td>✅</td><td>本文件、post-mvp-status.json、HTML hermes-deliver</td></tr>
+</table>
+<h2>2. 各段摘要</h2>
+<table>
+<tr><th>段</th><th>ID</th><th>重點</th></tr>
+<tr><td>----</td><td>-----</td><td>------</td></tr>
+<tr><td>D1</td><td>post-d1-strawwu-drivers</td><td>ubuntu-drivers 包裝 + Hub 驅動分頁</td></tr>
+<tr><td>HW1</td><td>post-hw-t1-live-usb</td><td>Live USB physical-live 矩陣 ≥3</td></tr>
+<tr><td>HW2</td><td>post-hw-t2-installed</td><td>已安裝系統 HW 矩陣</td></tr>
+<tr><td>HW4</td><td>post-hw4-peripherals</td><td>觸控板/Fn、webcam、指紋</td></tr>
+<tr><td>DDP</td><td>post-ddp-rootfs</td><td>device-proxy rootfs + Hub</td></tr>
+<tr><td>Q3</td><td>post-q3-mfp-smoke</td><td>CUPS 列印 + SANE 掃描 smoke</td></tr>
+<tr><td>I2</td><td>post-i2-calamares-luks</td><td>LUKS 加密 + 雙系統 Calamares</td></tr>
+<tr><td>D7</td><td>post-d7-software-sources</td><td>軟體源管理 UI</td></tr>
+<tr><td>UX</td><td>post-ux-theme-curation</td><td>StrawWU-Dark GTK + icon 策展</td></tr>
+<tr><td>V06</td><td>post-v06-closeout</td><td>全段 PASS 彙整、HTML、VERSION bump</td></tr>
+</table>
+<h2>3. 產品決策對齊（Q1–Q8）</h2>
+<table>
+<tr><th>決策</th><th>v0.6 範圍</th><th>驗收</th></tr>
+<tr><td>------</td><td>-----------</td><td>------</td></tr>
+<tr><td>Q2 Tier4 VFIO+microvm</td><td>Phase6.12 PoC（Post-MVP 後段）</td><td>不在 v0.6 blocking</td></tr>
+<tr><td>Q3 MFP 列印+掃描</td><td>post-q3-mfp-smoke</td><td>mfp-smoke-baseline PASS</td></tr>
+<tr><td>Q4 裝置代理預設開放</td><td>post-ddp-rootfs</td><td>device-proxy-hub-baseline</td></tr>
+<tr><td>Q5 社群 device_profile PR</td><td>DDP manifest 可擴展</td><td>device_profile schema</td></tr>
+<tr><td>Q6 self-hosted CI kernel</td><td>v0.7+ post-ci-kernel-selfhosted</td><td>deferred</td></tr>
+<tr><td>Q7 反作弊</td><td>v0.7+ post-w7-anticheat-substantive</td><td>deferred</td></tr>
+<tr><td>Q8 Office/Steam/Epic launcher</td><td>v0.7+ post-q8-golden-apps</td><td>deferred</td></tr>
+</table>
+<h2>4. Phase 6 政策摘要</h2>
+<ul>
+<li>預設 <strong>SubsystemSession（native）</strong> — 禁止 WinBox / strawwu-box</li>
+<li>container / microvm 僅覆寫路徑</li>
+<li>裝置代理（DDP）預設開放，Hub 可管理</li>
+</ul>
+<h2>5. 延後範圍（v0.7+，非 blocking）</h2>
+<ul>
+<li>HW T3 wincompat 實機（post-hw-t3-wincompat）</li>
+<li>HW5 stable gate ≥80%（post-hw5-stable-gate）</li>
+<li>升級 rollback、Secure Boot、CVE 政策、開機回歸 CI</li>
+<li>self-hosted CI kernel build、反作弊實質驗收</li>
+<li>Office/Steam/Epic/三角洲啟動器（Q8）</li>
+<li>時光機備份（post-backup-timeshift）</li>
+</ul>
+<h2>6. 驗收閘門</h2>
+<pre><code>
+make test-post-mvp-v06-closeout   # v0.6 DoD + 9 stage gates + HTML
+make preflight                    # 全 Wave + Post-MVP 基礎設施
+</code></pre>
+<p>Hermes state 9/9 prerequisite stages PASS 後，closeout stage 由 Hermes mark。</p>
+<h2>7. 產物索引</h2>
+<table>
+<tr><th>類型</th><th>路徑</th></tr>
+<tr><td>------</td><td>------</td></tr>
+<tr><td>Post-MVP 狀態</td><td><code>docs/plans/baselines/post-mvp-status.json</code></td></tr>
+<tr><td>Stage reports</td><td><code>docs/plans/stage-reports/POST-*.md</code>（10 份）</td></tr>
+<tr><td>HTML 報告</td><td><code>docs/plans/post-mvp-v06-closeout/html/post-mvp-v06-closeout-report.html</code></td></tr>
+<tr><td>路線圖</td><td><code>docs/plans/strawwu-post-mvp-roadmap.md</code></td></tr>
+<tr><td>HW 矩陣</td><td><code>docs/plans/hw-matrix-results.json</code></td></tr>
+<tr><td>release ISO</td><td><code>os-image/output/StrawWU-&lt;VERSION&gt;-amd64.iso</code></td></tr>
+</table>
+<h2>8. 後續</h2>
+<p><code>post-v06-closeout</code> PASS → 自動啟動 <strong>post-upg-rollback</strong>（v0.7 工程段，勿問使用者）。</p>
+    </main>
+    <footer>
+      StrawWU v0.6 drivers/HW · 10 Post-MVP stages · Next → post-upg-rollback
+    </footer>
+  </div>
+</body>
+</html>

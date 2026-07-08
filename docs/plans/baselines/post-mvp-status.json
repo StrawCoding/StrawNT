@@ -1,10 +1,13 @@
 {
-  "generated_at": "2026-07-08T09:39:10.502955",
+  "generated_at": "2026-07-08T01:55:23+00:00",
   "target": "0.9.0.0-engineering",
+  "version": "0.6.3.11",
+  "v06_target": "0.6.0.0-target",
   "total": 21,
   "passed": 9,
   "failed": 12,
   "all_pass": false,
+  "note": "Auto-updated by validate-post-mvp-v06-closeout.py",
   "stages": [
     {
       "id": "post-d1-strawwu-drivers",
@@ -53,7 +56,7 @@
     },
     {
       "id": "post-v06-closeout",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "pass": false
     },
     {

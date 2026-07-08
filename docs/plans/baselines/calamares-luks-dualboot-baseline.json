@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-calamares-luks-dualboot-baseline/v1",
   "stage": "post-i2-calamares-luks",
-  "version": "0.6.3.8",
+  "version": "0.6.3.11",
   "preflight": "tests/preflight/test-calamares-luks-dualboot.sh",
   "scenario_validate": "tests/install-e2e/validate-luks-dualboot-scenarios.sh",
   "unit_test": "os-image/debs/strawwu-calamares-settings/tests/test-luks-dualboot.py",

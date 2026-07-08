@@ -1,0 +1,289 @@
+#!/usr/bin/env python3
+"""Validate StrawWU Post-MVP v0.6 closeout (post-v06-closeout)."""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import re
+import subprocess
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+CLOSEOUT_DIR = REPO_ROOT / "docs" / "plans" / "post-mvp-v06-closeout"
+STAGE_REPORTS = REPO_ROOT / "docs" / "plans" / "stage-reports"
+BASELINES = REPO_ROOT / "docs" / "plans" / "baselines"
+RENDER = REPO_ROOT / "tests" / "post-mvp-v06-closeout" / "render-html.py"
+STATUS_PATH = BASELINES / "post-mvp-status.json"
+HERMES = Path(os.environ.get("HERMES_HOME", "/root/.hermes"))
+HERMES_STATE = HERMES / "logs" / "task-workers" / "strawwu" / "state.json"
+HERMES_CFG = HERMES / "config" / "task-workers" / "projects" / "strawwu.json"
+VERSION = (REPO_ROOT / "VERSION").read_text(encoding="utf-8").strip()
+
+FAILURES: list[str] = []
+
+V06_STAGES = [
+    ("post-d1-strawwu-drivers", "test-drivers"),
+    ("post-hw-t1-live-usb", "test-hw-t1-live-usb"),
+    ("post-hw-t2-installed", "test-hw-t2-installed"),
+    ("post-hw4-peripherals", "test-hw4-peripherals"),
+    ("post-ddp-rootfs", "test-ddp-rootfs"),
+    ("post-q3-mfp-smoke", "test-mfp-smoke"),
+    ("post-i2-calamares-luks", "test-calamares-luks-dualboot"),
+    ("post-d7-software-sources", "test-software-sources"),
+    ("post-ux-theme-curation", "test-ux-theme-curation"),
+    ("post-v06-closeout", None),
+]
+
+V06_BASELINES = [
+    "drivers-hub-baseline.json",
+    "hw-t1-live-usb-baseline.json",
+    "hw-t2-installed-baseline.json",
+    "hw4-peripherals-baseline.json",
+    "device-proxy-hub-baseline.json",
+    "mfp-smoke-baseline.json",
+    "calamares-luks-dualboot-baseline.json",
+    "software-sources-hub-baseline.json",
+    "ux-theme-curation-baseline.json",
+]
+
+STAGE_REPORTS_EXPECTED = [
+    "POST-D1-strawwu-drivers-report.md",
+    "POST-HW-T1-live-usb-report.md",
+    "POST-HW-T2-installed-report.md",
+    "POST-HW4-peripherals-report.md",
+    "POST-DDP-rootfs-report.md",
+    "POST-Q3-mfp-smoke-report.md",
+    "POST-I2-calamares-luks-report.md",
+    "POST-D7-software-sources-report.md",
+    "POST-UX-theme-curation-report.md",
+    "POST-V06-closeout-report.md",
+]
+
+DOD_PATTERNS = [
+    (CLOSEOUT_DIR / "post-mvp-v06-dod.md", [
+        r"strawwu-drivers",
+        r"physical-live",
+        r"device-proxy",
+        r"mfp-smoke",
+        r"LUKS",
+        r"software-sources",
+        r"StrawWU-Dark",
+        r"test-post-mvp-v06-closeout",
+    ]),
+]
+
+
+def fail(msg: str) -> None:
+    FAILURES.append(msg)
+    print(f"FAIL: {msg}", file=sys.stderr)
+
+
+def ok(msg: str) -> None:
+    print(f"PASS: {msg}")
+
+
+def require_file(path: Path, label: str) -> None:
+    if path.is_file():
+        ok(label)
+    else:
+        fail(f"{label} (missing {path})")
+
+
+def require_in_text(path: Path, patterns: list[str], label: str) -> None:
+    text = path.read_text(encoding="utf-8")
+    for pat in patterns:
+        if re.search(pat, text, re.IGNORECASE | re.MULTILINE):
+            ok(f"{label}: {pat}")
+        else:
+            fail(f"{label} missing pattern: {pat}")
+
+
+def run_make(target: str) -> bool:
+    proc = subprocess.run(
+        ["make", target],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if proc.returncode != 0:
+        tail = (proc.stdout + proc.stderr).strip().splitlines()[-5:]
+        fail(f"make {target} failed:\n" + "\n".join(tail))
+        return False
+    ok(f"make {target}")
+    return True
+
+
+def check_hermes_prerequisites() -> bool:
+    if not HERMES_STATE.is_file():
+        fail(f"missing Hermes state: {HERMES_STATE}")
+        return False
+    state = json.loads(HERMES_STATE.read_text(encoding="utf-8"))
+    stages = state.get("stages") or {}
+    all_ok = True
+    for sid, _ in V06_STAGES[:-1]:
+        st = (stages.get(sid) or {}).get("status")
+        if st == "PASS":
+            ok(f"Hermes {sid} PASS")
+        else:
+            fail(f"Hermes {sid} status={st!r} (expected PASS)")
+            all_ok = False
+    return all_ok
+
+
+def write_status(gate_rows: list[dict]) -> None:
+    gate_by_id = {r["id"]: r for r in gate_rows}
+    seq: list[str] = []
+    if HERMES_CFG.is_file():
+        seq = json.loads(HERMES_CFG.read_text(encoding="utf-8")).get("post_mvp_locked_sequence") or []
+    if not seq:
+        seq = [sid for sid, _ in V06_STAGES]
+
+    hermes_stages: dict = {}
+    if HERMES_STATE.is_file():
+        hermes_stages = json.loads(HERMES_STATE.read_text(encoding="utf-8")).get("stages") or {}
+
+    rows: list[dict] = []
+    for sid in seq:
+        if sid in gate_by_id:
+            row = gate_by_id[sid]
+            rows.append({"id": sid, "status": row["status"], "pass": row["pass"]})
+        else:
+            st = (hermes_stages.get(sid) or {}).get("status", "PENDING")
+            rows.append({"id": sid, "status": st, "pass": st == "PASS"})
+
+    passed = sum(1 for r in rows if r["pass"])
+    failed = sum(1 for r in rows if not r["pass"])
+    report = {
+        "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+        "target": "0.9.0.0-engineering",
+        "version": VERSION,
+        "v06_target": "0.6.0.0-target",
+        "total": len(rows),
+        "passed": passed,
+        "failed": failed,
+        "all_pass": failed == 0,
+        "note": "Auto-updated by validate-post-mvp-v06-closeout.py",
+        "stages": rows,
+    }
+    STATUS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    STATUS_PATH.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    v06_pass = sum(1 for r in rows if r["id"] in {s for s, _ in V06_STAGES} and r["pass"])
+    ok(f"post-mvp-status.json {passed}/{len(rows)} PASS (v0.6 subset {v06_pass}/10)")
+
+
+def load_status_rows() -> list[dict] | None:
+    if not STATUS_PATH.is_file():
+        return None
+    data = json.loads(STATUS_PATH.read_text(encoding="utf-8"))
+    stages = data.get("stages") or []
+    v06_ids = {sid for sid, _ in V06_STAGES[:-1]}
+    subset = [s for s in stages if s.get("id") in v06_ids]
+    return subset if len(subset) >= 9 else None
+
+
+def run_stage_gates() -> list[dict]:
+    rows: list[dict] = []
+    for sid, make_target in V06_STAGES:
+        if make_target:
+            passed = run_make(make_target)
+            rows.append({"id": sid, "status": "PASS" if passed else "FAIL", "pass": passed})
+        else:
+            closeout_report = STAGE_REPORTS / "POST-V06-closeout-report.md"
+            passed = closeout_report.is_file()
+            if passed:
+                ok("POST-V06-closeout-report.md")
+            else:
+                fail("POST-V06-closeout-report.md missing")
+            rows.append({"id": sid, "status": "PENDING" if not passed else "IN_PROGRESS", "pass": False})
+    return rows
+
+
+def verify_artifacts() -> None:
+    for name in STAGE_REPORTS_EXPECTED[:-1]:
+        require_file(STAGE_REPORTS / name, name)
+
+    for name in V06_BASELINES:
+        require_file(BASELINES / name, f"baseline {name}")
+
+    hw_matrix = REPO_ROOT / "docs" / "plans" / "hw-matrix-results.json"
+    require_file(hw_matrix, "hw-matrix-results.json")
+
+    for path, patterns in DOD_PATTERNS:
+        require_in_text(path, patterns, "post-mvp-v06-dod.md coverage")
+
+    result = subprocess.run([sys.executable, str(RENDER)], cwd=REPO_ROOT, capture_output=True, text=True)
+    if result.returncode != 0:
+        fail(f"render-html.py failed: {result.stderr.strip()}")
+    else:
+        for line in result.stdout.strip().splitlines():
+            ok(line.replace("PASS: ", "render: "))
+
+    html_path = CLOSEOUT_DIR / "html" / "post-mvp-v06-closeout-report.html"
+    require_file(html_path, "post-mvp-v06-closeout HTML report")
+    html_text = html_path.read_text(encoding="utf-8")
+    if "#14b8a6" in html_text:
+        ok("HTML Teal accent #14b8a6")
+    else:
+        fail("HTML missing Teal accent #14b8a6")
+    if "hermes-deliver" in html_text:
+        ok("HTML hermes-deliver marker")
+    else:
+        fail("HTML missing hermes-deliver marker")
+
+    post = REPO_ROOT / "docs" / "plans" / "kickoff" / "POST-MVP-AUTO-SEQUENCE.md"
+    if post.is_file() and "post-upg-rollback" in post.read_text(encoding="utf-8"):
+        ok("Post-MVP post-upg-rollback transition documented")
+    else:
+        fail("POST-MVP-AUTO-SEQUENCE missing post-upg-rollback")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--skip-stage-tests",
+        action="store_true",
+        help="Use frozen post-mvp-status.json + Hermes state (post VERSION bump)",
+    )
+    args = parser.parse_args()
+
+    print("=== Post-MVP v0.6 closeout validation ===")
+
+    require_file(CLOSEOUT_DIR / "post-mvp-v06-dod.md", "post-mvp-v06-dod.md")
+    require_file(RENDER, "render-html.py")
+    require_file(REPO_ROOT / "docs" / "plans" / "kickoff" / "POST-V06-closeout.md", "kickoff POST-V06-closeout.md")
+    require_file(REPO_ROOT / "docs" / "plans" / "strawwu-post-mvp-roadmap.md", "post-mvp roadmap")
+
+    if not re.match(r"^0\.\d+\.\d+\.\d+$", VERSION):
+        fail(f"VERSION semver MAJOR must be 0 before 1.0.0: {VERSION}")
+    else:
+        ok(f"VERSION MAJOR=0 policy: {VERSION}")
+
+    check_hermes_prerequisites()
+    verify_artifacts()
+
+    if args.skip_stage_tests:
+        rows = load_status_rows()
+        if not rows or len(rows) < 9:
+            fail("post-mvp-status.json missing v0.6 stages (run without --skip-stage-tests first)")
+        else:
+            prereq_pass = all(r.get("pass") for r in rows if r.get("id") != "post-v06-closeout")
+            if prereq_pass:
+                ok("frozen post-mvp-status.json prerequisite stages PASS")
+            else:
+                fail("post-mvp-status.json prerequisite stages not all PASS")
+    else:
+        rows = run_stage_gates()
+        write_status(rows)
+
+    if FAILURES:
+        print(f"=== Post-MVP v0.6 closeout validation: FAIL ({len(FAILURES)} issues) ===", file=sys.stderr)
+        return 1
+    print("=== Post-MVP v0.6 closeout validation: PASS ===")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

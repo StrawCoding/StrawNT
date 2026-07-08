@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-drivers-baseline/v1",
   "stage": "post-d1-strawwu-drivers",
-  "version": "0.6.2.7",
+  "version": "0.6.3.11",
   "package": "strawwu-drivers",
   "hub_panel": "drivers",
   "cli": "/usr/bin/strawwu-drivers",

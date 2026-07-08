@@ -1,0 +1,20 @@
+{
+  "schema": "strawwu-post-mvp-v06-closeout/v1",
+  "stage": "post-v06-closeout",
+  "version": "0.6.3.11",
+  "target": "0.6.0.0-target",
+  "v06_stages": 10,
+  "dod_markdown": "docs/plans/post-mvp-v06-closeout/post-mvp-v06-dod.md",
+  "html": "docs/plans/post-mvp-v06-closeout/html/post-mvp-v06-closeout-report.html",
+  "validate": "tests/post-mvp-v06-closeout/validate-post-mvp-v06-closeout.py",
+  "render": "tests/post-mvp-v06-closeout/render-html.py",
+  "preflight": "tests/preflight/test-post-mvp-v06-closeout.sh",
+  "stage_report": "docs/plans/stage-reports/POST-V06-closeout-report.md",
+  "status": "docs/plans/baselines/post-mvp-status.json",
+  "gates": [
+    "make test-post-mvp-v06-closeout",
+    "make preflight"
+  ],
+  "dod": "Post-MVP v0.6 drivers/HW 10 stages + HTML hermes-deliver",
+  "post_v06_next": "post-upg-rollback"
+}

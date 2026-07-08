@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-mfp-smoke-baseline/v1",
   "stage": "post-q3-mfp-smoke",
-  "version": "0.6.3.5",
+  "version": "0.6.3.11",
   "cli": "strawwu mfp smoke",
   "json_cli": "strawwu mfp smoke --json",
   "fixture": "os-image/debs/strawwu-device-proxy/usr/share/strawwu/device-proxy/mfp-fixture-catalog.json",

@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-software-sources-baseline/v1",
   "stage": "post-d7-software-sources",
-  "version": "0.6.3.10",
+  "version": "0.6.3.11",
   "package": "strawwu-software-sources",
   "hub_panel": "software-sources",
   "cli": "/usr/bin/strawwu-software-sources",
