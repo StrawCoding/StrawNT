@@ -1,0 +1,7 @@
+schema: strawwu-icon-theme/v1
+stage: post-ux-theme-curation
+default_icon_theme: Yaru-prussiangreen-dark
+distributor_logo: /usr/share/icons/hicolor/scalable/apps/distributor-logo.svg
+gsettings:
+  icon-theme: Yaru-prussiangreen-dark
+  cursor-theme: Yaru

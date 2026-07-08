@@ -10,6 +10,7 @@ SESSION_DESKTOP = ROOT / "usr/share/xsessions/strawwu-session.desktop"
 GNOME_SESSION = ROOT / "usr/share/gnome-session/sessions/strawwu.session"
 LAUNCHER = ROOT / "usr/bin/strawwu-session"
 AUTOSTART = ROOT / "etc/xdg/autostart/strawwu-hub-autostart.desktop"
+GSCHEMA = ROOT / "usr/share/glib-2.0/schemas/99_strawwu-session.gschema.override"
 CONTROL = ROOT / "debian/control"
 
 FORBIDDEN_CONTROL = (
@@ -51,6 +52,22 @@ def test_hub_autostart_guarded() -> None:
     assert "test -x" in text
 
 
+def test_gschema_dark_theme_defaults() -> None:
+    assert GSCHEMA.is_file()
+    text = GSCHEMA.read_text()
+    assert "gtk-theme='StrawWU-Dark'" in text
+    assert "color-scheme='prefer-dark'" in text
+    assert "icon-theme='Yaru-prussiangreen-dark'" in text
+    assert "accent-color='teal'" in text
+
+
+def test_control_theme_deps() -> None:
+    assert CONTROL.is_file()
+    text = CONTROL.read_text()
+    assert "strawwu-gtk-theme" in text
+    assert "strawwu-icon-theme" in text
+
+
 def test_control_no_forbidden_deps() -> None:
     assert CONTROL.is_file()
     text = CONTROL.read_text().lower()
@@ -64,6 +81,8 @@ def main() -> int:
         test_xsession_desktop,
         test_gnome_session_file,
         test_hub_autostart_guarded,
+        test_gschema_dark_theme_defaults,
+        test_control_theme_deps,
         test_control_no_forbidden_deps,
     ]
     failed = 0

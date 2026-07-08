@@ -1,0 +1,14 @@
+[org.gnome.desktop.interface]
+gtk-theme='StrawWU-Dark'
+icon-theme='Yaru-prussiangreen-dark'
+cursor-theme='Yaru'
+color-scheme='prefer-dark'
+accent-color='teal'
+
+[org.gnome.desktop.background]
+picture-uri-dark='file:///usr/share/backgrounds/strawwu/strawwu-wallpaper-dark.png'
+primary-color='#0A0E14'
+
+[org.gnome.desktop.screensaver]
+picture-uri='file:///usr/share/backgrounds/strawwu/strawwu-wallpaper-dark.png'
+primary-color='#0A0E14'

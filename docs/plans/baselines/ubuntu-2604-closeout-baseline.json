@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-ubuntu-2604-closeout/v1",
   "stage": "u26-m7-closeout",
-  "version": "0.6.3.9",
+  "version": "0.6.3.10",
   "target": "26.04.0-resolute",
   "migration_stages": 7,
   "dod_markdown": "docs/plans/ubuntu-2604-closeout/ubuntu-2604-dod.md",

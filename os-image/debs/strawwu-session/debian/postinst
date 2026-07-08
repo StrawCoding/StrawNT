@@ -8,6 +8,9 @@ case "${1}" in
                 x-session-manager /usr/bin/strawwu-session 50 \
                 2>/dev/null || true
         fi
+        if command -v glib-compile-schemas >/dev/null 2>&1; then
+            glib-compile-schemas /usr/share/glib-2.0/schemas 2>/dev/null || true
+        fi
         ;;
 esac
 

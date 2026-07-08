@@ -3,7 +3,7 @@ Version: __VERSION__
 Section: gnome
 Priority: optional
 Architecture: all
-Depends: gnome-session-bin, gnome-session-common, gnome-settings-daemon (>= 3.37.0), strawwu-shell, xwayland, session-migration
+Depends: gnome-session-bin, gnome-session-common, gnome-settings-daemon (>= 3.37.0), strawwu-shell, strawwu-gtk-theme, strawwu-icon-theme, xwayland, session-migration
 Recommends: xdg-desktop-portal-gnome
 Maintainer: StrawCoding <apt@wastebase.xyz>
 Provides: x-session-manager

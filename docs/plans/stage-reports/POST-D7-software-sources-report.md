@@ -87,9 +87,16 @@
 - `tests/preflight/test-greeter-session.sh` — 改為 `mkdir -p` + 只刪除舊 `.deb`，不再 `rm -rf` 整個 output 目錄
 - `Makefile` — 將 `test-software-sources.sh` 納入 `preflight` 鏈（緊接 `test-flathub-hub.sh`）
 
+## Hermes tick468 修復
+
+**根因**：`test-registry-hooks.sh` 中 `"${REGISTRY_BIN}" scan --json | grep -q` 在 `set -o pipefail` 下，`grep -q` 提早關閉 pipe 導致 Rust CLI 收到 SIGPIPE（Broken pipe panic），preflight 在 Makefile:160 失敗（log：`/tmp/hermes-tick468-preflight.log`）。
+
+**修復**：
+- `tests/preflight/test-registry-hooks.sh` — 先快取 CLI JSON/`list` 輸出再 grep（同 W8-MVP `test-initramfs-hooks.sh` 模式）
+
 ## 驗證命令輸出
 
-### `make test-software-sources` — exit 0（2026-07-08T08:58+08:00）
+### `make test-software-sources` — exit 0（2026-07-08T09:09+08:00）
 
 ```
 === POST-D7 strawwu-software-sources preflight ===
@@ -101,15 +108,19 @@ PASS: baseline unchanged software-sources-hub-baseline.json
 === POST-D7 strawwu-software-sources done: PASS ===
 ```
 
-### `make preflight` — exit 0（2026-07-08T09:02+08:00）
+### `make preflight` — exit 0（2026-07-08T09:14+08:00）
 
 ```
 === POST-D7 strawwu-software-sources done: PASS ===
 ...
+=== W5-R4 registry-hooks done: PASS ===
+...
 === FORK-F7 closeout done: PASS ===
 ```
 
-完整 log：`/tmp/hermes-preflight-d7-20260708-0858.log`（約 250s）
+完整 log：
+- `/tmp/hermes-d7-test-software-sources.log`
+- `/tmp/hermes-tick468-preflight-rerun.log`（約 240s）
 
 ## 建議 Hermes 驗收
 

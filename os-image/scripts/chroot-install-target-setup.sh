@@ -79,7 +79,7 @@ stage_debs() {
     rm -f "${STAGED}"/*.deb
 
     local pkg deb
-    for pkg in strawwu-initd strawwu-wincompat strawwu-device-proxy strawwu-shell strawwu-session strawwu-greeter strawwu-update-notifier strawwu-software-sources strawwu-bug-reporter strawwu-drivers strawwu-laptop \
+    for pkg in strawwu-initd strawwu-wincompat strawwu-device-proxy strawwu-shell strawwu-gtk-theme strawwu-icon-theme strawwu-session strawwu-greeter strawwu-update-notifier strawwu-software-sources strawwu-bug-reporter strawwu-drivers strawwu-laptop \
         strawwu-flatpak-setup strawwu-l10n-ime strawwu-firstboot strawwu-install-init strawwu-desktop-actions strawwu-registry-hooks strawwu-initramfs-hooks strawwu-target-identity strawwu-disable-upstream-init strawwu-minimal strawwu-desktop; do
         deb="$(latest_deb "${pkg}")"
         [[ -n "${deb}" && -f "${deb}" ]] || die "deb missing for ${pkg}"

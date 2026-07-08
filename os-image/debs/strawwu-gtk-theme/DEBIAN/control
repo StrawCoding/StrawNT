@@ -1,0 +1,11 @@
+Package: strawwu-gtk-theme
+Version: __VERSION__
+Section: gnome
+Priority: optional
+Architecture: all
+Depends: yaru-theme-gtk,
+         yaru-theme-gnome-shell
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU GTK and GNOME Shell dark theme
+ Ships StrawWU-Dark GTK3/4 and GNOME Shell theme with Teal (#14B8A6)
+ accent on deep background (#0A0E14). Based on Yaru-prussiangreen-dark.

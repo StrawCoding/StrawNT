@@ -6,6 +6,8 @@ packages:
   - strawwu-wincompat
   - strawwu-device-proxy
   - strawwu-shell
+  - strawwu-gtk-theme
+  - strawwu-icon-theme
   - strawwu-session
   - strawwu-greeter
   - strawwu-update-notifier

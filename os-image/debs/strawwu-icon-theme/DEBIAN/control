@@ -1,0 +1,10 @@
+Package: strawwu-icon-theme
+Version: __VERSION__
+Section: gnome
+Priority: optional
+Architecture: all
+Depends: yaru-theme-icon
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU icon theme branding overlay
+ Replaces distributor-logo with StrawWU branding and pins
+ Yaru-prussiangreen-dark as the default icon theme.

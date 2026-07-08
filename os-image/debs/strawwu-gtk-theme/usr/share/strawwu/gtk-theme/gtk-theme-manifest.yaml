@@ -1,0 +1,16 @@
+schema: strawwu-gtk-theme/v1
+stage: post-ux-theme-curation
+theme: StrawWU-Dark
+install_path: /usr/share/themes/StrawWU-Dark
+accent: "#14B8A6"
+background: "#0A0E14"
+text: "#F4F6F9"
+upstream_base: Yaru-prussiangreen-dark
+components:
+  - gtk-3.0/gtk.css
+  - gtk-4.0/gtk.css
+  - gnome-shell/gnome-shell.css
+gsettings:
+  gtk-theme: StrawWU-Dark
+  color-scheme: prefer-dark
+  accent-color: teal

@@ -1,0 +1,36 @@
+schema: strawwu-theme-curation/v1
+stage: post-ux-theme-curation
+version: 0.6.0.0-target
+default_mode: dark
+packages:
+  gtk: strawwu-gtk-theme
+  icon: strawwu-icon-theme
+themes:
+  gtk:
+    name: StrawWU-Dark
+    source: ../usr/share/themes/StrawWU-Dark
+    install_path: /usr/share/themes/StrawWU-Dark
+    accent: "#14B8A6"
+    background: "#0A0E14"
+    text: "#F4F6F9"
+    upstream_base: Yaru-prussiangreen-dark
+  icon:
+    name: Yaru-prussiangreen-dark
+    distributor_logo: ../usr/share/icons/hicolor/scalable/apps/distributor-logo.svg
+    install_path: /usr/share/icons/hicolor/scalable/apps/distributor-logo.svg
+  shell:
+    name: StrawWU-Dark
+    stylesheet: gnome-shell/gnome-shell.css
+    session_mode: strawwu
+gsettings:
+  gtk-theme: StrawWU-Dark
+  icon-theme: Yaru-prussiangreen-dark
+  cursor-theme: Yaru
+  color-scheme: prefer-dark
+  accent-color: teal
+  wallpaper_dark: /usr/share/backgrounds/strawwu/strawwu-wallpaper-dark.png
+  wallpaper_light: /usr/share/backgrounds/strawwu/strawwu-wallpaper-light.png
+colors_ref: ../source/strawwu-colors.md
+deferred:
+  - light-theme-variant
+  - hub-appearance-panel

@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-08T08:25:32.672590",
+  "generated_at": "2026-07-08T09:12:54.793461",
   "target": "0.9.0.0-engineering",
   "total": 21,
-  "passed": 7,
-  "failed": 14,
+  "passed": 8,
+  "failed": 13,
   "all_pass": false,
   "stages": [
     {
@@ -43,8 +43,8 @@
     },
     {
       "id": "post-d7-software-sources",
-      "status": "PENDING",
-      "pass": false
+      "status": "PASS",
+      "pass": true
     },
     {
       "id": "post-ux-theme-curation",

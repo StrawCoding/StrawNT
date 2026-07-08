@@ -1,0 +1,27 @@
+{
+  "schema": "strawwu-ux-theme-curation-baseline/v1",
+  "stage": "post-ux-theme-curation",
+  "version": "0.6.3.10",
+  "default_mode": "dark",
+  "packages": {
+    "gtk": "strawwu-gtk-theme",
+    "icon": "strawwu-icon-theme"
+  },
+  "theme": "StrawWU-Dark",
+  "icon_theme": "Yaru-prussiangreen-dark",
+  "accent": "#14B8A6",
+  "background": "#0A0E14",
+  "gsettings": {
+    "gtk-theme": "StrawWU-Dark",
+    "icon-theme": "Yaru-prussiangreen-dark",
+    "color-scheme": "prefer-dark",
+    "accent-color": "teal"
+  },
+  "session_gschema": "os-image/debs/strawwu-session/usr/share/glib-2.0/schemas/99_strawwu-session.gschema.override",
+  "branding_gschema": "os-image/config/branding/usr/share/glib-2.0/schemas/99_strawwu-branding.gschema.override",
+  "theme_manifest": "os-image/config/branding/themes/theme-manifest.yaml",
+  "deferred": [
+    "light-theme-variant",
+    "hub-appearance-panel"
+  ]
+}
