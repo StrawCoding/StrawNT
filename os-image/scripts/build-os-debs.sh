@@ -22,6 +22,7 @@ OS_DEB_PACKAGES=(
     strawwu-session
     strawwu-greeter
     strawwu-update-notifier
+    strawwu-software-sources
     strawwu-bug-reporter
     strawwu-drivers
     strawwu-laptop

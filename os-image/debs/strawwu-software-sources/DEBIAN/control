@@ -1,0 +1,15 @@
+Package: strawwu-software-sources
+Version: __VERSION__
+Section: admin
+Priority: optional
+Architecture: all
+Depends: python3,
+         pkexec,
+         polkitd,
+         strawwu-update-notifier
+Recommends: flatpak
+Maintainer: StrawCoding <apt@wastebase.xyz>
+Description: StrawWU software sources manager — APT/Flatpak source UI
+ GUI and CLI for listing and toggling StrawWU official repo,
+ third-party APT sources, and viewing Flathub / Ubuntu security feeds.
+ Integrates with strawwu-update-notifier for update checks.

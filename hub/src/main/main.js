@@ -6,6 +6,7 @@ const appRegistryService = require('./app-registry-service');
 const flathubService = require('./flathub-service');
 const driversService = require('./drivers-service');
 const deviceProxyService = require('./device-proxy-service');
+const softwareSourcesService = require('./software-sources-service');
 const i18n = require('../common/i18n');
 const { IPC_CHANNELS, UPDATE_CHANNELS } = require('../common/constants');
 
@@ -136,6 +137,15 @@ function setupIpcHandlers() {
   );
   ipcMain.handle(IPC_CHANNELS.GET_DEVICE_PROXY_STATUS, async () =>
     deviceProxyService.getDeviceProxyStatus(),
+  );
+  ipcMain.handle(IPC_CHANNELS.GET_SOFTWARE_SOURCES_STATUS, async () =>
+    softwareSourcesService.getSoftwareSourcesStatus(),
+  );
+  ipcMain.handle(IPC_CHANNELS.TOGGLE_SOFTWARE_SOURCE, async (_event, sourceId, enabled) =>
+    softwareSourcesService.toggleSoftwareSource(sourceId, enabled),
+  );
+  ipcMain.handle(IPC_CHANNELS.CHECK_SOFTWARE_UPDATES, async () =>
+    softwareSourcesService.checkForUpdates(),
   );
 }
 

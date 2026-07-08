@@ -40,6 +40,17 @@ const INSTALLED_DEVICE_PROXY_CLI = '/usr/bin/strawwu';
 const DEV_DEVICE_PROXY_CLI = path.join(REPO_ROOT, 'components/target/debug/strawwu');
 const DEV_DEVICE_PROXY_FIXTURE = path.join(HUB_ROOT, 'tests/fixtures/device-proxy-catalog.json');
 
+const INSTALLED_SOFTWARE_SOURCES_CLI = '/usr/bin/strawwu-software-sources';
+const DEV_SOFTWARE_SOURCES_CLI = path.join(
+  REPO_ROOT,
+  'os-image/debs/strawwu-software-sources/usr/bin/strawwu-software-sources',
+);
+const DEV_SOFTWARE_SOURCES_FIXTURE = path.join(
+  HUB_ROOT,
+  'tests/fixtures/software-sources-catalog.json',
+);
+const SOFTWARE_SOURCES_POLKIT_ACTION = 'xyz.wastebase.strawwu.software-sources.toggle';
+
 function firstExisting(...candidates) {
   for (const candidate of candidates) {
     if (candidate && fs.existsSync(candidate)) {
@@ -153,12 +164,34 @@ function resolveDeviceProxyFixture() {
   return firstExisting(DEV_DEVICE_PROXY_FIXTURE, debFixture);
 }
 
+function resolveSoftwareSourcesCli() {
+  if (
+    process.env.STRAWWU_SOFTWARE_SOURCES_CLI
+    && fs.existsSync(process.env.STRAWWU_SOFTWARE_SOURCES_CLI)
+  ) {
+    return process.env.STRAWWU_SOFTWARE_SOURCES_CLI;
+  }
+  return firstExisting(INSTALLED_SOFTWARE_SOURCES_CLI, DEV_SOFTWARE_SOURCES_CLI);
+}
+
+function resolveSoftwareSourcesFixture() {
+  if (process.env.STRAWWU_SOFTWARE_SOURCES_FIXTURE_PATH) {
+    return process.env.STRAWWU_SOFTWARE_SOURCES_FIXTURE_PATH;
+  }
+  const debFixture = path.join(
+    REPO_ROOT,
+    'os-image/debs/strawwu-software-sources/usr/share/strawwu/software-sources/fixture-catalog.json',
+  );
+  return firstExisting(DEV_SOFTWARE_SOURCES_FIXTURE, debFixture);
+}
+
 module.exports = {
   HUB_ROOT,
   REPO_ROOT,
   FLATHUB_API,
   FLATHUB_REMOTE,
   DRIVERS_POLKIT_ACTION,
+  SOFTWARE_SOURCES_POLKIT_ACTION,
   resolveLegalDir,
   resolveLegalDoc,
   resolveCompatMatrix,
@@ -170,6 +203,8 @@ module.exports = {
   resolveDriversFixture,
   resolveDeviceProxyCli,
   resolveDeviceProxyFixture,
+  resolveSoftwareSourcesCli,
+  resolveSoftwareSourcesFixture,
   readVersion,
   readOsPrettyName,
 };

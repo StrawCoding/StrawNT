@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=StrawWU Software Sources
+Name[zh_TW]=StrawWU 軟體源
+Comment=Manage APT and Flatpak software sources
+Comment[zh_TW]=管理 APT 與 Flatpak 軟體源
+Exec=strawwu-hub --tab=software-sources
+Icon=strawwu-hub
+Categories=Settings;System;
+Keywords=software;sources;apt;flatpak;repository;ppa;
+StartupNotify=true
+NoDisplay=false

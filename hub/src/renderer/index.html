@@ -33,6 +33,10 @@
         <span class="nav-icon">⟳</span>
         <span data-i18n="nav.updates">Update Channel</span>
       </button>
+      <button class="nav-btn" data-tab="software-sources">
+        <span class="nav-icon">⎙</span>
+        <span data-i18n="nav.software_sources">Software Sources</span>
+      </button>
       <button class="nav-btn" data-tab="apps">
         <span class="nav-icon">▦</span>
         <span data-i18n="nav.apps">Applications</span>
@@ -131,6 +135,19 @@
           </label>
         </div>
         <div id="channel-status" class="channel-status"></div>
+      </section>
+
+      <!-- Software Sources Panel -->
+      <section id="tab-software-sources" class="tab-panel">
+        <h2 data-i18n="sources.title">Software Sources</h2>
+        <p class="muted-text" data-i18n="sources.description">Manage StrawWU official repo, third-party APT sources, and view Flathub / Ubuntu security feeds.</p>
+        <div class="sources-toolbar">
+          <button id="btn-refresh-sources" class="btn btn-secondary" data-i18n="sources.refresh">Refresh</button>
+          <button id="btn-check-updates" class="btn btn-primary" data-i18n="sources.check_updates">Check for Updates</button>
+        </div>
+        <div id="sources-meta" class="apps-meta muted-text"></div>
+        <div id="sources-list" class="sources-list"></div>
+        <div id="sources-status" class="channel-status"></div>
       </section>
 
       <!-- Apps Panel -->

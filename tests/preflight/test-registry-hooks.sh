@@ -148,13 +148,16 @@ flatpak_fixture="${tmp_dir}/flatpak.list"
 printf '%s\n' 'org.gnome.Calculator	Calculator' > "${flatpak_fixture}"
 export STRAWWU_FLATPAK_LIST_FILE="${flatpak_fixture}"
 
-if "${REGISTRY_BIN}" scan --linux --json | grep -q 'demo-linux-app'; then
+# Cache CLI JSON once — pipefail + grep -q early-close trips SIGPIPE in Rust stdout.
+linux_scan_json="$("${REGISTRY_BIN}" scan --linux --json 2>/dev/null || true)"
+if grep -q 'demo-linux-app' <<<"${linux_scan_json}"; then
     pass "CLI scan --linux discovers desktop app"
 else
     fail "CLI scan --linux missing demo-linux-app"
 fi
 
-if "${REGISTRY_BIN}" scan --flatpak --json | grep -q 'org.gnome.calculator'; then
+flatpak_scan_json="$("${REGISTRY_BIN}" scan --flatpak --json 2>/dev/null || true)"
+if grep -q 'org.gnome.calculator' <<<"${flatpak_scan_json}"; then
     pass "CLI scan --flatpak discovers flatpak app"
 else
     fail "CLI scan --flatpak missing org.gnome.calculator"
@@ -166,17 +169,21 @@ else
     fail "CLI scan --all failed"
 fi
 
-if "${REGISTRY_BIN}" list | grep -q 'demo-linux-app' && "${REGISTRY_BIN}" list | grep -q 'org.gnome.calculator'; then
+registry_list="$("${REGISTRY_BIN}" list 2>/dev/null || true)"
+if grep -q 'demo-linux-app' <<<"${registry_list}" && grep -q 'org.gnome.calculator' <<<"${registry_list}"; then
     pass "registry lists scanned Linux + Flatpak apps"
 else
     fail "registry missing scanned apps"
 fi
 
-if STRAWWU_APP_REGISTRY_CLI="${REGISTRY_BIN}" \
+scan_wrapper_json="$(
+    STRAWWU_APP_REGISTRY_CLI="${REGISTRY_BIN}" \
     STRAWWU_LINUX_DESKTOP_DIRS="${STRAWWU_LINUX_DESKTOP_DIRS}" \
     STRAWWU_FLATPAK_LIST_FILE="${flatpak_fixture}" \
     STRAWWU_APP_REGISTRY="${STRAWWU_APP_REGISTRY}" \
-    python3 "${SCAN_CLI}" --all --json | grep -q 'discovered'; then
+    python3 "${SCAN_CLI}" --all --json 2>/dev/null || true
+)"
+if grep -q 'discovered' <<<"${scan_wrapper_json}"; then
     pass "strawwu-registry-scan wrapper integration"
 else
     fail "strawwu-registry-scan wrapper integration"

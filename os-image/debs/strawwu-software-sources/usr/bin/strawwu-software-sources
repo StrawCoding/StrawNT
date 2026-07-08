@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+"""StrawWU software sources CLI — list, toggle, and check updates."""
+from __future__ import annotations
+
+import argparse
+import importlib.util
+import sys
+from pathlib import Path
+
+_CORE = Path(__file__).resolve().parent.parent / "lib" / "strawwu-software-sources" / "core.py"
+_spec = importlib.util.spec_from_file_location("strawwu_software_sources_core", _CORE)
+_mod = importlib.util.module_from_spec(_spec)
+assert _spec.loader is not None
+_spec.loader.exec_module(_mod)
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="strawwu-software-sources",
+        description="StrawWU software sources manager (APT/Flatpak).",
+    )
+    parser.add_argument("--json", action="store_true", help="Emit JSON output")
+    parser.add_argument("--dry-run", action="store_true", help="Simulate toggle without changes")
+    sub = parser.add_subparsers(dest="command")
+    sub.add_parser("list", help="List configured software sources")
+    sub.add_parser("status", help="Show sources with summary metadata")
+    toggle_p = sub.add_parser("toggle", help="Enable or disable a third-party APT source")
+    toggle_p.add_argument("source_id", help="Source identifier")
+    toggle_group = toggle_p.add_mutually_exclusive_group(required=True)
+    toggle_group.add_argument("--enable", action="store_true", help="Enable the source")
+    toggle_group.add_argument("--disable", action="store_true", help="Disable the source")
+    sub.add_parser("check-updates", help="Check for updates via strawwu-update-notifier")
+    sub.add_parser("version", help="Print package version")
+
+    args = parser.parse_args(argv)
+    if args.command == "version":
+        return _mod.cmd_version()
+
+    enabled = None
+    if args.command == "toggle":
+        enabled = bool(args.enable)
+
+    return _mod.run_cli(
+        args.command,
+        source_id=getattr(args, "source_id", "") or "",
+        enabled=enabled,
+        as_json=args.json,
+        dry_run=args.dry_run,
+    )
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

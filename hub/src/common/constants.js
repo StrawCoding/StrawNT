@@ -32,6 +32,9 @@ module.exports = {
     LIST_DRIVERS: 'drivers:list',
     INSTALL_DRIVER: 'drivers:install',
     GET_DEVICE_PROXY_STATUS: 'device-proxy:get-status',
+    GET_SOFTWARE_SOURCES_STATUS: 'software-sources:get-status',
+    TOGGLE_SOFTWARE_SOURCE: 'software-sources:toggle',
+    CHECK_SOFTWARE_UPDATES: 'software-sources:check-updates',
   },
 
   COLORS: {

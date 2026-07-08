@@ -30,6 +30,9 @@ const $devicesList = document.getElementById('devices-list');
 const $devicesTierSummary = document.getElementById('devices-tier-summary');
 const $devicesMeta = document.getElementById('devices-meta');
 const $devicesHotplugStatus = document.getElementById('devices-hotplug-status');
+const $sourcesList = document.getElementById('sources-list');
+const $sourcesMeta = document.getElementById('sources-meta');
+const $sourcesStatus = document.getElementById('sources-status');
 
 let currentLogs = [];
 let currentTranslations = {};
@@ -748,6 +751,136 @@ async function installDriverPackage(packageName, label, btn) {
 
 document.getElementById('btn-refresh-drivers')?.addEventListener('click', refreshDrivers);
 
+// --- Software Sources ---
+const SOURCE_TYPE_KEYS = {
+  apt: 'sources.type.apt',
+  flatpak: 'sources.type.flatpak',
+};
+
+const SOURCE_CATEGORY_KEYS = {
+  strawwu: 'sources.category.strawwu',
+  security: 'sources.category.security',
+  'third-party': 'sources.category.third-party',
+  flatpak: 'sources.category.flatpak',
+};
+
+function renderSourceCard(source) {
+  const readonly = Boolean(source.readonly);
+  const typeKey = SOURCE_TYPE_KEYS[source.type] || source.type;
+  const categoryKey = SOURCE_CATEGORY_KEYS[source.category] || source.category;
+  const suites = source.suites ? `<span>${escapeHtml(source.suites)}</span>` : '';
+
+  return `
+    <article class="source-card${readonly ? ' readonly' : ''}" data-source-id="${escapeHtml(source.id)}">
+      <div class="source-card-info">
+        <div class="source-card-title">${escapeHtml(source.label || source.id)}</div>
+        <div class="source-card-uri">${escapeHtml(source.uri || '')}</div>
+        <div class="source-card-meta">
+          <span class="source-type-badge">${t(typeKey)}</span>
+          ${categoryKey ? `<span class="source-category-badge">${t(categoryKey)}</span>` : ''}
+          ${readonly ? `<span class="source-readonly-badge">${t('sources.readonly')}</span>` : ''}
+          ${suites}
+        </div>
+      </div>
+      <div class="source-toggle">
+        ${
+          readonly
+            ? `<span class="muted-text">${source.enabled ? t('sources.enabled') : t('sources.disabled')}</span>`
+            : `<label class="toggle-switch">
+                <input type="checkbox" class="source-enable-toggle" data-source-id="${escapeHtml(source.id)}" data-label="${escapeHtml(source.label || source.id)}" ${source.enabled ? 'checked' : ''}>
+                <span>${source.enabled ? t('sources.enabled') : t('sources.disabled')}</span>
+              </label>`
+        }
+      </div>
+    </article>
+  `;
+}
+
+function renderSourcesList(sources) {
+  if (!sources.length) {
+    $sourcesList.innerHTML = `<p class="muted-text">${t('sources.no_sources')}</p>`;
+    return;
+  }
+  $sourcesList.innerHTML = sources.map(renderSourceCard).join('');
+  $sourcesList.querySelectorAll('.source-enable-toggle').forEach((input) => {
+    input.addEventListener('change', () => handleSourceToggle(input));
+  });
+}
+
+async function refreshSoftwareSources() {
+  $sourcesStatus.textContent = '';
+  $sourcesStatus.classList.remove('status-error');
+  try {
+    const data = await strawwuHub.getSoftwareSourcesStatus();
+    const metaParts = [
+      t('sources.source_count', { count: (data.sources || []).length }),
+      t('sources.enabled_count', { count: data.summary?.enabled ?? 0 }),
+    ];
+    if (data.mock) metaParts.push(t('sources.dev_fixture'));
+    if (data.source === 'fixture-fallback') metaParts.push(t('sources.cli_fallback'));
+    $sourcesMeta.textContent = metaParts.join(' · ');
+    renderSourcesList(data.sources || []);
+  } catch (err) {
+    $sourcesList.innerHTML = `<p class="muted-text">${t('sources.load_failed')}</p>`;
+    $sourcesStatus.textContent = err.message || t('sources.load_failed');
+    $sourcesStatus.classList.add('status-error');
+  }
+}
+
+async function handleSourceToggle(input) {
+  const sourceId = input.dataset.sourceId;
+  const label = input.dataset.label || sourceId;
+  const enabled = input.checked;
+  const confirmKey = enabled ? 'sources.toggle_confirm_enable' : 'sources.toggle_confirm_disable';
+  if (!window.confirm(t(confirmKey, { name: label }))) {
+    input.checked = !enabled;
+    return;
+  }
+
+  $sourcesStatus.textContent = '';
+  $sourcesStatus.classList.remove('status-error');
+  try {
+    const result = await strawwuHub.toggleSoftwareSource(sourceId, enabled);
+    if (!result.success) {
+      throw new Error(result.error || t('sources.toggle_failed', { name: label }));
+    }
+    if (result.mock) {
+      $sourcesStatus.textContent = t('sources.toggle_mock', { name: label });
+    } else {
+      $sourcesStatus.textContent = t('sources.toggle_success', { name: label });
+    }
+    await refreshSoftwareSources();
+  } catch (err) {
+    input.checked = !enabled;
+    $sourcesStatus.textContent = err.message || t('sources.toggle_failed', { name: label });
+    $sourcesStatus.classList.add('status-error');
+  }
+}
+
+async function checkSoftwareUpdates() {
+  const btn = document.getElementById('btn-check-updates');
+  if (btn) btn.disabled = true;
+  $sourcesStatus.textContent = '';
+  $sourcesStatus.classList.remove('status-error');
+  try {
+    const result = await strawwuHub.checkSoftwareUpdates();
+    if (!result.success) {
+      throw new Error(result.error || t('sources.updates_check_failed'));
+    }
+    const count = result.upgradable ?? 0;
+    $sourcesStatus.textContent =
+      count > 0 ? t('sources.updates_found', { count }) : t('sources.updates_none');
+  } catch (err) {
+    $sourcesStatus.textContent = err.message || t('sources.updates_check_failed');
+    $sourcesStatus.classList.add('status-error');
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+document.getElementById('btn-refresh-sources')?.addEventListener('click', refreshSoftwareSources);
+document.getElementById('btn-check-updates')?.addEventListener('click', checkSoftwareUpdates);
+
 // --- Devices (device-proxy) ---
 function renderDeviceTierSummary(summary) {
   const tiers = Object.entries(summary || {}).sort(([a], [b]) => a.localeCompare(b));
@@ -851,6 +984,7 @@ initI18n().then(() => {
   refreshApps();
   refreshFlathubStatus().then(refreshFlathubCatalog);
   refreshDrivers();
+  refreshSoftwareSources();
   refreshDevices();
 });
 

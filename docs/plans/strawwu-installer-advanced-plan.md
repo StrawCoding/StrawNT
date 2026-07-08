@@ -4,7 +4,7 @@
 |------|-----|
 | 對照維度 | C7 LUKS、C8 雙系統偵測 |
 | Stage | `post-i2-calamares-luks` |
-| StrawWU 版本 | 0.6.3.7 |
+| StrawWU 版本 | 0.6.3.8 |
 
 ## 目標
 

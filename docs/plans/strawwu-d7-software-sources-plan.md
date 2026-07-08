@@ -30,6 +30,7 @@ make preflight
 
 ## 4. 交付物
 
-- `os-image/debs/strawwu-software-sources/`
-- Hub 導覽入口
-- `docs/plans/stage-reports/POST-D7-software-sources-report.md`
+- `os-image/debs/strawwu-software-sources/` ✅ v0.6.3.9
+- Hub 導覽入口（`tab-software-sources` + `strawwu-software-sources.desktop`）✅
+- `docs/plans/stage-reports/POST-D7-software-sources-report.md` ✅
+- `docs/plans/baselines/software-sources-hub-baseline.json` ✅

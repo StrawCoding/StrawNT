@@ -1,0 +1,24 @@
+schema: strawwu-software-sources/v1
+stage: post-d7-software-sources
+version: 0.6.0.0-target
+cli: strawwu-software-sources
+commands:
+  - list
+  - status
+  - toggle
+  - check-updates
+sources:
+  readonly:
+    - flathub
+    - ubuntu-security
+  strawwu:
+    - strawwu-official
+  third_party:
+    toggle_requires_polkit: true
+update_notifier:
+  cli: strawwu-update-notifier
+  check_command: check
+fixture_env: STRAWWU_SOFTWARE_SOURCES_FIXTURE
+polkit_action: xyz.wastebase.strawwu.software-sources.toggle
+deferred:
+  - fork-suite-toggle

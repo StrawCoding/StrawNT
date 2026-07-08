@@ -1,0 +1,33 @@
+{
+  "schema": "strawwu-software-sources-baseline/v1",
+  "stage": "post-d7-software-sources",
+  "version": "0.6.3.9",
+  "package": "strawwu-software-sources",
+  "hub_panel": "software-sources",
+  "cli": "/usr/bin/strawwu-software-sources",
+  "polkit_action": "xyz.wastebase.strawwu.software-sources.toggle",
+  "update_notifier": "strawwu-update-notifier",
+  "readonly_sources": [
+    "flathub",
+    "ubuntu-security"
+  ],
+  "strawwu_sources": [
+    "strawwu-official"
+  ],
+  "fixture": "os-image/debs/strawwu-software-sources/usr/share/strawwu/software-sources/fixture-catalog.json",
+  "hub_fixture": "hub/tests/fixtures/software-sources-catalog.json",
+  "ipc_channels": [
+    "software-sources:get-status",
+    "software-sources:toggle",
+    "software-sources:check-updates"
+  ],
+  "i18n_keys": [
+    "nav.software_sources",
+    "sources.title",
+    "sources.check_updates",
+    "sources.readonly"
+  ],
+  "deferred": [
+    "fork-suite-toggle"
+  ]
+}

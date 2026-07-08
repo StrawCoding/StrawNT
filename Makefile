@@ -150,6 +150,7 @@ preflight:
 	bash tests/preflight/test-hub-settings.sh
 	bash tests/preflight/test-apps-page.sh
 	bash tests/preflight/test-flathub-hub.sh
+	bash tests/preflight/test-software-sources.sh
 	bash tests/preflight/test-wincompat-registry.sh
 	bash tests/preflight/test-wincompat-gui.sh
 	bash tests/preflight/test-l10n-ime.sh

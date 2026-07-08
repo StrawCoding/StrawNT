@@ -1,0 +1,54 @@
+{
+  "schema": "strawwu-software-sources-fixture/v1",
+  "mock": true,
+  "sources": [
+    {
+      "id": "strawwu-official",
+      "label": "StrawWU Official Repository",
+      "type": "apt",
+      "uri": "https://apt.strawwu.org",
+      "suites": "resolute",
+      "components": "main",
+      "enabled": true,
+      "readonly": false,
+      "category": "strawwu",
+      "file": "/etc/apt/sources.list.d/strawwu.sources"
+    },
+    {
+      "id": "flathub",
+      "label": "Flathub",
+      "type": "flatpak",
+      "uri": "https://flathub.org/repo/flathub.flatpakrepo",
+      "enabled": true,
+      "readonly": true,
+      "category": "flatpak",
+      "remote": "flathub"
+    },
+    {
+      "id": "ubuntu-security",
+      "label": "Ubuntu Security Updates",
+      "type": "apt",
+      "uri": "http://security.ubuntu.com/ubuntu",
+      "suites": "resolute-security",
+      "components": "main restricted universe multiverse",
+      "enabled": true,
+      "readonly": true,
+      "category": "security",
+      "file": "/etc/apt/sources.list.d/ubuntu.sources"
+    },
+    {
+      "id": "third-party-demo",
+      "label": "Example Third-Party Source",
+      "type": "apt",
+      "uri": "https://ppa.example.com/strawwu-demo",
+      "suites": "resolute",
+      "components": "main",
+      "enabled": false,
+      "readonly": false,
+      "category": "third-party",
+      "file": "/etc/apt/sources.list.d/third-party-demo.sources"
+    }
+  ],
+  "upgradable_count": 3,
+  "last_check": "2026-07-08T00:00:00+00:00"
+}

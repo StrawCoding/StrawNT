@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+if [ "$1" = "configure" ]; then
+    if command -v update-polkit >/dev/null 2>&1; then
+        update-polkit --force
+    fi
+fi
+exit 0

@@ -237,6 +237,31 @@ GUIDES = [
 ]
 
 
+def _atomic_write(path: Path, content: str) -> None:
+    """Write via temp file + rename to avoid parallel preflight read races."""
+    import os
+    import tempfile
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(
+        prefix=f".{path.name}.",
+        dir=path.parent,
+        text=True,
+    )
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            fh.write(content)
+            fh.flush()
+            os.fsync(fh.fileno())
+        os.replace(tmp, path)
+    except Exception:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
+
+
 def main() -> int:
     HTML_DIR.mkdir(parents=True, exist_ok=True)
     for md_name, html_name, title in GUIDES:
@@ -245,7 +270,7 @@ def main() -> int:
             print(f"FAIL: missing {md_path}", file=sys.stderr)
             return 1
         out_path = HTML_DIR / html_name
-        out_path.write_text(render_guide(md_path, title), encoding="utf-8")
+        _atomic_write(out_path, render_guide(md_path, title))
         print(f"PASS: rendered {out_path.relative_to(REPO_ROOT)}")
     return 0
 

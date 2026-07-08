@@ -148,7 +148,9 @@ else
     fail "greeter unit tests"
 fi
 
-rm -rf "${OUTPUT_DIR}"
+# Avoid rm -rf on output/ — concurrent preflight runs can race on directory removal.
+mkdir -p "${OUTPUT_DIR}"
+rm -f "${OUTPUT_DIR}/strawwu-greeter_"*.deb 2>/dev/null || true
 if STRAWWU_VERSION="${VERSION}" bash "${BUILD}"; then
     pass "build-deb.sh succeeded"
 else
