@@ -57,6 +57,8 @@ require_file "${REGISTRY_BIN}" "strawwu-app-registry binary"
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf "${tmp_dir}"' EXIT
 
+# Wiring smoke test: empty stub binaries — opt into stub PE synthesis.
+export STRAWWU_SMOKE=1
 export STRAWWU_APP_REGISTRY="${tmp_dir}/app-registry.json"
 export STRAWWU_APP_REGISTRY_LOG="${tmp_dir}/app-registry.log"
 export STRAWWU_DESKTOP_DIR="${tmp_dir}/applications"

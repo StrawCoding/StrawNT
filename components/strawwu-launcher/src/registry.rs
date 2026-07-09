@@ -195,11 +195,16 @@ mod tests {
         let id = register_launch(&binary, BinaryFormat::PE, Some("native"), None).unwrap();
         assert_eq!(id, "demo-app");
 
-        let store = RegistryStore::open_at(registry.clone()).unwrap();
-        let app = store.get("demo-app").expect("registered");
-        assert_eq!(app.name, "demo-app");
-        assert_eq!(app.kind, AppKind::Win32);
-        assert_eq!(app.source, strawwu_app_registry::AppSource::Launcher);
+        // Drop each store handle before reopening: the registry holds an
+        // exclusive advisory lock for its lifetime, so overlapping handles on the
+        // same path in one process would contend.
+        {
+            let store = RegistryStore::open_at(registry.clone()).unwrap();
+            let app = store.get("demo-app").expect("registered");
+            assert_eq!(app.name, "demo-app");
+            assert_eq!(app.kind, AppKind::Win32);
+            assert_eq!(app.source, strawwu_app_registry::AppSource::Launcher);
+        }
 
         let id2 = register_launch(&binary, BinaryFormat::PE, Some("container"), None).unwrap();
         assert_eq!(id2, "demo-app");

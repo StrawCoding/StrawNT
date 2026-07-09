@@ -31,6 +31,8 @@ cp -a "${SCRIPT_DIR}/usr/share/strawwu/device-proxy/"* \
 sed "s/__VERSION__/${VERSION}/" "${SCRIPT_DIR}/DEBIAN/control" > "${PKG_DIR}/DEBIAN/control"
 cp "${SCRIPT_DIR}/DEBIAN/postinst" "${PKG_DIR}/DEBIAN/postinst"
 chmod 755 "${PKG_DIR}/DEBIAN/postinst"
+cp "${SCRIPT_DIR}/DEBIAN/postrm" "${PKG_DIR}/DEBIAN/postrm"
+chmod 755 "${PKG_DIR}/DEBIAN/postrm"
 
 cat > "${PKG_DIR}/usr/share/doc/strawwu-device-proxy/copyright" <<'EOF'
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/

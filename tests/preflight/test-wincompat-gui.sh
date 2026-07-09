@@ -65,6 +65,8 @@ trap 'rm -rf "${tmp_dir}"' EXIT
 export STRAWWU_APP_REGISTRY="${tmp_dir}/app-registry.json"
 export STRAWWU_APP_REGISTRY_LOG="${tmp_dir}/app-registry.log"
 export STRAWWU_DESKTOP_DIR="${tmp_dir}/applications"
+# Wiring smoke test: no real Windows binary — opt into stub PE synthesis.
+export STRAWWU_SMOKE=1
 export STRAWWU_WINCOMPAT_LOG="${tmp_dir}/wincompat.log"
 notepad_exe="${tmp_dir}/notepad.exe"
 

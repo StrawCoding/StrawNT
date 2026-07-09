@@ -188,6 +188,19 @@ pub fn execute_deep_remove_plan(
     Ok((deleted, flatpak))
 }
 
+/// Validate a Flatpak application ID before passing it to `flatpak uninstall`.
+/// Even though args are not shell-interpreted, an id beginning with `-` could be
+/// mistaken for an option (argument injection); we also require the reverse-DNS
+/// shape flatpak itself uses.
+fn is_valid_flatpak_app_id(app_id: &str) -> bool {
+    if app_id.is_empty() || app_id.starts_with('-') || !app_id.contains('.') {
+        return false;
+    }
+    app_id
+        .split('.')
+        .all(|seg| !seg.is_empty() && seg.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '_' | '-')))
+}
+
 fn run_flatpak_uninstall(app_id: &str, dry_run: bool) -> Result<FlatpakUninstallResult, DeepRemoveError> {
     if dry_run {
         return Ok(FlatpakUninstallResult {
@@ -205,8 +218,15 @@ fn run_flatpak_uninstall(app_id: &str, dry_run: bool) -> Result<FlatpakUninstall
         });
     }
 
+    if !is_valid_flatpak_app_id(app_id) {
+        return Err(DeepRemoveError::Flatpak(format!(
+            "refusing to uninstall invalid flatpak app id: {app_id:?}"
+        )));
+    }
+
+    // `--` terminates option parsing so an id can never be treated as a flag.
     let output = Command::new("flatpak")
-        .args(["uninstall", "-y", "--system", app_id])
+        .args(["uninstall", "-y", "--system", "--", app_id])
         .output()
         .map_err(|e| DeepRemoveError::Flatpak(e.to_string()))?;
 

@@ -120,9 +120,15 @@ async function listDrivers() {
   }
 }
 
+// Debian package names: lowercase alnum plus + . - (must start alnum). Reject
+// anything else (and leading '-') so a crafted name cannot become a CLI flag.
+function isValidPackageName(name) {
+  return typeof name === 'string' && /^[a-z0-9][a-z0-9+.-]*$/.test(name);
+}
+
 async function installDriver(packageName) {
-  if (!packageName) {
-    throw new Error('package name required');
+  if (!isValidPackageName(packageName)) {
+    throw new Error('invalid package name');
   }
 
   if (useFixtureMode()) {
@@ -134,14 +140,24 @@ async function installDriver(packageName) {
     };
   }
 
-  const data = await runCli(['--json', 'install', packageName], INSTALL_TIMEOUT_MS);
-  return {
-    package: packageName,
-    success: Boolean(data.success),
-    mock: Boolean(data.mock),
-    message: data.message || data.stderr || '',
-    stdout: data.stdout || '',
-  };
+  try {
+    // `--` terminates option parsing so packageName can never be read as a flag.
+    const data = await runCli(['--json', 'install', '--', packageName], INSTALL_TIMEOUT_MS);
+    return {
+      package: packageName,
+      success: Boolean(data.success),
+      mock: Boolean(data.mock),
+      message: data.message || data.stderr || '',
+      stdout: data.stdout || '',
+    };
+  } catch (err) {
+    return {
+      package: packageName,
+      success: false,
+      mock: false,
+      message: (err && err.message) || 'driver install failed',
+    };
+  }
 }
 
 module.exports = {

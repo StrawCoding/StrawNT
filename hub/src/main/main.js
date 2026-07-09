@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, nativeTheme } = require('electron');
+const { app, BrowserWindow, ipcMain, nativeTheme, shell } = require('electron');
 const path = require('path');
 const RuntimeClient = require('./runtime-client');
 const settingsService = require('./settings-service');
@@ -31,11 +31,28 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false,
+      // Sandbox the renderer: the preload only requires 'electron', so it works
+      // under the sandbox and gains OS-level process isolation.
+      sandbox: true,
     },
   });
 
   mainWindow.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'));
+
+  // Navigation guards: this is a single local-file UI. Block any in-page
+  // navigation away from the bundled renderer and route new-window requests to
+  // the external browser instead of spawning uncontrolled Electron windows.
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    if (url !== mainWindow.webContents.getURL()) {
+      event.preventDefault();
+    }
+  });
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (/^https?:\/\//i.test(url)) {
+      shell.openExternal(url);
+    }
+    return { action: 'deny' };
+  });
 
   mainWindow.on('closed', () => {
     mainWindow = null;
@@ -63,6 +80,19 @@ function setupRuntimeClient() {
   } catch {
     // runtime not running, mock mode
   }
+}
+
+// Validate a renderer-supplied string argument at the IPC boundary before it
+// reaches services that shell out or touch the filesystem. Rejects non-strings,
+// empty values, and absurdly long input.
+function asString(value, name, { maxLen = 512 } = {}) {
+  if (typeof value !== 'string' || value.length === 0) {
+    throw new Error(`invalid ${name}: expected non-empty string`);
+  }
+  if (value.length > maxLen) {
+    throw new Error(`invalid ${name}: too long`);
+  }
+  return value;
 }
 
 function setupIpcHandlers() {
@@ -106,6 +136,7 @@ function setupIpcHandlers() {
   });
 
   ipcMain.handle(IPC_CHANNELS.SET_LOCALE, async (_event, locale) => {
+    asString(locale, 'locale', { maxLen: 32 });
     i18n.setLocale(locale);
     const translations = i18n.loadTranslationsForRenderer(locale);
     return { locale, translations };
@@ -114,27 +145,31 @@ function setupIpcHandlers() {
   ipcMain.handle(IPC_CHANNELS.GET_ABOUT, async () => settingsService.getAboutInfo());
   ipcMain.handle(IPC_CHANNELS.GET_WINCOMPAT, async () => settingsService.getWinCompatInfo());
   ipcMain.handle(IPC_CHANNELS.GET_SYSTEM_SHORTCUTS, async () => settingsService.getSystemShortcuts());
-  ipcMain.handle(IPC_CHANNELS.OPEN_LEGAL, async (_event, docId) => settingsService.openLegalDoc(docId));
+  ipcMain.handle(IPC_CHANNELS.OPEN_LEGAL, async (_event, docId) =>
+    settingsService.openLegalDoc(asString(docId, 'docId', { maxLen: 128 })),
+  );
   ipcMain.handle(IPC_CHANNELS.LAUNCH_BUG_REPORT, async () => settingsService.launchBugReporter(true));
   ipcMain.handle(IPC_CHANNELS.OPEN_DESKTOP_SHORTCUT, async (_event, desktopFile) =>
-    settingsService.openDesktopShortcut(desktopFile),
+    settingsService.openDesktopShortcut(asString(desktopFile, 'desktopFile')),
   );
   ipcMain.handle(IPC_CHANNELS.GET_APPS, async () => appRegistryService.listApps());
   ipcMain.handle(IPC_CHANNELS.PREVIEW_REMOVE_APP, async (_event, id) =>
-    appRegistryService.previewRemoveApp(id),
+    appRegistryService.previewRemoveApp(asString(id, 'appId', { maxLen: 256 })),
   );
-  ipcMain.handle(IPC_CHANNELS.REMOVE_APP, async (_event, id) => appRegistryService.removeApp(id));
+  ipcMain.handle(IPC_CHANNELS.REMOVE_APP, async (_event, id) =>
+    appRegistryService.removeApp(asString(id, 'appId', { maxLen: 256 })),
+  );
   ipcMain.handle(IPC_CHANNELS.SEARCH_FLATHUB, async (_event, query) =>
-    flathubService.searchCatalog(query),
+    flathubService.searchCatalog(asString(query, 'query', { maxLen: 256 })),
   );
   ipcMain.handle(IPC_CHANNELS.GET_FLATHUB_STATUS, async () => flathubService.getFlathubStatus());
   ipcMain.handle(IPC_CHANNELS.INSTALL_FLATHUB, async (_event, appId) =>
-    flathubService.installApp(appId),
+    flathubService.installApp(asString(appId, 'appId', { maxLen: 256 })),
   );
   ipcMain.handle(IPC_CHANNELS.GET_DRIVERS_STATUS, async () => driversService.getDriverStatus());
   ipcMain.handle(IPC_CHANNELS.LIST_DRIVERS, async () => driversService.listDrivers());
   ipcMain.handle(IPC_CHANNELS.INSTALL_DRIVER, async (_event, packageName) =>
-    driversService.installDriver(packageName),
+    driversService.installDriver(asString(packageName, 'packageName', { maxLen: 256 })),
   );
   ipcMain.handle(IPC_CHANNELS.GET_DEVICE_PROXY_STATUS, async () =>
     deviceProxyService.getDeviceProxyStatus(),
@@ -142,19 +177,23 @@ function setupIpcHandlers() {
   ipcMain.handle(IPC_CHANNELS.GET_SOFTWARE_SOURCES_STATUS, async () =>
     softwareSourcesService.getSoftwareSourcesStatus(),
   );
-  ipcMain.handle(IPC_CHANNELS.TOGGLE_SOFTWARE_SOURCE, async (_event, sourceId, enabled) =>
-    softwareSourcesService.toggleSoftwareSource(sourceId, enabled),
-  );
+  ipcMain.handle(IPC_CHANNELS.TOGGLE_SOFTWARE_SOURCE, async (_event, sourceId, enabled) => {
+    asString(sourceId, 'sourceId', { maxLen: 128 });
+    if (typeof enabled !== 'boolean') {
+      throw new Error('invalid enabled: expected boolean');
+    }
+    return softwareSourcesService.toggleSoftwareSource(sourceId, enabled);
+  });
   ipcMain.handle(IPC_CHANNELS.CHECK_SOFTWARE_UPDATES, async () =>
     softwareSourcesService.checkForUpdates(),
   );
   ipcMain.handle(IPC_CHANNELS.GET_BACKUP_STATUS, async () => backupService.getBackupStatus());
   ipcMain.handle(IPC_CHANNELS.LIST_BACKUP_SNAPSHOTS, async () => backupService.listSnapshots());
   ipcMain.handle(IPC_CHANNELS.CREATE_BACKUP_SNAPSHOT, async (_event, label) =>
-    backupService.createSnapshot(label),
+    backupService.createSnapshot(asString(label, 'label', { maxLen: 128 })),
   );
   ipcMain.handle(IPC_CHANNELS.PREVIEW_BACKUP_RESTORE, async (_event, name) =>
-    backupService.previewRestore(name),
+    backupService.previewRestore(asString(name, 'name', { maxLen: 256 })),
   );
 }
 

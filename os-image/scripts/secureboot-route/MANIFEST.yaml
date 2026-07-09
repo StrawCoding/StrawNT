@@ -2,10 +2,10 @@ schema: strawwu-secureboot-route/v1
 stage: post-sec-secureboot-route
 enforced_default: false
 boot_chain:
-  - firmware_db
+  - uefi_firmware
   - shim.efi
   - grubx64.efi
-  - vmlinuz
+  - vmlinuz(mok-signed)
   - initrd.img
 scripts:
   sign: sign-boot-artifacts.sh
@@ -16,13 +16,10 @@ signing:
   tools:
     - sbsign
     - sbverify
-    - pesign
+  # Single MOK track: shim/grub stay Canonical-signed, only the kernel is
+  # MOK-signed; initrd is hash-recorded (measured via the signed kernel).
   artifacts:
-    - shim.efi
-    - grubx64.efi
     - vmlinuz
-    - initrd.img
 keys:
-  uefi_db: StrawWU-SB-DB
   mok: StrawWU-MOK
 doc: docs/plans/kickoff/POST-SEC-secureboot-route.md

@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
-# sign-boot-artifacts.sh — StrawWU Secure Boot signing skeleton (dry-run by default).
+# sign-boot-artifacts.sh — StrawWU Secure Boot signing (MOK single track, dry-run default).
+#
+# StrawWU uses ONE Secure Boot track: shim + grub stay Canonical/Microsoft-signed
+# and only the custom StrawWU kernel is signed with the StrawWU MOK. There is no
+# self-owned UEFI DB key (that would require firmware-level enrollment end users
+# cannot do). This script therefore MOK-signs the kernel and records the initrd
+# hash; shim/grub are left untouched.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 BOOT_DIR="${STRAWWU_SB_BOOT_DIR:-/boot}"
-KEY_DIR="${STRAWWU_SB_KEY_DIR:-${REPO_ROOT}/os-image/keys/secureboot}"
+KEY_DIR="${STRAWWU_SB_KEY_DIR:-${STRAWWU_MOK_DIR:-${REPO_ROOT}/os-image/keys/secureboot}}"
 DRY_RUN=1
 SIGN=0
 
@@ -13,9 +19,10 @@ usage() {
     cat <<'EOF'
 Usage: sign-boot-artifacts.sh [--dry-run|--sign] [--boot-dir DIR] [--key-dir DIR]
 
-Signs (or dry-runs) shim, grub, kernel, and initrd for the StrawWU SB route.
-Default: dry-run. Set STRAWWU_SB_SIGN=1 or pass --sign to attempt real signing
-when keys and sbsign/pesign are available.
+MOK-signs the StrawWU kernel and records the initrd hash for the StrawWU Secure
+Boot route (shim/grub remain Canonical-signed — single MOK track). Default:
+dry-run. Set STRAWWU_SB_SIGN=1 or pass --sign to attempt real signing when the
+StrawWU MOK and sbsign are available.
 EOF
 }
 
@@ -74,36 +81,40 @@ if [[ "${STRAWWU_SB_SIGN:-0}" == "1" ]]; then
     SIGN=1
 fi
 
-log "StrawWU secureboot sign skeleton boot_dir=${BOOT_DIR} dry-run=${DRY_RUN}"
+log "StrawWU secureboot MOK sign boot_dir=${BOOT_DIR} dry-run=${DRY_RUN}"
 
-ARTIFACTS=(
-    "${BOOT_DIR}/EFI/BOOT/shim.efi"
-    "${BOOT_DIR}/EFI/BOOT/grubx64.efi"
+# MOK single track: only the kernel is MOK-signed; shim/grub keep their upstream
+# (Canonical/Microsoft) signatures. The initrd is not PE-signed (grub measures it
+# via the signed kernel) — we only record its hash.
+KERNELS=(
     "${BOOT_DIR}/vmlinuz"
+)
+INITRDS=(
     "${BOOT_DIR}/initrd.img"
 )
 
-DB_KEY="${KEY_DIR}/StrawWU-SB-DB.key"
-DB_CERT="${KEY_DIR}/StrawWU-SB-DB.crt"
+MOK_KEY="${KEY_DIR}/StrawWU-MOK.key"
+MOK_CERT="${KEY_DIR}/StrawWU-MOK.crt"
 
-if [[ "${SIGN}" -eq 1 && ! -f "${DB_KEY}" ]]; then
-    warn "signing requested but key missing: ${DB_KEY} — falling back to dry-run"
+if [[ "${SIGN}" -eq 1 && ! -f "${MOK_KEY}" ]]; then
+    warn "signing requested but MOK key missing: ${MOK_KEY} — falling back to dry-run"
     DRY_RUN=1
 fi
 
-for path in "${ARTIFACTS[@]}"; do
+for path in "${KERNELS[@]}"; do
     if [[ ! -f "${path}" ]]; then
-        warn "artifact missing (ok for skeleton): ${path}"
+        warn "kernel missing (ok for skeleton/CI): ${path}"
         continue
     fi
-    case "${path}" in
-        *.efi)
-            sign_pe "${path}" "${DB_KEY}" "${DB_CERT}" || true
-            ;;
-        *)
-            sign_file_hash "${path}"
-            ;;
-    esac
+    sign_pe "${path}" "${MOK_KEY}" "${MOK_CERT}" || true
+done
+
+for path in "${INITRDS[@]}"; do
+    if [[ ! -f "${path}" ]]; then
+        warn "initrd missing (ok for skeleton/CI): ${path}"
+        continue
+    fi
+    sign_file_hash "${path}"
 done
 
 log "done (enforced=${STRAWWU_SECURE_BOOT_ENFORCE:-0})"

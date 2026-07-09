@@ -1,0 +1,9 @@
+#!/bin/sh
+# prerm — reverse the tlp/fprintd service enablement done in postinst so removing
+# strawwu-laptop leaves no orphaned enabled services from another package.
+set -e
+if [ "$1" = "remove" ] || [ "$1" = "deconfigure" ]; then
+    systemctl disable tlp.service 2>/dev/null || true
+    systemctl disable fprintd.service 2>/dev/null || true
+fi
+exit 0

@@ -47,6 +47,20 @@ def use_fixture_mode() -> bool:
     return os.environ.get("STRAWWU_SECUREBOOT_FIXTURE") == "1"
 
 
+def mok_cert_path() -> Path | None:
+    """Locate the StrawWU MOK PEM cert used to verify the signed kernel."""
+    override = os.environ.get("STRAWWU_MOK_CERT")
+    if override:
+        return Path(override)
+    for candidate in (
+        Path("/usr/share/strawwu/secureboot/StrawWU-MOK.crt"),
+        _PKG_USR / "share" / "strawwu" / "secureboot" / "StrawWU-MOK.crt",
+    ):
+        if candidate.is_file():
+            return candidate
+    return None
+
+
 def read_fixture() -> dict[str, Any]:
     path = fixture_path()
     if not path.is_file():
@@ -122,11 +136,13 @@ def route_info() -> dict[str, Any]:
             "doc": "docs/plans/kickoff/POST-SEC-secureboot-route.md",
         }
 
+    # MOK single track: firmware trusts shim (MS UEFI CA), shim+grub stay
+    # Canonical-signed, only the kernel carries the StrawWU MOK signature.
     boot_chain = [
-        "firmware_db",
+        "uefi_firmware",
         "shim.efi",
         "grubx64.efi",
-        "vmlinuz",
+        "vmlinuz(mok-signed)",
         "initrd.img",
     ]
     boot_dir = Path(os.environ.get("STRAWWU_SB_BOOT_DIR", "/boot"))
@@ -134,8 +150,13 @@ def route_info() -> dict[str, Any]:
     signed_initrd = False
     vmlinuz = boot_dir / "vmlinuz"
     initrd = boot_dir / "initrd.img"
+    mok_cert = mok_cert_path()
     if vmlinuz.is_file() and shutil.which("sbverify"):
-        proc = run_cmd(["sbverify", str(vmlinuz)])
+        # Verify specifically against the StrawWU MOK, not merely "any signature".
+        if mok_cert and mok_cert.is_file():
+            proc = run_cmd(["sbverify", "--cert", str(mok_cert), str(vmlinuz)])
+        else:
+            proc = run_cmd(["sbverify", str(vmlinuz)])
         signed_kernel = proc.returncode == 0
     if initrd.is_file():
         signed_initrd = (boot_dir / ".strawwu-sb-hashes.txt").is_file()
@@ -146,7 +167,8 @@ def route_info() -> dict[str, Any]:
         "boot_chain": boot_chain,
         "signed_kernel": signed_kernel,
         "signed_initrd": signed_initrd,
-        "shim_source": "strawwu-skeleton",
+        "shim_source": "canonical-shim",
+        "mok_track": True,
         "dry_run_signing": os.environ.get("STRAWWU_SB_SIGN", "0") != "1",
         "doc": "docs/plans/kickoff/POST-SEC-secureboot-route.md",
     }
@@ -182,6 +204,22 @@ def run_preflight() -> dict[str, Any]:
     }
 
 
+def read_manifest_version() -> str:
+    """Read the build-stamped version from the secureboot manifest."""
+    env = os.environ.get("STRAWWU_VERSION")
+    if env:
+        return env
+    for path in (MANIFEST_PATH, _PKG_USR / "share" / "strawwu" / "secureboot" / "secureboot-manifest.yaml"):
+        try:
+            for line in path.read_text(encoding="utf-8").splitlines():
+                stripped = line.strip()
+                if stripped.startswith("version:"):
+                    return stripped.split(":", 1)[1].strip()
+        except OSError:
+            continue
+    return "unknown"
+
+
 def cmd_version() -> int:
-    print("strawwu-secureboot 0.7.0.0-target (skeleton)")
+    print(f"strawwu-secureboot {read_manifest_version()}")
     return 0

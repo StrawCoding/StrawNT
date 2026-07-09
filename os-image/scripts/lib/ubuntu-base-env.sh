@@ -20,11 +20,13 @@ iso = a.get("iso_name") or f"ubuntu-{v}-desktop-amd64.iso"
 mirror = a.get("mirror") or f"https://releases.ubuntu.com/{v}"
 codename = a.get("codename", "noble")
 bm = t.get("base_mode", "clone")
+sha = a.get("iso_sha256", "")
 print(f"export _UBUNTU_BASE_VERSION='{v}'")
 print(f"export _UBUNTU_BASE_ISO='{iso}'")
 print(f"export _UBUNTU_BASE_MIRROR='{mirror}'")
 print(f"export _UBUNTU_BASE_CODENAME='{codename}'")
 print(f"export _STRAWWU_BASE_MODE='{bm}'")
+print(f"export _UBUNTU_BASE_ISO_SHA256='{sha}'")
 PY
 )"
         default_version="${_UBUNTU_BASE_VERSION}"
@@ -40,4 +42,6 @@ PY
     export STRAWWU_UBUNTU_MIRROR="${STRAWWU_UBUNTU_MIRROR:-${default_mirror}}"
     export STRAWWU_UBUNTU_ISO_NAME="${STRAWWU_UBUNTU_ISO_NAME:-${_UBUNTU_BASE_ISO_NAME:-ubuntu-${STRAWWU_UBUNTU_VERSION}-desktop-amd64.iso}}"
     export STRAWWU_BASE_MODE="${STRAWWU_BASE_MODE:-${_STRAWWU_BASE_MODE:-clone}}"
+    # Optional expected ISO checksum (empty when the target slot omits it).
+    export STRAWWU_UBUNTU_ISO_SHA256="${STRAWWU_UBUNTU_ISO_SHA256:-${_UBUNTU_BASE_ISO_SHA256:-}}"
 }

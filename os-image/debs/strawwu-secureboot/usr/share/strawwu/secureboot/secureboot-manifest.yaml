@@ -9,10 +9,10 @@ commands:
 enforced_default: false
 enforce_env: STRAWWU_SECURE_BOOT_ENFORCE
 boot_chain:
-  - firmware_db
+  - uefi_firmware
   - shim.efi
   - grubx64.efi
-  - vmlinuz
+  - vmlinuz(mok-signed)
   - initrd.img
 scripts:
   sign: os-image/scripts/secureboot-route/sign-boot-artifacts.sh
@@ -25,8 +25,9 @@ signing:
     - sbsign
     - sbverify
     - pesign
+# Single MOK track: shim/grub keep upstream (Canonical/MS) signatures; only the
+# custom kernel is signed with the StrawWU MOK. No self-owned UEFI DB key.
 keys:
-  uefi_db: StrawWU-SB-DB
   mok: StrawWU-MOK
 drivers_integration:
   package: strawwu-drivers

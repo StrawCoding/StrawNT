@@ -37,11 +37,54 @@ need_cmd() {
     for c in "$@"; do command -v "$c" >/dev/null 2>&1 || die "missing command: $c"; done
 }
 
+# Resolve the expected ISO SHA256: explicit env/target value first, else the
+# ISO's line in the mirror's SHA256SUMS (best-effort). Empty when unavailable.
+resolve_expected_sha256() {
+    local expected="${STRAWWU_UBUNTU_ISO_SHA256:-}"
+    if [[ -n "${expected}" ]]; then
+        echo "${expected}"
+        return 0
+    fi
+    local sums="" fetch=""
+    if command -v curl >/dev/null 2>&1; then
+        fetch="curl -fsL"
+    elif command -v wget >/dev/null 2>&1; then
+        fetch="wget -qO-"
+    else
+        return 0
+    fi
+    sums="$(${fetch} "${UBUNTU_MIRROR}/SHA256SUMS" 2>/dev/null || true)"
+    [[ -n "${sums}" ]] || return 0
+    # Lines look like: <sha256>  *ubuntu-...-desktop-amd64.iso
+    awk -v iso="${UBUNTU_ISO_NAME}" '$2 ~ ("[*]?" iso "$") {print $1; exit}' <<<"${sums}"
+}
+
+verify_iso_checksum() {
+    local iso="$1"
+    command -v sha256sum >/dev/null 2>&1 || { log "sha256sum missing — cannot verify ISO"; return 0; }
+    local expected
+    expected="$(resolve_expected_sha256)"
+    if [[ -z "${expected}" ]]; then
+        if [[ "${STRAWWU_REQUIRE_ISO_CHECKSUM:-0}" == "1" ]]; then
+            die "no expected SHA256 for ${UBUNTU_ISO_NAME} (set STRAWWU_UBUNTU_ISO_SHA256 or add iso_sha256 to ubuntu-base-target.json)"
+        fi
+        log "WARN: no expected SHA256 for ${UBUNTU_ISO_NAME} — skipping integrity check (set STRAWWU_REQUIRE_ISO_CHECKSUM=1 to enforce)"
+        return 0
+    fi
+    local actual
+    actual="$(sha256sum "${iso}" | awk '{print $1}')"
+    if [[ "${actual}" != "${expected}" ]]; then
+        die "ISO checksum mismatch for ${iso}: expected ${expected}, got ${actual}"
+    fi
+    log "ISO SHA256 verified: ${actual}"
+}
+
 download_iso() {
     mkdir -p "${ISO_CACHE}"
     local iso="${ISO_CACHE}/${UBUNTU_ISO_NAME}"
     if [[ -f "${iso}" ]]; then
         log "using cached ISO: ${iso}"
+        verify_iso_checksum "${iso}"
         echo "${iso}"
         return
     fi
@@ -55,6 +98,7 @@ download_iso() {
     else
         die "need wget or curl"
     fi
+    verify_iso_checksum "${iso}"
     echo "${iso}"
 }
 
@@ -192,7 +236,7 @@ install_calamares() {
         export DEBIAN_FRONTEND=noninteractive
         apt-get update -qq
         apt-get install -y --no-install-recommends calamares
-        if dpkg-query -W -f='\${Status}' calamares-settings-ubuntu-common 2>/dev/null | grep -q "ok installed"; then
+        if dpkg-query -W -f=\${Status} calamares-settings-ubuntu-common 2>/dev/null | grep -q "ok installed"; then
             apt-get remove -y --purge calamares-settings-ubuntu-common || true
         fi
         dpkg -i /tmp/strawwu-calamares-settings.deb

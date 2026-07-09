@@ -24,6 +24,10 @@ warn() {
     echo "WARN: $*"
 }
 
+skip() {
+    echo "SKIP: $*"
+}
+
 require_file() {
     local path="$1"
     local label="${2:-$1}"
@@ -49,13 +53,18 @@ has_rootfs() {
 
 # Runtime-artifact guard for preflight scripts that inspect the built rootfs or
 # squashfs. When neither is present (e.g. the GitHub CI runner, which never
-# clones the heavy Ubuntu base), run only the static checks already executed and
-# skip the runtime checks with a clean PASS so CI stays green — build hosts still
-# enforce the full gate because the rootfs/squashfs exists there.
+# clones the heavy Ubuntu base), the runtime checks cannot run. Report an honest
+# SKIPPED status (not PASS) so a green CI is never mistaken for the runtime gate
+# having actually executed — build hosts still enforce the full gate because the
+# rootfs/squashfs exists there. Exit 0 keeps CI green for the static portion.
 skip_without_filesystem() {
     local label="${1:-preflight}"
     if ! has_rootfs && ! has_squashfs; then
-        warn "no rootfs/squashfs present (static/CI env) — skipping runtime checks"
+        skip "no rootfs/squashfs present (static/CI env) — runtime checks NOT executed"
+        if [[ "${PREFLIGHT_FAIL}" -eq 0 ]]; then
+            echo "=== ${label} done: SKIPPED (runtime checks skipped; static checks passed) ==="
+            exit 0
+        fi
         preflight_exit "${label}"
     fi
 }

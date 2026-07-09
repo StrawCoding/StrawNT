@@ -1077,9 +1077,15 @@ strawwuHub.onLogEntry((data) => {
 
 // --- Utilities ---
 function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
+  // Escape quotes too: values are interpolated into attribute contexts
+  // (data-*, src=...) where textContent→innerHTML alone leaves " and '
+  // unescaped, allowing attribute-breakout injection.
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 // --- Init ---

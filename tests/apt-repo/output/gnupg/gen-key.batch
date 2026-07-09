@@ -1,7 +1,0 @@
-Key-Type: RSA
-Key-Length: 2048
-Name-Real: StrawWU Test Archive
-Name-Email: apt@test.strawwu.local
-Expire-Date: 0
-%no-protection
-%commit

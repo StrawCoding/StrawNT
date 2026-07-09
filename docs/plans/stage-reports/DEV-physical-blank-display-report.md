@@ -110,3 +110,35 @@ QEMU boot-test never enabled Secure Boot so it was missed.
 Verified: BIOS PASS (226s), SecureBoot PASS (239s, fallback -> desktop)
 Issue: v0.7.0.14 physical Live USB "no system" (Secure Boot)
 ```
+
+## 自製部分全面審查修正 (aall, v0.7.0.21)
+
+依使用者「完整詳細審查自製 part」+「aall」，對自製程式碼做全面治本修正（非表面）。全部經 `make test-phase0` + `make preflight` 通過（0 FAIL）。
+
+### Rust 元件（治本安全性/正確性）
+- launcher：缺檔/非法二進位不再偽造成功；PE stub 合成改由 `STRAWWU_SMOKE=1` 顯式開啟；成功訊息標 `mode=simulated`。
+- strawwu-nt：`loader.rs`/`pe.rs` RVA/size 計算改 u64，杜絕 u32 溢位回繞。
+- app-registry：原子寫入（temp+rename）+ 跨程序 `flock` 諮詢鎖（有界重試逾時）；log 改 `serde_json` 防注入。
+- launcher desktop entry：app-id 白名單驗證（防路徑穿越）+ 值跳脫（防換行注入）。
+- flatpak/apt 移除：app-id/套件名驗證 + `--` 終止選項（防引數注入）。
+
+### OS image 建置管線
+- `clone-ubuntu-base.sh`：修 `dpkg-query` 引號 bug；新增 base ISO SHA256 校驗（來源 target JSON/env/上游 SHA256SUMS）。
+- Secure Boot 統一為 **MOK 單軌**（shim/grub 維持 Canonical 簽章，僅核心 MOK 簽）；`patch_boot_serial_console` 修正避免誤改 `vmlinuz-generic`；fallback grub patch 僅在確有 staged fallback 時套用。
+- branding sed 由全域替換收斂為僅改 menuentry/submenu 標題與已知字串（避免破壞 `search --label` 開機媒體偵測與 gnome-shell）。
+- 為會改系統/他人檔的 deb 補 `prerm`/`postrm`（laptop/device-proxy/icon-theme）。
+
+### Kernel pin（單一真相來源）
+- ABI 單一來源＝`docs/plans/ubuntu-base-target.json` `active.kernel_abi`；移除 Makefile/腳本硬編字面 fallback。
+- `apt-get source` 移除未 pin fallback → 版本不符即硬失敗；抓取後驗證樹版本符合 ABI。
+- 產出 `.kernel-signing` 誠實記錄簽核姿態（module sig 關閉、vmlinuz 交由 ISO 階段 MOK 簽）；`swap-kernel.sh` 記錄實際 MOK 簽核結果。
+
+### Electron Hub
+- `sandbox:true` + 導航守衛（will-navigate/setWindowOpenHandler）+ IPC 引數驗證 + `escapeHtml` 補跳脫引號（防屬性逸出 XSS）。
+
+### 測試誠實 / Git 衛生
+- 無 rootfs 環境的 preflight 由假 PASS 改回報 **SKIPPED**；CI 補齊 `lrelease` 等相依；Rust CLI 修 SIGPIPE panic。
+- 止血 repo 膨脹：取消追蹤 389 個 `os-image/debs/*/output/*.deb` 與 `tests/apt-repo|ci/output/`（含測試用 GPG 私鑰）並加入 `.gitignore`；歷史瘦身（filter-repo + force-push main）屬破壞性，待使用者明示授權再執行。
+
+### README 漂移同步
+- 版本 0.4.0.0→0.7.0.21、kernel 6.8.12→7.0.0-strawwu(6.14+)、codename noble→resolute(26.04)、Rust crate 8→11（補 app-registry/cli/hub）。

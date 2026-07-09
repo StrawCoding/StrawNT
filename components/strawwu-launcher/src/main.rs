@@ -129,7 +129,7 @@ fn main() {
             if let Some(ref smoke) = gui {
                 let _ = log::append_event("gui_smoke", smoke);
                 println!(
-                    "strawwu: launched {} (format={}, pid={}, backend={}, app_id={}, gui-smoke=PASS hwnd={} compositor={} visible={})",
+                    "strawwu: launched {} (format={}, pid={}, backend={}, app_id={}, mode=simulated, gui-smoke=PASS hwnd={} compositor={} visible={})",
                     req.binary_path.display(),
                     req.format,
                     exec.pid,
@@ -141,7 +141,7 @@ fn main() {
                 );
             } else {
                 println!(
-                    "strawwu: launched {} (format={}, pid={}, backend={}, app_id={}, gui-smoke=SKIP subsystem=non-gui)",
+                    "strawwu: launched {} (format={}, pid={}, backend={}, app_id={}, mode=simulated, gui-smoke=SKIP subsystem=non-gui)",
                     req.binary_path.display(),
                     req.format,
                     exec.pid,

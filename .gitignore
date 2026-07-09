@@ -20,6 +20,18 @@ kernel/build/
 kernel/build.log
 kernel/output/*.deb
 **/__pycache__/
+**/*.pyc
+
+# deb build outputs are rebuilt from source (build-deb.sh) — never commit them.
+# They previously bloated the repo with hundreds of per-version binaries.
+os-image/debs/*/output/
+os-image/output/apt-repo/
+os-image/output/apt-fork-repo/
+
+# preflight test outputs are regenerated every run (they even contain throwaway
+# GPG keypairs) — must never be committed.
+tests/apt-repo/output/
+tests/ci/output/
 
 # upstream technical references (~370MB; refresh via docs/technical-references/scripts/)
 docs/technical-references/upstream/

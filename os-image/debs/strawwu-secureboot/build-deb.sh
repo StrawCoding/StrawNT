@@ -18,6 +18,14 @@ echo "=== Building strawwu-secureboot ${VERSION} ==="
 cp -a "${SCRIPT_DIR}/usr" "${PKG_DIR}/"
 chmod 755 "${PKG_DIR}/usr/bin/strawwu-secureboot"
 
+# Stamp the real build version into the installed manifest so `strawwu-secureboot
+# version` (core.read_manifest_version) reports the actual release, not a
+# hardcoded placeholder.
+MANIFEST_OUT="${PKG_DIR}/usr/share/strawwu/secureboot/secureboot-manifest.yaml"
+if [[ -f "${MANIFEST_OUT}" ]]; then
+    sed -i "s/^version:.*/version: ${VERSION}/" "${MANIFEST_OUT}"
+fi
+
 sed "s/__VERSION__/${VERSION}/" "${SCRIPT_DIR}/DEBIAN/control" > "${PKG_DIR}/DEBIAN/control"
 cp "${SCRIPT_DIR}/DEBIAN/postinst" "${PKG_DIR}/DEBIAN/postinst"
 chmod 755 "${PKG_DIR}/DEBIAN/postinst"

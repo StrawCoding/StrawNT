@@ -61,6 +61,13 @@ main() {
         log "iso-staging missing — skip Secure Boot fallback patch"
         exit 0
     }
+    # Only rewrite grub to point at the fallback kernel when it was actually
+    # staged; otherwise the menu would reference a non-existent
+    # /casper/vmlinuz-generic and break boot.
+    if [[ ! -f "${ISO_STAGING}/casper/vmlinuz-generic" || ! -f "${ISO_STAGING}/casper/initrd-generic" ]]; then
+        log "no staged Secure Boot fallback kernel/initrd — skip fallback grub patch"
+        exit 0
+    fi
     for cfg in \
         "${ISO_STAGING}/boot/grub/grub.cfg" \
         "${ISO_STAGING}/boot/grub/loopback.cfg" \

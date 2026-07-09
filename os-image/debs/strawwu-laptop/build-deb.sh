@@ -21,6 +21,8 @@ chmod 755 "${PKG_DIR}/usr/bin/strawwu-laptop-peripherals"
 sed "s/__VERSION__/${VERSION}/" "${SCRIPT_DIR}/DEBIAN/control" > "${PKG_DIR}/DEBIAN/control"
 cp "${SCRIPT_DIR}/DEBIAN/postinst" "${PKG_DIR}/DEBIAN/postinst"
 chmod 755 "${PKG_DIR}/DEBIAN/postinst"
+cp "${SCRIPT_DIR}/DEBIAN/prerm" "${PKG_DIR}/DEBIAN/prerm"
+chmod 755 "${PKG_DIR}/DEBIAN/prerm"
 
 mkdir -p "${PKG_DIR}/usr/share/doc/strawwu-laptop"
 cat > "${PKG_DIR}/usr/share/doc/strawwu-laptop/README" <<'EOF'

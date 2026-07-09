@@ -1,0 +1,9 @@
+#!/bin/sh
+# postrm — reload udev after our rules are removed so the device-proxy tty/hidraw
+# rules stop applying immediately on package removal.
+set -e
+if [ "$1" = "remove" ] || [ "$1" = "purge" ]; then
+    udevadm control --reload-rules 2>/dev/null || true
+    udevadm trigger --subsystem-match=tty --subsystem-match=hidraw 2>/dev/null || true
+fi
+exit 0

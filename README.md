@@ -2,7 +2,8 @@
 
 StrawWU 是以 **Ubuntu 官方 live 映像為基底**的桌面作業系統，透過 **clone → 替換自訂 kernel → 疊加 StrawWU 元件** 的方式建置，目標是在單一 OS 內提供 Windows 與 Linux 應用程式同級的 runtime 調度能力。
 
-> **v0.4.0.0（Released 2026-07-04）** — Phase 0–7 全部完成。完全重新 clean-room 實作，禁止沿用封存 legacy 程式碼。ISO 已通過 BIOS + UEFI boot test。
+> **最後正式發布 v0.4.0.0（2026-07-04）** — Phase 0–7 全部完成，完全 clean-room 實作，禁用封存 legacy 程式碼；ISO 通過 BIOS + UEFI boot test。
+> **目前開發 v0.7.0.21** — rebase 至 Ubuntu 26.04 (resolute) + kernel 7.0.0-strawwu，並加入 Secure Boot（MOK 簽核 + Canonical fallback）等強化。
 
 ## 版本規格
 
@@ -14,11 +15,10 @@ StrawWU 是以 **Ubuntu 官方 live 映像為基底**的桌面作業系統，透
 
 | 項目 | 值 |
 |------|-----|
-| 版本 | `v0.4.0.0` |
-| ISO | `StrawWU-0.4.0.0-amd64.iso` (6.1 GB) |
-| SHA256 | `50bfe4dc3fb68db49540764d108eacd3e7ec96a25c609930a0f3f1f4670c9ea3` |
-| Kernel | `6.8.12-strawwu` |
-| Tests | 402/402 PASS (367 Rust + 35 Hub) |
+| 開發版本 | `v0.7.0.21`（Ubuntu 26.04 resolute rebase 開發中；最後正式發布為 v0.4.0.0） |
+| ISO | `StrawWU-<version>-amd64.iso` |
+| Kernel | `7.0.0-strawwu`（Ubuntu resolute ABI 7.0.0-14，上游 Linux 6.14+） |
+| Tests | Rust + Hub 全綠（見 `make test-wincompat` / `hub` npm test） |
 | Windows 相容 | 13/13 sub-stages PASS |
 | i18n | 206 語言（Ubuntu 完整清單） |
 | Boot test | BIOS PASS / UEFI PASS |
@@ -26,28 +26,28 @@ StrawWU 是以 **Ubuntu 官方 live 映像為基底**的桌面作業系統，透
 
 ## 核心原則
 
-1. **Ubuntu clone 優先** — 不自造 rootfs/Calamares 行為；直接參照 Ubuntu noble 官方套件與 `calamares-settings-ubuntu-common`。
-2. **僅替換 kernel** — 換 `linux-image-*` 為 StrawWU 自訂 kernel（6.8.12），其餘 userland 保持 Ubuntu 相容。
+1. **Ubuntu clone 優先** — 不自造 rootfs/Calamares 行為；直接參照 Ubuntu resolute (26.04) 官方套件與 `calamares-settings-ubuntu-common`。
+2. **僅替換 kernel** — 換 `linux-image-*` 為 StrawWU 自訂 kernel（7.0.0-strawwu，上游 Linux 6.14+），其餘 userland 保持 Ubuntu 相容。
 3. **Clean-room NT 子系統** — Windows 相容層為全新實作（見 `components/`），禁止 Wine/Proton 依賴。
 4. **先自查再 E2E** — preflight 靜態檢查 PASS 才跑 QEMU/安裝測試。
 
 ## 架構
 
 ```
-官方 Ubuntu noble live ISO
+官方 Ubuntu resolute (26.04) live ISO
         │
         ▼ clone (unsquashfs + chroot)
    Ubuntu rootfs（保留官方 calamares/desktop）
         │
         ▼ swap-kernel.sh
-   StrawWU custom kernel (6.8.12-strawwu)
+   StrawWU custom kernel (7.0.0-strawwu, 上游 Linux 6.14+)
         │
-        ▼ 疊加 components（8 Rust crates + Electron Hub）
+        ▼ 疊加 components（11 Rust crates + Electron Hub）
    strawwu-nt / bridge / runtime / graphics / audio
-   anticheat / device-proxy / launcher + Hub GUI
+   anticheat / device-proxy / launcher / app-registry / cli + Hub GUI
         │
         ▼ repack ISO (xorriso, xz 壓縮)
-   StrawWU-0.4.0.0-amd64.iso
+   StrawWU-<version>-amd64.iso
 ```
 
 ## 元件總覽
@@ -62,6 +62,8 @@ StrawWU 是以 **Ubuntu 官方 live 映像為基底**的桌面作業系統，透
 | `strawwu-anticheat` | 反作弊 — ProbeEngine, EAC/BE/Vanguard 矩陣, compat grade |
 | `strawwu-device-proxy` | 裝置代理 — udev 列舉, COM port, hotplug, IOCTL, VFIO passthrough |
 | `strawwu-launcher` | Launcher — AppDatabase, installer, WoW64, CLI |
+| `strawwu-app-registry` | 使用者 app 註冊表 — list/register/remove + schema 驗證 |
+| `strawwu-cli` | 共用 CLI 參數解析與命令分派 |
 
 **Hub（Electron）**— 桌面控制中心 GUI，顯示 subsystem 狀態、app 管理、更新通道、206 語言即時切換。
 
@@ -82,13 +84,13 @@ StrawWU/
 │   │   └── build-iso.sh
 │   ├── config/                    # branding overlay（Plymouth, GRUB, icons）
 │   └── output/                    # ISO + SHA256SUMS
-├── kernel/                        # 自訂 kernel 6.8.12-strawwu
+├── kernel/                        # 自訂 kernel 7.0.0-strawwu（上游 Linux 6.14+）
 ├── hub/                           # Electron 控制中心
 │   ├── src/
 │   ├── locales/                   # 206 語言翻譯檔
 │   └── dist/
 ├── .github/workflows/             # CI: release ISO on tag push
-├── components/                    # 8 Rust crates（workspace）
+├── components/                    # 11 Rust crates（workspace）
 │   ├── Cargo.toml
 │   ├── strawwu-nt/
 │   ├── strawwu-runtime/
@@ -97,7 +99,10 @@ StrawWU/
 │   ├── strawwu-audio/
 │   ├── strawwu-anticheat/
 │   ├── strawwu-device-proxy/
-│   └── strawwu-launcher/
+│   ├── strawwu-launcher/
+│   ├── strawwu-app-registry/
+│   ├── strawwu-cli/
+│   └── strawwu-hub/
 ├── packaging/                     # .deb 打包
 └── tests/
     ├── preflight/
@@ -110,7 +115,7 @@ StrawWU/
 |-------|------|------|
 | 0 | 骨架與規範 | PASS |
 | 1 | Ubuntu Clone 管線 | PASS |
-| 2 | 自訂 Kernel (6.8.12) | PASS |
+| 2 | 自訂 Kernel (7.0.0-strawwu) | PASS |
 | 3 | Calamares 安裝 E2E | PASS |
 | 4 | 元件基礎 (Greenfield) | PASS |
 | 5 | 桌面控制中心 (Electron Hub) | PASS |
@@ -122,7 +127,7 @@ StrawWU/
 ```bash
 make help                       # 顯示所有可用目標
 make preflight                  # 靜態檢查（工具、設定、branding）
-make clone-ubuntu-base          # 下載並提取 Ubuntu noble live rootfs
+make clone-ubuntu-base          # 下載並提取 Ubuntu resolute (26.04) live rootfs
 make swap-kernel                # 替換 kernel 為 strawwu
 make release-iso                # 完整 ISO 建置（xz 壓縮，約 30 分鐘）
 make preflight-iso-before-boot  # ISO 完整性閘門
@@ -141,7 +146,7 @@ make dev-vm-sync                # rsync 變更至 VM
 
 ## 建置需求
 
-- Ubuntu 24.04+ (noble)
+- Ubuntu 24.04+（建置主機；目標基底為 Ubuntu 26.04 resolute）
 - Rust toolchain (edition 2021)
 - Node.js 18+ (Hub)
 - xorriso, squashfs-tools, qemu-system-x86

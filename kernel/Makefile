@@ -1,6 +1,9 @@
 .PHONY: help build clean test
 
-KERNEL_ABI ?= 7.0.0-14
+# ABI is resolved by build.sh from docs/plans/ubuntu-base-target.json
+# (active.kernel_abi) — the single source of truth. Only override here by passing
+# KERNEL_ABI=<x.y.z-n> on the command line.
+KERNEL_ABI ?=
 JOBS       ?= $(shell nproc)
 
 help:
@@ -10,7 +13,7 @@ help:
 	@echo "  make test    Verify .deb exists"
 
 build:
-	STRAWWU_KERNEL_ABI=$(KERNEL_ABI) STRAWWU_KERNEL_JOBS=$(JOBS) bash build.sh
+	$(if $(KERNEL_ABI),STRAWWU_KERNEL_ABI=$(KERNEL_ABI) ,)STRAWWU_KERNEL_JOBS=$(JOBS) bash build.sh
 
 clean:
 	rm -rf build output

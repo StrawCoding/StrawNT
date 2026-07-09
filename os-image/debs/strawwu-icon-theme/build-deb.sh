@@ -26,6 +26,8 @@ cp -a "${SCRIPT_DIR}/usr" "${PKG_DIR}/"
 sed "s/__VERSION__/${VERSION}/" "${SCRIPT_DIR}/DEBIAN/control" > "${PKG_DIR}/DEBIAN/control"
 cp "${SCRIPT_DIR}/DEBIAN/postinst" "${PKG_DIR}/DEBIAN/postinst"
 chmod 755 "${PKG_DIR}/DEBIAN/postinst"
+cp "${SCRIPT_DIR}/DEBIAN/postrm" "${PKG_DIR}/DEBIAN/postrm"
+chmod 755 "${PKG_DIR}/DEBIAN/postrm"
 
 mkdir -p "${PKG_DIR}/usr/share/doc/strawwu-icon-theme"
 cat > "${PKG_DIR}/usr/share/doc/strawwu-icon-theme/copyright" <<'EOF'

@@ -86,7 +86,9 @@ patch_boot_serial_console() {
         sed -i 's/ username=ubuntu//g' "${cfg}"
         sed -i 's/ boot=casper//g' "${cfg}"
         # boot=casper + console=tty0 must precede '---' (kernel args); missing on UEFI breaks live-media scan.
-        sed -i '/^[[:space:]]*linux[[:space:]]/ s|\(/casper/vmlinuz\)[[:space:]]*|\1 boot=casper '"${console_args}"' |' "${cfg}"
+        # Require a whitespace right after "vmlinuz" (captured as \2) so this never
+        # matches the "/casper/vmlinuz-generic" fallback line as a substring.
+        sed -i '/^[[:space:]]*linux[[:space:]]/ s|\(/casper/vmlinuz\)\([[:space:]]\)|\1 boot=casper '"${console_args}"'\2|' "${cfg}"
         sed -i "/^[[:space:]]*append[[:space:]]/ s/^/boot=casper ${console_args} /" "${cfg}"
         # Strip duplicate console args that upstream placed after '---' (initrd-side only).
         sed -i 's/ --- quiet splash '"${console_args}"'/ --- quiet splash/g' "${cfg}"

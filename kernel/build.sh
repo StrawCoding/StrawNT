@@ -30,6 +30,17 @@ PY
     fi
 }
 
+# Single source of truth for the kernel ABI: docs/plans/ubuntu-base-target.json
+# active.kernel_abi. Keeps build.sh, the Makefile, and the rootfs aligned.
+read_target_kernel_abi() {
+    if [[ -f "${TARGET_JSON}" ]]; then
+        python3 - "${TARGET_JSON}" <<'PY'
+import json, sys
+print(json.load(open(sys.argv[1])).get("active", {}).get("kernel_abi", ""))
+PY
+    fi
+}
+
 detect_rootfs_kernel_abi() {
     local mod_dir kver
     mod_dir="$(ls -d "${ROOTFS_DIR}/lib/modules/"* 2>/dev/null | head -1 || true)"
@@ -41,8 +52,12 @@ detect_rootfs_kernel_abi() {
 }
 
 UBUNTU_CODENAME="${STRAWWU_APT_SUITE:-$(read_target_codename)}"
+# ABI resolution order: explicit override → rootfs detection → target JSON (single
+# source of truth). No hardcoded literal fallback so the ABI never silently drifts
+# from ubuntu-base-target.json.
 KERNEL_ABI="${STRAWWU_KERNEL_ABI:-$(detect_rootfs_kernel_abi || true)}"
-KERNEL_ABI="${KERNEL_ABI:-7.0.0-14}"
+KERNEL_ABI="${KERNEL_ABI:-$(read_target_kernel_abi)}"
+[[ -n "${KERNEL_ABI}" ]] || die "kernel ABI unresolved (set STRAWWU_KERNEL_ABI or active.kernel_abi in ${TARGET_JSON})"
 
 need_cmd() {
     for c in "$@"; do command -v "$c" >/dev/null 2>&1 || die "missing command: $c"; done
@@ -101,18 +116,26 @@ fetch_source() {
         log "reusing ${tree} (${KERNEL_ABI})"
         return
     fi
-    log "fetching ${src_deb} for ABI ${KERNEL_ABI} (suite ${UBUNTU_CODENAME})"
+    log "fetching ${src_deb} for ABI ${KERNEL_ABI} (suite ${UBUNTU_CODENAME}, version ${src_ver})"
     rm -rf "${BUILD_DIR}"/linux-* "${stamp}"
     ensure_deb_src_for_codename "${UBUNTU_CODENAME}"
+    # Only fetch the ABI-pinned source. Do NOT fall back to an unversioned
+    # `apt-get source linux`: that would silently pull whatever version the mirror
+    # currently ships and produce an ABI-mismatched kernel/modules.
     (
         cd "${BUILD_DIR}"
         apt-get source -y "linux=${src_ver}" 2>/dev/null \
-            || apt-get source -y "${src_deb}=${src_ver}" 2>/dev/null \
-            || apt-get source -y "${src_deb}"
-    )
+            || apt-get source -y "${src_deb}=${src_ver}"
+    ) || die "apt-get source failed for pinned version ${src_ver} (ABI ${KERNEL_ABI}); refusing unpinned fallback"
     local extracted
     extracted="$(find "${BUILD_DIR}" -maxdepth 1 -type d -name 'linux-*' ! -name 'linux-source' | sort | tail -1)"
     [[ -n "${extracted}" ]] || die "linux source tree not found under ${BUILD_DIR}"
+    # Verify the fetched tree matches the requested ABI upstream base so a mismatch
+    # is a hard error, not a subtly wrong build.
+    local upstream_base="${KERNEL_ABI%%-*}"
+    if [[ "$(basename "${extracted}")" != linux-"${upstream_base}"* ]]; then
+        die "fetched source $(basename "${extracted}") does not match ABI ${KERNEL_ABI} (expected linux-${upstream_base}*)"
+    fi
     ln -sfn "$(basename "${extracted}")" "${tree}"
     echo "${KERNEL_ABI}" > "${stamp}"
 }
@@ -281,6 +304,17 @@ repackage_strawwu_image() {
     log "produced ${out} (image+modules merged)"
     echo "${out}" > "${OUTPUT_DIR}/.kernel-deb-path"
     echo "${KERNEL_ABI}" > "${OUTPUT_DIR}/.kernel-abi"
+    # Record the signing posture transparently: this kernel is built with module
+    # signing OFF and ships UNSIGNED; the vmlinuz is MOK-signed later in the ISO
+    # pipeline (swap-kernel.sh) so it boots under Secure Boot after MOK enrollment,
+    # with the Canonical generic kernel as the no-MOK fallback.
+    cat > "${OUTPUT_DIR}/.kernel-signing" <<EOF
+module_sig=disabled
+system_trusted_keyring=disabled
+kernel_image_signed_at_build=false
+kernel_mok_signed=deferred-to-swap-kernel
+abi=${KERNEL_ABI}
+EOF
     date -Is > "${MARKER}"
 }
 

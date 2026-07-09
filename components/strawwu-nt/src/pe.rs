@@ -262,11 +262,14 @@ impl PeFile {
     }
 
     fn rva_to_file_offset(rva: u32, sections: &[PeSection]) -> Option<usize> {
+        // Compute in u64 so a crafted section with a large virtual_address/size
+        // cannot overflow u32 and wrap into a bogus (but in-range) offset.
+        let rva = rva as u64;
         for section in sections {
-            let sec_start = section.virtual_address;
-            let sec_end = sec_start + section.virtual_size.max(section.raw_size);
+            let sec_start = section.virtual_address as u64;
+            let sec_end = sec_start + section.virtual_size.max(section.raw_size) as u64;
             if rva >= sec_start && rva < sec_end {
-                return Some((rva - sec_start + section.raw_offset) as usize);
+                return Some((rva - sec_start + section.raw_offset as u64) as usize);
             }
         }
         None

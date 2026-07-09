@@ -76,14 +76,29 @@ main() {
     # Secure Boot: sign the custom (unsigned) StrawWU kernel with the StrawWU MOK so
     # it boots under Secure Boot once the user enrolls the MOK. The Canonical-signed
     # generic kernel is kept in the rootfs as the no-MOK fallback (see build-iso.sh).
-    local custom_vmlinuz
+    local custom_vmlinuz mok_status="not-attempted"
     custom_vmlinuz="$(ls "${ROOTFS_DIR}/boot/vmlinuz-"*strawwu* 2>/dev/null | head -1 || true)"
     if [[ -n "${custom_vmlinuz}" ]]; then
-        bash "${SCRIPT_DIR}/secureboot-route/mok-sign.sh" "${custom_vmlinuz}" || true
+        if bash "${SCRIPT_DIR}/secureboot-route/mok-sign.sh" "${custom_vmlinuz}"; then
+            # mok-sign.sh is a no-op (exit 0) when the MOK key is absent, so verify
+            # the signature actually landed to record an honest signed/unsigned state.
+            if command -v sbverify >/dev/null 2>&1 \
+                && [[ -f "${REPO_ROOT}/os-image/keys/secureboot/StrawWU-MOK.crt" ]] \
+                && sbverify --cert "${REPO_ROOT}/os-image/keys/secureboot/StrawWU-MOK.crt" "${custom_vmlinuz}" >/dev/null 2>&1; then
+                mok_status="mok-signed"
+            else
+                mok_status="unsigned (no MOK key or sbverify) — boots via Canonical fallback"
+            fi
+        else
+            mok_status="sign-error"
+        fi
     fi
 
-    echo "strawwu-kernel:${kver:-unknown}" > "${MARKER}"
-    log "kernel swap complete (${kver:-unknown})"
+    {
+        echo "strawwu-kernel:${kver:-unknown}"
+        echo "mok_signed:${mok_status}"
+    } > "${MARKER}"
+    log "kernel swap complete (${kver:-unknown}); MOK: ${mok_status}"
 }
 
 main "$@"

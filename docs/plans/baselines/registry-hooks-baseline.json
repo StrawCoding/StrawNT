@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-registry-hooks-baseline/v1",
   "wave": "W5-R4",
-  "version": "0.7.0.20",
+  "version": "0.7.0.21",
   "package": "strawwu-registry-hooks",
   "registry_path": "/var/lib/strawwu/app-registry.json",
   "registry_cli": "/usr/bin/strawwu-app-registry",

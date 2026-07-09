@@ -145,10 +145,10 @@ data = {
         "manifest": "os-image/scripts/secureboot-route/MANIFEST.yaml",
     },
     "boot_chain": [
-        "firmware_db",
+        "uefi_firmware",
         "shim.efi",
         "grubx64.efi",
-        "vmlinuz",
+        "vmlinuz(mok-signed)",
         "initrd.img",
     ],
     "signing": {

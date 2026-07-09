@@ -58,8 +58,10 @@ impl PeLoader {
 
         self.state = LoaderState::Mapping;
 
+        // Widen to u64 before adding: virtual_address + size can exceed u32::MAX
+        // for a crafted/large PE and must not wrap around.
         let total_size = pe.sections.iter()
-            .map(|s| (s.virtual_address + s.virtual_size.max(s.raw_size)) as u64)
+            .map(|s| s.virtual_address as u64 + s.virtual_size.max(s.raw_size) as u64)
             .max()
             .unwrap_or(0x1000);
 

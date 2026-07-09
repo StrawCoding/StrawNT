@@ -161,9 +161,21 @@ async function getFlathubStatus() {
   };
 }
 
+// Flatpak application IDs are reverse-DNS. Reject anything else (and anything
+// starting with '-') so a crafted id cannot be treated as a flatpak option even
+// though execFile does not use a shell.
+function isValidFlatpakAppId(appId) {
+  if (typeof appId !== 'string' || appId.length === 0 || appId.startsWith('-') || !appId.includes('.')) {
+    return false;
+  }
+  return appId
+    .split('.')
+    .every((seg) => seg.length > 0 && /^[A-Za-z0-9_-]+$/.test(seg));
+}
+
 async function installApp(appId) {
-  if (!appId || typeof appId !== 'string') {
-    throw new Error('App ID required');
+  if (!isValidFlatpakAppId(appId)) {
+    throw new Error('Invalid Flatpak application ID');
   }
 
   const cli = resolveFlatpakCli();
@@ -181,11 +193,21 @@ async function installApp(appId) {
     return { appId, installed: true, alreadyInstalled: true };
   }
 
-  await execFileAsync(
-    cli,
-    ['install', '-y', '--noninteractive', '--system', FLATHUB_REMOTE, appId],
-    { timeout: INSTALL_TIMEOUT_MS, encoding: 'utf8' },
-  );
+  try {
+    // `--` terminates option parsing so appId can never be read as a flag.
+    await execFileAsync(
+      cli,
+      ['install', '-y', '--noninteractive', '--system', FLATHUB_REMOTE, '--', appId],
+      { timeout: INSTALL_TIMEOUT_MS, encoding: 'utf8' },
+    );
+  } catch (err) {
+    return {
+      appId,
+      installed: false,
+      mock: false,
+      error: (err && err.message) || 'flatpak install failed',
+    };
+  }
 
   return { appId, installed: true, mock: false };
 }

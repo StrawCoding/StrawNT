@@ -5,6 +5,86 @@ use std::path::{Path, PathBuf};
 
 use thiserror::Error;
 
+/// Cross-process advisory lock held for the whole open→mutate→flush lifetime of a
+/// [`RegistryStore`] so concurrent writers (launcher, registry CLI, install hooks)
+/// serialize instead of racing the read-modify-write window and clobbering each
+/// other. The lock is released when the file handle is dropped.
+struct RegistryLock {
+    #[allow(dead_code)]
+    file: fs::File,
+}
+
+impl RegistryLock {
+    #[cfg(unix)]
+    fn acquire(registry_path: &Path) -> Result<Self, std::io::Error> {
+        use std::os::unix::io::AsRawFd;
+        let lock_path = lock_path_for(registry_path);
+        if let Some(parent) = lock_path.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        let file = fs::OpenOptions::new()
+            .create(true)
+            .write(true)
+            .truncate(false)
+            .open(&lock_path)?;
+        // Non-blocking retry with a bounded timeout instead of a blocking
+        // LOCK_EX: a stale/held lock surfaces as a clean error rather than an
+        // indefinite hang. Override the budget with STRAWWU_REGISTRY_LOCK_TIMEOUT_MS.
+        let timeout_ms: u64 = std::env::var("STRAWWU_REGISTRY_LOCK_TIMEOUT_MS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(10_000);
+        let deadline = std::time::Instant::now() + std::time::Duration::from_millis(timeout_ms);
+        loop {
+            let rc = unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) };
+            if rc == 0 {
+                return Ok(Self { file });
+            }
+            let err = std::io::Error::last_os_error();
+            let would_block = matches!(
+                err.raw_os_error(),
+                Some(code) if code == libc::EWOULDBLOCK || code == libc::EAGAIN
+            );
+            if !would_block {
+                return Err(err);
+            }
+            if std::time::Instant::now() >= deadline {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::WouldBlock,
+                    format!(
+                        "timed out acquiring registry lock: {}",
+                        lock_path.display()
+                    ),
+                ));
+            }
+            std::thread::sleep(std::time::Duration::from_millis(25));
+        }
+    }
+
+    #[cfg(not(unix))]
+    fn acquire(registry_path: &Path) -> Result<Self, std::io::Error> {
+        let lock_path = lock_path_for(registry_path);
+        if let Some(parent) = lock_path.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        let file = fs::OpenOptions::new()
+            .create(true)
+            .write(true)
+            .truncate(false)
+            .open(&lock_path)?;
+        Ok(Self { file })
+    }
+}
+
+fn lock_path_for(registry_path: &Path) -> PathBuf {
+    let mut name = registry_path
+        .file_name()
+        .map(|n| n.to_os_string())
+        .unwrap_or_default();
+    name.push(".lock");
+    registry_path.with_file_name(name)
+}
+
 use crate::deep_remove::{
     execute_deep_remove_plan, plan_deep_remove, should_sync_remove_on_scan, DeepRemoveResult,
 };
@@ -68,6 +148,8 @@ pub struct RegistryStore {
     path: PathBuf,
     log_path: PathBuf,
     data: AppRegistryFile,
+    // Held for the store's lifetime to serialize concurrent writers.
+    _lock: RegistryLock,
 }
 
 impl RegistryStore {
@@ -77,6 +159,10 @@ impl RegistryStore {
 
     pub fn open_at(path: PathBuf) -> Result<Self, RegistryError> {
         let log_path = default_log_path();
+        ensure_parent_dir(&path)?;
+        // Acquire the cross-process lock BEFORE reading so the whole
+        // read-modify-write cycle is serialized against other writers.
+        let lock = RegistryLock::acquire(&path)?;
         let data = if path.exists() {
             let raw = fs::read_to_string(&path)?;
             let registry: AppRegistryFile = serde_json::from_str(&raw)?;
@@ -91,6 +177,7 @@ impl RegistryStore {
             path,
             log_path,
             data,
+            _lock: lock,
         })
     }
 
@@ -437,7 +524,27 @@ impl RegistryStore {
             .map_err(|errs| RegistryError::Validation(errs.join("; ")))?;
         ensure_parent_dir(&self.path)?;
         let json = serde_json::to_string_pretty(&self.data)?;
-        fs::write(&self.path, format!("{json}\n"))?;
+        // Atomic replace: write to a sibling temp file, fsync, then rename over
+        // the target so a crash mid-write never leaves a truncated/corrupt
+        // registry. rename(2) is atomic within the same filesystem.
+        let mut tmp = self.path.clone();
+        let mut tmp_name = tmp
+            .file_name()
+            .map(|n| n.to_os_string())
+            .unwrap_or_default();
+        tmp_name.push(format!(".tmp.{}", std::process::id()));
+        tmp.set_file_name(tmp_name);
+
+        {
+            let mut f = fs::File::create(&tmp)?;
+            f.write_all(json.as_bytes())?;
+            f.write_all(b"\n")?;
+            f.sync_all()?;
+        }
+        if let Err(e) = fs::rename(&tmp, &self.path) {
+            let _ = fs::remove_file(&tmp);
+            return Err(e.into());
+        }
         Ok(())
     }
 
@@ -454,10 +561,16 @@ impl RegistryStore {
             .create(true)
             .append(true)
             .open(&self.log_path)?;
-        let line = format!(
-            "{{\"ts\":\"{}\",\"component\":\"app-registry\",\"action\":\"{action}\",\"app_id\":\"{app_id}\"}}\n",
-            chrono::Utc::now().to_rfc3339()
-        );
+        // Build the log line with serde so an app_id containing quotes/newlines
+        // (it derives from user-controlled paths/desktop names) cannot inject or
+        // break the JSONL structure.
+        let mut line = serde_json::to_string(&serde_json::json!({
+            "ts": chrono::Utc::now().to_rfc3339(),
+            "component": "app-registry",
+            "action": action,
+            "app_id": app_id,
+        }))?;
+        line.push('\n');
         file.write_all(line.as_bytes())?;
         Ok(())
     }

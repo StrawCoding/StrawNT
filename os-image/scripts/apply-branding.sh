@@ -131,17 +131,14 @@ configure_desktop_theme() {
 
 patch_user_visible_ubuntu() {
     log "replacing user-visible Ubuntu strings in rootfs"
-    local files
-    files="$(grep -rl 'Ubuntu' \
-        "${ROOTFS_DIR}/etc/issue" \
-        "${ROOTFS_DIR}/etc/issue.net" \
-        "${ROOTFS_DIR}/etc/motd" \
-        "${ROOTFS_DIR}/usr/share/gnome-shell" \
-        2>/dev/null || true)"
-    if [[ -n "${files}" ]]; then
-        # shellcheck disable=SC2086
-        sed -i 's/Ubuntu/StrawWU/g' ${files} 2>/dev/null || true
-    fi
+    # Only the plain-text login banners are safe for a blanket rename. Do NOT sed
+    # the whole gnome-shell tree: it contains JS/CSS and extension identifiers
+    # (e.g. ubuntu-dock@ubuntu.com) where replacing "Ubuntu" breaks the shell.
+    local banner
+    for banner in etc/issue etc/issue.net etc/motd; do
+        [[ -f "${ROOTFS_DIR}/${banner}" ]] || continue
+        sed -i 's/Ubuntu/StrawWU/g' "${ROOTFS_DIR}/${banner}" 2>/dev/null || true
+    done
     if [[ -f "${ROOTFS_DIR}/usr/share/glib-2.0/schemas/10_ubuntu-settings.gschema.override" ]]; then
         sed -i "s|logo='/usr/share/plymouth/ubuntu-logo.png'|logo='/usr/share/plymouth/themes/strawwu-boot/logo.png'|" \
             "${ROOTFS_DIR}/usr/share/glib-2.0/schemas/10_ubuntu-settings.gschema.override" || true
@@ -162,10 +159,15 @@ patch_iso_staging() {
         "${ISO_STAGING}/isolinux/txt.cfg" \
         "${ISO_STAGING}/isolinux/grub.cfg"; do
         [[ -f "${f}" ]] || continue
+        # Only rename visible menu titles. A blanket s/Ubuntu/StrawWU/g here would
+        # also rewrite `search --label 'Ubuntu ...'` / volume-id lines and break
+        # live-media detection, so restrict to menuentry/submenu title lines plus
+        # the two known full-title strings.
         sed -i \
             -e 's/Try or Install Ubuntu/Try or Install StrawWU/g' \
             -e 's/Ubuntu (safe graphics)/StrawWU (safe graphics)/g' \
-            -e 's/Ubuntu/StrawWU/g' \
+            -e '/^[[:space:]]*menuentry[[:space:]]/ s/Ubuntu/StrawWU/g' \
+            -e '/^[[:space:]]*submenu[[:space:]]/ s/Ubuntu/StrawWU/g' \
             "${f}"
     done
     if [[ -f "${ISO_STAGING}/.disk/info" ]]; then
