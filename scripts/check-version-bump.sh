@@ -26,7 +26,7 @@ if [[ ${#CHANGED[@]} -eq 0 ]]; then
     exit 0
 fi
 
-IGNORE_PATTERN='^(VERSION$|\.github/workflows/release\.yml$|os-image/output/|tests/boot/output/|.*\.iso$|.*\.log$|docs/technical-references/upstream/)'
+IGNORE_PATTERN='^(VERSION$|\.github/workflows/|os-image/output/|tests/boot/output/|.*\.iso$|.*\.log$|docs/technical-references/upstream/)'
 
 needs_bump=0
 for f in "${CHANGED[@]}"; do

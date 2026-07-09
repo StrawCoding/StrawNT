@@ -11,6 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          # lrelease (Qt Linguist) compiles the calamares/install-init .ts -> .qm
+          # translations during deb builds; squashfs-tools/zstd/rsync/gnupg back the
+          # rootfs + apt-repo preflight steps. The heavy Ubuntu base rootfs is not
+          # built in CI, so runtime rootfs checks skip themselves (see common.sh).
+          sudo apt-get install -y --no-install-recommends \
+            qttools5-dev-tools squashfs-tools zstd rsync gnupg
       - name: Phase 0 preflight
         run: make test-phase0 && make preflight
 

@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-target-setup-baseline/v1",
   "wave": "W3-N2",
-  "version": "0.7.0.18",
+  "version": "0.7.0.19",
   "package": "strawwu-target-setup",
   "log_path": "/var/log/strawwu/target-setup.log",
   "error_code": "SWU-IN-002",
