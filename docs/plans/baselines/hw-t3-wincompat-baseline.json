@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-hw-t3-wincompat-baseline/v1",
   "wave": "POST-HW-T3",
-  "version": "0.7.0.14",
+  "version": "0.7.0.15",
   "tier": "T3",
   "minimum_wincompat_pass": 1,
   "dimensions_required": [

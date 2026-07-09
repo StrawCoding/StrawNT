@@ -3,8 +3,8 @@
   "product_version": "8.8.8.8",
   "kernel_abi": "7.0.0-14",
   "channel": "kernel-ci",
-  "published_at": "2026-07-09T03:29:15Z",
-  "git_sha": "935e27725f1de1719c74054034b667dfcc223ea5",
+  "published_at": "2026-07-09T04:12:04Z",
+  "git_sha": "ac69afea5e5b23cb90af41cbb984197a25ec429c",
   "artifacts": [
     {
       "name": "linux-image-strawwu_7.0.0-14_amd64.deb",
