@@ -290,18 +290,46 @@ CRITICAL_MAIN_MODULES = (
 # Casper early initrd only mirrors upstream QEMU virtio/bochs GPU modules.
 # Physical Intel/AMD/NVIDIA need explicit injection or Plymouth two-step stays black.
 EARLY_PHYSICAL_GPU_MODULES = (
+    "kernel/drivers/gpu/drm/display/drm_display_helper.ko",
+    "kernel/drivers/gpu/drm/drm_ttm_helper.ko",
+    "kernel/drivers/gpu/drm/drm_buddy.ko",
+    "kernel/drivers/gpu/drm/drm_exec.ko",
+    "kernel/drivers/gpu/drm/drm_suballoc_helper.ko",
+    "kernel/drivers/gpu/drm/drm_panel_backlight_quirks.ko",
+    "kernel/drivers/gpu/drm/scheduler/gpu-sched.ko",
     "kernel/drivers/gpu/drm/i915/i915.ko",
     "kernel/drivers/gpu/drm/amd/amdgpu/amdgpu.ko",
     "kernel/drivers/gpu/drm/amd/amdgpu/amdxcp/amdxcp.ko",
     "kernel/drivers/gpu/drm/nouveau/nouveau.ko",
     "kernel/drivers/gpu/drm/radeon/radeon.ko",
-    "kernel/drivers/gpu/drm/scheduler/gpu-sched.ko",
-    "kernel/drivers/gpu/drm/drm_buddy.ko",
-    "kernel/drivers/gpu/drm/drm_exec.ko",
-    "kernel/drivers/gpu/drm/drm_suballoc_helper.ko",
-    "kernel/drivers/gpu/drm/drm_panel_backlight_quirks.ko",
     "kernel/drivers/media/cec/core/cec.ko",
+    "kernel/drivers/i2c/i2c-core.ko",
     "kernel/drivers/i2c/algos/i2c-algo-bit.ko",
+)
+
+EARLY_PHYSICAL_GPU_METADATA_KEYWORDS = (
+    "i915",
+    "amdgpu",
+    "nouveau",
+    "radeon",
+    "drm_display",
+    "drm_ttm",
+    "drm_exec",
+    "drm_buddy",
+    "drm_suballoc",
+    "drm_panel",
+    "gpu-sched",
+    "i2c-core",
+    "i2c-algo-bit",
+    "cec",
+)
+
+# linux-firmware GPU trees required for i915/amdgpu KMS before Plymouth two-step.
+EARLY_PHYSICAL_GPU_FIRMWARE_DIRS = (
+    "i915",
+    "amdgpu",
+    "nouveau",
+    "radeon",
 )
 
 
@@ -350,6 +378,49 @@ def inject_early_physical_gpu_modules(
     return injected
 
 
+def resolve_firmware_root(modules_src: Path | None) -> Path | None:
+    """Locate linux-firmware root from rootfs (preferred) or build host."""
+    if modules_src is not None:
+        try:
+            rootfs = modules_src.parents[2]
+        except IndexError:
+            rootfs = None
+        if rootfs is not None:
+            for rel in ("usr/lib/firmware", "lib/firmware"):
+                candidate = rootfs / rel
+                if candidate.is_dir() and any((candidate / name).is_dir() for name in EARLY_PHYSICAL_GPU_FIRMWARE_DIRS):
+                    return candidate
+    host = Path("/lib/firmware")
+    if host.is_dir():
+        return host
+    return None
+
+
+def inject_early_physical_gpu_firmware(module_dir: Path, firmware_root: Path | None) -> int:
+    """Mirror GPU firmware into the early module phase for physical KMS."""
+    if firmware_root is None or not firmware_root.is_dir():
+        return 0
+    import shutil
+
+    if (module_dir / "usr/lib/firmware").is_dir() or not (module_dir / "lib/firmware").is_dir():
+        dest_base = module_dir / "usr/lib/firmware"
+    else:
+        dest_base = module_dir / "lib/firmware"
+    dest_base.mkdir(parents=True, exist_ok=True)
+
+    injected = 0
+    for name in EARLY_PHYSICAL_GPU_FIRMWARE_DIRS:
+        src = firmware_root / name
+        if not src.is_dir():
+            continue
+        dest = dest_base / name
+        if dest.exists():
+            shutil.rmtree(dest)
+        shutil.copytree(src, dest)
+        injected += sum(1 for path in dest.rglob("*") if path.is_file())
+    return injected
+
+
 def mirror_critical_modules_to_main(
     main_dir: Path,
     modules_src: Path,
@@ -376,6 +447,88 @@ def resolve_overlays_root(overlays_root: Path | None) -> Path | None:
     if DEFAULT_OVERLAYS_ROOT.is_dir() and (DEFAULT_OVERLAYS_ROOT / "scripts").is_dir():
         return DEFAULT_OVERLAYS_ROOT
     return None
+
+
+def inject_early_gpu_module_metadata(
+    modules_root: Path,
+    new_kver: str,
+    modules_src: Path,
+) -> int:
+    """Copy GPU-related modules.dep/alias so modprobe can resolve early .ko.zst payloads."""
+    dest_dir = modules_root / new_kver
+    if not modules_src.is_dir():
+        return 0
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    written = 0
+    for name in ("modules.dep", "modules.alias", "modules.softdep"):
+        src = modules_src / name
+        if not src.is_file():
+            continue
+        filtered = [
+            line
+            for line in src.read_text().splitlines()
+            if any(keyword in line for keyword in EARLY_PHYSICAL_GPU_METADATA_KEYWORDS)
+        ]
+        if not filtered:
+            continue
+        (dest_dir / name).write_text(transform_dep_to_zst("\n".join(filtered) + "\n"))
+        written += 1
+    return written
+
+
+def inject_early_gpu_hook_into_module_phase(
+    module_dir: Path,
+    overlays_root: Path | None = None,
+) -> bool:
+    """Mirror init-top GPU hook into the early module phase (pre-Plymouth)."""
+    root = resolve_overlays_root(overlays_root)
+    if root is None:
+        return False
+    hook_src = root / "scripts/init-top/05strawwu-early-gpu"
+    if not hook_src.is_file():
+        return False
+    import shutil
+
+    hook_dest_dir = module_dir / "scripts/init-top"
+    hook_dest_dir.mkdir(parents=True, exist_ok=True)
+    hook_dest = hook_dest_dir / "05strawwu-early-gpu"
+    shutil.copy2(hook_src, hook_dest)
+    hook_dest.chmod(0o755)
+    ensure_hook_order_after(module_dir, "init-top", "udev", ["05strawwu-early-gpu"])
+    return True
+
+
+def ensure_hook_order_after(
+    main_dir: Path,
+    hook_dir: str,
+    after_hook: str,
+    hook_names: list[str],
+) -> None:
+    order = main_dir / "scripts" / hook_dir / "ORDER"
+    existing = order.read_text() if order.is_file() else ""
+    if not existing.strip():
+        order.write_text("\n".join(f'/scripts/{hook_dir}/{name} "$@"' for name in hook_names) + "\n")
+        return
+    lines = existing.splitlines()
+    new_lines: list[str] = []
+    inserted = False
+    anchor = f"/scripts/{hook_dir}/{after_hook}"
+    for line in lines:
+        new_lines.append(line)
+        if anchor in line and not inserted:
+            for hook_name in hook_names:
+                needle = f"/scripts/{hook_dir}/{hook_name}"
+                if needle not in existing:
+                    new_lines.append(f'{needle} "$@"')
+            inserted = True
+    if not inserted:
+        prefix_lines = [
+            f'/scripts/{hook_dir}/{hook_name} "$@"'
+            for hook_name in hook_names
+            if f"/scripts/{hook_dir}/{hook_name}" not in existing
+        ]
+        new_lines = prefix_lines + lines
+    order.write_text("\n".join(new_lines) + "\n")
 
 
 def ensure_hook_order(main_dir: Path, hook_dir: str, hook_names: list[str]) -> None:
@@ -482,7 +635,10 @@ def inject_initrd_overlays(main_dir: Path, overlays_root: Path | None) -> None:
             if p.is_file() and p.name.startswith(("05strawwu", "20iso_scan"))
         )
         if strawwu_hooks:
-            ensure_hook_order(main_dir, hook_dir.name, strawwu_hooks)
+            if hook_dir.name == "init-top":
+                ensure_hook_order_after(main_dir, hook_dir.name, "udev", strawwu_hooks)
+            else:
+                ensure_hook_order(main_dir, hook_dir.name, strawwu_hooks)
 
 
 def inject_casper_premount_hooks(main_dir: Path, branding_root: Path | None) -> None:
@@ -636,6 +792,14 @@ def replace_early3_modules(
     injected = inject_early_physical_gpu_modules(modules_root, new_kver, modules_src)
     if injected:
         print(f"injected {injected} physical GPU modules into {phase_name}", file=sys.stderr)
+    fw_injected = inject_early_physical_gpu_firmware(module_dir, resolve_firmware_root(modules_src))
+    if fw_injected:
+        print(f"injected {fw_injected} physical GPU firmware files into {phase_name}", file=sys.stderr)
+    meta_written = inject_early_gpu_module_metadata(modules_root, new_kver, modules_src)
+    if meta_written:
+        print(f"injected GPU module metadata ({meta_written} files) into {phase_name}", file=sys.stderr)
+    if inject_early_gpu_hook_into_module_phase(module_dir):
+        print(f"injected early-gpu init-top hook into {phase_name}", file=sys.stderr)
     # Remove any leftover upstream kver trees (prevents dual 6.11 + 6.8.12 trees).
     for extra in old_kvers[1:]:
         extra_dir = modules_root / extra

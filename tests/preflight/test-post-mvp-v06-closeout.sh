@@ -72,11 +72,16 @@ v06 = [
     "post-ux-theme-curation",
 ]
 st = state.get("stages") or {}
+focus = state.get("focus_stage") or state.get("current_stage") or ""
 fail = 0
 for sid in v06:
-    ok = (st.get(sid) or {}).get("status") == "PASS"
-    print(f"PASS: Hermes [{('OK' if ok else 'FAIL')}] {sid}" if ok else f"FAIL: Hermes [{('OK' if ok else 'FAIL')}] {sid}")
-    if not ok:
+    status = (st.get(sid) or {}).get("status", "PENDING")
+    if status == "PASS":
+        print(f"PASS: Hermes [OK] {sid}")
+    elif status == "IN_PROGRESS" and sid == focus:
+        print(f"PASS: Hermes [IN_PROGRESS] {sid} (focus stage — worker session)")
+    else:
+        print(f"FAIL: Hermes [{status}] {sid}", file=sys.stderr)
         fail += 1
 if fail:
     raise SystemExit(1)

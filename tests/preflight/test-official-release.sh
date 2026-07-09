@@ -11,6 +11,12 @@ BASELINE="${BASELINES_DIR}/official-release-baseline.json"
 
 echo "=== official-release preflight ==="
 
+# official-release is Q9 / last lock stage — skip until user creates .official-release-authorized.
+if [[ ! -f "${REPO_ROOT}/.official-release-authorized" ]]; then
+    pass "official-release skipped (no .official-release-authorized)"
+    preflight_exit "official-release (skipped)"
+fi
+
 require_file "${CLOSEOUT_DIR}/official-release-dod.md" "official-release-dod.md"
 require_file "${VALIDATE}" "validate-official-release.py"
 require_file "${RENDER}" "render-html.py"
@@ -53,7 +59,7 @@ print(json.dumps({
 }, indent=2))
 PY
 )"
-write_baseline "${BASELINE}" "${baseline_content}"
+write_json_if_changed "${BASELINE}" "${baseline_content}"
 
 if [[ "${PREFLIGHT_FAIL:-0}" -eq 1 ]]; then
     echo "=== official-release done: FAIL ==="

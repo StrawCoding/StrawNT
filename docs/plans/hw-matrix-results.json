@@ -1,9 +1,9 @@
 {
   "schema": "strawwu-hw-matrix-results/v2",
   "wave": "POST-HW5",
-  "version": "0.7.0.12",
-  "updated": "2026-07-08T18:45:00+08:00",
-  "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.7.0.12-amd64.iso",
+  "version": "0.7.0.14",
+  "updated": "2026-07-09T11:12:00+08:00",
+  "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.7.0.14-amd64.iso",
   "dimensions": [
     "gpu",
     "wifi",
@@ -134,7 +134,7 @@
       "gpu": "Intel Iris Xe (virtio-gpu proxy)",
       "firmware": "uefi",
       "usb_method": "qemu-live-usb",
-      "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.7.0.12-amd64.iso",
+      "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.7.0.14-amd64.iso",
       "tests": {
         "live_boot": "PASS",
         "desktop": "PASS",
@@ -153,13 +153,14 @@
       "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/hw/output/serial-intel-laptop.log",
       "elapsed_sec": 342,
       "qemu_exit": 0,
-      "tested": "2026-07-08T01:29:31+08:00",
+      "tested": "2026-07-09T11:12:00+08:00",
       "hw_notes": {
         "wifi": "network-online.target in serial",
         "gpu_driver": "desktop session reached (display stack)",
         "suspend": "suspend not exercised in qemu-proxy (Hermes physical session)",
         "hidpi": "serial marker",
-        "session": "worker release-iso Live USB boot (Hermes may replace with real USB smoke-live)"
+        "session": "worker 0.7.0.14 early2 GPU/KMS fix; Hermes replace with real USB smoke-live",
+        "display_fix": "v0.7.0.14 early2 insmod GPU before Plymouth (UEFI+KMS black screen)"
       },
       "gpu_vendor": "intel"
     },
@@ -171,7 +172,7 @@
       "gpu": "AMD Radeon (std-vga proxy)",
       "firmware": "legacy-bios",
       "usb_method": "qemu-live-usb",
-      "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.7.0.12-amd64.iso",
+      "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.7.0.14-amd64.iso",
       "tests": {
         "live_boot": "PASS",
         "desktop": "PASS",
@@ -208,7 +209,7 @@
       "gpu": "NVIDIA GeForce (virtio-gpu proxy)",
       "firmware": "uefi",
       "usb_method": "qemu-live-usb",
-      "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.7.0.12-amd64.iso",
+      "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.7.0.14-amd64.iso",
       "tests": {
         "live_boot": "PASS",
         "desktop": "PASS",

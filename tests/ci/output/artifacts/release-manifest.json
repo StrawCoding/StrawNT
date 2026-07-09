@@ -3,7 +3,7 @@
   "version": "8.8.8.8",
   "channel": "nightly",
   "git_tag": null,
-  "git_sha": "8cde88ff1e822671e88ad0d0169684afd2e9f070",
+  "git_sha": "935e27725f1de1719c74054034b667dfcc223ea5",
   "artifacts": [
     {
       "name": "StrawWU-8.8.8.8-amd64.iso",
@@ -118,5 +118,5 @@
     "file": "SHA256SUMS",
     "gpg_sig": null
   },
-  "published_at": "2026-07-08T10:58:38Z"
+  "published_at": "2026-07-09T03:29:15Z"
 }

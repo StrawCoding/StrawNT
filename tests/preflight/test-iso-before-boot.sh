@@ -235,6 +235,49 @@ if [[ -n "${CASPER_DIR}" && -d "${CASPER_DIR}" ]]; then
           echo "FAIL: initrd ${modules_phase} missing physical GPU modules — Plymouth black screen on real hardware" >&2
           FAIL=1
         fi
+        fw_ok=0
+        fw_detail=""
+        if [[ -n "${modules_dir}" ]]; then
+          for fw_dir in i915 amdgpu nouveau radeon; do
+            fw_count=$(find "${modules_dir}" -path "*/firmware/${fw_dir}/*" -type f 2>/dev/null | wc -l)
+            if [[ "${fw_count}" -gt 0 ]]; then
+              fw_ok=1
+              fw_detail="${fw_dir}(${fw_count})"
+              break
+            fi
+          done
+        fi
+        if [[ "${fw_ok}" -eq 1 ]]; then
+          echo "PASS: initrd ${modules_phase} has physical GPU firmware (${fw_detail})"
+        elif [[ -n "${modules_dir}" ]]; then
+          echo "FAIL: initrd ${modules_phase} missing GPU firmware — KMS/Plymouth black screen on real hardware" >&2
+          FAIL=1
+        fi
+        gpu_hook="${modules_dir}/scripts/init-top/05strawwu-early-gpu"
+        if [[ -f "${gpu_hook}" ]]; then
+          echo "PASS: initrd ${modules_phase} has early-gpu init-top hook (pre-Plymouth)"
+        elif [[ -n "${modules_dir}" ]]; then
+          echo "FAIL: initrd ${modules_phase} missing early-gpu hook — GPU modules never loaded before Plymouth" >&2
+          FAIL=1
+        fi
+        meta_ok=0
+        if [[ -n "${modules_dir}" ]]; then
+          mod_meta_root=$(find "${modules_dir}/usr/lib/modules" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | head -1)
+          if [[ -n "${mod_meta_root}" ]]; then
+            for meta in modules.dep modules.alias; do
+              if [[ -f "${mod_meta_root}/${meta}" ]] && grep -qE 'i915|amdgpu|nouveau|radeon' "${mod_meta_root}/${meta}" 2>/dev/null; then
+                meta_ok=1
+                break
+              fi
+            done
+          fi
+        fi
+        if [[ "${meta_ok}" -eq 1 ]]; then
+          echo "PASS: initrd ${modules_phase} has GPU module metadata (modprobe fallback)"
+        elif [[ -n "${modules_dir}" ]]; then
+          echo "FAIL: initrd ${modules_phase} missing GPU modules.dep/alias" >&2
+          FAIL=1
+        fi
       else
         warn "unmkinitramfs failed — skipping initrd module checks"
       fi

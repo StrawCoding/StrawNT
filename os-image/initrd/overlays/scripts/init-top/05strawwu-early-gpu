@@ -1,5 +1,6 @@
 #!/bin/sh
 # Load physical GPU DRM before Plymouth (casper early only ships virtio/bochs modules).
+# early2 has .ko.zst payloads but no full modules.dep — use explicit insmod paths.
 PREREQ="udev"
 
 prereqs()
@@ -14,9 +15,30 @@ prereqs)
 	;;
 esac
 
-for drv in simpledrm i915 amdgpu nouveau radeon; do
-	modprobe -q -b "${drv}" 2>/dev/null || true
+KVER="$(uname -r)"
+MODROOT="/usr/lib/modules/${KVER}/kernel"
+
+load_mod() {
+	stem="$1"
+	# shellcheck disable=SC2044
+	for ko in $(find "${MODROOT}" -name "${stem}.ko*" 2>/dev/null); do
+		[ -f "${ko}" ] || continue
+		insmod "${ko}" 2>/dev/null && return 0
+	done
+	modprobe -q -b "${stem}" 2>/dev/null || true
+}
+
+# DRM helpers before GPU drivers; simpledrm last as firmware-fb fallback.
+for drv in \
+	drm_display_helper drm_ttm_helper drm_exec drm_buddy \
+	drm_suballoc_helper drm_panel_backlight_quirks gpu-sched \
+	cec i2c-algo-bit i2c-core \
+	i915 amdgpu nouveau radeon simpledrm; do
+	load_mod "${drv}"
 done
-udevadm settle 2>/dev/null || true
+
+if command -v udevadm >/dev/null 2>&1; then
+	udevadm settle 2>/dev/null || true
+fi
 
 exit 0

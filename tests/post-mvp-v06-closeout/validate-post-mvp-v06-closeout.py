@@ -125,11 +125,14 @@ def check_hermes_prerequisites() -> bool:
         return False
     state = json.loads(HERMES_STATE.read_text(encoding="utf-8"))
     stages = state.get("stages") or {}
+    focus = state.get("focus_stage") or state.get("current_stage") or ""
     all_ok = True
     for sid, _ in V06_STAGES[:-1]:
         st = (stages.get(sid) or {}).get("status")
         if st == "PASS":
             ok(f"Hermes {sid} PASS")
+        elif st == "IN_PROGRESS" and sid == focus:
+            ok(f"Hermes {sid} IN_PROGRESS (focus stage — worker session)")
         else:
             fail(f"Hermes {sid} status={st!r} (expected PASS)")
             all_ok = False

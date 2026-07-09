@@ -50,6 +50,24 @@ else
 	fail "initrd-splice.py missing overlay injection"
 fi
 
+if grep -q 'inject_early_physical_gpu_firmware' "${SPLICE}" && grep -q 'EARLY_PHYSICAL_GPU_FIRMWARE_DIRS' "${SPLICE}"; then
+	pass "initrd-splice.py injects physical GPU firmware"
+else
+	fail "initrd-splice.py missing physical GPU firmware injection"
+fi
+
+if grep -q 'inject_early_gpu_hook_into_module_phase' "${SPLICE}" && grep -q 'inject_early_gpu_module_metadata' "${SPLICE}"; then
+	pass "initrd-splice.py injects early-gpu hook + module metadata into module phase"
+else
+	fail "initrd-splice.py missing early-gpu module-phase injection"
+fi
+
+if grep -q 'find "${MODROOT}"' "${OVERLAYS}/scripts/init-top/05strawwu-early-gpu"; then
+	pass "early-gpu hook uses explicit insmod paths (no modules.dep dependency)"
+else
+	fail "early-gpu hook still modprobe-only — will fail on early2 without modules.dep"
+fi
+
 legacy_hook="${REPO_ROOT}/os-image/config/branding/initrd/scripts/casper-premount/05strawwu-wait-live-media"
 if [[ -f "${legacy_hook}" ]]; then
 	fail "legacy branding premount hook still present — use os-image/initrd/overlays/"

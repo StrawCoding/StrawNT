@@ -1,23 +1,23 @@
 {
-  "version": "0.7.0.12",
+  "version": "0.7.0.14",
   "status": "PASS",
   "marker": "STRAWWU_BOOT_OK",
-  "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.7.0.12-amd64.iso",
-  "tested": "2026-07-08T18:42:31+08:00",
-  "modes_tested": "bios",
+  "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.7.0.14-amd64.iso",
+  "tested": "2026-07-09T11:11:57+08:00",
+  "modes_tested": "uefi",
   "bios": {
     "mode": "bios",
-    "status": "PASS",
-    "marker": "STRAWWU_BOOT_OK",
-    "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.7.0.12-amd64.iso",
-    "start": "2026-07-08T18:35:29+08:00",
-    "end": "2026-07-08T18:42:31+08:00",
-    "elapsed_sec": 422,
-    "qemu_exit": 0,
-    "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/boot/output/serial-bios.log"
+    "status": "SKIPPED"
   },
   "uefi": {
     "mode": "uefi",
-    "status": "SKIPPED"
+    "status": "PASS",
+    "marker": "STRAWWU_BOOT_OK",
+    "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.7.0.14-amd64.iso",
+    "start": "2026-07-09T11:05:05+08:00",
+    "end": "2026-07-09T11:11:57+08:00",
+    "elapsed_sec": 412,
+    "qemu_exit": 0,
+    "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/boot/output/serial-uefi.log"
   }
 }
