@@ -95,7 +95,7 @@ fn main() {
                 }
             };
 
-            let pe_data = match pe_loader::load_pe_bytes(&binary, format) {
+            let pe_data = match pe_loader::load_pe_bytes(&binary, format, pe_loader::smoke_mode()) {
                 Ok(data) => data,
                 Err(e) => {
                     eprintln!("strawwu: PE load failed: {e}");

@@ -16,26 +16,30 @@ pub fn smoke_mode() -> bool {
 }
 
 /// Load PE bytes from disk. Returns an error for a missing/invalid binary unless
-/// smoke mode (`STRAWWU_SMOKE=1`) is set, in which case a stub PE is synthesized
-/// for wiring smoke tests.
-pub fn load_pe_bytes(path: &Path, format: BinaryFormat) -> Result<Vec<u8>, String> {
+/// `smoke` is true, in which case a stub PE is synthesized for wiring smoke tests.
+///
+/// `smoke` is passed explicitly (production resolves it once via [`smoke_mode`])
+/// rather than read from the process environment here: reading a global env var
+/// inside the function made the unit tests race on `STRAWWU_SMOKE` when run in
+/// parallel (one test setting it while another cleared it).
+pub fn load_pe_bytes(path: &Path, format: BinaryFormat, smoke: bool) -> Result<Vec<u8>, String> {
     if path.exists() {
         let data = fs::read(path).map_err(|e| e.to_string())?;
         if !data.is_empty() && detect_format(&data) != BinaryFormat::Unknown {
             return Ok(data);
         }
-        if !smoke_mode() {
+        if !smoke {
             return Err(format!(
                 "invalid or empty binary: {} (not a recognized PE/ELF/MSI)",
                 path.display()
             ));
         }
-    } else if !smoke_mode() {
+    } else if !smoke {
         return Err(format!("binary not found: {}", path.display()));
     }
 
     if format == BinaryFormat::PE {
-        // smoke_mode() is guaranteed true here.
+        // smoke is guaranteed true here.
         Ok(build_stub_pe(PeMachine::Amd64, PeSubsystem::WindowsGui))
     } else {
         Err(format!(
@@ -53,18 +57,15 @@ mod tests {
 
     #[test]
     fn stub_pe_for_missing_exe_in_smoke_mode() {
-        std::env::set_var("STRAWWU_SMOKE", "1");
         let path = PathBuf::from("/nonexistent/notepad.exe");
-        let data = load_pe_bytes(&path, BinaryFormat::PE).unwrap();
+        let data = load_pe_bytes(&path, BinaryFormat::PE, true).unwrap();
         assert!(data.len() > 64);
         assert_eq!(detect_format(&data), BinaryFormat::PE);
-        std::env::remove_var("STRAWWU_SMOKE");
     }
 
     #[test]
     fn missing_exe_errors_without_smoke() {
-        std::env::remove_var("STRAWWU_SMOKE");
         let path = PathBuf::from("/nonexistent/notepad.exe");
-        assert!(load_pe_bytes(&path, BinaryFormat::PE).is_err());
+        assert!(load_pe_bytes(&path, BinaryFormat::PE, false).is_err());
     }
 }
