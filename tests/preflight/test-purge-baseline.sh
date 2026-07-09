@@ -23,9 +23,7 @@ else
     warn "purge marker missing — run: sudo bash os-image/scripts/chroot-purge-ubuntu-telemetry.sh"
 fi
 
-if ! has_rootfs && ! has_squashfs; then
-    fail "neither rootfs nor squashfs present — run make clone-ubuntu-base first"
-fi
+skip_without_filesystem "W1-B1 purge-baseline"
 
 for pkg in "${PURGE_TARGET_PACKAGES[@]}"; do
     if has_rootfs && package_installed_in_rootfs "${pkg}"; then

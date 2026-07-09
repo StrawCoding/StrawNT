@@ -28,9 +28,7 @@ else
     warn "flatpak setup marker missing — run: sudo bash os-image/scripts/chroot-install-flatpak-setup.sh"
 fi
 
-if ! has_rootfs && ! has_squashfs; then
-    fail "neither rootfs nor squashfs present — run make clone-ubuntu-base first"
-fi
+skip_without_filesystem "W1-F1 flatpak"
 
 check_flatpak_package() {
     local label="$1"

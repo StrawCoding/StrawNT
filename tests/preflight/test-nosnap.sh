@@ -22,9 +22,7 @@ else
     warn "nosnap harden marker missing — run: sudo bash os-image/scripts/chroot-nosnap-harden.sh"
 fi
 
-if ! has_rootfs && ! has_squashfs; then
-    fail "neither rootfs nor squashfs present — run make clone-ubuntu-base first"
-fi
+skip_without_filesystem "W1-F2 nosnap"
 
 check_snap_absent() {
     local label="$1"

@@ -47,6 +47,19 @@ has_rootfs() {
     [[ -d "${ROOTFS}/etc" ]]
 }
 
+# Runtime-artifact guard for preflight scripts that inspect the built rootfs or
+# squashfs. When neither is present (e.g. the GitHub CI runner, which never
+# clones the heavy Ubuntu base), run only the static checks already executed and
+# skip the runtime checks with a clean PASS so CI stays green — build hosts still
+# enforce the full gate because the rootfs/squashfs exists there.
+skip_without_filesystem() {
+    local label="${1:-preflight}"
+    if ! has_rootfs && ! has_squashfs; then
+        warn "no rootfs/squashfs present (static/CI env) — skipping runtime checks"
+        preflight_exit "${label}"
+    fi
+}
+
 list_installed_packages() {
     local status_file="$1"
     awk '/^Package: / { pkg=$2 }

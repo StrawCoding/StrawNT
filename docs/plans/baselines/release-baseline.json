@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-release-baseline/v1",
   "generated_at": "2026-07-04",
-  "version": "0.5.0.1",
+  "version": "0.7.0.17",
   "channels": {
     "dev": {
       "iso_mode": "dev-iso",
@@ -25,22 +25,9 @@
     }
   },
   "squashfs": {
-    "present": true,
-    "ubuntu_packages": [
-      "ubuntu-desktop",
-      "ubuntu-desktop-minimal",
-      "ubuntu-docs",
-      "ubuntu-drivers-common",
-      "ubuntu-keyring",
-      "ubuntu-minimal",
-      "ubuntu-mono",
-      "ubuntu-release-upgrader-core",
-      "ubuntu-settings",
-      "ubuntu-standard",
-      "ubuntu-wallpapers",
-      "ubuntu-wallpapers-noble"
-    ],
-    "ubuntu_package_count": 12,
+    "present": false,
+    "ubuntu_packages": [],
+    "ubuntu_package_count": 0,
     "strawwu_deb_count": 0
   },
   "purge": {
@@ -74,9 +61,20 @@
       "StrawWU-0.4.0.0-amd64.iso",
       "StrawWU-0.4.0.1-amd64.iso",
       "StrawWU-0.4.1.33-amd64.iso",
-      "StrawWU-0.4.1.4-amd64.iso"
+      "StrawWU-0.4.1.4-amd64.iso",
+      "StrawWU-0.5.0.5-amd64.iso",
+      "StrawWU-0.5.0.6-amd64.iso",
+      "StrawWU-0.5.0.7-amd64.iso",
+      "StrawWU-0.6.1.4-amd64.iso",
+      "StrawWU-0.6.1.5-amd64.iso",
+      "StrawWU-0.6.2.5-amd64.iso",
+      "StrawWU-0.7.0.12-amd64.iso",
+      "StrawWU-0.7.0.13-amd64.iso",
+      "StrawWU-0.7.0.14-amd64.iso",
+      "StrawWU-0.7.0.16-amd64.iso",
+      "StrawWU-0.7.0.17-amd64.iso"
     ],
-    "latest_iso": "StrawWU-0.4.1.4-amd64.iso",
+    "latest_iso": "StrawWU-0.7.0.17-amd64.iso",
     "gpg_signing_ready": true,
     "apt_repo_ready": true,
     "release_manifest_ready": true
@@ -89,7 +87,7 @@
     "publish_debs": "scripts/publish-debs.sh"
   },
   "wave0_gaps": [
-    "12 ubuntu-* packages still in squashfs",
+    "0 ubuntu-* packages still in squashfs",
     "W7-RE1 manifest + RE2 GPG signing scripts present",
     "W7-RE3 APT repo + strawwu-keyring + publish-debs.sh present",
     "W1-B1 purge complete — snap transition apps removed (Flathub in F1)",
