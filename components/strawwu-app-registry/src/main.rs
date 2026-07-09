@@ -8,7 +8,23 @@ use strawwu_app_registry::{
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
+// Restore the default SIGPIPE disposition so the CLI is terminated by the signal
+// (like every other Unix filter) when a downstream reader closes the pipe early
+// — e.g. `strawwu-app-registry ... | head` or `| grep -q`. Rust ignores SIGPIPE
+// by default and instead panics on the failed stdout write ("Broken pipe"), which
+// is noisy and breaks pipelines. Must run before any stdout output.
+#[cfg(unix)]
+fn reset_sigpipe() {
+    unsafe {
+        libc::signal(libc::SIGPIPE, libc::SIG_DFL);
+    }
+}
+
+#[cfg(not(unix))]
+fn reset_sigpipe() {}
+
 fn main() {
+    reset_sigpipe();
     let args: Vec<String> = std::env::args().skip(1).collect();
     let cmd = match cli::parse_args(&args) {
         Ok(cmd) => cmd,

@@ -19,5 +19,8 @@ strawwu-app-registry = { path = "../strawwu-app-registry" }
 strawwu-cli = { path = "../strawwu-cli" }
 strawwu-nt = { path = "../strawwu-nt" }
 
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
 [dev-dependencies]
 tempfile = "3"

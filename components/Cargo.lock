@@ -320,6 +320,7 @@ name = "strawwu-app-registry"
 version = "0.4.0"
 dependencies = [
  "chrono",
+ "libc",
  "serde",
  "serde_json",
  "tempfile",
@@ -376,6 +377,7 @@ dependencies = [
 name = "strawwu-launcher"
 version = "0.4.0"
 dependencies = [
+ "libc",
  "serde",
  "serde_json",
  "strawwu-app-registry",

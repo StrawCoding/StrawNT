@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-greeter-session-baseline/v1",
   "wave": "W5-GRT",
-  "version": "0.7.0.19",
+  "version": "0.7.0.20",
   "package": "strawwu-greeter",
   "log_path": "/var/log/strawwu/greeter.log",
   "marker_path": "/var/lib/strawwu/setup/greeter.ok",

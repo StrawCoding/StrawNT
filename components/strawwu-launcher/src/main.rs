@@ -14,7 +14,22 @@ use strawwu_runtime::{execute_pe, maybe_run_gui_smoke};
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
+// Restore default SIGPIPE so the CLI is terminated by the signal (like any Unix
+// filter) when a downstream reader closes the pipe early — e.g. `strawwu ... |
+// grep -q` / `| head`. Rust otherwise ignores SIGPIPE and panics on the failed
+// stdout write ("Broken pipe"). Must run before any stdout output.
+#[cfg(unix)]
+fn reset_sigpipe() {
+    unsafe {
+        libc::signal(libc::SIGPIPE, libc::SIG_DFL);
+    }
+}
+
+#[cfg(not(unix))]
+fn reset_sigpipe() {}
+
 fn main() {
+    reset_sigpipe();
     let args: Vec<String> = std::env::args().skip(1).collect();
     let cmd = match cli::parse_args(&args) {
         Ok(cmd) => cmd,
