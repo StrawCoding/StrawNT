@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-hw5-stable-gate-baseline/v1",
   "stage": "post-hw5-stable-gate",
-  "version": "0.7.0.21",
+  "version": "0.7.0.25",
   "minimum_stable_rate": 0.8,
   "scope": "T1+T2 real-hardware (physical-live, physical-installed, installed-e2e)",
   "compute_script": "tests/hw/compute-stable-summary.py",

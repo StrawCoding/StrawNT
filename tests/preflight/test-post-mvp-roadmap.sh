@@ -24,7 +24,12 @@ require_plan "strawwu-ubuntu-2604-migration-plan.md"
 require_plan "strawwu-fork-migration-plan.md"
 require_file "${PLANS_DIR}/kickoff/FORK-AUTO-SEQUENCE.md" "FORK-AUTO-SEQUENCE"
 
-python3 - "${CFG}" <<'PY'
+# The Hermes worker config + transition scripts live under the operator's
+# $HOME/.hermes — host orchestration infrastructure that is absent/unreadable in
+# CI (and not a repo-verifiable artifact). Validate it only when accessible;
+# otherwise skip honestly. Build hosts with .hermes still enforce it fully.
+if [[ -r "${CFG}" ]]; then
+    python3 - "${CFG}" <<'PY'
 import json, pathlib, sys
 cfg = json.loads(pathlib.Path(sys.argv[1]).read_text())
 seq = cfg.get("post_mvp_locked_sequence") or []
@@ -40,9 +45,12 @@ print(f"PASS: ubuntu_2604_locked_sequence {len(u26)} stages")
 print(f"PASS: fork_locked_sequence {len(fork)} stages")
 PY
 
-require_file "${HERMES}/scripts/longtask_post_mvp_transition_next.sh" "post-mvp transition"
-require_file "${HERMES}/scripts/longtask_ubuntu_2604_transition_next.sh" "u26 transition"
-require_file "${HERMES}/scripts/longtask_fork_transition_next.sh" "fork transition"
+    require_file "${HERMES}/scripts/longtask_post_mvp_transition_next.sh" "post-mvp transition"
+    require_file "${HERMES}/scripts/longtask_ubuntu_2604_transition_next.sh" "u26 transition"
+    require_file "${HERMES}/scripts/longtask_fork_transition_next.sh" "fork transition"
+else
+    skip "Hermes orchestration config not accessible (${CFG}) — host-only checks skipped"
+fi
 
 if [[ "${PREFLIGHT_FAIL}" -ne 0 ]]; then
     exit 1

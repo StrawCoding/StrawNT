@@ -23,7 +23,10 @@ for k in FORK-F1-baseline-snapshot FORK-F2-manifest-repo FORK-F3-build-pipeline 
     require_file "${PLANS_DIR}/kickoff/${k}.md" "kickoff ${k}"
 done
 
-python3 - "${CFG}" "${REPO_ROOT}/docs/plans/ubuntu-base-target.json" <<'PY'
+# Hermes worker config + transition script are host orchestration infrastructure
+# ($HOME/.hermes), absent/unreadable in CI. Validate only when accessible.
+if [[ -r "${CFG}" ]]; then
+    python3 - "${CFG}" "${REPO_ROOT}/docs/plans/ubuntu-base-target.json" <<'PY'
 import json, pathlib, sys
 cfg = json.loads(pathlib.Path(sys.argv[1]).read_text())
 base = json.loads(pathlib.Path(sys.argv[2]).read_text())
@@ -37,7 +40,10 @@ print(f"PASS: fork_locked_sequence {len(fork)} stages")
 print(f"PASS: ubuntu-base-target fork config")
 PY
 
-require_file "${HERMES}/scripts/longtask_fork_transition_next.sh" "fork transition"
+    require_file "${HERMES}/scripts/longtask_fork_transition_next.sh" "fork transition"
+else
+    skip "Hermes orchestration config not accessible (${CFG}) — host-only checks skipped"
+fi
 
 if [[ "${PREFLIGHT_FAIL}" -ne 0 ]]; then
     exit 1

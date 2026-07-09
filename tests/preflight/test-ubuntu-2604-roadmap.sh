@@ -16,21 +16,33 @@ for k in U26-M1-base-clone U26-M2-kernel-rebase U26-M3-debs-rebuild U26-M4-suite
     require_file "${PLANS_DIR}/kickoff/${k}.md" "kickoff ${k}"
 done
 
-python3 - "${CFG}" <<'PY'
+# Hermes worker config + transition script are host orchestration infrastructure
+# ($HOME/.hermes), absent/unreadable in CI. The ubuntu-base-target.json checks are
+# repo-verifiable, so run them regardless; gate the Hermes-only parts on access.
+if [[ -r "${CFG}" ]]; then
+    python3 - "${CFG}" <<'PY'
 import json, pathlib, sys
 cfg = json.loads(pathlib.Path(sys.argv[1]).read_text())
 seq = cfg.get("ubuntu_2604_locked_sequence") or []
 assert len(seq) == 7, f"expected 7 u26 stages got {len(seq)}"
 for sid in seq:
     assert sid in cfg.get("stages", {}), f"missing stage def {sid}"
+print(f"PASS: ubuntu_2604_locked_sequence {len(seq)} stages")
+PY
+
+    require_file "${HERMES}/scripts/longtask_ubuntu_2604_transition_next.sh" "u26 transition script"
+else
+    skip "Hermes orchestration config not accessible (${CFG}) — host-only checks skipped"
+fi
+
+# Repo-verifiable target config (always checked).
+python3 - <<'PY'
+import json, pathlib
 target = json.loads(pathlib.Path("docs/plans/ubuntu-base-target.json").read_text())
 assert target["target"]["codename"] == "resolute"
 assert target["target"]["version"].startswith("26.04")
-print(f"PASS: ubuntu_2604_locked_sequence {len(seq)} stages")
 print(f"PASS: target Ubuntu {target['target']['version']} {target['target']['codename']}")
 PY
-
-require_file "${HERMES}/scripts/longtask_ubuntu_2604_transition_next.sh" "u26 transition script"
 
 if [[ "${PREFLIGHT_FAIL}" -ne 0 ]]; then
     exit 1
