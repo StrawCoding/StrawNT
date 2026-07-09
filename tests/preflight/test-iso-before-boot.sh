@@ -131,7 +131,13 @@ else
 fi
 
 if [[ -n "${CASPER_DIR}" && -d "${CASPER_DIR}" ]]; then
-  VMLINUZ_PATH="$(find "${CASPER_DIR}" -maxdepth 1 -name 'vmlinuz' -o -name 'vmlinuz*' 2>/dev/null | head -1)"
+  # Primary (custom) kernel is exactly casper/vmlinuz; casper/vmlinuz-generic is the
+  # Secure Boot fallback and must not shadow this match.
+  if [[ -f "${CASPER_DIR}/vmlinuz" ]]; then
+    VMLINUZ_PATH="${CASPER_DIR}/vmlinuz"
+  else
+    VMLINUZ_PATH="$(find "${CASPER_DIR}" -maxdepth 1 -name 'vmlinuz' 2>/dev/null | head -1)"
+  fi
   INITRD_PATH="${CASPER_DIR}/initrd"
   SQUASHFS_PATH="${CASPER_DIR}/minimal.squashfs"
 
@@ -143,7 +149,7 @@ if [[ -n "${CASPER_DIR}" && -d "${CASPER_DIR}" ]]; then
     rootfs_vmlinuz="$(find "${WORK_DIR}/rootfs/boot" -maxdepth 1 -name 'vmlinuz-*strawwu*' 2>/dev/null | head -1)"
     if [[ -n "${rootfs_vmlinuz}" && -f "${rootfs_vmlinuz}" ]] && cmp -s "${VMLINUZ_PATH}" "${rootfs_vmlinuz}"; then
       echo "PASS: casper vmlinuz matches rootfs strawwu kernel image"
-    elif strings "${VMLINUZ_PATH}" 2>/dev/null | grep -qE '6\.8\.[0-9]+-strawwu|Linux version .*strawwu'; then
+    elif strings "${VMLINUZ_PATH}" 2>/dev/null | grep -qE '[0-9]+\.[0-9]+\.[0-9]+-strawwu|Linux version .*strawwu'; then
       echo "PASS: vmlinuz strings reference strawwu kernel"
     else
       echo "FAIL: casper vmlinuz does not match strawwu kernel (cmp/strings)" >&2
@@ -260,6 +266,17 @@ if [[ -n "${CASPER_DIR}" && -d "${CASPER_DIR}" ]]; then
           echo "FAIL: initrd ${modules_phase} missing early-gpu hook — GPU modules never loaded before Plymouth" >&2
           FAIL=1
         fi
+        early_order="${modules_dir}/scripts/init-top/ORDER"
+        if [[ -f "${early_order}" ]]; then
+          if grep -q 'udev' "${early_order}" 2>/dev/null; then
+            echo "PASS: initrd ${modules_phase} init-top ORDER includes udev before GPU"
+          else
+            echo "FAIL: initrd ${modules_phase} has standalone init-top ORDER without udev — physical panic risk" >&2
+            FAIL=1
+          fi
+        else
+          echo "PASS: initrd ${modules_phase} has no standalone init-top ORDER (main phase owns hook order)"
+        fi
         meta_ok=0
         if [[ -n "${modules_dir}" ]]; then
           mod_meta_root=$(find "${modules_dir}/usr/lib/modules" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | head -1)
@@ -375,8 +392,65 @@ if [[ -n "${grub_cfg}" ]]; then
     echo "FAIL: GRUB missing username=ubuntu — casper may use nonexistent strawwu user" >&2
     FAIL=1
   fi
+  if grep -E 'linux.*boot=casper.*console=tty0.*---' "${grub_cfg}" >/dev/null 2>&1 \
+     || grep -E 'append.*boot=casper.*console=tty0' "${grub_cfg}" >/dev/null 2>&1; then
+    echo "PASS: GRUB console=tty0 precedes --- (kernel early console)"
+  else
+    echo "FAIL: GRUB console=tty0 after --- — kernel may miss physical display" >&2
+    FAIL=1
+  fi
 else
   warn "GRUB cfg not found — skipping console/username checks"
+fi
+
+# --- Secure Boot hybrid (MOK-signed custom kernel + signed generic fallback) ---
+MOK_CRT="${REPO_ROOT}/os-image/keys/secureboot/StrawWU-MOK.crt"
+if [[ -n "${CASPER_DIR}" && -d "${CASPER_DIR}" ]]; then
+  sb_vmlinuz="${CASPER_DIR}/vmlinuz"
+  sb_generic="${CASPER_DIR}/vmlinuz-generic"
+  sb_initrd_generic="${CASPER_DIR}/initrd-generic"
+
+  if command -v sbverify >/dev/null 2>&1 && [[ -f "${MOK_CRT}" && -f "${sb_vmlinuz}" ]]; then
+    if sbverify --cert "${MOK_CRT}" "${sb_vmlinuz}" >/dev/null 2>&1; then
+      echo "PASS: casper/vmlinuz is StrawWU MOK-signed (boots under Secure Boot after enroll)"
+    else
+      echo "FAIL: casper/vmlinuz not MOK-signed — Secure Boot will reject custom kernel with no fallback recovery" >&2
+      FAIL=1
+    fi
+  else
+    warn "sbverify or MOK cert unavailable — skipping custom kernel signature check"
+  fi
+
+  if [[ -f "${sb_generic}" ]]; then
+    echo "PASS: casper/vmlinuz-generic present (Secure Boot fallback kernel)"
+    if command -v sbverify >/dev/null 2>&1; then
+      if sbverify --list "${sb_generic}" 2>/dev/null | grep -qi 'Canonical'; then
+        echo "PASS: casper/vmlinuz-generic is Canonical-signed (boots on stock Secure Boot)"
+      else
+        echo "FAIL: casper/vmlinuz-generic not Canonical-signed — fallback will also fail under Secure Boot" >&2
+        FAIL=1
+      fi
+    fi
+  else
+    echo "FAIL: casper/vmlinuz-generic missing — no Secure Boot fallback (real HW = 'no system')" >&2
+    FAIL=1
+  fi
+
+  if [[ -f "${sb_initrd_generic}" ]]; then
+    echo "PASS: casper/initrd-generic present (fallback initrd)"
+  else
+    echo "FAIL: casper/initrd-generic missing — fallback kernel cannot mount live filesystem" >&2
+    FAIL=1
+  fi
+fi
+
+if [[ -n "${grub_cfg}" ]]; then
+  if grep -q '/casper/vmlinuz-generic' "${grub_cfg}"; then
+    echo "PASS: GRUB has Secure Boot fallback to /casper/vmlinuz-generic"
+  else
+    echo "FAIL: GRUB missing Secure Boot fallback entry — unenrolled MOK on real HW drops to firmware" >&2
+    FAIL=1
+  fi
 fi
 
 # --- Build mode marker ---

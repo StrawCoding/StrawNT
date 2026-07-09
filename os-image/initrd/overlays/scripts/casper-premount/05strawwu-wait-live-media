@@ -1,5 +1,5 @@
 #!/bin/sh
-# StrawWU overlay — wait for optical media and preload fs modules before casper mountroot.
+# StrawWU overlay — wait for live media (optical OR USB iso9660) and preload fs modules.
 PREREQ=""
 
 prereqs() {
@@ -13,12 +13,19 @@ prereqs)
 	;;
 esac
 
-# strawwu kernel boots faster than stock; sr0 may not be ready when casper first mounts.
+# strawwu kernel boots faster than stock; block devices may lag behind casper mountroot.
 i=0
 while [ "$i" -lt 50 ]; do
 	if [ -b /dev/sr0 ] || [ -b /dev/cdrom ]; then
 		break
 	fi
+	for usb in /dev/sd*[0-9]; do
+		[ -b "$usb" ] || continue
+		fstype=$(blkid -o value -s TYPE "$usb" 2>/dev/null || true)
+		if [ "$fstype" = "iso9660" ] || [ "$fstype" = "udf" ]; then
+			break 2
+		fi
+	done
 	sleep 0.2
 	i=$((i + 1))
 done
@@ -41,13 +48,20 @@ modprobe -q -b isofs 2>/dev/null || true
 modprobe -q -b overlay 2>/dev/null || true
 modprobe -q -b squashfs 2>/dev/null || true
 
-# Probe-mount until the block layer accepts the ISO (ENODEV race on fast boots).
+# Probe-mount until the block layer accepts the ISO (optical or USB iso9660).
 mkdir -p /cdrom
 i=0
 while [ "$i" -lt 30 ]; do
 	for dev in /dev/sr0 /dev/cdrom; do
 		[ -b "$dev" ] || continue
 		if mount -t iso9660 -o ro "$dev" /cdrom 2>/dev/null; then
+			umount /cdrom 2>/dev/null || true
+			exit 0
+		fi
+	done
+	for usb in /dev/sd*[0-9]; do
+		[ -b "$usb" ] || continue
+		if mount -t iso9660 -o ro "$usb" /cdrom 2>/dev/null; then
 			umount /cdrom 2>/dev/null || true
 			exit 0
 		fi

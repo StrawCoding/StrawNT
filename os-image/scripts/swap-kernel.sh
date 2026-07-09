@@ -56,12 +56,32 @@ main() {
         log "apt install failed (broken deps?) — falling back to dpkg -i"
         chroot_run bash -c 'DEBIAN_FRONTEND=noninteractive dpkg -i --force-depends /tmp/strawwu-kernel.deb || dpkg -i /tmp/strawwu-kernel.deb'
     fi
-    chroot_run bash -c 'apt-get purge -y "linux-image-generic*" "linux-image-unsigned-*" 2>/dev/null || true; update-initramfs -u -k all' || true
+    # Keep the Canonical-signed concrete generic kernel + modules as the Secure Boot
+    # fallback (no-MOK path). Only the generic meta-packages are purged; the actual
+    # linux-image-<ver>-generic must survive autoremove.
+    chroot_run bash -c '
+        set -e
+        for pkg in $(dpkg-query -W -f="\${Package}\n" "linux-image-*-generic" "linux-modules-*-generic" 2>/dev/null); do
+            apt-mark manual "$pkg" 2>/dev/null || true
+        done
+        apt-get purge -y "linux-image-generic" "linux-image-generic-hwe-*" "linux-image-unsigned-*" 2>/dev/null || true
+        update-initramfs -u -k all
+    ' || true
     rm -f "${ROOTFS_DIR}/tmp/strawwu-kernel.deb"
 
     local kver=""
     kver="$(ls "${ROOTFS_DIR}/lib/modules" 2>/dev/null | grep strawwu | head -1 || true)"
     [[ -n "${kver}" ]] || kver="$(ls "${ROOTFS_DIR}/boot/vmlinuz-"* 2>/dev/null | sed 's|.*/vmlinuz-||' | head -1 || true)"
+
+    # Secure Boot: sign the custom (unsigned) StrawWU kernel with the StrawWU MOK so
+    # it boots under Secure Boot once the user enrolls the MOK. The Canonical-signed
+    # generic kernel is kept in the rootfs as the no-MOK fallback (see build-iso.sh).
+    local custom_vmlinuz
+    custom_vmlinuz="$(ls "${ROOTFS_DIR}/boot/vmlinuz-"*strawwu* 2>/dev/null | head -1 || true)"
+    if [[ -n "${custom_vmlinuz}" ]]; then
+        bash "${SCRIPT_DIR}/secureboot-route/mok-sign.sh" "${custom_vmlinuz}" || true
+    fi
+
     echo "strawwu-kernel:${kver:-unknown}" > "${MARKER}"
     log "kernel swap complete (${kver:-unknown})"
 }

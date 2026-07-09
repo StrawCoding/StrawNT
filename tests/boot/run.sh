@@ -39,6 +39,31 @@ find_ovmf_vars() {
     die "OVMF vars not found (install ovmf package)"
 }
 
+find_ovmf_secboot() {
+    for p in \
+        /usr/share/OVMF/OVMF_CODE_4M.secboot.fd \
+        /usr/share/OVMF/OVMF_CODE.secboot.fd; do
+        if [[ -f "$p" ]]; then
+            echo "$p"
+            return
+        fi
+    done
+    die "Secure Boot OVMF firmware not found (install ovmf; need OVMF_CODE*.secboot.fd)"
+}
+
+# Vars pre-enrolled with Microsoft + Canonical UEFI CA keys.
+find_ovmf_vars_ms() {
+    for p in \
+        /usr/share/OVMF/OVMF_VARS_4M.ms.fd \
+        /usr/share/OVMF/OVMF_VARS.ms.fd; do
+        if [[ -f "$p" ]]; then
+            echo "$p"
+            return
+        fi
+    done
+    die "Secure Boot OVMF vars (MS-enrolled) not found (need OVMF_VARS*.ms.fd)"
+}
+
 run_qemu_boot() {
     local mode="$1"
     local serial_log="${OUTPUT_DIR}/serial-${mode}.log"
@@ -69,6 +94,27 @@ run_qemu_boot() {
                 -machine q35,accel=kvm:tcg
                 -drive "if=pflash,format=raw,readonly=on,file=${ovmf}"
                 -drive "if=pflash,format=raw,file=${ovmf_vars_tmp}"
+                -drive "file=${ISO_PATH},format=raw,if=none,id=cdrom0,media=cdrom,readonly=on"
+                -device virtio-scsi-pci,id=scsi0
+                -device scsi-cd,bus=scsi0.0,drive=cdrom0,bootindex=1
+            )
+            ;;
+        secureboot)
+            # Secure Boot enabled (MS + Canonical CA enrolled). The MOK-signed custom
+            # kernel is rejected (unenrolled MOK) so this exercises the GRUB fallback to
+            # the Canonical-signed generic kernel. PASS => a real machine with Secure Boot
+            # ON still boots StrawWU out of the box.
+            local ovmf ovmf_vars
+            ovmf="$(find_ovmf_secboot)"
+            ovmf_vars="$(find_ovmf_vars_ms)"
+            ovmf_vars_tmp="$(mktemp)"
+            cp "${ovmf_vars}" "${ovmf_vars_tmp}"
+            extra_args=(
+                -machine q35,accel=kvm:tcg,smm=on
+                -global driver=cfi.pflash01,property=secure,value=on
+                -global ICH9-LPC.disable_s3=1
+                -drive "if=pflash,format=raw,unit=0,readonly=on,file=${ovmf}"
+                -drive "if=pflash,format=raw,unit=1,file=${ovmf_vars_tmp}"
                 -drive "file=${ISO_PATH},format=raw,if=none,id=cdrom0,media=cdrom,readonly=on"
                 -device virtio-scsi-pci,id=scsi0
                 -device scsi-cd,bus=scsi0.0,drive=cdrom0,bootindex=1
@@ -169,12 +215,15 @@ main() {
     acquire_boot_lock
 
     local modes_csv="${STRAWWU_BOOT_TEST_MODES:-bios,uefi}"
-    local run_bios=0 run_uefi=0
+    local run_bios=0 run_uefi=0 run_secboot=0
     [[ "${modes_csv}" == *bios* ]] && run_bios=1
-    [[ "${modes_csv}" == *uefi* ]] && run_uefi=1
+    # match uefi but not confuse with secureboot; check explicitly
+    [[ ",${modes_csv}," == *,uefi,* ]] && run_uefi=1
+    [[ "${modes_csv}" == *secureboot* ]] && run_secboot=1
 
     local bios_result='{"mode":"bios","status":"SKIPPED"}'
     local uefi_result='{"mode":"uefi","status":"SKIPPED"}'
+    local secboot_result='{"mode":"secureboot","status":"SKIPPED"}'
     local overall="PASS"
 
     if [[ "${run_bios}" -eq 1 ]]; then
@@ -185,6 +234,10 @@ main() {
         uefi_result="$(run_qemu_boot uefi)"
         [[ "$(echo "${uefi_result}" | jq -r '.status')" == "PASS" ]] || overall="FAIL"
     fi
+    if [[ "${run_secboot}" -eq 1 ]]; then
+        secboot_result="$(run_qemu_boot secureboot)"
+        [[ "$(echo "${secboot_result}" | jq -r '.status')" == "PASS" ]] || overall="FAIL"
+    fi
 
     jq -n \
         --arg version "${VERSION}" \
@@ -194,8 +247,9 @@ main() {
         --arg modes "${modes_csv}" \
         --argjson bios "${bios_result}" \
         --argjson uefi "${uefi_result}" \
+        --argjson secureboot "${secboot_result}" \
         --arg tested "$(date -Is)" \
-        '{version: $version, status: $overall, marker: $marker, iso: $iso, tested: $tested, modes_tested: $modes, bios: $bios, uefi: $uefi}' \
+        '{version: $version, status: $overall, marker: $marker, iso: $iso, tested: $tested, modes_tested: $modes, bios: $bios, uefi: $uefi, secureboot: $secureboot}' \
         > "${OUTPUT_DIR}/boot-result.json"
 
     log "boot-result.json → ${OUTPUT_DIR}/boot-result.json (overall: ${overall}, modes: ${modes_csv})"

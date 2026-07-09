@@ -480,7 +480,13 @@ def inject_early_gpu_hook_into_module_phase(
     module_dir: Path,
     overlays_root: Path | None = None,
 ) -> bool:
-    """Mirror init-top GPU hook into the early module phase (pre-Plymouth)."""
+    """Copy GPU hook payload into the early module phase (pre-Plymouth modules tree).
+
+    Do NOT write scripts/init-top/ORDER here — early2 prefix must stay data-only.
+    A standalone ORDER with only the GPU hook runs before udev during prefix unpack
+    and can kernel-panic on physical Intel/AMD hardware (GRUB → black → firmware).
+    Runtime hook ordering lives in main initrd (inject_initrd_overlays → after udev).
+    """
     root = resolve_overlays_root(overlays_root)
     if root is None:
         return False
@@ -494,7 +500,9 @@ def inject_early_gpu_hook_into_module_phase(
     hook_dest = hook_dest_dir / "05strawwu-early-gpu"
     shutil.copy2(hook_src, hook_dest)
     hook_dest.chmod(0o755)
-    ensure_hook_order_after(module_dir, "init-top", "udev", ["05strawwu-early-gpu"])
+    order = hook_dest_dir / "ORDER"
+    if order.is_file():
+        order.unlink()
     return True
 
 

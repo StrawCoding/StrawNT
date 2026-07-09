@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# strawwu-mok-enroll — Enroll the StrawWU MOK so the MOK-signed performance kernel
+# (linux-image-strawwu) boots under UEFI Secure Boot. Safe no-op when Secure Boot is
+# off or the MOK is already enrolled. Enrollment is confirmed by the user in shim
+# MokManager on the next reboot.
+#
+#   strawwu-mok-enroll --check   Report state, exit 0 if action needed, 10 if not.
+#   strawwu-mok-enroll           Import the MOK (prompts for a one-time password).
+set -euo pipefail
+
+CER="${STRAWWU_MOK_CER:-/usr/share/strawwu/secureboot/StrawWU-MOK.cer}"
+
+sb_enabled() {
+    command -v mokutil >/dev/null 2>&1 || return 1
+    mokutil --sb-state 2>/dev/null | grep -qi 'SecureBoot enabled'
+}
+
+mok_enrolled() {
+    [[ -f "${CER}" ]] || return 1
+    mokutil --test-key "${CER}" 2>/dev/null | grep -qi 'already enrolled'
+}
+
+mok_pending() {
+    mokutil --list-new 2>/dev/null | grep -q .
+}
+
+state() {
+    if ! command -v mokutil >/dev/null 2>&1; then echo "no-mokutil"; return; fi
+    if ! sb_enabled; then echo "sb-off"; return; fi
+    if [[ ! -f "${CER}" ]]; then echo "no-cert"; return; fi
+    if mok_enrolled; then echo "enrolled"; return; fi
+    if mok_pending; then echo "pending"; return; fi
+    echo "needs-enroll"
+}
+
+case "${1:-}" in
+    --check)
+        s="$(state)"
+        echo "strawwu-mok state: ${s}"
+        [[ "${s}" == "needs-enroll" ]] && exit 0 || exit 10
+        ;;
+    -h|--help)
+        grep '^#' "$0" | sed 's/^# \{0,1\}//'
+        exit 0
+        ;;
+esac
+
+s="$(state)"
+case "${s}" in
+    no-mokutil) echo "mokutil not available — cannot enroll." >&2; exit 1 ;;
+    sb-off)     echo "Secure Boot is disabled — MOK enrollment not required." ; exit 0 ;;
+    no-cert)    echo "MOK certificate not found: ${CER}" >&2; exit 1 ;;
+    enrolled)   echo "StrawWU MOK already enrolled — performance kernel will boot." ; exit 0 ;;
+    pending)    echo "A MOK enrollment is already pending — reboot to confirm in MokManager." ; exit 0 ;;
+esac
+
+echo "Importing StrawWU MOK. You will set a one-time password now and confirm it in"
+echo "the blue MOK Manager screen on the next reboot."
+mokutil --import "${CER}"
+echo "Done. Reboot and choose 'Enroll MOK' to enable the StrawWU performance kernel."

@@ -1,6 +1,6 @@
 .PHONY: help preflight preflight-iso-before-boot preflight-dev-vm clone-ubuntu-base sync-base fork-sync-base fork-baseline-snapshot fork-apply-manifest build-fork-packages swap-kernel \
 	build-iso dev-iso release-iso repack-iso validate-rootfs boot-test-iso boot-test-dev-iso \
-	boot-test-release-iso dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
+	boot-test-release-iso boot-test-secureboot dev-vm-start dev-vm-sync dev-vm-test dev-vm-cycle dev-vm-rollback \
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
 	test-install-e2e test-install-firstboot-e2e test-installed-boot test-target-flathub test-wincompat test-wincompat-os test-wincompat-registry test-wincompat-gui test-wincompat-e2e test-hw-live-usb test-hw-matrix test-user-docs test-handbook test-mvp-closeout test-release-manifest test-apt-repo test-ci-baseline test-ci-nightly test-perf-baseline test-perf-legal-gate test-strawwu-shell test-hub test-hub-settings test-apps-page test-flathub-hub test-l10n-ime test-firstboot test-finished-meta test-context-menu test-registry-hooks test-deep-uninstall test-initramfs-hooks test-target-identity test-greeter-session test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-initrd-overlays test-initrd-core test-initrd-bottom test-init-tools test-bug-reporter test-calamares-settings test-app-registry test-security-baseline test-observability test-legal-trademark test-desktop-stack test-live-install-ux test-update-notifier test-target-setup test-meta-audit purge-ubuntu-telemetry \
 	install-flatpak-setup install-bug-reporter install-calamares-settings install-update-notifier install-target-setup install-firstboot install-wincompat nosnap-harden build-debs bump-version check-version-bump generate-release-manifest release-sign publish-debs publish-fork-debs
@@ -263,10 +263,14 @@ boot-test-iso: boot-test-release-iso
 
 boot-test-dev-iso:
 	STRAWWU_ISO_MODE=dev-iso bash tests/preflight/test-iso-before-boot.sh
-	STRAWWU_ISO_MODE=dev-iso STRAWWU_BOOT_TEST_MODES=bios bash tests/boot/run.sh
+	STRAWWU_ISO_MODE=dev-iso STRAWWU_BOOT_TEST_MODES=bios,secureboot bash tests/boot/run.sh
 
 boot-test-release-iso: preflight-iso-before-boot
-	STRAWWU_ISO_MODE=release-iso STRAWWU_BOOT_TEST_MODES=bios,uefi bash tests/boot/run.sh
+	STRAWWU_ISO_MODE=release-iso STRAWWU_BOOT_TEST_MODES=bios,uefi,secureboot bash tests/boot/run.sh
+
+# Secure Boot regression gate only (MOK-signed custom kernel -> signed generic fallback).
+boot-test-secureboot:
+	STRAWWU_BOOT_TEST_MODES=secureboot bash tests/boot/run.sh
 
 dev-vm-start:
 	bash tests/dev-vm/start.sh

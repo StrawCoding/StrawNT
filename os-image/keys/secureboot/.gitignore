@@ -1,0 +1,4 @@
+# The StrawWU MOK private key is a signing secret and MUST NOT be committed.
+# Only the public certificate (.crt / .cer) is tracked so builds can verify
+# signatures and the rootfs can ship the enrollment certificate.
+StrawWU-MOK.key

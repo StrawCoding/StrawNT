@@ -62,10 +62,28 @@ else
 	fail "initrd-splice.py missing early-gpu module-phase injection"
 fi
 
+if grep -q 'Do NOT write scripts/init-top/ORDER here' "${SPLICE}"; then
+	pass "initrd-splice.py avoids standalone early2 init-top ORDER (udev race)"
+else
+	fail "initrd-splice.py may still write early2 ORDER without udev — physical panic risk"
+fi
+
+if grep -q 'detect_gpu_driver' "${OVERLAYS}/scripts/init-top/05strawwu-early-gpu"; then
+	pass "early-gpu hook is PCI-aware (single driver load)"
+else
+	fail "early-gpu hook loads all GPU drivers — physical panic risk"
+fi
+
 if grep -q 'find "${MODROOT}"' "${OVERLAYS}/scripts/init-top/05strawwu-early-gpu"; then
 	pass "early-gpu hook uses explicit insmod paths (no modules.dep dependency)"
 else
 	fail "early-gpu hook still modprobe-only — will fail on early2 without modules.dep"
+fi
+
+if grep -q '/dev/sd\*\[0-9\]' "${OVERLAYS}/scripts/casper-premount/05strawwu-wait-live-media"; then
+	pass "wait-live-media probes USB iso9660 partitions"
+else
+	fail "wait-live-media only waits for sr0/cdrom — Live USB boot race"
 fi
 
 legacy_hook="${REPO_ROOT}/os-image/config/branding/initrd/scripts/casper-premount/05strawwu-wait-live-media"

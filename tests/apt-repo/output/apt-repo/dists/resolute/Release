@@ -1,23 +1,23 @@
 Architectures: amd64
 Codename: resolute
 Components: main
-Date: Thu, 09 Jul 2026 03:29:14 +0000
+Date: Thu, 09 Jul 2026 11:03:20 +0000
 Label: StrawWU APT Repository
 Origin: StrawWU
 Suite: resolute
 MD5Sum:
- 77ea9785ea97992298cab0eb395fbe69              157 Release
- 43e3aad7381a69be8b4c2b3c35803c67              575 main/binary-amd64/Packages
- 81fae2d3f633c47ee59800dacbf0d07c              415 main/binary-amd64/Packages.gz
+ 50e037188936f724ee9984f3ad404486              157 Release
+ 012e467bd76d9d35cc711d04b7f147b9              575 main/binary-amd64/Packages
+ 21c8a315867080c80b233d06342a42da              413 main/binary-amd64/Packages.gz
 SHA1:
- e9d6851daa009c136fbdc3fff4e7cd2be13ac8e7              157 Release
- 43414f35445e0845f0b13b4f67a25db40989e6e0              575 main/binary-amd64/Packages
- bb197567a72cb6f0546e56dd63453393325072f1              415 main/binary-amd64/Packages.gz
+ 1d57d35aef5ec6c18a6e4e9e7fda417007c13bb2              157 Release
+ 1aaaf53498478e11739742ad7f5e0a93a977dd21              575 main/binary-amd64/Packages
+ c9155f2f85b1b7fa514c67c0eea074d5b407a20a              413 main/binary-amd64/Packages.gz
 SHA256:
- 89212bf1c7bcf79e00ba86969650c2ee4920dbf09a480a59eb4488d34e3ef902              157 Release
- 9626e12ef6bb38335259f9cf779c4bb44c340bf09886f163c2c4d3954ac319ee              575 main/binary-amd64/Packages
- 522d195f17f1cd14be4ff928eee0ccf693442176fefc6f52e1232eb963eaffab              415 main/binary-amd64/Packages.gz
+ f76e1b33cea9e4051d7f83868ec26086fd13cd3a54ded134a1c9a5dc79e15f81              157 Release
+ 52e180c36d4cd6ad336fe82a68b07a794f5bef73ec26ef0486417245c4888280              575 main/binary-amd64/Packages
+ 5c7becf2e91b497b0cea14d76a97234e3faa7f6bc4eb1aa9c0e42957bc40c96b              413 main/binary-amd64/Packages.gz
 SHA512:
- 26e6471a5d283e739723d4411e11faf667c9d2322d133cef8bc7999095ea2c1f7d59aeae4d6763dd820f358ebf82cc4a248a890844910838c09ca2a873d3f918              157 Release
- a43d49d5ef76701c1bb76beda3257e17d592ccb2343473864df4d658f21f852e4d9b5adc0aff63da37e5f63d134f86a7999aa6e88c336f3251d8cd1e4eb28aaa              575 main/binary-amd64/Packages
- 139be2735d48a9d3a2e3ac47f10916604a4d8bc5e29846deac571091ba59b2826b92095a8036ce4f7bc596299e41f505917a40381465d17b831df73c205c7945              415 main/binary-amd64/Packages.gz
+ 9c39b55cea7084b0cfda96b75d509dbc09d084634d739600b9549fa0d950ed8fb9d5280193e8fe06323f1593889a409a87291210934d110fef8542a057a750c3              157 Release
+ 658b9b334d7948b1218cf37b1dd3dcbbc34d349c092b6b32b3d56597bd12977eb30da6137475991f767a0a3decf00f0857c529404dff5dd0f4da15d280e08289              575 main/binary-amd64/Packages
+ f5198c9a8ef4dae7d8e6aa4bf585953479b6dbbeb30b09cf072f4a4d8eb7c505420a5e15de2ba291462d76c1043faba2750a24774b1ef280f86b03de57761c49              413 main/binary-amd64/Packages.gz

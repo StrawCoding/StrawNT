@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-release-manifest-baseline/v1",
   "wave": "W7-RE1+RE2",
-  "version": "0.7.0.15",
+  "version": "0.7.0.17",
   "scripts": {
     "generate_manifest": "scripts/generate-release-manifest.sh",
     "release_sign": "scripts/release-sign.sh",

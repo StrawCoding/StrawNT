@@ -85,11 +85,12 @@ patch_boot_serial_console() {
         sed -i 's/ console=tty0//g' "${cfg}"
         sed -i 's/ username=ubuntu//g' "${cfg}"
         sed -i 's/ boot=casper//g' "${cfg}"
-        # boot=casper must precede '---' (kernel args); missing on UEFI breaks live-media scan.
-        sed -i '/^[[:space:]]*linux[[:space:]]/ s|\(/casper/vmlinuz\)[[:space:]]*|\1 boot=casper |' "${cfg}"
-        sed -i "/^[[:space:]]*append[[:space:]]/ s/^/boot=casper /" "${cfg}"
-        sed -i "/^[[:space:]]*linux[[:space:]]/ s/$/ ${console_args}/" "${cfg}"
-        sed -i "/^[[:space:]]*append[[:space:]]/ s/$/ ${console_args}/" "${cfg}"
+        # boot=casper + console=tty0 must precede '---' (kernel args); missing on UEFI breaks live-media scan.
+        sed -i '/^[[:space:]]*linux[[:space:]]/ s|\(/casper/vmlinuz\)[[:space:]]*|\1 boot=casper '"${console_args}"' |' "${cfg}"
+        sed -i "/^[[:space:]]*append[[:space:]]/ s/^/boot=casper ${console_args} /" "${cfg}"
+        # Strip duplicate console args that upstream placed after '---' (initrd-side only).
+        sed -i 's/ --- quiet splash '"${console_args}"'/ --- quiet splash/g' "${cfg}"
+        sed -i 's/ --- quiet splash '"${console_args}"'/ --- quiet splash/g' "${cfg}"
         # Upstream noble grub has a bare "grub_platform" line UEFI grub treats as a command.
         sed -i '/^grub_platform$/d' "${cfg}"
     done
@@ -172,6 +173,23 @@ EOF
 
 apply_branding() {
     STRAWWU_VERSION="${VERSION}" bash "${SCRIPT_DIR}/apply-branding.sh" rootfs
+}
+
+# Deploy the StrawWU MOK certificate + enrollment helper into the rootfs so the
+# installed/live system can enroll the MOK and boot the signed performance kernel.
+install_secureboot_assets() {
+    local mok_cer="${REPO_ROOT}/os-image/keys/secureboot/StrawWU-MOK.cer"
+    local enroll_src="${REPO_ROOT}/os-image/config/secureboot/strawwu-mok-enroll"
+    if [[ ! -f "${mok_cer}" ]]; then
+        log "WARN: MOK cert missing (${mok_cer}) — skipping secureboot asset install"
+        return 0
+    fi
+    log "installing Secure Boot assets (MOK cert + enroll helper) into rootfs"
+    install -d -m 0755 "${ROOTFS_DIR}/usr/share/strawwu/secureboot"
+    install -m 0644 "${mok_cer}" "${ROOTFS_DIR}/usr/share/strawwu/secureboot/StrawWU-MOK.cer"
+    if [[ -f "${enroll_src}" ]]; then
+        install -m 0755 "${enroll_src}" "${ROOTFS_DIR}/usr/sbin/strawwu-mok-enroll"
+    fi
 }
 
 resolve_source_iso() {
@@ -483,7 +501,39 @@ sync_casper_kernel() {
     kver="$(basename "${vmlinuz}" | sed 's/^vmlinuz-//')"
     log "syncing casper vmlinuz from ${kver} (preserving casper initrd, injecting modules)"
     cp -f "${vmlinuz}" "${ISO_STAGING}/casper/vmlinuz"
+    # Ensure the live custom kernel carries the StrawWU MOK signature.
+    bash "${SCRIPT_DIR}/secureboot-route/mok-sign.sh" "${ISO_STAGING}/casper/vmlinuz" || true
     sync_casper_initrd_modules "${kver}"
+    stage_secureboot_fallback_kernel
+}
+
+# Secure Boot hybrid: stage the Canonical-signed generic kernel + its native casper
+# initrd as the no-MOK fallback. GRUB tries the MOK-signed custom kernel first and
+# falls back here when shim rejects an unenrolled MOK (see patch-iso-secureboot-fallback.sh).
+stage_secureboot_fallback_kernel() {
+    local casper="${ISO_STAGING}/casper"
+    local generic_vmlinuz generic_ver
+    # Pick the highest-versioned Canonical-signed *-generic kernel in the rootfs.
+    generic_vmlinuz="$(ls -1 "${ROOTFS_DIR}/boot/vmlinuz-"*-generic 2>/dev/null | sort -V | tail -1 || true)"
+    if [[ -z "${generic_vmlinuz}" || ! -f "${generic_vmlinuz}" ]]; then
+        log "WARN: no signed generic kernel in rootfs — Secure Boot fallback unavailable"
+        return 0
+    fi
+    generic_ver="$(basename "${generic_vmlinuz}" | sed 's/^vmlinuz-//')"
+    log "staging Secure Boot fallback kernel: ${generic_ver}"
+    cp -f "${generic_vmlinuz}" "${casper}/vmlinuz-generic"
+
+    # Fallback initrd = pristine upstream casper initrd (native to the generic kernel,
+    # proven to mount the layered squashfs — identical to stock Ubuntu live boot).
+    if [[ -f "${casper}/initrd.ubuntu-backup" ]]; then
+        cp -f "${casper}/initrd.ubuntu-backup" "${casper}/initrd-generic"
+    elif [[ -f "${casper}/initrd" ]]; then
+        # No backup (rare): reuse current initrd; generic modules already inside upstream tree.
+        cp -f "${casper}/initrd" "${casper}/initrd-generic"
+    else
+        die "no casper initrd available for Secure Boot fallback"
+    fi
+    log "Secure Boot fallback staged: casper/vmlinuz-generic + casper/initrd-generic"
 }
 
 wait_for_stable_file() {
@@ -641,6 +691,7 @@ __build_iso_main() {
         STRAWWU_KERNEL_DEB="${kernel_deb}" bash "${SCRIPT_DIR}/swap-kernel.sh"
         bash "${SCRIPT_DIR}/sync-calamares-installer.sh"
         apply_branding
+        install_secureboot_assets
         configure_live_autologin
         force_gdm_x11
         inject_boot_marker
@@ -658,6 +709,7 @@ __build_iso_main() {
     fi
     STRAWWU_VERSION="${VERSION}" bash "${SCRIPT_DIR}/apply-branding.sh" iso
     patch_boot_serial_console
+    bash "${SCRIPT_DIR}/patch-iso-secureboot-fallback.sh"
     unmount_chroot
     rebuild_squashfs
     sync_casper_kernel
