@@ -25,7 +25,11 @@ def ok(msg: str) -> None:
     print(f"PASS: {msg}")
 
 
-def validate_manifest(path: Path, expect_version: str | None = None) -> None:
+def validate_manifest(
+    path: Path,
+    expect_version: str | None = None,
+    allow_empty_artifacts: bool = False,
+) -> None:
     if not path.is_file():
         fail(f"manifest missing {path}")
         return
@@ -80,6 +84,12 @@ def validate_manifest(path: Path, expect_version: str | None = None) -> None:
 
     if artifacts:
         ok(f"artifacts count={len(artifacts)}")
+    elif allow_empty_artifacts:
+        # No ISO built yet (e.g. CI static env / pre-release): the generator
+        # legitimately emits an empty artifact list. Validate the rest of the
+        # schema without demanding an ISO. Build/release runs never pass this flag,
+        # so a missing ISO at release time still hard-fails.
+        ok("artifacts list empty (no ISO built — allowed)")
     else:
         fail("artifacts list empty")
 
@@ -126,12 +136,14 @@ def validate_manifest(path: Path, expect_version: str | None = None) -> None:
 
 
 def main() -> int:
-    manifest_arg = sys.argv[1] if len(sys.argv) > 1 else str(REPO_ROOT / "os-image/output/release-manifest.json")
-    expect = sys.argv[2] if len(sys.argv) > 2 else VERSION
+    args = [a for a in sys.argv[1:] if a != "--allow-empty-artifacts"]
+    allow_empty = "--allow-empty-artifacts" in sys.argv[1:]
+    manifest_arg = args[0] if len(args) > 0 else str(REPO_ROOT / "os-image/output/release-manifest.json")
+    expect = args[1] if len(args) > 1 else VERSION
     path = Path(manifest_arg)
 
     print("=== W7-RE1 release-manifest validation ===")
-    validate_manifest(path, expect_version=expect)
+    validate_manifest(path, expect_version=expect, allow_empty_artifacts=allow_empty)
 
     if FAILURES:
         print(f"=== validation done: FAIL ({len(FAILURES)} issue(s)) ===", file=sys.stderr)

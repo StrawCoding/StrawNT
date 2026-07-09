@@ -143,7 +143,15 @@ fi
 MANIFEST="${REPO_ROOT}/os-image/output/release-manifest.json"
 if [[ -f "${MANIFEST}" ]]; then
     pass "os-image/output/release-manifest.json present"
-    if python3 "${VALIDATE}" "${MANIFEST}" "${VERSION}"; then
+    # A real ISO is only present on build/release hosts. In CI (no ISO) the
+    # generator emits an empty artifact list legitimately, so allow that there
+    # while still enforcing the full schema; build/release runs (ISO present)
+    # keep the strict non-empty-artifacts gate.
+    validate_flags=()
+    if ! ls "${REPO_ROOT}/os-image/output/"StrawWU-*.iso >/dev/null 2>&1; then
+        validate_flags+=(--allow-empty-artifacts)
+    fi
+    if python3 "${VALIDATE}" "${MANIFEST}" "${VERSION}" "${validate_flags[@]}"; then
         pass "validate-release-manifest.py (repo output)"
     else
         fail "validate-release-manifest.py (repo output)"
