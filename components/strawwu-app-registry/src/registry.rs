@@ -9,9 +9,19 @@ use thiserror::Error;
 /// [`RegistryStore`] so concurrent writers (launcher, registry CLI, install hooks)
 /// serialize instead of racing the read-modify-write window and clobbering each
 /// other. The lock is released when the file handle is dropped.
-struct RegistryLock {
+///
+/// Acquisition is *best-effort with respect to the filesystem*: if the lock file
+/// cannot even be created (parent dir missing / not writable / read-only fs — e.g.
+/// a read-only `strawwu status` run by an unprivileged user against the default
+/// `/var/lib/strawwu`), we degrade to [`RegistryLock::Bypassed`] instead of failing.
+/// Read-only callers were never serialized before, and writers on such a path would
+/// fail later in `flush()` with a real, actionable error anyway. Genuine lock
+/// *contention* (the file exists but another process holds it) still surfaces as a
+/// hard timeout error so we never silently clobber a concurrent writer.
+enum RegistryLock {
     #[allow(dead_code)]
-    file: fs::File,
+    Held(fs::File),
+    Bypassed,
 }
 
 impl RegistryLock {
@@ -20,13 +30,21 @@ impl RegistryLock {
         use std::os::unix::io::AsRawFd;
         let lock_path = lock_path_for(registry_path);
         if let Some(parent) = lock_path.parent() {
-            fs::create_dir_all(parent)?;
+            if fs::create_dir_all(parent).is_err() {
+                return Ok(Self::Bypassed);
+            }
         }
-        let file = fs::OpenOptions::new()
+        let file = match fs::OpenOptions::new()
             .create(true)
             .write(true)
             .truncate(false)
-            .open(&lock_path)?;
+            .open(&lock_path)
+        {
+            Ok(f) => f,
+            // Cannot create the lock file (permission / read-only fs) — proceed
+            // lock-free; a real write will fail later in flush() with a clear error.
+            Err(_) => return Ok(Self::Bypassed),
+        };
         // Non-blocking retry with a bounded timeout instead of a blocking
         // LOCK_EX: a stale/held lock surfaces as a clean error rather than an
         // indefinite hang. Override the budget with STRAWWU_REGISTRY_LOCK_TIMEOUT_MS.
@@ -38,7 +56,7 @@ impl RegistryLock {
         loop {
             let rc = unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) };
             if rc == 0 {
-                return Ok(Self { file });
+                return Ok(Self::Held(file));
             }
             let err = std::io::Error::last_os_error();
             let would_block = matches!(
@@ -65,14 +83,19 @@ impl RegistryLock {
     fn acquire(registry_path: &Path) -> Result<Self, std::io::Error> {
         let lock_path = lock_path_for(registry_path);
         if let Some(parent) = lock_path.parent() {
-            fs::create_dir_all(parent)?;
+            if fs::create_dir_all(parent).is_err() {
+                return Ok(Self::Bypassed);
+            }
         }
-        let file = fs::OpenOptions::new()
+        match fs::OpenOptions::new()
             .create(true)
             .write(true)
             .truncate(false)
-            .open(&lock_path)?;
-        Ok(Self { file })
+            .open(&lock_path)
+        {
+            Ok(file) => Ok(Self::Held(file)),
+            Err(_) => Ok(Self::Bypassed),
+        }
     }
 }
 
@@ -159,9 +182,13 @@ impl RegistryStore {
 
     pub fn open_at(path: PathBuf) -> Result<Self, RegistryError> {
         let log_path = default_log_path();
-        ensure_parent_dir(&path)?;
+        // NB: do not create the parent dir here — a read-only caller (e.g.
+        // `strawwu status` as an unprivileged user against the default
+        // /var/lib/strawwu) must not fail just because the dir is absent/unwritable.
+        // Writers create the dir on demand in flush().
         // Acquire the cross-process lock BEFORE reading so the whole
-        // read-modify-write cycle is serialized against other writers.
+        // read-modify-write cycle is serialized against other writers (best-effort:
+        // bypassed when the path isn't writable — see RegistryLock).
         let lock = RegistryLock::acquire(&path)?;
         let data = if path.exists() {
             let raw = fs::read_to_string(&path)?;
