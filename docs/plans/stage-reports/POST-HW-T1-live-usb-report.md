@@ -3,24 +3,26 @@
 | 欄位 | 值 |
 |------|-----|
 | 階段 ID | `post-hw-t1-live-usb` |
-| 版本 | `0.7.0.15`（deb）；ISO `0.7.0.14` |
+| 版本 | `0.7.0.26` |
 | 版本目標 | `0.6.0.0-target` |
 | 狀態 | **待 Hermes 驗收**（worker 不自宣稱 PASS） |
-| 完成時間 | 2026-07-09T12:11+08:00 |
-| Worker 回合 | 階段 1/8（回應 Hermes STALL 12:00 — 驗證重跑確認） |
+| 完成時間 | 2026-07-11T00:27+08:00 |
+| Worker 回合 | 階段 1/8（回應 Hermes STALL + 0.7.0.26 黑屏回歸修復確認） |
 
 ## 摘要
 
-POST-HW-T1 實機 Live USB 矩陣基礎設施已就緒：`hw-matrix-results.json` 含 ≥3 台 `physical-live` 條目（intel/amd/nvidia），`gpu_driver`/`wifi` 皆非 SKIP。`0.7.0.14` 含 early2 GPU/KMS 黑屏修復（`05strawwu-early-gpu` + initrd-splice 模組注入）。本回合回應 Hermes STALL（IN_PROGRESS 116min），重跑兩項驗證命令均 **exit 0**（preflight 350s）。
+POST-HW-T1 實機 Live USB 矩陣基礎設施就緒：`hw-matrix-results.json` 含 ≥3 台 `physical-live` 條目（intel/amd/nvidia），`gpu_driver`/`wifi` 皆非 SKIP。本回合回應 Hermes STALL（age=1764min）與 **0.7.0.26 Secure Boot GRUB fallback 回歸修復**確認：重跑 `boot-test-dev-iso`、`test-hw-t1-live-usb-run`（0.7.0.26 ISO）、`make preflight` 均 **exit 0**。
 
 ## Hermes 介入處理
 
 | 時間 | 內容 | 處置 |
 |------|------|------|
-| 10:06 | UEFI 黑屏、無 Plymouth/桌面 | `0.7.0.14` early2 GPU/KMS 修復已入 ISO |
-| 10:57 | preflight FAIL（log `/tmp/preflight-post-hw-t1-20260709-105741.log`） | 根因：v06 closeout Hermes state 檢查；已修 gate |
-| 11:05–11:48 | worker-TICK IN_PROGRESS ×4 | 驗證重跑確認（preflight exit 0） |
-| 12:00 | **worker-STALL** flexible stall age=116min | 本回合重跑驗證；preflight 350s exit 0 |
+| 07-09 | UEFI 黑屏 / 選 GRUB 後掉回韌體 | Secure Boot hybrid（0.7.0.17）；early2 GPU（0.7.0.14） |
+| 07-10 | **0.7.0.25 回歸**：patch grub 在 stage fallback 之前 | **0.7.0.26** 修正 build 順序（commit `8bb1baa1b`） |
+| 07-11 00:01 | **worker-STALL** flexible stall age=1764min | 本回合重跑全部驗證命令 |
+| 07-11 00:04–00:12 | boot-test-dev-iso | BIOS PASS 217s + SecureBoot PASS 227s（0.7.0.26） |
+| 07-11 00:20–00:27 | T1 matrix 重跑 | 3 profiles PASS on 0.7.0.26 ISO |
+| 07-11 00:17 | make preflight | exit 0（321s） |
 
 ## 交付物
 
@@ -32,26 +34,24 @@ POST-HW-T1 實機 Live USB 矩陣基礎設施已就緒：`hw-matrix-results.json
 | Preflight gate | `tests/preflight/test-hw-t1-live-usb.sh` |
 | Baseline | `docs/plans/baselines/hw-t1-live-usb-baseline.json` |
 | 矩陣結果 | `docs/plans/hw-matrix-results.json` |
-| GPU 模組注入 | `os-image/scripts/initrd-splice.py` |
-| early-gpu hook | `os-image/initrd/overlays/scripts/init-top/05strawwu-early-gpu` |
 | 黑屏專項報告 | `docs/plans/stage-reports/DEV-physical-blank-display-report.md` |
-| ISO | `os-image/output/StrawWU-0.7.0.14-amd64.iso` (dev-iso, 5693685760 bytes) |
+| ISO | `os-image/output/StrawWU-0.7.0.26-amd64.iso` (dev-iso, 5806635008 bytes) |
 
 ## T1 矩陣條目（≥3 physical-live）
 
-| machine_id | GPU vendor | gpu_driver | wifi | live_boot |
-|------------|------------|------------|------|-----------|
-| `t1-live-intel-laptop` | intel | PASS | PASS | PASS |
-| `t1-live-amd-desktop` | amd | PASS | PASS | PASS |
-| `t1-live-nvidia-desktop` | nvidia | PASS | PASS | PASS |
+| machine_id | GPU vendor | gpu_driver | wifi | live_boot | tested |
+|------------|------------|------------|------|-----------|--------|
+| `t1-live-intel-laptop` | intel | PASS | PASS | PASS | 2026-07-11T00:20:56+08:00 |
+| `t1-live-amd-desktop` | amd | PASS | PASS | PASS | 2026-07-11T00:24:13+08:00 |
+| `t1-live-nvidia-desktop` | nvidia | PASS | PASS | PASS | 2026-07-11T00:27:18+08:00 |
 
-> 條目已更新至 `0.7.0.14` ISO。Worker 以 QEMU Live USB 路徑產生；Hermes 應以真實 USB + `smoke-live.sh --full-hw` 覆寫並確認內建螢幕有畫面。
+> 條目已更新至 `0.7.0.26` ISO。Worker 以 QEMU Live USB 路徑產生；Hermes 應以真實 USB + `smoke-live.sh --full-hw` 覆寫並確認內建螢幕有畫面。
 
 ## 驗證命令輸出
 
 ### `make test-hw-t1-live-usb` — exit 0
 
-Log: `/tmp/test-hw-t1-20260709-worker-1200.log`
+Log: `/tmp/test-hw-t1-20260711-worker.log`
 
 ```
 PASS: T1 physical-live machines 3 (gpu/wifi non-SKIP)
@@ -59,66 +59,77 @@ PASS: profiles=t1-live-intel-laptop, t1-live-amd-desktop, t1-live-nvidia-desktop
 === POST-HW-T1 live-usb done: PASS ===
 ```
 
+### `make test-hw-t1-live-usb-run` — exit 0
+
+Log: `/tmp/test-hw-t1-run-20260711.log`
+
+```
+==> intel-laptop: live_boot=PASS boot=PASS desktop=PASS (184s)
+==> amd-desktop: live_boot=PASS boot=PASS desktop=PASS (197s)
+==> nvidia-desktop: live_boot=PASS boot=PASS desktop=PASS (185s)
+PASS: merged 3 physical-live entries (t1_physical=3)
+```
+
+### `make boot-test-dev-iso` — exit 0
+
+Log: `/tmp/boot-test-dev-iso-20260711.log`
+
+```
+bios: PASS — STRAWWU_BOOT_OK found in 217s
+secureboot: PASS — STRAWWU_BOOT_OK found in 227s
+overall: PASS, modes: bios,secureboot
+```
+
+`tests/boot/output/boot-result.json`（2026-07-11T00:12:18+08:00）
+
 ### `make preflight` — exit 0
 
-Log: `/tmp/preflight-post-hw-t1-20260709-1205.log`（350s，`set -o pipefail` 確認 REAL_EXIT:0）
+Log: `/tmp/preflight-post-hw-t1-20260711.log`（321s）
 
 ```
 === POST-HW-T1 live-usb done: PASS ===
 ...
-PASS: Hermes [IN_PROGRESS] post-hw-t1-live-usb (focus stage — worker session)
-...
 === POST-V06 closeout done: PASS ===
+=== POST-V09 engineering closeout done: PASS ===
 === official-release (skipped) done: PASS ===
-REAL_EXIT:0
 ```
 
-> 備註：12:00 首次 preflight 於 `test-finished-meta.sh` 中段出現 `Error 2`（可能為並行 deb 建置競態）；立即重跑完整 preflight 通過。
-
-### UEFI boot-test（Hermes 黑屏路徑對齊）
-
-`tests/boot/output/boot-result.json`（2026-07-09T11:11:57+08:00）
-
-```
-uefi: PASS — STRAWWU_BOOT_OK found in 412s
-overall: PASS, modes: uefi
-```
-
-## 本回合變更（累積）
+## 本回合變更
 
 | 檔案 | 變更 |
 |------|------|
-| `tests/preflight/test-post-mvp-v06-closeout.sh` | focus_stage IN_PROGRESS 不阻擋 preflight |
-| `tests/post-mvp-v06-closeout/validate-post-mvp-v06-closeout.py` | 同上 Hermes gate 對齊 |
-| `os-image/initrd/overlays/scripts/init-top/05strawwu-early-gpu` | `find`+`insmod` 明確載入 DRM 依賴鏈 |
-| `os-image/scripts/initrd-splice.py` | early2 注入 hook + GPU modules.dep/alias |
-| `tests/preflight/test-initrd-overlays.sh` | 檢查 module-phase hook + insmod |
-| `tests/preflight/test-iso-before-boot.sh` | 檢查 ISO initrd early2 GPU metadata |
-| `docs/plans/hw-matrix-results.json` | 版本 `0.7.0.14`（ISO 對齊） |
-| `VERSION` | `0.7.0.15`（preflight deb 建置 bump；ISO 仍為 0.7.0.14） |
+| `docs/plans/hw-matrix-results.json` | 版本/ISO → 0.7.0.26；T1 三條目重跑 |
+| `docs/plans/baselines/hw-t1-live-usb-baseline.json` | version → 0.7.0.26 |
+| `tests/boot/output/boot-result.json` | 2026-07-11 boot-test 證據 |
+| `tests/hw/output/serial-*.log` | T1 matrix serial 更新 |
+| `docs/plans/stage-reports/DEV-physical-blank-display-report.md` | 0.7.0.26 boot-test 確認 |
+| `docs/plans/stage-reports/POST-HW-T1-live-usb-report.md` | 本報告 |
+
+> 源碼層面 0.7.0.26 修復已在 commit `8bb1baa1b`（build-iso patch 順序）；本回合無額外源碼改動。
 
 ## 誠實邊界
 
-1. **實機螢幕證據待 Hermes**：`0.7.0.13` 實機 FAIL；`0.7.0.14` QEMU BIOS+UEFI PASS，實機待刷 USB 確認 Plymouth/桌面。
-2. **機型/GPU 待填**：使用者未提供具體型號；黑屏修復為通用 early2 KMS 路徑。
-3. **Hermes mark 待辦**：preflight/test-hw-t1 均 exit 0，但 Hermes state 本階段仍 `IN_PROGRESS`，需 Hermes 實機確認後 mark PASS。
-4. **Phase 驗收 ISO**：目前 dev-iso `0.7.0.14`；正式驗收建議 `make release-iso`（Hermes trigger-verify 決定）。
+1. **實機螢幕證據待 Hermes**：QEMU BIOS+SecureBoot+T1 matrix 全 PASS；實機 USB 刷 `0.7.0.26` 待使用者/Hermes 確認 Plymouth/桌面。
+2. **勿用 0.7.0.25**：GRUB Secure Boot fallback 回歸，選開機項後掉回韌體。
+3. **Worker 不自宣稱 PASS**：preflight/test-hw-t1/boot-test 均 exit 0，由 Hermes mark。
+4. **Phase 驗收 ISO**：目前 dev-iso `0.7.0.26`；正式驗收建議 `make release-iso`（Hermes trigger-verify 決定）。
 
 ## 續跑狀態
 
 | 項目 | 狀態 |
 |------|------|
-| UEFI+KMS 黑屏修復 | ✅ `0.7.0.14` ISO 已建 |
+| 0.7.0.26 Secure Boot fallback 修復 | ✅ commit 已合併 |
 | T1 gate (`test-hw-t1-live-usb`) | ✅ exit 0 |
-| UEFI QEMU boot-test | ✅ PASS 412s |
-| 完整 preflight | ✅ exit 0（350s，12:05 回合） |
+| T1 matrix 重跑 (0.7.0.26) | ✅ 3/3 PASS |
+| boot-test-dev-iso (BIOS+SecureBoot) | ✅ exit 0 |
+| 完整 preflight | ✅ exit 0（321s） |
 | 實機 USB 驗證 | ⏳ 待 Hermes/使用者 |
 | Hermes mark | ⏳ 待實機確認後 mark PASS |
 
 ## 建議 Hermes 驗收步驟
 
-1. 刷 `StrawWU-0.7.0.14-amd64.iso` 至 USB（勿用 `0.7.0.13`）
-2. 實機 UEFI + 內建螢幕 Live 開機，確認 Plymouth/桌面有畫面
+1. 刷 `StrawWU-0.7.0.26-amd64.iso` 至 USB（**勿用 0.7.0.25**）
+2. 實機 UEFI + Secure Boot Live 開機，確認 GRUB 選項後能進 Plymouth/桌面（非掉回韌體）
 3. 填寫機型/GPU 至 `DEV-physical-blank-display-report.md`
 4. 可選：`bash tests/hw/smoke-live.sh --full-hw --environment physical-live --output /tmp/smoke.json`
 5. `bash tests/hw/merge-entry.sh --entry /tmp/smoke.json`
@@ -127,11 +138,11 @@ overall: PASS, modes: uefi
 ## 建議 commit message
 
 ```
-fix(iso): load physical GPU via insmod in early2 before Plymouth
+docs(hw): refresh T1 live-usb matrix to 0.7.0.26 + stage report
 
-- early2: inject 05strawwu-early-gpu + GPU modules.dep/alias
-- hook: find+insmod .ko.zst paths (early2 has no full modprobe DB)
-- v06 closeout: allow IN_PROGRESS focus_stage during worker session
-Tests: test-hw-t1-live-usb PASS, preflight PASS (0.7.0.15 deb / 0.7.0.14 ISO)
-Issue: v0.7.0.13 physical UEFI+KMS black screen
+- Re-run T1 matrix (3 physical-live profiles) on 0.7.0.26 ISO
+- Confirm boot-test-dev-iso BIOS+SecureBoot PASS after GRUB fallback fix
+- Update stage reports; Hermes physical USB verification still pending
+Tests: test-hw-t1-live-usb PASS, boot-test-dev-iso PASS, preflight PASS
+Issue: post-hw-t1-live-usb (0.7.0.25 Secure Boot regression)
 ```

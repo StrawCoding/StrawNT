@@ -87,7 +87,7 @@ STRAWWU_BOOT_OK
 | BIOS/UEFI | UEFI + Secure Boot（實機回報掉回韌體＝已用 QEMU Secure Boot 重現+修復驗證） |
 | 啟動媒體 | Live USB（內建螢幕） |
 | ISO 版本 | 請刷 `StrawWU-0.7.0.26-amd64.iso`（0.7.0.25 曾回歸缺 GRUB fallback，勿用） |
-| 使用者驗證 | **待刷 0.7.0.26 回報**；QEMU BIOS + SecureBoot 皆 PASS（2026-07-10） |
+| 使用者驗證 | **待刷 0.7.0.26 回報**；QEMU BIOS + SecureBoot 皆 PASS（2026-07-10、**2026-07-11 重跑確認**） |
 | 截圖/錄影 | 無 |
 
 ## 結論
@@ -100,7 +100,7 @@ STRAWWU_BOOT_OK
 |------|---------------|-----------|-----------------|
 | 0.7.0.17 | ✅ | PASS | PASS |
 | 0.7.0.25 | ❌ 回歸 | 未重測 | 未重測 |
-| 0.7.0.26 | ✅ | PASS (227s) | PASS (233s) |
+| 0.7.0.26 | ✅ | PASS (217s, 07-11) | PASS (227s, 07-11) |
 
 **勿自行宣稱 stage PASS**；由 Hermes/使用者刷實機後 mark。
 

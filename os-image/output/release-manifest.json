@@ -3,12 +3,12 @@
   "version": "0.7.0.26",
   "channel": "beta",
   "git_tag": null,
-  "git_sha": "af867c04dc951cde6adaf38e8853cc9bf714f884",
+  "git_sha": "8bb1baa1b11eb9c401df52764cc5117203957ae4",
   "artifacts": [
     {
-      "name": "StrawWU-0.7.0.25-amd64.iso",
-      "sha256": "885df41946b98fa7ec0b6b75bfee874a37aad1fb82e74c5c5ecfa949ace3ed4f",
-      "size": 5259491328,
+      "name": "StrawWU-0.7.0.26-amd64.iso",
+      "sha256": "5adaa52a1960cd23b6041ad271f89e4149ccb055a028f5bc4049892ae4c00771",
+      "size": 5806635008,
       "gpg_sig": null
     }
   ],
@@ -118,5 +118,5 @@
     "file": "SHA256SUMS",
     "gpg_sig": null
   },
-  "published_at": "2026-07-10T15:11:17Z"
+  "published_at": "2026-07-10T16:17:38Z"
 }
