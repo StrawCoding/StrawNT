@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-hw-t1-live-usb-baseline/v1",
   "wave": "POST-HW-T1",
-  "version": "0.7.0.25",
+  "version": "0.7.0.26",
   "tier": "T1",
   "minimum_physical_live": 3,
   "dimensions_required": [

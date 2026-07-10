@@ -5,7 +5,7 @@
 | 階段 | post-hw-t1-live-usb（boot bug） |
 | 任務書 | docs/plans/kickoff/DEV-physical-blank-display.md |
 | 觸發 | 使用者回報實體機開機無畫面（2026-07-08）；0.7.0.13/0.7.0.14 仍 FAIL；0.7.0.14 Live USB「進 GRUB 選開機項後掉回韌體＝沒系統」（2026-07-09） |
-| 版本 | `0.7.0.17` |
+| 版本 | `0.7.0.26` |
 | official-release | 已停止（未授權） |
 
 ## 回報演進
@@ -86,13 +86,23 @@ STRAWWU_BOOT_OK
 | 機型 | 待填（使用者未提供） |
 | BIOS/UEFI | UEFI + Secure Boot（實機回報掉回韌體＝已用 QEMU Secure Boot 重現+修復驗證） |
 | 啟動媒體 | Live USB（內建螢幕） |
-| ISO 版本 | 請刷 `StrawWU-0.7.0.17-amd64.iso` |
-| 使用者驗證 | **待刷 0.7.0.17 回報**；QEMU BIOS + SecureBoot 皆 PASS |
+| ISO 版本 | 請刷 `StrawWU-0.7.0.26-amd64.iso`（0.7.0.25 曾回歸缺 GRUB fallback，勿用） |
+| 使用者驗證 | **待刷 0.7.0.26 回報**；QEMU BIOS + SecureBoot 皆 PASS（2026-07-10） |
 | 截圖/錄影 | 無 |
 
 ## 結論
 
-治本：根因為 **Secure Boot 拒絕未簽章自製核心**（非先前推測的 GPU/KMS 黑屏）。0.7.0.17 導入 hybrid：MOK 簽自製核心 + 未 enroll 時自動 fallback 到 Canonical 簽章 generic 核心。QEMU BIOS **PASS**（226s）+ **SecureBoot PASS**（239s，serial 證實走 fallback 開到桌面）。並新增 Secure Boot QEMU boot-test 進回歸閘門（先前正因 boot-test 沒測 Secure Boot 才漏掉）。**勿自行宣稱 stage PASS**；由 Hermes/使用者刷實機後 mark。
+治本：根因為 **Secure Boot 拒絕未簽章自製核心**（非先前推測的 GPU/KMS 黑屏）。0.7.0.17 導入 hybrid：MOK 簽自製核心 + 未 enroll 時自動 fallback 到 Canonical 簽章 generic 核心。
+
+**0.7.0.25 回歸（2026-07-10）**：`build-iso.sh` 在 `sync_casper_kernel`（stage vmlinuz-generic）**之前**就執行 `patch-iso-secureboot-fallback.sh`，patch 因 fallback 檔尚未存在而 skip → 實機 UEFI+Secure Boot 又會「選 GRUB 後掉回韌體」。**0.7.0.26** 修正 build 順序（patch 改在 sync_casper_kernel 之後）。
+
+| 版本 | GRUB fallback | QEMU BIOS | QEMU SecureBoot |
+|------|---------------|-----------|-----------------|
+| 0.7.0.17 | ✅ | PASS | PASS |
+| 0.7.0.25 | ❌ 回歸 | 未重測 | 未重測 |
+| 0.7.0.26 | ✅ | PASS (227s) | PASS (233s) |
+
+**勿自行宣稱 stage PASS**；由 Hermes/使用者刷實機後 mark。
 
 ## 建議 commit message
 ```

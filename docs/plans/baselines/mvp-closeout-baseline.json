@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-mvp-closeout-baseline/v1",
   "wave": "W8-MVP-closeout",
-  "version": "0.7.0.25",
+  "version": "0.7.0.26",
   "target_mvp": "0.5.0.0",
   "wave_stages": 47,
   "dod_markdown": "docs/plans/mvp-closeout/mvp-dod.md",

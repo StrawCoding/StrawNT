@@ -711,10 +711,11 @@ __build_iso_main() {
     fi
     STRAWWU_VERSION="${VERSION}" bash "${SCRIPT_DIR}/apply-branding.sh" iso
     patch_boot_serial_console
-    bash "${SCRIPT_DIR}/patch-iso-secureboot-fallback.sh"
     unmount_chroot
     rebuild_squashfs
     sync_casper_kernel
+    # Must run after sync_casper_kernel stages casper/vmlinuz-generic + initrd-generic.
+    bash "${SCRIPT_DIR}/patch-iso-secureboot-fallback.sh"
     xorriso_repack "${source_iso}"
     write_checksums
 
