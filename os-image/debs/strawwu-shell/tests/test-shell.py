@@ -45,6 +45,7 @@ def test_strawwu_session_mode_json() -> None:
     assert MODE.is_file()
     data = json.loads(MODE.read_text())
     assert data["parentMode"] == "user"
+    assert data.get("stylesheetName") == "StrawWU-Dark/gnome-shell.css"
     assert "strawwu-dock@strawwu" in data["enabledExtensions"]
     for ext in UBUNTU_EXTENSIONS:
         assert ext not in data["enabledExtensions"]

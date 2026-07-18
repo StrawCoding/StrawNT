@@ -75,17 +75,17 @@ real = [
     if m.get("tier") == "T1"
     and m.get("environment") in physical_envs
     and m.get("environment") not in skip_envs
-    and m.get("tests", {}).get("gpu_driver") not in (None, "SKIP")
-    and m.get("tests", {}).get("wifi") not in (None, "SKIP")
+    and m.get("tests", {}).get("gpu_driver") == "PASS"
+    and m.get("tests", {}).get("wifi") == "PASS"
     and m.get("tests", {}).get("live_boot") == "PASS"
 ]
 
 if len(real) >= 3:
     vendors = sorted({m.get("gpu_vendor", m.get("gpu", "?")[:20]) for m in real})
-    print(f"PASS: T1 physical-live machines {len(real)} (gpu/wifi non-SKIP)")
+    print(f"PASS: T1 physical-live machines {len(real)} (gpu/wifi PASS, non-SKIP)")
     print(f"PASS: profiles={', '.join(m.get('machine_id', '?') for m in real)}")
 else:
-    print(f"FAIL: T1 physical-live need >=3 got {len(real)}", file=sys.stderr)
+    print(f"FAIL: T1 physical-live need >=3 with live_boot+gpu+wifi PASS, got {len(real)}", file=sys.stderr)
     sys.exit(1)
 PY
 

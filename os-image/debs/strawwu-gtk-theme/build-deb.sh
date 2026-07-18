@@ -14,12 +14,21 @@ trap cleanup EXIT
 
 [[ -d "${THEME_SRC}" ]] || { echo "ERROR: theme source missing: ${THEME_SRC}" >&2; exit 1; }
 
-mkdir -p "${OUTPUT_DIR}" "${PKG_DIR}/DEBIAN" "${PKG_DIR}/usr/share/themes"
+mkdir -p "${OUTPUT_DIR}" "${PKG_DIR}/DEBIAN" "${PKG_DIR}/usr/share/themes" \
+    "${PKG_DIR}/usr/share/gnome-shell/theme/StrawWU-Dark"
 
 echo "=== Building strawwu-gtk-theme ${VERSION} ==="
 
 cp -a "${THEME_SRC}" "${PKG_DIR}/usr/share/themes/"
 cp -a "${SCRIPT_DIR}/usr" "${PKG_DIR}/"
+
+# GNOME Shell mode stylesheetName resolves under /usr/share/gnome-shell/theme/
+# (see strawwu-shell modes/strawwu.json). Shipping only under /usr/share/themes
+# leaves the mode CSS missing → shell/greeter can fail to paint on real GPUs.
+if [[ -f "${THEME_SRC}/gnome-shell/gnome-shell.css" ]]; then
+    cp -a "${THEME_SRC}/gnome-shell/." \
+        "${PKG_DIR}/usr/share/gnome-shell/theme/StrawWU-Dark/"
+fi
 
 sed "s/__VERSION__/${VERSION}/" "${SCRIPT_DIR}/DEBIAN/control" > "${PKG_DIR}/DEBIAN/control"
 cp "${SCRIPT_DIR}/DEBIAN/postinst" "${PKG_DIR}/DEBIAN/postinst"

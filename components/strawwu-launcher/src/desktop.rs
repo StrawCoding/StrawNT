@@ -74,6 +74,18 @@ pub fn write_launcher_desktop(
     binary: &Path,
     name: Option<&str>,
 ) -> Result<PathBuf, String> {
+    write_launcher_desktop_in(&desktop_dir(), app_id, binary, name)
+}
+
+/// Write a `.desktop` entry into `dir` (tests pass a tempdir; production uses
+/// [`desktop_dir`]). Avoids process-global `STRAWWU_DESKTOP_DIR` races under
+/// parallel `cargo test`.
+pub fn write_launcher_desktop_in(
+    dir: &Path,
+    app_id: &str,
+    binary: &Path,
+    name: Option<&str>,
+) -> Result<PathBuf, String> {
     validate_app_id(app_id)?;
     let display_name = desktop_escape(
         &name
@@ -81,11 +93,9 @@ pub fn write_launcher_desktop(
             .unwrap_or_else(|| derive_app_name(binary)),
     );
     let exec = format!("strawwu run {}", desktop_exec_arg(&binary.display().to_string()));
-    let path = desktop_path_for(app_id);
+    let path = dir.join(format!("{app_id}.desktop"));
 
-    if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent).map_err(|e| e.to_string())?;
-    }
+    fs::create_dir_all(dir).map_err(|e| e.to_string())?;
 
     let body = format!(
         "[Desktop Entry]\n\
@@ -108,44 +118,42 @@ pub fn write_launcher_desktop(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::env;
     use tempfile::tempdir;
 
     #[test]
     fn write_desktop_entry() {
         let dir = tempdir().unwrap();
-        env::set_var("STRAWWU_DESKTOP_DIR", dir.path());
         let binary = Path::new("/tmp/apps/notepad.exe");
-        let path = write_launcher_desktop("notepad", binary, Some("Notepad")).unwrap();
+        let path = write_launcher_desktop_in(dir.path(), "notepad", binary, Some("Notepad")).unwrap();
         assert!(path.exists());
         let content = fs::read_to_string(&path).unwrap();
         assert!(content.contains("Name=Notepad"));
         assert!(content.contains("X-StrawWU-App-Id=notepad"));
         assert!(content.contains("strawwu run"));
-        env::remove_var("STRAWWU_DESKTOP_DIR");
     }
 
     #[test]
     fn rejects_app_id_with_path_traversal() {
         let dir = tempdir().unwrap();
-        env::set_var("STRAWWU_DESKTOP_DIR", dir.path());
         let binary = Path::new("/tmp/apps/x.exe");
-        assert!(write_launcher_desktop("../../evil", binary, Some("X")).is_err());
-        assert!(write_launcher_desktop("a/b", binary, Some("X")).is_err());
-        env::remove_var("STRAWWU_DESKTOP_DIR");
+        assert!(write_launcher_desktop_in(dir.path(), "../../evil", binary, Some("X")).is_err());
+        assert!(write_launcher_desktop_in(dir.path(), "a/b", binary, Some("X")).is_err());
     }
 
     #[test]
     fn escapes_newline_injection_in_name() {
         let dir = tempdir().unwrap();
-        env::set_var("STRAWWU_DESKTOP_DIR", dir.path());
         let binary = Path::new("/tmp/apps/x.exe");
-        let path =
-            write_launcher_desktop("safe", binary, Some("Evil\nExec=/bin/sh -c pwned")).unwrap();
+        let path = write_launcher_desktop_in(
+            dir.path(),
+            "safe",
+            binary,
+            Some("Evil\nExec=/bin/sh -c pwned"),
+        )
+        .unwrap();
         let content = fs::read_to_string(&path).unwrap();
         // The injected newline must not create a second Exec line.
         assert_eq!(content.matches("\nExec=").count(), 1);
         assert!(content.contains("Name=Evil\\nExec=/bin/sh -c pwned"));
-        env::remove_var("STRAWWU_DESKTOP_DIR");
     }
 }

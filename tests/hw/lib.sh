@@ -230,12 +230,18 @@ run_profile_boot() {
             qemu_rc=$?
             break
         fi
+        # Boot+desktop alone is enough for live_boot; when collecting HW dimensions
+        # (include_hw=1) also wait for network-online so wifi is not a false FAIL
+        # from early QEMU stop (race seen on nvidia-desktop ~52s).
         if grep -q "${MARKER_BOOT}" "${serial_log}" 2>/dev/null \
             && grep -q "${MARKER_DESKTOP}" "${serial_log}" 2>/dev/null; then
-            hw_log "${profile_id}: markers found after ${waited}s — stopping QEMU"
-            kill "${qemu_pid}" 2>/dev/null; wait "${qemu_pid}" 2>/dev/null || true
-            qemu_rc=0
-            break
+            if [[ "${include_hw}" != "1" ]] \
+                || grep -qE "${MARKER_NET}|network-online\\.target|Network is Online" "${serial_log}" 2>/dev/null; then
+                hw_log "${profile_id}: markers found after ${waited}s — stopping QEMU"
+                kill "${qemu_pid}" 2>/dev/null; wait "${qemu_pid}" 2>/dev/null || true
+                qemu_rc=0
+                break
+            fi
         fi
         sleep "${poll_interval}"
         (( waited += poll_interval ))

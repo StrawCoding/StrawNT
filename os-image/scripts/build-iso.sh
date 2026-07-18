@@ -72,15 +72,19 @@ chroot_run() {
 
 patch_boot_serial_console() {
     # tty0 = physical display (Plymouth + framebuffer); ttyS0 = QEMU serial boot-test marker
+    # plymouth.ignore-serial-consoles = keep splash/GDM on the real panel when ttyS0 is present
+    # (without it Plymouth binds the serial seat → physical Live USB looks like a black screen;
+    #  QEMU still gets STRAWWU_BOOT_OK on ttyS0, which is why boot-test can PASS while real HW blanks).
     # username=ubuntu keeps casper live user stable when .disk/info starts with "StrawWU"
-    local console_args="console=tty0 console=ttyS0,115200n8 username=ubuntu"
+    local console_args="console=tty0 console=ttyS0,115200n8 plymouth.ignore-serial-consoles username=ubuntu"
     local cfg
     for cfg in \
         "${ISO_STAGING}/boot/grub/grub.cfg" \
         "${ISO_STAGING}/boot/grub/loopback.cfg" \
         "${ISO_STAGING}/isolinux/txt.cfg"; do
         [[ -f "${cfg}" ]] || continue
-        log "patching console (tty0 + serial) into ${cfg}"
+        log "patching console (tty0 + serial + plymouth.ignore-serial-consoles) into ${cfg}"
+        sed -i 's/ plymouth.ignore-serial-consoles//g' "${cfg}"
         sed -i 's/ console=ttyS0,115200n8//g' "${cfg}"
         sed -i 's/ console=tty0//g' "${cfg}"
         sed -i 's/ username=ubuntu//g' "${cfg}"

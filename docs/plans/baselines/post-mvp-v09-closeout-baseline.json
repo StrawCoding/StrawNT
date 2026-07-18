@@ -1,7 +1,7 @@
 {
   "schema": "strawwu-post-mvp-v09-closeout/v1",
   "stage": "post-v09-engineering-closeout",
-  "version": "0.7.1.3",
+  "version": "0.7.1.5",
   "target": "0.9.0.0-target",
   "v09_stages": 11,
   "dod_markdown": "docs/plans/post-mvp-v09-closeout/post-mvp-v09-dod.md",

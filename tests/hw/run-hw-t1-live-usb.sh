@@ -102,8 +102,9 @@ data["t1_physical"] = {
     "count": sum(
         1 for m in new_entries
         if m.get("environment") in ("physical-live", "physical")
-        and m.get("tests", {}).get("gpu_driver") not in (None, "SKIP")
-        and m.get("tests", {}).get("wifi") not in (None, "SKIP")
+        and m.get("tests", {}).get("gpu_driver") == "PASS"
+        and m.get("tests", {}).get("wifi") == "PASS"
+        and m.get("tests", {}).get("live_boot") == "PASS"
     ),
 }
 

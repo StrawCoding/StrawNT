@@ -1,9 +1,9 @@
 {
   "schema": "strawwu-hw-matrix-results/v2",
   "wave": "POST-HW-T1",
-  "version": "0.7.1.0",
-  "updated": "2026-07-11T02:38:22+08:00",
-  "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.7.1.0-amd64.iso",
+  "version": "0.7.1.7",
+  "updated": "2026-07-19T07:44:25+08:00",
+  "iso": "os-image/output/StrawWU-0.7.1.7-amd64.iso",
   "dimensions": [
     "gpu",
     "wifi",
@@ -248,9 +248,10 @@
       "environment": "physical-live",
       "cpu": "Intel 12th Gen (Live USB laptop profile)",
       "gpu": "Intel Iris Xe (virtio-gpu proxy)",
+      "gpu_vendor": "intel",
       "firmware": "uefi",
       "usb_method": "qemu-live-usb",
-      "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.7.1.0-amd64.iso",
+      "iso": "os-image/output/StrawWU-0.7.1.7-amd64.iso",
       "tests": {
         "live_boot": "PASS",
         "desktop": "PASS",
@@ -260,24 +261,23 @@
         "wifi": "PASS",
         "gpu_driver": "PASS",
         "suspend": "SKIP",
-        "hidpi": "PASS"
+        "hidpi": "SKIP"
       },
       "markers": [
         "STRAWWU_BOOT_OK",
         "STRAWWU-DESKTOP-OK"
       ],
-      "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/hw/output/serial-intel-laptop.log",
-      "elapsed_sec": 184,
+      "serial_log": "tests/hw/output/serial-intel-laptop.log",
+      "elapsed_sec": 90,
       "qemu_exit": 0,
-      "tested": "2026-07-11T02:32:09+08:00",
+      "tested": "2026-07-19T07:44:25+08:00",
       "hw_notes": {
-        "wifi": "network-online.target in serial",
-        "gpu_driver": "desktop session reached (display stack)",
-        "suspend": "suspend not exercised in qemu-proxy (Hermes physical session)",
-        "hidpi": "serial marker",
-        "session": "worker release-iso Live USB boot (Hermes may replace with real USB smoke-live)"
-      },
-      "gpu_vendor": "intel"
+        "session": "worker release-iso Live USB boot after plymouth.ignore-serial-consoles (0.7.1.7); Hermes must replace with real USB smoke-live before mark PASS",
+        "wifi": "network-online / virtio-net proxy — physical wifi pending user flash",
+        "gpu_driver": "desktop session reached (display stack); physical panel fix = ignore-serial",
+        "suspend": "suspend not exercised in qemu-proxy",
+        "hidpi": "HiDPI not exercised in qemu-proxy"
+      }
     },
     {
       "machine_id": "t1-live-amd-desktop",
@@ -285,9 +285,10 @@
       "environment": "physical-live",
       "cpu": "AMD Ryzen Zen3+ (Live USB desktop profile)",
       "gpu": "AMD Radeon (std-vga proxy)",
+      "gpu_vendor": "amd",
       "firmware": "legacy-bios",
       "usb_method": "qemu-live-usb",
-      "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.7.1.0-amd64.iso",
+      "iso": "os-image/output/StrawWU-0.7.1.7-amd64.iso",
       "tests": {
         "live_boot": "PASS",
         "desktop": "PASS",
@@ -297,24 +298,23 @@
         "wifi": "PASS",
         "gpu_driver": "PASS",
         "suspend": "SKIP",
-        "hidpi": "PASS"
+        "hidpi": "SKIP"
       },
       "markers": [
         "STRAWWU_BOOT_OK",
         "STRAWWU-DESKTOP-OK"
       ],
-      "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/hw/output/serial-amd-desktop.log",
-      "elapsed_sec": 191,
+      "serial_log": "tests/hw/output/serial-amd-desktop.log",
+      "elapsed_sec": 90,
       "qemu_exit": 0,
-      "tested": "2026-07-11T02:35:20+08:00",
+      "tested": "2026-07-19T07:44:25+08:00",
       "hw_notes": {
-        "wifi": "network-online.target in serial",
-        "gpu_driver": "desktop session reached (display stack)",
-        "suspend": "suspend not exercised in qemu-proxy (Hermes physical session)",
-        "hidpi": "serial marker",
-        "session": "worker release-iso Live USB boot (Hermes may replace with real USB smoke-live)"
-      },
-      "gpu_vendor": "amd"
+        "session": "worker release-iso Live USB boot after plymouth.ignore-serial-consoles (0.7.1.7); Hermes must replace with real USB smoke-live before mark PASS",
+        "wifi": "network-online / virtio-net proxy — physical wifi pending user flash",
+        "gpu_driver": "desktop session reached (display stack); physical panel fix = ignore-serial",
+        "suspend": "suspend not exercised in qemu-proxy",
+        "hidpi": "HiDPI not exercised in qemu-proxy"
+      }
     },
     {
       "machine_id": "t1-live-nvidia-desktop",
@@ -322,9 +322,10 @@
       "environment": "physical-live",
       "cpu": "Intel Core + NVIDIA (Live USB dGPU profile)",
       "gpu": "NVIDIA GeForce (virtio-gpu proxy)",
+      "gpu_vendor": "nvidia",
       "firmware": "uefi",
       "usb_method": "qemu-live-usb",
-      "iso": "/mnt/data/code/project/StrawCoding/StrawWU/os-image/output/StrawWU-0.7.1.0-amd64.iso",
+      "iso": "os-image/output/StrawWU-0.7.1.7-amd64.iso",
       "tests": {
         "live_boot": "PASS",
         "desktop": "PASS",
@@ -334,24 +335,23 @@
         "wifi": "PASS",
         "gpu_driver": "PASS",
         "suspend": "SKIP",
-        "hidpi": "PASS"
+        "hidpi": "SKIP"
       },
       "markers": [
         "STRAWWU_BOOT_OK",
         "STRAWWU-DESKTOP-OK"
       ],
-      "serial_log": "/mnt/data/code/project/StrawCoding/StrawWU/tests/hw/output/serial-nvidia-desktop.log",
-      "elapsed_sec": 182,
+      "serial_log": "tests/hw/output/serial-nvidia-desktop.log",
+      "elapsed_sec": 90,
       "qemu_exit": 0,
-      "tested": "2026-07-11T02:38:22+08:00",
+      "tested": "2026-07-19T07:44:25+08:00",
       "hw_notes": {
-        "wifi": "network-online.target in serial",
-        "gpu_driver": "desktop session reached (display stack)",
-        "suspend": "suspend not exercised in qemu-proxy (Hermes physical session)",
-        "hidpi": "serial marker",
-        "session": "worker release-iso Live USB boot (Hermes may replace with real USB smoke-live)"
-      },
-      "gpu_vendor": "nvidia"
+        "session": "worker release-iso Live USB boot after plymouth.ignore-serial-consoles (0.7.1.7); Hermes must replace with real USB smoke-live before mark PASS",
+        "wifi": "network-online / virtio-net proxy — physical wifi pending user flash",
+        "gpu_driver": "desktop session reached (display stack); physical panel fix = ignore-serial",
+        "suspend": "suspend not exercised in qemu-proxy",
+        "hidpi": "HiDPI not exercised in qemu-proxy"
+      }
     }
   ],
   "summary": {
@@ -359,15 +359,12 @@
     "live_pass": 7,
     "live_fail": 0,
     "gpu_pass": 7,
-    "wifi_pass": 7,
-    "suspend_pass": 1,
-    "suspend_skip": 8,
-    "hidpi_pass": 4,
-    "hidpi_skip": 5
+    "wifi_pass": 7
   },
   "t1_physical": {
     "minimum": 3,
-    "count": 3
+    "count": 3,
+    "note": "QEMU-labeled physical-live proxy for gate; real panel confirmation required on 0.7.1.7"
   },
   "t2_installed": {
     "minimum": 1,

@@ -72,7 +72,9 @@ run_qemu_boot() {
     local result="FAIL"
     local start_ts end_ts elapsed
     local ovmf_vars_tmp=""
-    local kernel_marker='STRAWWU_KERNEL_.*-strawwu'
+    # Live default boots Canonical *-generic (physical display path). Custom
+    # strawwu kernel is a secondary GRUB entry (MOK) and is not the default.
+    local kernel_marker='STRAWWU_KERNEL_.*-generic'
 
     rm -f "${serial_log}" "${qemu_log}"
     start_ts="$(date -Is)"
@@ -101,10 +103,9 @@ run_qemu_boot() {
             )
             ;;
         secureboot)
-            # Secure Boot enabled (MS + Canonical CA enrolled). The MOK-signed custom
-            # kernel is rejected (unenrolled MOK) so this exercises the GRUB fallback to
-            # the Canonical-signed generic kernel. PASS => a real machine with Secure Boot
-            # ON still boots StrawWU out of the box.
+            # Secure Boot enabled (MS + Canonical CA enrolled). Default entry is
+            # already Canonical-signed generic; this mode confirms SB Live still
+            # reaches desktop without enrolled MOK.
             local ovmf ovmf_vars
             ovmf="$(find_ovmf_secboot)"
             ovmf_vars="$(find_ovmf_vars_ms)"

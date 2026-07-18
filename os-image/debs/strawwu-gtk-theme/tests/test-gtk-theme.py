@@ -54,13 +54,29 @@ def test_no_snap_resource_imports() -> None:
     assert "resource:///com/ubuntu/themes" not in text
 
 
+def test_build_script_installs_gnome_shell_theme_path() -> None:
+    text = BUILD.read_text()
+    assert "gnome-shell/theme/StrawWU-Dark" in text
+    assert "stylesheetName resolves under /usr/share/gnome-shell/theme" in text \
+        or "GNOME Shell mode stylesheetName" in text
+
+
+def test_branding_gnome_shell_css_exists() -> None:
+    css = BRANDING / "gnome-shell/gnome-shell.css"
+    assert css.is_file()
+    assert ACCENT.lower() in css.read_text().lower() or "14b8a6" in css.read_text().lower() \
+        or css.stat().st_size > 1000
+
+
 def main() -> int:
     tests = [
         test_manifest_exists,
         test_control_depends_yaru,
         test_build_script_exists,
+        test_build_script_installs_gnome_shell_theme_path,
         test_branding_theme_has_teal_accent,
         test_branding_theme_index,
+        test_branding_gnome_shell_css_exists,
         test_no_snap_resource_imports,
     ]
     failed = 0

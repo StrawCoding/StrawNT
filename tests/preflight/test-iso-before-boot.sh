@@ -16,8 +16,6 @@ if [[ -z "${STRICT}" ]]; then
     STRICT=1
   fi
 fi
-ISO_NAME="StrawWU-${VERSION}-amd64.iso"
-ISO_PATH="${OUTPUT_DIR}/${ISO_NAME}"
 STAGING="${WORK_DIR}/iso-staging"
 SPLICE="${REPO_ROOT}/os-image/scripts/initrd-splice.py"
 MOUNT="${WORK_DIR}/.preflight-iso-mount"
@@ -37,6 +35,25 @@ check() {
 warn() {
   echo "WARN: $*" >&2
 }
+
+ISO_NAME="StrawWU-${VERSION}-amd64.iso"
+# Prefer explicit path (worker may verify latest built ISO before VERSION-matched rebuild).
+if [[ -n "${STRAWWU_ISO_PATH:-}" ]]; then
+  ISO_PATH="${STRAWWU_ISO_PATH}"
+elif [[ -f "${OUTPUT_DIR}/${ISO_NAME}" ]]; then
+  ISO_PATH="${OUTPUT_DIR}/${ISO_NAME}"
+else
+  # Fall back to newest StrawWU-*-amd64.iso so bump-without-rebuild does not false-FAIL.
+  newest="$(find "${OUTPUT_DIR}" -maxdepth 1 -name 'StrawWU-*-amd64.iso' -type f 2>/dev/null \
+    | sort -V | tail -1 || true)"
+  if [[ -n "${newest}" && -f "${newest}" ]]; then
+    ISO_PATH="${newest}"
+    warn "no ISO for VERSION=${VERSION}; using ${ISO_PATH}"
+  else
+    ISO_PATH="${OUTPUT_DIR}/${ISO_NAME}"
+  fi
+fi
+ISO_NAME="$(basename "${ISO_PATH}")"
 
 squashfs_has_path() {
   local sq="$1" relpath="$2"
@@ -343,6 +360,16 @@ if [[ -n "${grub_cfg}" ]]; then
     echo "FAIL: GRUB missing console=tty0 — real hardware will show blank screen" >&2
     FAIL=1
   fi
+  if grep -q 'console=ttyS0' "${grub_cfg}"; then
+    if grep -q 'plymouth.ignore-serial-consoles' "${grub_cfg}"; then
+      echo "PASS: GRUB has plymouth.ignore-serial-consoles (panel not stolen by ttyS0)"
+    else
+      echo "FAIL: GRUB has ttyS0 without plymouth.ignore-serial-consoles — physical Live USB blanks while QEMU serial PASS" >&2
+      FAIL=1
+    fi
+  else
+    echo "PASS: GRUB has no ttyS0 (no serial/plymouth conflict)"
+  fi
   if grep -q 'username=ubuntu' "${grub_cfg}"; then
     echo "PASS: GRUB has username=ubuntu (casper live user)"
   else
@@ -420,10 +447,55 @@ fi
 
 if [[ -n "${grub_cfg}" ]]; then
   if grep -q '/casper/vmlinuz-generic' "${grub_cfg}"; then
-    echo "PASS: GRUB has Secure Boot fallback to /casper/vmlinuz-generic"
+    echo "PASS: GRUB references /casper/vmlinuz-generic"
   else
-    echo "FAIL: GRUB missing Secure Boot fallback entry — unenrolled MOK on real HW drops to firmware" >&2
+    echo "FAIL: GRUB missing /casper/vmlinuz-generic — physical Live has no Ubuntu display path" >&2
     FAIL=1
+  fi
+  # Default "Try or Install" must boot Canonical generic (SB-off machines never
+  # hit the old custom→fallback path and stayed black on real panels).
+  if python3 - "${grub_cfg}" <<'PY'
+import re, sys
+from pathlib import Path
+text = Path(sys.argv[1]).read_text(encoding="utf-8")
+m = re.search(
+    r'menuentry\s+"Try or Install StrawWU"\s*\{(.*?)\}',
+    text,
+    flags=re.DOTALL,
+)
+if not m:
+    sys.exit(1)
+body = m.group(1)
+if "/casper/vmlinuz-generic" not in body or re.search(r"linux\s+/casper/vmlinuz\s", body):
+    sys.exit(2)
+if "StrawWU custom kernel (MOK)" not in text:
+    sys.exit(3)
+sys.exit(0)
+PY
+  then
+    echo "PASS: GRUB default Try/Install boots vmlinuz-generic (physical Live path)"
+    echo "PASS: GRUB has custom kernel (MOK) secondary entry"
+  else
+    echo "FAIL: GRUB default must boot vmlinuz-generic; custom kernel is secondary only" >&2
+    FAIL=1
+  fi
+fi
+
+# Live layer must not block display-manager on snapd seeding (snapd purged).
+if [[ -n "${CASPER_DIR}" && -f "${CASPER_DIR}/minimal.standard.live.squashfs" ]]; then
+  if unsquashfs -l "${CASPER_DIR}/minimal.standard.live.squashfs" 2>/dev/null \
+      | grep -q 'wait-for-snapd-seeding.conf'; then
+    echo "FAIL: live layer still has wait-for-snapd-seeding (snapd purged → DM risk)" >&2
+    FAIL=1
+  else
+    echo "PASS: live layer has no wait-for-snapd-seeding.conf"
+  fi
+  if unsquashfs -l "${CASPER_DIR}/minimal.standard.live.squashfs" 2>/dev/null \
+      | grep -q 'ubuntu-desktop-bootstrap'; then
+    echo "FAIL: live layer still ships ubuntu-desktop-bootstrap (StrawWU uses Calamares)" >&2
+    FAIL=1
+  else
+    echo "PASS: live layer has no ubuntu-desktop-bootstrap"
   fi
 fi
 
@@ -452,9 +524,15 @@ HERMES_LOCK="/root/.hermes/locks/strawwu-build.lock"
 if [[ -f "${HERMES_LOCK}" ]]; then
   holder=$(cat "${HERMES_LOCK}" 2>/dev/null || echo unknown)
   holder_pid=$(echo "${holder}" | sed -n 's/.*pid=\([0-9]*\).*/\1/p')
-  if [[ -n "${holder_pid}" ]] && kill -0 "${holder_pid}" 2>/dev/null && [[ "${holder_pid}" -ne "$$" ]]; then
+  # Same-process tree holding the mutex (e.g. boot-test under longtask_build_mutex)
+  # must not false-FAIL: ISO is already written; we are the owner, not a parallel writer.
+  if [[ -n "${holder_pid}" ]] && kill -0 "${holder_pid}" 2>/dev/null \
+      && [[ "${holder_pid}" -ne "$$" ]] \
+      && [[ "${STRAWWU_IN_BUILD_MUTEX:-0}" != "1" ]]; then
     echo "FAIL: build mutex held by live process pid=${holder_pid} — ISO may be mid-write" >&2
     FAIL=1
+  elif [[ "${STRAWWU_IN_BUILD_MUTEX:-0}" == "1" ]]; then
+    echo "PASS: build mutex held by this session (STRAWWU_IN_BUILD_MUTEX=1)"
   else
     echo "PASS: build mutex free or stale (${holder})"
   fi
