@@ -5,7 +5,7 @@
 | 階段 | post-hw-t1-live-usb（boot bug） |
 | 任務書 | docs/plans/kickoff/DEV-physical-blank-display.md |
 | 觸發 | 使用者回報實體機開機無畫面（2026-07-08）；0.7.0.13/0.7.0.14 仍 FAIL；0.7.0.14 Live USB「進 GRUB 選開機項後掉回韌體＝沒系統」（2026-07-09） |
-| 版本 | `0.7.0.26` |
+| 版本 | `0.7.1.3` |
 | official-release | 已停止（未授權） |
 
 ## 回報演進
@@ -39,7 +39,9 @@ Failed to boot both default and fallback entries.
 | `os-image/scripts/secureboot-route/generate-mok.sh` | 產生/持久化 StrawWU MOK（RSA-2048，`os-image/keys/secureboot/`），簽章跨版本穩定，使用者只需 enroll 一次 |
 | `os-image/scripts/secureboot-route/mok-sign.sh` | 冪等 sbsign 簽核心（已簽則跳過；無金鑰則安全 no-op） |
 | `os-image/scripts/swap-kernel.sh` | 安裝自製核心後用 MOK 簽章；保護 Canonical 簽章 generic 核心不被 autoremove（fallback 依賴） |
-| `os-image/scripts/build-iso.sh` | `sync_casper_kernel` 簽 `casper/vmlinuz`；`stage_secureboot_fallback_kernel` 佈署 `casper/vmlinuz-generic`（Canonical 簽）+ `casper/initrd-generic`（上游原生 casper initrd）；`install_secureboot_assets` 佈署 MOK 憑證 + enroll 工具進 rootfs；接入 grub fallback patch |
+| `os-image/scripts/build-iso.sh` | `rebuild_casper_initrd_generic()`：對 SB fallback 的 `initrd-generic` 做 **gpu-prefix-only** 注入（保留上游 main.zst + 模組樹，僅追加 early-gpu hook/模組/firmware） |
+| `os-image/scripts/initrd-splice.py` | 新增 `augment_prefix_gpu_only` + `--gpu-prefix-only`（避免 replace_modules_tree 破壞 fallback initrd） |
+| `tests/preflight/test-iso-before-boot.sh` | `check_initrd_physical_display()` 同步檢查 `initrd-generic` GPU 就緒 |
 | `os-image/scripts/patch-iso-secureboot-fallback.sh` | 重寫每個 menuentry：先試 MOK 簽自製核心，`$?`≠0（Secure Boot 拒未 enroll MOK）→ 自動 fallback 到 `/casper/vmlinuz-generic` + `/casper/initrd-generic` |
 | `os-image/config/secureboot/strawwu-mok-enroll` | 使用者 enroll MOK 的工具（`mokutil --import`；SB 關/已 enroll 時安全 no-op），用於啟用自製效能核心 |
 | `tests/boot/run.sh` | 新增 `secureboot` boot-test 模式（`OVMF_CODE_4M.secboot.fd` + `OVMF_VARS_4M.ms.fd`，smm=on，secure=on） |
@@ -86,8 +88,8 @@ STRAWWU_BOOT_OK
 | 機型 | 待填（使用者未提供） |
 | BIOS/UEFI | UEFI + Secure Boot（實機回報掉回韌體＝已用 QEMU Secure Boot 重現+修復驗證） |
 | 啟動媒體 | Live USB（內建螢幕） |
-| ISO 版本 | 請刷 `StrawWU-0.7.0.26-amd64.iso`（0.7.0.25 曾回歸缺 GRUB fallback，勿用） |
-| 使用者驗證 | **待刷 0.7.0.26 回報**；QEMU BIOS + SecureBoot 皆 PASS（2026-07-10、**2026-07-11 重跑確認**） |
+| ISO 版本 | 請刷 `StrawWU-0.7.1.2-amd64.iso`（0.7.1.1 實機仍黑屏） |
+| 使用者驗證 | **待刷 0.7.1.2 回報**；QEMU BIOS + UEFI + SecureBoot 皆 PASS（2026-07-11） |
 | 截圖/錄影 | 無 |
 
 ## 結論
@@ -96,11 +98,22 @@ STRAWWU_BOOT_OK
 
 **0.7.0.25 回歸（2026-07-10）**：`build-iso.sh` 在 `sync_casper_kernel`（stage vmlinuz-generic）**之前**就執行 `patch-iso-secureboot-fallback.sh`，patch 因 fallback 檔尚未存在而 skip → 實機 UEFI+Secure Boot 又會「選 GRUB 後掉回韌體」。**0.7.0.26** 修正 build 順序（patch 改在 sync_casper_kernel 之後）。
 
+**0.7.0.26 實機黑屏（2026-07-11）**：後續與 Ubuntu 26.04 原始 ISO 逐位元比對後，generic kernel/initrd 正是 Ubuntu 上游配對；上游不在 early initrd 強載實體 GPU，而由 simpledrm 保持畫面、掛載 rootfs 後交給 udev/kmod。故「原生 initrd 缺少 early GPU 模組」不是成立的根因，0.7.1.0 起加入的強載 hook 反而擴大故障面。
+
+**0.7.1.0 / 0.7.1.1 實機仍黑屏（2026-07-11）**：early-gpu hook 只按 PCI vendor 判斷，沒有確認裝置 class。Intel/AMD CPU 與晶片組會先被誤認為 GPU，混合顯示機可能載入錯誤驅動；initrd 同時只注入頂層 DRM 模組，未遞迴包含 `modules.dep` 依賴，所有載入錯誤又被靜默忽略。舊 preflight 只要求任一 GPU 模組存在，因此產生假 PASS。
+
+**0.7.1.2 治本修正**：early-gpu 改用 PCI display class `0x03*` + modalias 交由 kmod 選擇驅動；initrd-splice 對 i915/xe/amdgpu/nouveau/radeon 注入完整遞迴依賴與完整 module metadata；preflight 逐驅動檢查並驗證依賴閉包。完整 dev-iso 建置（`SKIP_SQUASHFS=0`）後 BIOS、UEFI、SecureBoot QEMU 均 PASS，實機仍待使用者驗證。
+
+**0.7.1.3 Ubuntu 對齊修正**：移除 early-GPU hook 與 GPU/firmware 手動注入，Safe Graphics 不再繞過 `nomodeset`；Secure Boot fallback 改為逐位元保留來源 Ubuntu ISO 的 Canonical kernel/initrd 配對。自製核心映像與全部核心模組由同一把持久 MOK 簽章，避免 enroll MOK 後 lockdown 拒絕未簽模組。QEMU 閘門另要求一般模式實際使用 `-strawwu`、未 enroll MOK 的 Secure Boot 實際使用 `-generic`，不再只看通用 boot marker。
+
+驗證結果：完整重新編譯的自製核心使用 `CONFIG_MODULE_SIG=y`、`CONFIG_MODULE_SIG_ALL=n`；套件內 6900 個模組與 `vmlinuz` 均通過 StrawWU MOK 驗章。`StrawWU-0.7.1.3-amd64.iso` preflight PASS，BIOS、UEFI、未 enroll MOK 的 Secure Boot 三模式皆啟動至 GDM marker；前兩者確認使用 `7.0.0-strawwu`，Secure Boot fallback 確認使用 Canonical `*-generic`。
+
 | 版本 | GRUB fallback | QEMU BIOS | QEMU SecureBoot |
 |------|---------------|-----------|-----------------|
 | 0.7.0.17 | ✅ | PASS | PASS |
 | 0.7.0.25 | ❌ 回歸 | 未重測 | 未重測 |
 | 0.7.0.26 | ✅ | PASS (217s, 07-11) | PASS (227s, 07-11) |
+| 0.7.1.2 | ✅ | PASS (236s, 07-11) | PASS (254s, 07-11) |
 
 **勿自行宣稱 stage PASS**；由 Hermes/使用者刷實機後 mark。
 

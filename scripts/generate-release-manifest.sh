@@ -141,14 +141,18 @@ for pkg in packages:
     seen[pkg["name"]] = pkg["version"]
 packages = [{"name": k, "version": v} for k, v in sorted(seen.items())]
 
-boot_test = {"bios": "PENDING", "uefi": "PENDING"}
-boot_result = repo_root / "tests/boot/output/boot-run-release.log"
+boot_test = {"bios": "PENDING", "uefi": "PENDING", "secureboot": "PENDING"}
+boot_result = repo_root / "tests/boot/output/boot-result.json"
 if boot_result.is_file():
-    text = boot_result.read_text(encoding="utf-8", errors="replace")
-    if "STRAWWU_BOOT_OK" in text:
-        boot_test["bios"] = "PASS"
-    if "UEFI" in text and "STRAWWU_BOOT_OK" in text:
-        boot_test["uefi"] = "PASS"
+    try:
+        result = json.loads(boot_result.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        result = {}
+    if result.get("version") == version:
+        for mode in boot_test:
+            status = (result.get(mode) or {}).get("status")
+            if status in {"PASS", "FAIL", "SKIPPED"}:
+                boot_test[mode] = status
 
 sha256sums = output / "SHA256SUMS"
 checksums = None

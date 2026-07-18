@@ -65,8 +65,9 @@ main() {
             apt-mark manual "$pkg" 2>/dev/null || true
         done
         apt-get purge -y "linux-image-generic" "linux-image-generic-hwe-*" "linux-image-unsigned-*" 2>/dev/null || true
-        update-initramfs -u -k all
     ' || true
+    chroot_run update-initramfs -u -k all \
+        || die "failed to generate installed-system initramfs after kernel swap"
     rm -f "${ROOTFS_DIR}/tmp/strawwu-kernel.deb"
 
     local kver=""
@@ -79,19 +80,18 @@ main() {
     local custom_vmlinuz mok_status="not-attempted"
     custom_vmlinuz="$(ls "${ROOTFS_DIR}/boot/vmlinuz-"*strawwu* 2>/dev/null | head -1 || true)"
     if [[ -n "${custom_vmlinuz}" ]]; then
-        if bash "${SCRIPT_DIR}/secureboot-route/mok-sign.sh" "${custom_vmlinuz}"; then
-            # mok-sign.sh is a no-op (exit 0) when the MOK key is absent, so verify
-            # the signature actually landed to record an honest signed/unsigned state.
+        if STRAWWU_REQUIRE_MOK=1 bash "${SCRIPT_DIR}/secureboot-route/mok-sign.sh" "${custom_vmlinuz}"; then
             if command -v sbverify >/dev/null 2>&1 \
                 && [[ -f "${REPO_ROOT}/os-image/keys/secureboot/StrawWU-MOK.crt" ]] \
                 && sbverify --cert "${REPO_ROOT}/os-image/keys/secureboot/StrawWU-MOK.crt" "${custom_vmlinuz}" >/dev/null 2>&1; then
                 mok_status="mok-signed"
             else
-                mok_status="unsigned (no MOK key or sbverify) — boots via Canonical fallback"
+                mok_status="verification-error"
             fi
         else
             mok_status="sign-error"
         fi
+        [[ "${mok_status}" == "mok-signed" ]] || die "custom kernel MOK signing failed: ${mok_status}"
     fi
 
     {

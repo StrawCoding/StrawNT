@@ -17,12 +17,10 @@ require_file "${SPLICE}" "initrd-splice.py"
 
 require_file "${OVERLAYS}/scripts/casper-premount/05strawwu-wait-live-media" "premount wait-live-media"
 require_file "${OVERLAYS}/scripts/casper-premount/20iso_scan" "iso-scan overlay"
-require_file "${OVERLAYS}/scripts/init-top/05strawwu-early-gpu" "init-top early-gpu"
 
 for script in \
 	"${OVERLAYS}/scripts/casper-premount/05strawwu-wait-live-media" \
-	"${OVERLAYS}/scripts/casper-premount/20iso_scan" \
-	"${OVERLAYS}/scripts/init-top/05strawwu-early-gpu"; do
+	"${OVERLAYS}/scripts/casper-premount/20iso_scan"; do
 	if [[ -x "${script}" ]]; then
 		pass "$(basename "${script}") executable"
 	else
@@ -50,34 +48,16 @@ else
 	fail "initrd-splice.py missing overlay injection"
 fi
 
-if grep -q 'inject_early_physical_gpu_firmware' "${SPLICE}" && grep -q 'EARLY_PHYSICAL_GPU_FIRMWARE_DIRS' "${SPLICE}"; then
-	pass "initrd-splice.py injects physical GPU firmware"
+if [[ ! -e "${OVERLAYS}/scripts/init-top/05strawwu-early-gpu" ]]; then
+	pass "no forced early-GPU hook (Ubuntu simpledrm/rootfs handoff)"
 else
-	fail "initrd-splice.py missing physical GPU firmware injection"
+	fail "forced early-GPU hook still present"
 fi
 
-if grep -q 'inject_early_gpu_hook_into_module_phase' "${SPLICE}" && grep -q 'inject_early_gpu_module_metadata' "${SPLICE}"; then
-	pass "initrd-splice.py injects early-gpu hook + module metadata into module phase"
+if ! grep -qE 'gpu-prefix-only|inject_early_gpu|EARLY_PHYSICAL_GPU' "${SPLICE}"; then
+	pass "initrd-splice.py does not force physical GPU loading"
 else
-	fail "initrd-splice.py missing early-gpu module-phase injection"
-fi
-
-if grep -q 'Do NOT write scripts/init-top/ORDER here' "${SPLICE}"; then
-	pass "initrd-splice.py avoids standalone early2 init-top ORDER (udev race)"
-else
-	fail "initrd-splice.py may still write early2 ORDER without udev — physical panic risk"
-fi
-
-if grep -q 'detect_gpu_driver' "${OVERLAYS}/scripts/init-top/05strawwu-early-gpu"; then
-	pass "early-gpu hook is PCI-aware (single driver load)"
-else
-	fail "early-gpu hook loads all GPU drivers — physical panic risk"
-fi
-
-if grep -q 'find "${MODROOT}"' "${OVERLAYS}/scripts/init-top/05strawwu-early-gpu"; then
-	pass "early-gpu hook uses explicit insmod paths (no modules.dep dependency)"
-else
-	fail "early-gpu hook still modprobe-only — will fail on early2 without modules.dep"
+	fail "initrd-splice.py still contains forced early-GPU injection"
 fi
 
 if grep -q '/dev/sd\*\[0-9\]' "${OVERLAYS}/scripts/casper-premount/05strawwu-wait-live-media"; then

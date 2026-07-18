@@ -72,6 +72,7 @@ run_qemu_boot() {
     local result="FAIL"
     local start_ts end_ts elapsed
     local ovmf_vars_tmp=""
+    local kernel_marker='STRAWWU_KERNEL_.*-strawwu'
 
     rm -f "${serial_log}" "${qemu_log}"
     start_ts="$(date -Is)"
@@ -119,6 +120,7 @@ run_qemu_boot() {
                 -device virtio-scsi-pci,id=scsi0
                 -device scsi-cd,bus=scsi0.0,drive=cdrom0,bootindex=1
             )
+            kernel_marker='STRAWWU_KERNEL_.*-generic'
             ;;
         *)
             die "unknown mode: ${mode}"
@@ -149,8 +151,9 @@ run_qemu_boot() {
             qemu_rc=$?
             break
         fi
-        if grep -q "${MARKER}" "${serial_log}" 2>/dev/null; then
-            log "${mode}: marker found after ${waited}s — killing QEMU"
+        if grep -q "${MARKER}" "${serial_log}" 2>/dev/null \
+            && grep -Eq "${kernel_marker}" "${serial_log}" 2>/dev/null; then
+            log "${mode}: boot and expected kernel markers found after ${waited}s — killing QEMU"
             kill "${qemu_pid}" 2>/dev/null; wait "${qemu_pid}" 2>/dev/null || true
             qemu_rc=0
             break
@@ -171,9 +174,10 @@ run_qemu_boot() {
     end_ts="$(date -Is)"
     elapsed=$(( $(date -d "${end_ts}" +%s) - $(date -d "${start_ts}" +%s) ))
 
-    if grep -q "${MARKER}" "${serial_log}" 2>/dev/null; then
+    if grep -q "${MARKER}" "${serial_log}" 2>/dev/null \
+        && grep -Eq "${kernel_marker}" "${serial_log}" 2>/dev/null; then
         result="PASS"
-        log "${mode}: PASS — ${MARKER} found in ${elapsed}s"
+        log "${mode}: PASS — ${MARKER} and ${kernel_marker} found in ${elapsed}s"
     else
         log "${mode}: FAIL — marker not found after ${elapsed}s (qemu exit ${qemu_rc})"
         tail -30 "${serial_log}" 2>/dev/null >&2 || true

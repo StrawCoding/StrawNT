@@ -18,11 +18,11 @@ the key once (via `shim`/MokManager).
   build host it persists at `StrawWU-MOK.key`; `generate-mok.sh` only creates a
   new pair when one is absent (stable signatures across releases → users enroll
   once).
-- To build signed kernels on a fresh host, provision the same `StrawWU-MOK.key`
-  out-of-band (secret store) alongside the tracked public cert. Without the key,
-  the build still succeeds but produces an unsigned custom kernel; boot then
-  relies on the Canonical-signed generic fallback kernel (see
-  `patch-iso-secureboot-fallback.sh`).
+- To build the custom kernel on a fresh host, provision the same
+  `StrawWU-MOK.key` out-of-band (secret store) alongside the tracked public cert.
+  Custom-kernel builds fail closed without it: the kernel image and every packaged
+  module must be signed by the same MOK. The untouched Canonical Ubuntu kernel and
+  initrd remain the no-MOK recovery path.
 - The MOK is a self-owned key, **not** a trusted CA. Enrolling it only permits
   booting StrawWU-signed artifacts on the machine where the owner explicitly
   enrolled it.

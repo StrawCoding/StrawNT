@@ -1,14 +1,14 @@
 {
   "schema": "strawwu-release-manifest/v1",
-  "version": "0.7.0.26",
+  "version": "0.7.1.3",
   "channel": "beta",
   "git_tag": null,
-  "git_sha": "8bb1baa1b11eb9c401df52764cc5117203957ae4",
+  "git_sha": "118d9abcc932acdb1cfff3bdbfc2e59c20bdc6f2",
   "artifacts": [
     {
-      "name": "StrawWU-0.7.0.26-amd64.iso",
-      "sha256": "5adaa52a1960cd23b6041ad271f89e4149ccb055a028f5bc4049892ae4c00771",
-      "size": 5806635008,
+      "name": "StrawWU-0.7.1.3-amd64.iso",
+      "sha256": "444d1cabbe30e77fa7410290f71793de0a6c89d81e33b25b4222dcf9ccfdf323",
+      "size": 5767680000,
       "gpg_sig": null
     }
   ],
@@ -19,75 +19,75 @@
     },
     {
       "name": "strawwu-bug-reporter",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     },
     {
       "name": "strawwu-calamares-settings",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     },
     {
       "name": "strawwu-desktop",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     },
     {
       "name": "strawwu-desktop-actions",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     },
     {
       "name": "strawwu-disable-upstream-init",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     },
     {
       "name": "strawwu-firstboot",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     },
     {
       "name": "strawwu-flatpak-setup",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     },
     {
       "name": "strawwu-greeter",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     },
     {
       "name": "strawwu-initd",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     },
     {
       "name": "strawwu-initramfs-hooks",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     },
     {
       "name": "strawwu-install-init",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     },
     {
       "name": "strawwu-keyring",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     },
     {
       "name": "strawwu-l10n-ime",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     },
     {
       "name": "strawwu-live-install-ux",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     },
     {
       "name": "strawwu-minimal",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     },
     {
       "name": "strawwu-registry-hooks",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     },
     {
       "name": "strawwu-session",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     },
     {
       "name": "strawwu-shell",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     },
     {
       "name": "strawwu-system",
@@ -95,28 +95,29 @@
     },
     {
       "name": "strawwu-target-identity",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     },
     {
       "name": "strawwu-target-setup",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     },
     {
       "name": "strawwu-update-notifier",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     },
     {
       "name": "strawwu-wincompat",
-      "version": "0.7.0.26"
+      "version": "0.7.1.3"
     }
   ],
   "boot_test": {
     "bios": "PASS",
-    "uefi": "PENDING"
+    "uefi": "PASS",
+    "secureboot": "PASS"
   },
   "checksums": {
     "file": "SHA256SUMS",
     "gpg_sig": null
   },
-  "published_at": "2026-07-10T16:17:38Z"
+  "published_at": "2026-07-18T13:49:33Z"
 }

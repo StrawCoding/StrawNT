@@ -51,6 +51,36 @@ squashfs_has_path() {
   return 1
 }
 
+# Ubuntu keeps native GPU loading out of the live initrd recovery path. Verify
+# StrawWU does not reintroduce a forced pre-Plymouth KMS hook.
+check_initrd_no_forced_gpu() {
+  local initrd_path="$1"
+  local label="$2"
+
+  [[ -f "${initrd_path}" ]] || return 0
+  command -v unmkinitramfs >/dev/null 2>&1 || {
+    warn "${label}: unmkinitramfs unavailable — skipping forced-GPU check"
+    return 0
+  }
+
+  local initrd_tmp
+  initrd_tmp=$(mktemp -d)
+  if ! unmkinitramfs "${initrd_path}" "${initrd_tmp}" 2>/dev/null; then
+    warn "${label}: unmkinitramfs failed — skipping forced-GPU check"
+    rm -rf "${initrd_tmp}"
+    return 0
+  fi
+
+  if find "${initrd_tmp}" -name '05strawwu-early-gpu' -print -quit | grep -q .; then
+    echo "FAIL: ${label} contains forced early-GPU hook" >&2
+    FAIL=1
+  else
+    echo "PASS: ${label} has no forced early-GPU hook"
+  fi
+
+  rm -rf "${initrd_tmp}"
+}
+
 cleanup_mount() {
   if mountpoint -q "${MOUNT}" 2>/dev/null; then
     umount "${MOUNT}" 2>/dev/null || umount -l "${MOUNT}" 2>/dev/null || true
@@ -192,22 +222,6 @@ if [[ -n "${CASPER_DIR}" && -d "${CASPER_DIR}" ]]; then
             break
           fi
         done
-        if [[ -n "${modules_dir}" ]]; then
-          mod_kvers=$(find "${modules_dir}/usr/lib/modules" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' 2>/dev/null || true)
-          if echo "${mod_kvers}" | grep -q 'strawwu'; then
-            echo "PASS: initrd ${modules_phase} has strawwu modules"
-          else
-            echo "FAIL: initrd ${modules_phase} missing strawwu modules (found: ${mod_kvers:-none})" >&2
-            FAIL=1
-          fi
-          if echo "${mod_kvers}" | grep -q '6\.11\.0-17-generic' && ! echo "${mod_kvers}" | grep -q 'strawwu'; then
-            echo "FAIL: initrd ${modules_phase} still upstream 6.11-only modules" >&2
-            FAIL=1
-          fi
-        else
-          echo "FAIL: initrd has no early2/early3 usr/lib/modules" >&2
-          FAIL=1
-        fi
         iso_fs_ok=0
         if [[ -n "${modules_dir}" ]] && find "${modules_dir}" -name 'isofs.ko*' -o -name 'iso9660.ko*' 2>/dev/null | grep -q .; then
           iso_fs_ok=1
@@ -226,46 +240,6 @@ if [[ -n "${CASPER_DIR}" && -d "${CASPER_DIR}" ]]; then
           echo "FAIL: initrd ${modules_phase} missing isofs/iso9660 module (CD mount will fail)" >&2
           FAIL=1
         fi
-        gpu_ok=0
-        if [[ -n "${modules_dir}" ]]; then
-          for gpu_mod in i915 amdgpu nouveau radeon; do
-            if find "${modules_dir}" -name "${gpu_mod}.ko*" 2>/dev/null | grep -q .; then
-              gpu_ok=1
-              break
-            fi
-          done
-        fi
-        if [[ "${gpu_ok}" -eq 1 ]]; then
-          echo "PASS: initrd ${modules_phase} has physical GPU module (i915/amdgpu/nouveau/radeon)"
-        elif [[ -n "${modules_dir}" ]]; then
-          echo "FAIL: initrd ${modules_phase} missing physical GPU modules — Plymouth black screen on real hardware" >&2
-          FAIL=1
-        fi
-        fw_ok=0
-        fw_detail=""
-        if [[ -n "${modules_dir}" ]]; then
-          for fw_dir in i915 amdgpu nouveau radeon; do
-            fw_count=$(find "${modules_dir}" -path "*/firmware/${fw_dir}/*" -type f 2>/dev/null | wc -l)
-            if [[ "${fw_count}" -gt 0 ]]; then
-              fw_ok=1
-              fw_detail="${fw_dir}(${fw_count})"
-              break
-            fi
-          done
-        fi
-        if [[ "${fw_ok}" -eq 1 ]]; then
-          echo "PASS: initrd ${modules_phase} has physical GPU firmware (${fw_detail})"
-        elif [[ -n "${modules_dir}" ]]; then
-          echo "FAIL: initrd ${modules_phase} missing GPU firmware — KMS/Plymouth black screen on real hardware" >&2
-          FAIL=1
-        fi
-        gpu_hook="${modules_dir}/scripts/init-top/05strawwu-early-gpu"
-        if [[ -f "${gpu_hook}" ]]; then
-          echo "PASS: initrd ${modules_phase} has early-gpu init-top hook (pre-Plymouth)"
-        elif [[ -n "${modules_dir}" ]]; then
-          echo "FAIL: initrd ${modules_phase} missing early-gpu hook — GPU modules never loaded before Plymouth" >&2
-          FAIL=1
-        fi
         early_order="${modules_dir}/scripts/init-top/ORDER"
         if [[ -f "${early_order}" ]]; then
           if grep -q 'udev' "${early_order}" 2>/dev/null; then
@@ -274,32 +248,15 @@ if [[ -n "${CASPER_DIR}" && -d "${CASPER_DIR}" ]]; then
             echo "FAIL: initrd ${modules_phase} has standalone init-top ORDER without udev — physical panic risk" >&2
             FAIL=1
           fi
-        else
-          echo "PASS: initrd ${modules_phase} has no standalone init-top ORDER (main phase owns hook order)"
-        fi
-        meta_ok=0
-        if [[ -n "${modules_dir}" ]]; then
-          mod_meta_root=$(find "${modules_dir}/usr/lib/modules" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | head -1)
-          if [[ -n "${mod_meta_root}" ]]; then
-            for meta in modules.dep modules.alias; do
-              if [[ -f "${mod_meta_root}/${meta}" ]] && grep -qE 'i915|amdgpu|nouveau|radeon' "${mod_meta_root}/${meta}" 2>/dev/null; then
-                meta_ok=1
-                break
-              fi
-            done
-          fi
-        fi
-        if [[ "${meta_ok}" -eq 1 ]]; then
-          echo "PASS: initrd ${modules_phase} has GPU module metadata (modprobe fallback)"
         elif [[ -n "${modules_dir}" ]]; then
-          echo "FAIL: initrd ${modules_phase} missing GPU modules.dep/alias" >&2
-          FAIL=1
+          echo "PASS: initrd ${modules_phase} has no standalone init-top ORDER (main phase owns hook order)"
         fi
       else
         warn "unmkinitramfs failed — skipping initrd module checks"
       fi
       rm -rf "${initrd_tmp}"
     fi
+    check_initrd_no_forced_gpu "${INITRD_PATH}" "initrd"
   fi
 
   if [[ -f "${SQUASHFS_PATH}" ]]; then
@@ -409,6 +366,8 @@ if [[ -n "${CASPER_DIR}" && -d "${CASPER_DIR}" ]]; then
   sb_vmlinuz="${CASPER_DIR}/vmlinuz"
   sb_generic="${CASPER_DIR}/vmlinuz-generic"
   sb_initrd_generic="${CASPER_DIR}/initrd-generic"
+  sb_upstream_kernel="${CASPER_DIR}/vmlinuz.ubuntu-backup"
+  sb_upstream_initrd="${CASPER_DIR}/initrd.ubuntu-backup"
 
   if command -v sbverify >/dev/null 2>&1 && [[ -f "${MOK_CRT}" && -f "${sb_vmlinuz}" ]]; then
     if sbverify --cert "${MOK_CRT}" "${sb_vmlinuz}" >/dev/null 2>&1; then
@@ -436,8 +395,23 @@ if [[ -n "${CASPER_DIR}" && -d "${CASPER_DIR}" ]]; then
     FAIL=1
   fi
 
+  if [[ -f "${sb_generic}" && -f "${sb_upstream_kernel}" ]] \
+      && cmp -s "${sb_generic}" "${sb_upstream_kernel}"; then
+    echo "PASS: fallback kernel is byte-for-byte Ubuntu source"
+  else
+    echo "FAIL: fallback kernel differs from Ubuntu source" >&2
+    FAIL=1
+  fi
+
   if [[ -f "${sb_initrd_generic}" ]]; then
     echo "PASS: casper/initrd-generic present (fallback initrd)"
+    if [[ -f "${sb_upstream_initrd}" ]] && cmp -s "${sb_initrd_generic}" "${sb_upstream_initrd}"; then
+      echo "PASS: fallback initrd is byte-for-byte Ubuntu source"
+    else
+      echo "FAIL: fallback initrd differs from Ubuntu source" >&2
+      FAIL=1
+    fi
+    check_initrd_no_forced_gpu "${sb_initrd_generic}" "initrd-generic"
   else
     echo "FAIL: casper/initrd-generic missing — fallback kernel cannot mount live filesystem" >&2
     FAIL=1

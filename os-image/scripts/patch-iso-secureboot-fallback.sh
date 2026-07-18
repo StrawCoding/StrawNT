@@ -50,7 +50,7 @@ def repl(m):
 
 new_text, n = line_re.subn(repl, text)
 if n == 0:
-    sys.exit(0)
+    raise SystemExit(f"no custom kernel/initrd pair found in {cfg}")
 cfg.write_text(new_text, encoding="utf-8")
 print(f"patched {n} menuentr(ies) with Secure Boot fallback: {cfg}", file=sys.stderr)
 PY

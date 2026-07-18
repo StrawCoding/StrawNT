@@ -140,7 +140,7 @@ Wants=gdm.service
 [Service]
 Type=oneshot
 # GDM up = live session ready; tee to serial + console (do not require -c ttyS0 — casper overlay may lag).
-ExecStart=/bin/sh -c 'K=$(uname -r); { echo STRAWWU_BOOT_OK; echo STRAWWU-DESKTOP-OK; echo "STRAWWU_KERNEL_${K}"; } | tee /dev/ttyS0 /dev/console /dev/kmsg >/dev/null 2>&1 || true'
+ExecStart=/bin/sh -c '{ echo STRAWWU_BOOT_OK; echo STRAWWU-DESKTOP-OK; echo "STRAWWU_KERNEL_$(uname -r)"; } | tee /dev/ttyS0 /dev/console /dev/kmsg >/dev/null 2>&1 || true'
 RemainAfterExit=yes
 
 [Install]
@@ -243,9 +243,10 @@ stage_iso_tree() {
         fi
     fi
 
-    if [[ -f "${ISO_STAGING}/casper/initrd" && ! -f "${ISO_STAGING}/casper/initrd.ubuntu-backup" ]]; then
+    if [[ -f "${ISO_STAGING}/casper/initrd" && -f "${ISO_STAGING}/casper/vmlinuz" ]]; then
         cp -a "${ISO_STAGING}/casper/initrd" "${ISO_STAGING}/casper/initrd.ubuntu-backup"
-        log "saved casper/initrd.ubuntu-backup from upstream ISO"
+        cp -a "${ISO_STAGING}/casper/vmlinuz" "${ISO_STAGING}/casper/vmlinuz.ubuntu-backup"
+        log "saved exact upstream casper kernel/initrd fallback pair"
     fi
 
     umount "${ISO_MOUNT}"
@@ -504,38 +505,29 @@ sync_casper_kernel() {
     log "syncing casper vmlinuz from ${kver} (preserving casper initrd, injecting modules)"
     cp -f "${vmlinuz}" "${ISO_STAGING}/casper/vmlinuz"
     # Ensure the live custom kernel carries the StrawWU MOK signature.
-    bash "${SCRIPT_DIR}/secureboot-route/mok-sign.sh" "${ISO_STAGING}/casper/vmlinuz" || true
+    STRAWWU_REQUIRE_MOK=1 bash "${SCRIPT_DIR}/secureboot-route/mok-sign.sh" \
+        "${ISO_STAGING}/casper/vmlinuz"
     sync_casper_initrd_modules "${kver}"
     stage_secureboot_fallback_kernel
 }
 
-# Secure Boot hybrid: stage the Canonical-signed generic kernel + its native casper
-# initrd as the no-MOK fallback. GRUB tries the MOK-signed custom kernel first and
-# falls back here when shim rejects an unenrolled MOK (see patch-iso-secureboot-fallback.sh).
+# Secure Boot hybrid: preserve the source Ubuntu ISO's exact signed kernel/initrd
+# pair as the no-MOK fallback. Never rebuild or augment this recovery route.
 stage_secureboot_fallback_kernel() {
     local casper="${ISO_STAGING}/casper"
-    local generic_vmlinuz generic_ver
-    # Pick the highest-versioned Canonical-signed *-generic kernel in the rootfs.
-    generic_vmlinuz="$(ls -1 "${ROOTFS_DIR}/boot/vmlinuz-"*-generic 2>/dev/null | sort -V | tail -1 || true)"
-    if [[ -z "${generic_vmlinuz}" || ! -f "${generic_vmlinuz}" ]]; then
-        log "WARN: no signed generic kernel in rootfs — Secure Boot fallback unavailable"
-        return 0
-    fi
-    generic_ver="$(basename "${generic_vmlinuz}" | sed 's/^vmlinuz-//')"
-    log "staging Secure Boot fallback kernel: ${generic_ver}"
-    cp -f "${generic_vmlinuz}" "${casper}/vmlinuz-generic"
+    local upstream_kernel="${casper}/vmlinuz.ubuntu-backup"
+    local upstream_initrd="${casper}/initrd.ubuntu-backup"
 
-    # Fallback initrd = pristine upstream casper initrd (native to the generic kernel,
-    # proven to mount the layered squashfs — identical to stock Ubuntu live boot).
-    if [[ -f "${casper}/initrd.ubuntu-backup" ]]; then
-        cp -f "${casper}/initrd.ubuntu-backup" "${casper}/initrd-generic"
-    elif [[ -f "${casper}/initrd" ]]; then
-        # No backup (rare): reuse current initrd; generic modules already inside upstream tree.
-        cp -f "${casper}/initrd" "${casper}/initrd-generic"
-    else
-        die "no casper initrd available for Secure Boot fallback"
-    fi
-    log "Secure Boot fallback staged: casper/vmlinuz-generic + casper/initrd-generic"
+    [[ -f "${upstream_kernel}" ]] || die "upstream fallback kernel backup missing: ${upstream_kernel}"
+    [[ -f "${upstream_initrd}" ]] || die "upstream fallback initrd backup missing: ${upstream_initrd}"
+
+    cp -f "${upstream_kernel}" "${casper}/vmlinuz-generic"
+    cp -f "${upstream_initrd}" "${casper}/initrd-generic"
+    cmp -s "${upstream_kernel}" "${casper}/vmlinuz-generic" \
+        || die "staged fallback kernel differs from Ubuntu source"
+    cmp -s "${upstream_initrd}" "${casper}/initrd-generic" \
+        || die "staged fallback initrd differs from Ubuntu source"
+    log "Secure Boot fallback staged byte-for-byte from Ubuntu source ISO"
 }
 
 wait_for_stable_file() {

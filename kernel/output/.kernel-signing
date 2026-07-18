@@ -1,0 +1,8 @@
+module_sig=enabled
+module_sig_all=disabled-explicit-mok-signing
+kernel_image_signed_at_build=true
+kernel_mok_signed=true
+module_signer=StrawWU Secure Boot Machine Owner Key
+module_count=6900
+mok_sha256=C2:0A:60:59:A7:AB:8F:FD:EB:42:6F:A2:78:90:C9:A0:6F:2D:73:BC:49:42:BB:E2:CE:FB:F8:55:18:4B:70:D0
+abi=7.0.0-14
