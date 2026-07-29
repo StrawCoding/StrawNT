@@ -10,13 +10,13 @@
   "execution_backend": "native",
   "cli": "strawnt",
   "github": "StrawCoding/StrawNT",
-  "generated_at": "2026-07-29T15:14:24Z",
+  "generated_at": "2026-07-29T15:15:03Z",
   "git": {
     "branch": "main",
-    "head": "68566cbeb3e62b89001ba1568fa6ab6aa3766645",
-    "origin_main": "68566cbeb3e62b89001ba1568fa6ab6aa3766645",
+    "head": "2067cff835e8b5c558744ac4624b8e6f6ed38fdc",
+    "origin_main": "2067cff835e8b5c558744ac4624b8e6f6ed38fdc",
     "merged_to_main": true,
-    "skip_merge_check": true
+    "skip_merge_check": false
   },
   "stages": {
     "nt0-rebrand-disconnect": {
