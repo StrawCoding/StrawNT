@@ -38,6 +38,7 @@ docs/technical-references/upstream/
 
 # Rust/Cargo build artifacts
 components/target/
+components/target
 components/packaging/output/
 packaging/output/
 
@@ -48,6 +49,8 @@ components/packaging/portable/prefix/opt/
 components/packaging/portable/prefix/var/
 components/packaging/portable/prefix/share/strawwu/
 components/packaging/portable/prefix/share/doc/
+components/packaging/portable/prefix/share/applications/
+components/packaging/portable/prefix/share/mime/
 
 # Portable Core AppImage / bundle artifacts (rebuild via make portable-appimage)
 components/packaging/portable/appimage/dist/

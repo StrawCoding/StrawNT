@@ -3,7 +3,7 @@
   "stage": "pe0-remove-wine",
   "status": "PASS",
   "version": "0.7.1.18",
-  "generated_at": "2026-07-29T05:14:57Z",
+  "generated_at": "2026-07-29T05:15:50Z",
   "binary": {
     "path": "components/target/release/strawwu",
     "version_output": "strawwu 0.7.1-preview.18",
@@ -66,7 +66,8 @@
   ],
   "git": {
     "branch": "main",
-    "head_at_evidence": "5d20153aa1d039af7fad93ae450a7c88babebaec",
-    "note": "commit+push follows evidence generation"
+    "pushed": true,
+    "commit": "5dcee225c619a9cb8cffd4953b1aeeee846eed0b",
+    "note": "pe0 product commit; gitignore hygiene follows"
   }
 }
