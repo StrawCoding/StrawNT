@@ -48,3 +48,7 @@ components/packaging/portable/prefix/opt/
 components/packaging/portable/prefix/var/
 components/packaging/portable/prefix/share/strawwu/
 components/packaging/portable/prefix/share/doc/
+
+# Portable Core AppImage / bundle artifacts (rebuild via make portable-appimage)
+components/packaging/portable/appimage/dist/
+components/packaging/portable/appimage/.tools/
