@@ -40,3 +40,11 @@ docs/technical-references/upstream/
 components/target/
 components/packaging/output/
 packaging/output/
+
+# Portable Core built prefix binaries (rebuild via make portable-prefix)
+components/packaging/portable/prefix/bin/
+components/packaging/portable/prefix/lib/
+components/packaging/portable/prefix/opt/
+components/packaging/portable/prefix/var/
+components/packaging/portable/prefix/share/strawwu/
+components/packaging/portable/prefix/share/doc/

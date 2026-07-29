@@ -24,16 +24,25 @@ Crate → artifact mapping lives in:
 
 Required core keys: `runtime`, `nt`, `launcher`, `cli`, `graphics`, `audio`, `hub`.
 
-## Smoke
+## Build (pc1)
 
-Scaffold stub (pc0):
+```bash
+make portable-prefix
+# or: bash components/packaging/portable/build-prefix.sh
+```
+
+Optional Hub bundling: `STRAWWU_PORTABLE_WITH_HUB=1 make portable-prefix`.
+
+## Smoke
 
 ```bash
 bash tests/portable/smoke-prefix.sh --help
-bash tests/portable/smoke-prefix.sh --dry-run
+bash tests/portable/smoke-prefix.sh --dry-run   # scaffold + inventory only
+make test-portable-prefix                      # builds if needed; writes smoke-prefix.json
+jq .status tests/portable/output/smoke-prefix.json
 ```
 
-Full prefix build / `--version` / `status` without system `strawwu-*` debs is **pc1**.
+Full prefix `--version` / `status` without system `strawwu-*` debs is **pc1**.
 
 ## Explicit non-goals
 

@@ -1,0 +1,35 @@
+{
+  "schema": "strawwu-portable-smoke-prefix/v1",
+  "stage": "pc1-self-contained-prefix",
+  "status": "PASS",
+  "version": "0.7.1.9",
+  "prefix": "/mnt/data/code/project/StrawCoding/StrawWU-portable/components/packaging/portable/prefix",
+  "generated_at": "2026-07-29T02:36:37Z",
+  "checks": {
+    "version": {
+      "status": "PASS",
+      "output": "strawwu 0.4.0"
+    },
+    "status_cmd": {
+      "status": "PASS",
+      "output": "strawwu: status — runtime idle, 0 session(s), 0 app(s) registered"
+    },
+    "no_system_deb_required": {
+      "status": "PASS",
+      "system_strawwu_debs": "absent",
+      "binary": "/mnt/data/code/project/StrawCoding/StrawWU-portable/components/packaging/portable/prefix/bin/strawwu"
+    },
+    "prefix_layout": {
+      "status": "PASS",
+      "bin": true,
+      "lib_dir": true,
+      "manifest": true
+    }
+  },
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
+    "no Wine/Proton substrate",
+    "no WinBox naming",
+    "no full Windows compatibility claim"
+  ]
+}
