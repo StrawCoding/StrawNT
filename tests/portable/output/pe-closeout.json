@@ -1,0 +1,117 @@
+{
+  "schema": "strawwu-portable-pe-closeout/v1",
+  "stage": "pe7-closeout",
+  "status": "PASS",
+  "version": "0.7.1.25",
+  "track": "native-pe-real-exec",
+  "backend": "native",
+  "execution_backend": "native",
+  "generated_at": "2026-07-29T07:27:21Z",
+  "git": {
+    "branch": "main",
+    "head": "a04bf3bcba11fb81197ecbe1798f5cc1d5c8a1a5",
+    "origin_main": "a04bf3bcba11fb81197ecbe1798f5cc1d5c8a1a5",
+    "merged_to_main": true,
+    "skip_merge_check": true
+  },
+  "stages": {
+    "pe0-remove-wine": {
+      "status": "PASS",
+      "evidence": [
+        "tests/portable/output/pe0-remove-wine.json"
+      ],
+      "acceptable": true
+    },
+    "pe1-real-cpu-exec": {
+      "status": "PASS",
+      "evidence": [
+        "tests/portable/output/pe-real-exec.json"
+      ],
+      "acceptable": true
+    },
+    "pe2-win32-console-mvp": {
+      "status": "PASS",
+      "evidence": [
+        "tests/portable/output/pe-console.json"
+      ],
+      "acceptable": true
+    },
+    "pe3-gui-user32-mvp": {
+      "status": "PASS",
+      "evidence": [
+        "tests/portable/output/pe-gui.json"
+      ],
+      "acceptable": true
+    },
+    "pe4-installer-real": {
+      "status": "PASS",
+      "evidence": [
+        "tests/portable/output/pe-installer.json"
+      ],
+      "acceptable": true
+    },
+    "pe5-desktop-click": {
+      "status": "PASS",
+      "evidence": [
+        "tests/portable/output/pe-desktop-click.json"
+      ],
+      "acceptable": true
+    },
+    "pe6-golden-smoke": {
+      "status": "PARTIAL",
+      "evidence": [
+        "tests/portable/output/pe-golden.json"
+      ],
+      "acceptable": true
+    },
+    "pc4-cross-distro-smoke": {
+      "status": "PASS",
+      "evidence": [
+        "tests/portable/output/matrix.json"
+      ],
+      "acceptable": true
+    },
+    "pe7-closeout": {
+      "status": "PASS",
+      "evidence": [
+        "tests/portable/output/pe-closeout.json",
+        "docs/plans/portable-core"
+      ],
+      "acceptable": true
+    }
+  },
+  "docs": {
+    "user_guide": "docs/plans/portable-core/USER-GUIDE.md",
+    "user_facing": "docs/user/portable-guide.md",
+    "closeout_report": "docs/plans/portable-core/pe-closeout-report.md",
+    "html": "docs/plans/portable-core/html/pe-closeout-report.html",
+    "kickoff": "docs/plans/kickoff/PE7-closeout.md",
+    "stage_report": "docs/plans/stage-reports/PE7-closeout-report.md",
+    "artifacts_index": "docs/plans/portable-core/artifacts.json",
+    "readme": "README.md"
+  },
+  "artifacts": {
+    "index": "docs/plans/portable-core/artifacts.json",
+    "sha256sums": "tests/portable/output/SHA256SUMS",
+    "sha256_present": true,
+    "appimage": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.25-x86_64.AppImage",
+    "portable_tar_gz": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.25-x86_64.portable.tar.gz",
+    "appimage_present": true,
+    "portable_tar_gz_present": true
+  },
+  "honesty": {
+    "pe6_golden": "PARTIAL",
+    "flatpak": "PARTIAL",
+    "full_windows_claim": false,
+    "anti_cheat_claim": false,
+    "wine_substrate": false
+  },
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
+    "no Wine/Proton substrate; execution_backend=native",
+    "no WinBox naming",
+    "no full Windows compatibility / anti-cheat claim",
+    "pe6 golden PARTIAL kept honest (not rewritten as PASS)",
+    "Flatpak PARTIAL kept honest"
+  ]
+}

@@ -2,9 +2,9 @@
   "schema": "strawwu-portable-cross-distro-matrix/v1",
   "stage": "pc4-cross-distro-smoke",
   "status": "PASS",
-  "version": "0.7.1.12",
+  "version": "0.7.1.25",
   "dist": "/mnt/data/code/project/StrawCoding/StrawWU-portable/components/packaging/portable/appimage/dist",
-  "generated_at": "2026-07-29T03:51:09Z",
+  "generated_at": "2026-07-29T07:27:12Z",
   "distros": [
     {
       "id": "ubuntu-24.04",
@@ -32,10 +32,10 @@
       "family": "debian",
       "status": "PASS",
       "artifact_kind": "portable.tar.gz",
-      "version_output": "strawwu 0.4.0",
+      "version_output": "strawwu 0.7.1-preview.25",
       "status_output": "strawwu: status — runtime idle, 0 session(s), 0 app(s) registered",
       "detail": "ok",
-      "checked_at": "2026-07-29T03:51:06Z"
+      "checked_at": "2026-07-29T07:27:08Z"
     },
     {
       "id": "fedora-41",
@@ -43,10 +43,10 @@
       "family": "rpm",
       "status": "PASS",
       "artifact_kind": "portable.tar.gz",
-      "version_output": "strawwu 0.4.0",
+      "version_output": "strawwu 0.7.1-preview.25",
       "status_output": "strawwu: status — runtime idle, 0 session(s), 0 app(s) registered",
       "detail": "ok",
-      "checked_at": "2026-07-29T03:51:08Z"
+      "checked_at": "2026-07-29T07:27:11Z"
     },
     {
       "id": "archlinux",
@@ -54,10 +54,10 @@
       "family": "arch",
       "status": "PASS",
       "artifact_kind": "portable.tar.gz",
-      "version_output": "strawwu 0.4.0",
+      "version_output": "strawwu 0.7.1-preview.25",
       "status_output": "strawwu: status — runtime idle, 0 session(s), 0 app(s) registered",
       "detail": "ok",
-      "checked_at": "2026-07-29T03:51:09Z"
+      "checked_at": "2026-07-29T07:27:12Z"
     }
   ],
   "summary": {

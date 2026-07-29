@@ -1,30 +1,31 @@
 {
   "schema": "strawwu-portable-artifacts/v1",
-  "version": "0.7.1.19",
-  "generated_at": "2026-07-29T05:02:08Z",
+  "version": "0.7.1.25",
+  "generated_at": "2026-07-29T07:26:00Z",
   "artifacts": [
     {
-      "name": "StrawWU-Core-0.7.1.17-x86_64.AppImage",
+      "name": "StrawWU-Core-0.7.1.25-x86_64.AppImage",
       "kind": "AppImage",
-      "path": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.17-x86_64.AppImage",
-      "sha256": "fe0eb5b3de8eecdad4be1d951e5616ef1b0849bf61a4286feb84f10b10ec920b",
-      "size_bytes": 1362424,
-      "built_version_tag": "StrawWU-Core-0.7.1.17-x86_64.AppImage"
+      "path": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.25-x86_64.AppImage",
+      "sha256": "d5f7d3cba8bb066daaa143416c6cf0de323f79281c576ab22ed9c483d843c9a8",
+      "size_bytes": 1399288,
+      "built_version_tag": "StrawWU-Core-0.7.1.25-x86_64.AppImage"
     },
     {
-      "name": "StrawWU-Core-0.7.1.17-x86_64.portable.tar.gz",
+      "name": "StrawWU-Core-0.7.1.25-x86_64.portable.tar.gz",
       "kind": "portable.tar.gz",
-      "path": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.17-x86_64.portable.tar.gz",
-      "sha256": "301474a54aa67ee71d1ba85dcde8c2a409e29b7307e207f90d2943a178f46339",
-      "size_bytes": 446318,
-      "built_version_tag": "StrawWU-Core-0.7.1.17-x86_64.portable.tar.gz"
+      "path": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.25-x86_64.portable.tar.gz",
+      "sha256": "952c5bf01257e1d0a842361085b550b053c2adf258fe26c5023349045e92f1e3",
+      "size_bytes": 495612,
+      "built_version_tag": "StrawWU-Core-0.7.1.25-x86_64.portable.tar.gz"
     }
   ],
   "sha256sums": "tests/portable/output/SHA256SUMS",
   "notes": [
-    "Portable Core redistribution artifacts for GitHub Releases.",
+    "Portable Core redistribution artifacts for GitHub Releases (pe7-closeout).",
     "Default PE backend=native (strawwu-nt); Wine/Proton removed from product path.",
     "Click-to-open: strawwu integrate + double-click .exe/.msi (MIME → open; menu Exec pins --backend native)",
+    "pe6 golden smoke is honest PARTIAL for public 7za/BusyBox (load+CPU evidence; full CLI side effects pending).",
     "Not a full Windows OS claim; anti-cheat may fail."
   ]
 }

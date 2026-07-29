@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>StrawWU Portable Native PE Closeout</title>
+  <style>
+:root {
+  --bg: #0f1419;
+  --surface: #1a2332;
+  --text: #e8eef4;
+  --muted: #8b9cb3;
+  --accent: #14b8a6;
+  --border: #2d3a4d;
+  --code-bg: #0d1117;
+  --pass: #34d399;
+  --partial: #fbbf24;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  margin: 0;
+  padding: 2rem 1rem 4rem;
+}
+.wrap { max-width: 56rem; margin: 0 auto; }
+header {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+.brand { color: var(--accent); font-weight: 600; letter-spacing: 0.02em; }
+h1 { color: var(--text); font-size: 1.85rem; margin: 0.5rem 0 0.25rem; }
+.meta { color: var(--muted); font-size: 0.9rem; }
+h2 {
+  color: var(--accent);
+  font-size: 1.25rem;
+  margin-top: 2rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.35rem;
+}
+h3 { color: var(--text); font-size: 1.05rem; margin-top: 1.5rem; }
+p { margin: 0.75rem 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 1.4rem; }
+li { margin: 0.35rem 0; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.92rem;
+}
+th, td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+}
+th { background: var(--surface); color: var(--accent); }
+tr:nth-child(even) td { background: rgba(26, 35, 50, 0.5); }
+code {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.88em;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+}
+pre code { border: none; padding: 0; background: transparent; }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1rem 0;
+  padding: 0.25rem 1rem;
+  color: var(--muted);
+}
+footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.badge-pass { color: var(--pass); font-weight: 600; }
+.badge-partial { color: var(--partial); font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">StrawWU</div>
+      <h1>Native PE Real Exec Closeout</h1>
+      <p class="meta">版本 0.7.1.25 · pe7-closeout · hermes-deliver</p>
+    </header>
+    <h1>Portable Native PE Real Exec — Closeout 報告</h1>
+<table>
+<tr><th>項目</th><th>值</th></tr>
+<tr><td>Track</td><td>Native PE Real Exec（pe0–pe7）</td></tr>
+<tr><td>階段</td><td><code>pe7-closeout</code>（14/14；鎖序 pe0–pe7）</td></tr>
+<tr><td>分支</td><td><code>main</code></td></tr>
+<tr><td>工作區</td><td><code>/mnt/data/code/project/StrawCoding/StrawWU-portable</code></td></tr>
+<tr><td>執行層</td><td>自研 <strong>strawwu-nt</strong>／<code>execution_backend=native</code></td></tr>
+<tr><td>結果</td><td><strong>待 Hermes mark</strong>（worker 不自宣稱最終 PASS）</td></tr>
+</table>
+<h2>鎖序結果</h2>
+<table>
+<tr><th>Stage</th><th>證據</th><th>狀態</th></tr>
+<tr><td>pe0-remove-wine</td><td><code>tests/portable/output/pe0-remove-wine.json</code></td><td>PASS</td></tr>
+<tr><td>pe1-real-cpu-exec</td><td><code>pe-real-exec.json</code>（mode=real 副作用）</td><td>PASS</td></tr>
+<tr><td>pe2-win32-console-mvp</td><td><code>pe-console.json</code></td><td>PASS</td></tr>
+<tr><td>pe3-gui-user32-mvp</td><td><code>pe-gui.json</code></td><td>PASS</td></tr>
+<tr><td>pe4-installer-real</td><td><code>pe-installer.json</code></td><td>PASS</td></tr>
+<tr><td>pe5-desktop-click</td><td><code>pe-desktop-click.json</code></td><td>PASS</td></tr>
+<tr><td>pe6-golden-smoke</td><td><code>pe-golden.json</code></td><td><strong>PARTIAL</strong>（誠實；公開 PE 已載入／CPU 執行，完整 CLI 副作用仍待加深）</td></tr>
+<tr><td>pe7-closeout</td><td><code>pe-closeout.json</code></td><td>本階段</td></tr>
+</table>
+<p>包裝軌道（前序 pc0–pc5）仍可追溯：<code>closeout.json</code>、<code>matrix.json</code>、<code>smoke-*.json</code>。</p>
+<h2>交付物</h2>
+<table>
+<tr><th>類型</th><th>路徑</th></tr>
+<tr><td>Kickoff</td><td><code>docs/plans/kickoff/PE7-closeout.md</code></td></tr>
+<tr><td>使用者指南</td><td><code>docs/plans/portable-core/USER-GUIDE.md</code>、<code>docs/user/portable-guide.md</code></td></tr>
+<tr><td>README</td><td><code>README.md</code>（native 預設；無 Wine 安裝指引）</td></tr>
+<tr><td>產物索引</td><td><code>docs/plans/portable-core/artifacts.json</code></td></tr>
+<tr><td>SHA256</td><td><code>tests/portable/output/SHA256SUMS</code></td></tr>
+<tr><td>AppImage／portable.tar.gz</td><td><code>components/packaging/portable/appimage/dist/</code></td></tr>
+<tr><td>Closeout 報告／HTML</td><td>本檔 + <code>html/pe-closeout-report.html</code></td></tr>
+<tr><td>證據</td><td><code>tests/portable/output/pe-closeout.json</code></td></tr>
+</table>
+<h2>誠實標記</h2>
+<ul>
+<li><strong>pe6 golden = PARTIAL</strong>：7za／BusyBox 經 native 載入與 CPU 執行迴圈有證據；完整 CRT／CLI 功能性副作用尚未觀測 — <strong>不</strong>改寫成 PASS</li>
+<li><strong>不宣稱</strong>完整 Windows 相容／反作弊通過</li>
+<li><strong>未使用</strong> Wine／Proton 底層；產品路徑無 <code>ensure_wine</code>／<code>wine_backend</code>／<code>STRAWWU_BACKEND=wine</code></li>
+<li><strong>未改</strong> ISO／os-image／Plymouth／Calamares／kernel／桌面 session</li>
+<li><strong>未使用</strong> WinBox 命名</li>
+<li>GitHub Release 文案必須描述 <strong>native／strawwu-nt</strong>（取代曾誤發的 Wine 預設 Release）</li>
+</ul>
+<h2>驗收</h2>
+<pre><code>
+bash tests/portable/pe-closeout.sh
+test -f tests/portable/output/pe-closeout.json
+jq -e &#x27;.status == &quot;PASS&quot;&#x27; tests/portable/output/pe-closeout.json
+</code></pre>
+<p>最終驗收由 Hermes <code>trigger-verify</code> + <code>mark</code>；worker 不自宣稱最終 PASS。</p>
+    <footer>StrawWU Portable · native PE / strawwu-nt · generated from pe-closeout-report.md</footer>
+  </div>
+</body>
+</html>

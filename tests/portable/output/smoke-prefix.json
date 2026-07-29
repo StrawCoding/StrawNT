@@ -2,17 +2,17 @@
   "schema": "strawwu-portable-smoke-prefix/v1",
   "stage": "pc1-self-contained-prefix",
   "status": "PASS",
-  "version": "0.7.1.17",
+  "version": "0.7.1.25",
   "prefix": "/mnt/data/code/project/StrawCoding/StrawWU-portable/components/packaging/portable/prefix",
-  "generated_at": "2026-07-29T05:01:35Z",
+  "generated_at": "2026-07-29T07:27:20Z",
   "checks": {
     "version": {
       "status": "PASS",
-      "output": "strawwu 0.7.1-preview.17"
+      "output": "strawwu 0.7.1-preview.25"
     },
     "status_cmd": {
       "status": "PASS",
-      "output": "strawwu: status — runtime idle, 0 session(s), 0 app(s) registered\nstrawwu: wine: OK (wine-10.0 (Ubuntu 10.0~repack-12ubuntu1)) prefix=/root/.local/share/strawwu-core/wineprefix\nstrawwu: default backend=wine (real PE); use --backend native for simulated nt"
+      "output": "strawwu: status — runtime idle, 0 session(s), 0 app(s) registered\nstrawwu: execution_backend=native (strawwu-nt)\nstrawwu: default backend=native"
     },
     "no_system_deb_required": {
       "status": "PASS",
@@ -28,7 +28,7 @@
   },
   "exclusions_honored": [
     "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
-    "Wine is the default real-PE backend (not claimed as full Windows OS)",
+    "no Wine/Proton substrate; default execution_backend=native",
     "no WinBox naming",
     "no full Windows compatibility claim"
   ]

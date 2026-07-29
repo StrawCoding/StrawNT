@@ -11,6 +11,8 @@ StrawWU **Win 相容核心**（runtime／nt／launcher／graphics·audio／Hub�
 > pe3：user32/gdi 最小視窗＋訊息迴圈；真實 GUI PE 可顯示／關閉；證據含截圖與 compositor 觀測（`tests/portable/output/pe-gui.json`）。
 > pe4：EXE/MSI native 解包安裝＋app-registry＋捷徑；`open` 同路徑（`tests/portable/output/pe-installer.json`）。
 > pe5：MIME/`integrate`／選單捷徑只走 native；雙擊 `open` 可安裝／啟動；選單可再開（`tests/portable/output/pe-desktop-click.json`）；`install.sh` 無 Wine。
+> pe6：公開小型 Win 程式（7za／BusyBox）native 啟動證據為 **PARTIAL**（載入＋CPU 執行有；完整 CLI 副作用仍待加深；`tests/portable/output/pe-golden.json`）。
+> pe7：文件／Release 產物／跨發行版 smoke／HTML closeout（`tests/portable/output/pe-closeout.json`）。
 
 ## 選擇哪一種包裝
 
@@ -30,7 +32,7 @@ strawwu --version
 strawwu status
 ```
 
-自訂：`bash -s -- --prefix "$HOME/.local/strawwu"` 或 `--version 0.7.1.15`。
+自訂：`bash -s -- --prefix "$HOME/.local/strawwu"` 或 `--version` 對應 GitHub Release tag（見根目錄 `VERSION`）。
 
 ## 快速開始（prefix／開發建置）
 
@@ -76,11 +78,30 @@ jq .status tests/portable/output/matrix.json
 
 預設矩陣：Ubuntu 24.04、Fedora 41、Arch（容器；非實機 ISO）。
 
+## Native PE 驗收證據（pe0–pe7）
+
+| Stage | JSON |
+|-------|------|
+| pe0 撤回 Wine | `tests/portable/output/pe0-remove-wine.json` |
+| pe1 真實 CPU | `tests/portable/output/pe-real-exec.json` |
+| pe2 Console MVP | `tests/portable/output/pe-console.json` |
+| pe3 GUI MVP | `tests/portable/output/pe-gui.json` |
+| pe4 Installer | `tests/portable/output/pe-installer.json` |
+| pe5 桌面點擊 | `tests/portable/output/pe-desktop-click.json` |
+| pe6 黃金煙測 | `tests/portable/output/pe-golden.json`（允許誠實 PARTIAL） |
+| pe7 Closeout | `tests/portable/output/pe-closeout.json` |
+
+```bash
+make test-portable-pe-closeout
+jq .status tests/portable/output/pe-closeout.json
+```
+
 ## 產物與校驗
 
 - 索引：`docs/plans/portable-core/artifacts.json`
 - 校驗：`tests/portable/output/SHA256SUMS`
 - 元件對照：`docs/plans/portable-core/inventory.json`
+- Closeout HTML：`docs/plans/portable-core/html/pe-closeout-report.html`
 
 ## 支援與回報
 
