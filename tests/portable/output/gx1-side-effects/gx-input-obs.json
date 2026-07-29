@@ -1,0 +1,54 @@
+{
+  "controllers_connected": 1,
+  "events": [
+    {
+      "buttons": null,
+      "detail": "controller 0 connected",
+      "index": 0,
+      "kind": "connect",
+      "left_thumb_filtered": null,
+      "left_thumb_x": null
+    },
+    {
+      "buttons": 4112,
+      "detail": "A+Start pressed",
+      "index": 0,
+      "kind": "button",
+      "left_thumb_filtered": 0,
+      "left_thumb_x": 2000
+    },
+    {
+      "buttons": null,
+      "detail": "left_thumb_x=20000 filtered=20000",
+      "index": 0,
+      "kind": "axis",
+      "left_thumb_filtered": 20000,
+      "left_thumb_x": 20000
+    },
+    {
+      "buttons": null,
+      "detail": "left=12000 right=8000",
+      "index": 0,
+      "kind": "vibration",
+      "left_thumb_filtered": null,
+      "left_thumb_x": null
+    }
+  ],
+  "execution_backend": "native",
+  "host": {
+    "evdev_count": 7,
+    "evdev_nodes": [
+      "event0",
+      "event1",
+      "event2",
+      "event3",
+      "event4",
+      "event5",
+      "event6",
+      "mice"
+    ],
+    "notes": []
+  },
+  "max_controllers": 4,
+  "schema": "strawwu-portable-gx-input-obs/v1"
+}

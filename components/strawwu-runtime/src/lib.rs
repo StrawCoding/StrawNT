@@ -6,6 +6,7 @@ pub mod executor;
 pub mod gui_smoke;
 pub mod golden_apps;
 pub mod graphics_smoke;
+pub mod audio_smoke;
 
 pub use session::SubsystemSession;
 pub use process::{ProcessGraph, ProcessNode};
@@ -21,3 +22,4 @@ pub use golden_apps::{
     GoldenAppsManifest, GoldenAppsReport,
 };
 pub use graphics_smoke::{run_portable_graphics_smoke, GraphicsSmokeResult};
+pub use audio_smoke::{run_portable_audio_input_smoke, AudioInputSmokeResult};

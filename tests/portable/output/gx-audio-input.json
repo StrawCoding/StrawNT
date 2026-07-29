@@ -1,0 +1,104 @@
+{
+  "audio": {
+    "alsa_nodes": 6,
+    "bridge_backend": "alsa",
+    "bytes_rendered": 48044,
+    "channels": 2,
+    "devices_capture": 1,
+    "devices_render": 2,
+    "host_backend": "alsa",
+    "pipewire_socket_present": false,
+    "sample_rate": 48000,
+    "samples_generated": 24000,
+    "samples_written": 48000,
+    "streams_created": 1,
+    "tone_hz": 440.0,
+    "wav": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/gx1-side-effects/gx-tone.wav"
+  },
+  "backend": "native",
+  "checks": [
+    {
+      "detail": "selected=alsa pipewire_socket=false alsa_nodes=6 notes=3",
+      "name": "host_audio_probe",
+      "status": "PASS"
+    },
+    {
+      "detail": "backend=Alsa streams=1 devices=3",
+      "name": "wasapi_stream_lifecycle",
+      "status": "PASS"
+    },
+    {
+      "detail": "hz=440 samples=24000 bytes_wav=48044 samples_written=48000",
+      "name": "wasapi_tone_render",
+      "status": "PASS"
+    },
+    {
+      "detail": "wasapi→alsa (pipewire_preferred=false, equivalent_ok=true)",
+      "name": "wasapi_to_host_bridge",
+      "status": "PASS"
+    },
+    {
+      "detail": "controllers=1 buttons=1 axes=1 vib=true deadzone=true evdev=7",
+      "name": "xinput_basic_path",
+      "status": "PASS"
+    },
+    {
+      "detail": "wav=/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/gx1-side-effects/gx-tone.wav",
+      "name": "pcm_wav_evidence",
+      "status": "PASS"
+    }
+  ],
+  "claims": {
+    "anticheat_ranked_pass": false,
+    "full_windows_compat": false,
+    "libpipewire_spa_linked": false,
+    "wine_proton_used": false
+  },
+  "component": "strawwu-audio",
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
+    "no Wine/Proton substrate; execution_backend=native",
+    "no WinBox naming",
+    "no full Windows compatibility claim",
+    "no anti-cheat ranked pass claim"
+  ],
+  "execution_backend": "native",
+  "gaps": [
+    "native libpipewire SPA client not linked; host path is probe + PCM file / ALSA-equivalent sink",
+    "real Win PE WASAPI/XAudio2 import trampolines not yet hooked in strawwu-nt CPU loop",
+    "live microphone capture / exclusive WASAPI mode not exercised in gx1",
+    "DirectInput full HID enumeration remains stub-level beyond XInput matrix",
+    "host PipeWire socket not present; selected ALSA/Pulse/File equivalent backend"
+  ],
+  "generated_at": "2026-07-29T08:21:52Z",
+  "input": {
+    "axis_events": 1,
+    "button_events": 1,
+    "controllers_connected": 1,
+    "deadzone_applied": true,
+    "evdev_count": 7,
+    "observation": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/gx1-side-effects/gx-input-obs.json",
+    "vibration_set": true
+  },
+  "known_limitations": [
+    "native libpipewire SPA client not linked; host path is probe + PCM file / ALSA-equivalent sink",
+    "real Win PE WASAPI/XAudio2 import trampolines not yet hooked in strawwu-nt CPU loop",
+    "live microphone capture / exclusive WASAPI mode not exercised in gx1",
+    "DirectInput full HID enumeration remains stub-level beyond XInput matrix",
+    "host PipeWire socket not present; selected ALSA/Pulse/File equivalent backend"
+  ],
+  "paths": {
+    "pcm_wav_evidence": true,
+    "wasapi_to_pipewire_or_equivalent": true,
+    "xinput_basic_path": true
+  },
+  "schema": "strawwu-portable-gx-audio-input/v1",
+  "side_effects": {
+    "dir": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/gx1-side-effects",
+    "input_obs": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/gx1-side-effects/gx-input-obs.json",
+    "wav": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/gx1-side-effects/gx-tone.wav"
+  },
+  "stage": "gx1-audio-input",
+  "status": "PASS",
+  "version": "0.7.1.27"
+}

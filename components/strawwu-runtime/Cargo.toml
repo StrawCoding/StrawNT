@@ -12,6 +12,7 @@ thiserror = "2"
 strawwu-bridge = { path = "../strawwu-bridge" }
 strawwu-nt = { path = "../strawwu-nt" }
 strawwu-graphics = { path = "../strawwu-graphics" }
+strawwu-audio = { path = "../strawwu-audio" }
 
 [[bin]]
 name = "golden-apps-verify"

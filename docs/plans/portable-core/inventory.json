@@ -114,7 +114,7 @@
       "kind": "rust-lib",
       "artifact": "libstrawwu_audio.rlib",
       "linked_into": ["strawwu"],
-      "role": "audio / input bridge (WASAPI stubs, XInput path)",
+      "role": "audio / input bridge (WASAPI→PipeWire/ALSA/Pulse/File, XInput path, gx1 evidence)",
       "shared_libs_host": ["libc.so.6", "libpulse.so.0", "libasound.so.2"],
       "notes": "Pulse/PipeWire host access may require Flatpak --socket=pulseaudio",
       "packaging": {
