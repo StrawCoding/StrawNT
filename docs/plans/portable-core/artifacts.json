@@ -1,31 +1,31 @@
 {
   "schema": "strawwu-portable-artifacts/v1",
-  "version": "0.7.1.25",
-  "generated_at": "2026-07-29T07:26:00Z",
+  "version": "0.7.1.32",
+  "generated_at": "2026-07-29T09:55:00Z",
   "artifacts": [
     {
-      "name": "StrawWU-Core-0.7.1.25-x86_64.AppImage",
+      "name": "StrawWU-Core-0.7.1.32-x86_64.AppImage",
       "kind": "AppImage",
-      "path": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.25-x86_64.AppImage",
-      "sha256": "d5f7d3cba8bb066daaa143416c6cf0de323f79281c576ab22ed9c483d843c9a8",
-      "size_bytes": 1399288,
-      "built_version_tag": "StrawWU-Core-0.7.1.25-x86_64.AppImage"
+      "path": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.32-x86_64.AppImage",
+      "sha256": "d5c578ac58179fd64fc668497a137e2330887cd5d889ca4e68ddc8455cc1bab8",
+      "size_bytes": 1403384,
+      "built_version_tag": "StrawWU-Core-0.7.1.32-x86_64.AppImage"
     },
     {
-      "name": "StrawWU-Core-0.7.1.25-x86_64.portable.tar.gz",
+      "name": "StrawWU-Core-0.7.1.32-x86_64.portable.tar.gz",
       "kind": "portable.tar.gz",
-      "path": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.25-x86_64.portable.tar.gz",
-      "sha256": "952c5bf01257e1d0a842361085b550b053c2adf258fe26c5023349045e92f1e3",
-      "size_bytes": 495612,
-      "built_version_tag": "StrawWU-Core-0.7.1.25-x86_64.portable.tar.gz"
+      "path": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.32-x86_64.portable.tar.gz",
+      "sha256": "7890357ad0c2435bf47b126cf02b0403bb8bffbfbc20ead8a619e96d6266d962",
+      "size_bytes": 499157,
+      "built_version_tag": "StrawWU-Core-0.7.1.32-x86_64.portable.tar.gz"
     }
   ],
   "sha256sums": "tests/portable/output/SHA256SUMS",
   "notes": [
-    "Portable Core redistribution artifacts for GitHub Releases (pe7-closeout).",
+    "Portable Core redistribution artifacts for GitHub Releases (gx5-closeout / game-compat).",
     "Default PE backend=native (strawwu-nt); Wine/Proton removed from product path.",
-    "Click-to-open: strawwu integrate + double-click .exe/.msi (MIME → open; menu Exec pins --backend native)",
-    "pe6 golden smoke is honest PARTIAL for public 7za/BusyBox (load+CPU evidence; full CLI side effects pending).",
-    "Not a full Windows OS claim; anti-cheat may fail."
+    "Game Compat: gx0 graphics VK/GL, gx1 audio/input, gx2 light games, gx3 launchers PARTIAL (launch-only), gx4 anticheat PARTIAL (probe matrix; no ranked play claim).",
+    "pe6 golden smoke remains honest PARTIAL for public 7za/BusyBox.",
+    "Not a full Windows OS claim; anti-cheat may fail; no 3A complete claim."
   ]
 }

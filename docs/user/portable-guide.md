@@ -7,10 +7,11 @@
 ## 誠實邊界
 
 - 預設執行路徑為自研 **strawwu-nt**／`execution_backend=native`
-- **不宣稱**完整 Windows 應用相容／反作弊通過
+- **不宣稱**完整 Windows 應用相容／反作弊排位可用／3A 全開
 - **不使用** Wine／Proton 當底層
 - **不使用** `WinBox`／`winbox` 命名
 - 公開小工具黃金煙測可為 **PARTIAL**（見 `pe-golden.json`）
+- Game Compat：啟動器僅驗啟動（`gx-launchers.json` PARTIAL）；反作弊為探測矩陣（`gx-anticheat.json` PARTIAL）
 - Flatpak 對 PE／SubsystemSession：**PARTIAL**（需 host filesystem）
 - **不取代** Live USB／安裝版 ISO 軌道
 

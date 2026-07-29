@@ -1,7 +1,7 @@
 {
-  "track": "A+3 + native-pe-real-exec",
-  "stage": "pe7-closeout",
-  "description": "Portable Core crate→artifact inventory for self-contained prefix / AppImage / Flatpak, plus Native PE Real Exec (pe0–pe7). Not a full Windows compatibility claim.",
+  "track": "A+3 + native-pe-real-exec + game-compat",
+  "stage": "gx5-closeout",
+  "description": "Portable Core crate→artifact inventory for self-contained prefix / AppImage / Flatpak, Native PE Real Exec (pe0–pe7), and Game Compat (gx0–gx5). Not a full Windows compatibility claim; anti-cheat matrix is honest PARTIAL (no ranked play claim).",
   "prefix_env": "STRAWWU_PREFIX",
   "execution_backend": "native",
   "build": {
@@ -17,12 +17,14 @@
     "smoke_matrix": "tests/portable/smoke-matrix.sh",
     "closeout": "tests/portable/closeout.sh",
     "pe_closeout": "tests/portable/pe-closeout.sh",
+    "gx_closeout": "tests/portable/gx-closeout.sh",
     "evidence": "tests/portable/output/smoke-prefix.json",
     "evidence_appimage": "tests/portable/output/smoke-appimage.json",
     "evidence_flatpak": "tests/portable/output/smoke-flatpak.json",
     "evidence_matrix": "tests/portable/output/matrix.json",
     "evidence_closeout": "tests/portable/output/closeout.json",
     "evidence_pe_closeout": "tests/portable/output/pe-closeout.json",
+    "evidence_gx_closeout": "tests/portable/output/gx-closeout.json",
     "evidence_pe0": "tests/portable/output/pe0-remove-wine.json",
     "evidence_pe1": "tests/portable/output/pe-real-exec.json",
     "evidence_pe2": "tests/portable/output/pe-console.json",
@@ -30,10 +32,16 @@
     "evidence_pe4": "tests/portable/output/pe-installer.json",
     "evidence_pe5": "tests/portable/output/pe-desktop-click.json",
     "evidence_pe6": "tests/portable/output/pe-golden.json",
+    "evidence_gx0": "tests/portable/output/gx-graphics.json",
+    "evidence_gx1": "tests/portable/output/gx-audio-input.json",
+    "evidence_gx2": "tests/portable/output/gx-light-games.json",
+    "evidence_gx3": "tests/portable/output/gx-launchers.json",
+    "evidence_gx4": "tests/portable/output/gx-anticheat.json",
     "sha256sums": "tests/portable/output/SHA256SUMS",
     "artifacts_index": "docs/plans/portable-core/artifacts.json",
     "user_guide": "docs/plans/portable-core/USER-GUIDE.md",
     "pe_closeout_report": "docs/plans/portable-core/pe-closeout-report.md",
+    "gx_closeout_report": "docs/plans/portable-core/gx-closeout-report.md",
     "flatpak_manifest": "components/packaging/portable/flatpak/org.strawwu.Core.yaml",
     "flatpak_sandbox_notes": "components/packaging/portable/flatpak/SANDBOX-NOTES.md"
   },
@@ -164,6 +172,7 @@
     "Wine/Proton forbidden as execution substrate (execution_backend=native only)",
     "WinBox/winbox naming",
     "ISO/os-image/Plymouth/Calamares/kernel/desktop session",
-    "full Windows compatibility claims"
+    "full Windows compatibility claims",
+    "anti-cheat ranked play / 排位可用 claims"
   ]
 }

@@ -1,0 +1,112 @@
+{
+  "schema": "strawwu-portable-gx-closeout/v1",
+  "stage": "gx5-closeout",
+  "status": "PASS",
+  "version": "0.7.1.32",
+  "track": "game-compat",
+  "backend": "native",
+  "execution_backend": "native",
+  "generated_at": "2026-07-29T09:56:44Z",
+  "git": {
+    "branch": "main",
+    "head": "af8244d3580eb6f25b5083b2b81c4fbf6db9e41f",
+    "origin_main": "af8244d3580eb6f25b5083b2b81c4fbf6db9e41f",
+    "merged_to_main": true,
+    "skip_merge_check": true
+  },
+  "stages": {
+    "gx0-graphics-vk-gl": {
+      "status": "PASS",
+      "evidence": [
+        "tests/portable/output/gx-graphics.json"
+      ],
+      "acceptable": true
+    },
+    "gx1-audio-input": {
+      "status": "PASS",
+      "evidence": [
+        "tests/portable/output/gx-audio-input.json"
+      ],
+      "acceptable": true
+    },
+    "gx2-light-2d3d": {
+      "status": "PASS",
+      "evidence": [
+        "tests/portable/output/gx-light-games.json"
+      ],
+      "acceptable": true
+    },
+    "gx3-launcher-smoke": {
+      "status": "PARTIAL",
+      "evidence": [
+        "tests/portable/output/gx-launchers.json"
+      ],
+      "acceptable": true
+    },
+    "gx4-anticheat-matrix": {
+      "status": "PARTIAL",
+      "evidence": [
+        "tests/portable/output/gx-anticheat.json"
+      ],
+      "acceptable": true
+    },
+    "pc4-cross-distro-smoke": {
+      "status": "PASS",
+      "evidence": [
+        "tests/portable/output/matrix.json"
+      ],
+      "acceptable": true
+    },
+    "gx5-closeout": {
+      "status": "PASS",
+      "evidence": [
+        "tests/portable/output/gx-closeout.json",
+        "docs/plans/portable-core"
+      ],
+      "acceptable": true
+    }
+  },
+  "docs": {
+    "user_guide": "docs/plans/portable-core/USER-GUIDE.md",
+    "user_facing": "docs/user/portable-guide.md",
+    "closeout_report": "docs/plans/portable-core/gx-closeout-report.md",
+    "html": "docs/plans/portable-core/html/gx-closeout-report.html",
+    "kickoff": "docs/plans/kickoff/GX5-closeout.md",
+    "stage_report": "docs/plans/stage-reports/GX5-closeout-report.md",
+    "artifacts_index": "docs/plans/portable-core/artifacts.json",
+    "readme": "README.md"
+  },
+  "artifacts": {
+    "index": "docs/plans/portable-core/artifacts.json",
+    "sha256sums": "tests/portable/output/SHA256SUMS",
+    "sha256_present": true,
+    "appimage": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.32-x86_64.AppImage",
+    "portable_tar_gz": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.32-x86_64.portable.tar.gz",
+    "appimage_present": true,
+    "portable_tar_gz_present": true
+  },
+  "honesty": {
+    "gx0_graphics": "PASS",
+    "gx1_audio_input": "PASS",
+    "gx2_light_games": "PASS",
+    "gx3_launchers": "PARTIAL",
+    "gx4_anticheat": "PARTIAL",
+    "pe6_golden": "PARTIAL",
+    "flatpak": "PARTIAL",
+    "full_windows_claim": false,
+    "anti_cheat_ranked_claim": false,
+    "aaa_complete_claim": false,
+    "wine_substrate": false,
+    "forbidden_claim_hits": []
+  },
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
+    "no Wine/Proton substrate; execution_backend=native",
+    "no WinBox naming",
+    "no full Windows compatibility claim",
+    "no anti-cheat ranked / 排位通過 claim",
+    "gx3 launchers PARTIAL kept honest (launcher-only; not full game play)",
+    "gx4 anticheat PARTIAL kept honest (probe matrix; not ranked pass)",
+    "cross-distro matrix reused from pc4 smoke-matrix.sh"
+  ]
+}

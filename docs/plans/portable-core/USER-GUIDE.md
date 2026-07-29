@@ -13,6 +13,12 @@ StrawWU **Win 相容核心**（runtime／nt／launcher／graphics·audio／Hub�
 > pe5：MIME/`integrate`／選單捷徑只走 native；雙擊 `open` 可安裝／啟動；選單可再開（`tests/portable/output/pe-desktop-click.json`）；`install.sh` 無 Wine。
 > pe6：公開小型 Win 程式（7za／BusyBox）native 啟動證據為 **PARTIAL**（載入＋CPU 執行有；完整 CLI 副作用仍待加深；`tests/portable/output/pe-golden.json`）。
 > pe7：文件／Release 產物／跨發行版 smoke／HTML closeout（`tests/portable/output/pe-closeout.json`）。
+> gx0：DXGI/D3D11→Vulkan + wgl→GL present／triangle 證據（`gx-graphics.json`）。
+> gx1：WASAPI→PipeWire/ALSA + 基本輸入路徑（`gx-audio-input.json`）。
+> gx2：≥2 輕量 2D/3D 標竿 native 啟動（`gx-light-games.json`；apps 可含誠實 PARTIAL）。
+> gx3：Steam／Epic／三角洲級 **啟動器僅驗啟動**（`gx-launchers.json` = **PARTIAL**；不保證遊戲本體暢玩）。
+> gx4：EAC/BE/Vanguard 探測矩陣（`gx-anticheat.json` = **PARTIAL**；grade 含 F；**禁止**宣稱排位／官方 AC 簽章通過）。
+> gx5：Game Compat 文件誠實邊界／Release／跨發行版 smoke／HTML closeout（`gx-closeout.json`）。
 
 ## 選擇哪一種包裝
 
@@ -96,12 +102,28 @@ make test-portable-pe-closeout
 jq .status tests/portable/output/pe-closeout.json
 ```
 
+## Game Compat 驗收證據（gx0–gx5）
+
+| Stage | JSON |
+|-------|------|
+| gx0 圖形 VK/GL | `tests/portable/output/gx-graphics.json` |
+| gx1 音訊／輸入 | `tests/portable/output/gx-audio-input.json` |
+| gx2 輕量 2D/3D | `tests/portable/output/gx-light-games.json` |
+| gx3 啟動器煙測 | `tests/portable/output/gx-launchers.json`（誠實 **PARTIAL**） |
+| gx4 反作弊矩陣 | `tests/portable/output/gx-anticheat.json`（誠實 **PARTIAL**；非排位可用） |
+| gx5 Closeout | `tests/portable/output/gx-closeout.json` |
+
+```bash
+make test-portable-gx-closeout
+jq .status tests/portable/output/gx-closeout.json
+```
+
 ## 產物與校驗
 
 - 索引：`docs/plans/portable-core/artifacts.json`
 - 校驗：`tests/portable/output/SHA256SUMS`
 - 元件對照：`docs/plans/portable-core/inventory.json`
-- Closeout HTML：`docs/plans/portable-core/html/pe-closeout-report.html`
+- Closeout HTML：`docs/plans/portable-core/html/pe-closeout-report.html`、`html/gx-closeout-report.html`
 
 ## 支援與回報
 

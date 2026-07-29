@@ -40,6 +40,7 @@ strawwu run app.exe             # 預設 backend=native
 
 - 預設執行路徑為自研 **strawwu-nt**／`execution_backend=native`（**不**使用 Wine／Proton）
 - **不保證**所有 Windows 軟體都可跑（反作弊／核心驅動／部分遊戲可能失敗）
+- Game Compat：圖形／音訊橋接可證；輕量遊戲可啟動；商店／啟動器**僅驗啟動**；反作弊為探測矩陣（誠實 PARTIAL）— **禁止**宣稱排位／官方 AC 簽章通過或 3A 全開
 - Flatpak 對 PE／session 為 **PARTIAL**
 - **不是** StrawWU ISO／桌面安裝器
 
