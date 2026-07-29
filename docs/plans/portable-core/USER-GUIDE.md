@@ -8,6 +8,7 @@ StrawWU **Win 相容核心**（runtime／nt／launcher／graphics·audio／Hub�
 > Flatpak 對 PE／SubsystemSession 為 **PARTIAL**。不是 ISO／桌面發行版。
 > pe1 起：最小 console PE fixture 經 native CPU 迴圈可產生可觀測副作用（`mode=real`）；更大範圍相容仍依 pe2+ 推進。
 > pe2：kernel32 檔案／行程 + msvcrt CRT 路徑足以跑小型 console `.exe`（非 stub-only）；證據 `tests/portable/output/pe-console.json`。
+> pe3：user32/gdi 最小視窗＋訊息迴圈；真實 GUI PE 可顯示／關閉；證據含截圖與 compositor 觀測（`tests/portable/output/pe-gui.json`）。
 
 ## 選擇哪一種包裝
 

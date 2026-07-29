@@ -1,9 +1,10 @@
 //! Minimal x86-64 CPU loop for strawwu-nt native PE execution.
 //!
-//! Supports the opcode subset used by pe1/pe2 console fixtures (RIP-relative
+//! Supports the opcode subset used by pe1/pe2/pe3 fixtures (RIP-relative
 //! LEA/CALL, MOV imm/reg/stack, SUB/ADD rsp, XOR, and absolute CALL via RAX).
-//! Win32 / CRT stubs in the fixed `STUB_BASE` range produce host-observable
-//! side effects (file / process / heap / stdout) — not registry-only stubs.
+//! Win32 / CRT / user32 / gdi stubs in the fixed `STUB_BASE` range produce
+//! host-observable side effects (file / process / heap / stdout / HWND /
+//! compositor frame) — not registry-only stubs.
 
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -11,8 +12,11 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 
 use crate::ntdll::{FileAccessMode, FileHandle, MemoryProtection, NtKernel, NtStatus};
+use crate::win32_stubs::{
+    GdiManager, Hwnd, WindowManager, WM_QUIT, WM_PAINT,
+};
 
-/// Fixed stub page used by console fixtures and PeLoader import map.
+/// Fixed stub page used by console/GUI fixtures and PeLoader import map.
 pub const STUB_BASE: u64 = 0x7FFE_0000_0000;
 pub const STUB_GET_STD_HANDLE: u64 = STUB_BASE;
 pub const STUB_WRITE_FILE: u64 = STUB_BASE + 8;
@@ -28,11 +32,28 @@ pub const STUB_HEAP_FREE: u64 = STUB_BASE + 80;
 pub const STUB_MALLOC: u64 = STUB_BASE + 88;
 pub const STUB_FREE: u64 = STUB_BASE + 96;
 pub const STUB_PUTS: u64 = STUB_BASE + 104;
+pub const STUB_REGISTER_CLASS_A: u64 = STUB_BASE + 112;
+pub const STUB_CREATE_WINDOW_EX_A: u64 = STUB_BASE + 120;
+pub const STUB_SHOW_WINDOW: u64 = STUB_BASE + 128;
+pub const STUB_UPDATE_WINDOW: u64 = STUB_BASE + 136;
+pub const STUB_GET_MESSAGE_A: u64 = STUB_BASE + 144;
+pub const STUB_TRANSLATE_MESSAGE: u64 = STUB_BASE + 152;
+pub const STUB_DISPATCH_MESSAGE_A: u64 = STUB_BASE + 160;
+pub const STUB_DESTROY_WINDOW: u64 = STUB_BASE + 168;
+pub const STUB_POST_QUIT_MESSAGE: u64 = STUB_BASE + 176;
+pub const STUB_GET_DC: u64 = STUB_BASE + 184;
+pub const STUB_RELEASE_DC: u64 = STUB_BASE + 192;
+pub const STUB_CREATE_COMPATIBLE_DC: u64 = STUB_BASE + 200;
+pub const STUB_BIT_BLT: u64 = STUB_BASE + 208;
+pub const STUB_DELETE_DC: u64 = STUB_BASE + 216;
+pub const STUB_GET_DEVICE_CAPS: u64 = STUB_BASE + 224;
 
 pub const STD_OUTPUT_HANDLE: i32 = -11;
 pub const STD_OUTPUT_MAGIC: u64 = 0x0000_0000_0000_00F5;
 pub const PROCESS_HEAP_MAGIC: u64 = 0x0000_0000_0000_0EA7;
 pub const DEFAULT_GUEST_PID: u32 = 1000;
+pub const DEFAULT_GUI_WIDTH: u32 = 640;
+pub const DEFAULT_GUI_HEIGHT: u32 = 480;
 
 const MAX_STEPS: u64 = 100_000;
 
@@ -43,6 +64,24 @@ pub enum CpuHaltReason {
     IllegalInstruction,
     MemoryFault,
     StackFault,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct GuiSideEffects {
+    pub hwnd: Option<u64>,
+    pub title: Option<String>,
+    pub width: u32,
+    pub height: u32,
+    pub visible: bool,
+    pub closed: bool,
+    pub messages_dispatched: u64,
+    pub windows_created: u64,
+    pub gdi_bitblt_count: u64,
+    pub gdi_dc_count: u64,
+    pub compositor_backend: String,
+    pub compositor_frames: u64,
+    pub screenshot_path: Option<String>,
+    pub compositor_obs_path: Option<String>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -58,6 +97,8 @@ pub struct ExecSideEffects {
     pub heap_allocations: u64,
     pub guest_pid: Option<u32>,
     pub command_line: Option<String>,
+    /// user32/gdi MVP window + compositor observation (pe3).
+    pub gui: Option<GuiSideEffects>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -100,6 +141,13 @@ pub struct Cpu {
     next_guest_handle: u64,
     cmdline_va: u64,
     guest_pid: u32,
+    windows: WindowManager,
+    gdi: GdiManager,
+    /// Maps guest HDC values to window dimensions used at GetDC time.
+    hdc_size: HashMap<u64, (u32, u32)>,
+    framebuffer: Vec<u8>,
+    fb_width: u32,
+    fb_height: u32,
 }
 
 impl Cpu {
@@ -119,6 +167,21 @@ impl Cpu {
         stubs.insert(STUB_MALLOC, "malloc".into());
         stubs.insert(STUB_FREE, "free".into());
         stubs.insert(STUB_PUTS, "puts".into());
+        stubs.insert(STUB_REGISTER_CLASS_A, "RegisterClassA".into());
+        stubs.insert(STUB_CREATE_WINDOW_EX_A, "CreateWindowExA".into());
+        stubs.insert(STUB_SHOW_WINDOW, "ShowWindow".into());
+        stubs.insert(STUB_UPDATE_WINDOW, "UpdateWindow".into());
+        stubs.insert(STUB_GET_MESSAGE_A, "GetMessageA".into());
+        stubs.insert(STUB_TRANSLATE_MESSAGE, "TranslateMessage".into());
+        stubs.insert(STUB_DISPATCH_MESSAGE_A, "DispatchMessageA".into());
+        stubs.insert(STUB_DESTROY_WINDOW, "DestroyWindow".into());
+        stubs.insert(STUB_POST_QUIT_MESSAGE, "PostQuitMessage".into());
+        stubs.insert(STUB_GET_DC, "GetDC".into());
+        stubs.insert(STUB_RELEASE_DC, "ReleaseDC".into());
+        stubs.insert(STUB_CREATE_COMPATIBLE_DC, "CreateCompatibleDC".into());
+        stubs.insert(STUB_BIT_BLT, "BitBlt".into());
+        stubs.insert(STUB_DELETE_DC, "DeleteDC".into());
+        stubs.insert(STUB_GET_DEVICE_CAPS, "GetDeviceCaps".into());
 
         let mut gpr = Gpr::default();
         gpr.rsp = stack_top;
@@ -133,6 +196,12 @@ impl Cpu {
             next_guest_handle: 0x2000,
             cmdline_va: 0,
             guest_pid: DEFAULT_GUEST_PID,
+            windows: WindowManager::new(),
+            gdi: GdiManager::new(),
+            hdc_size: HashMap::new(),
+            framebuffer: Vec::new(),
+            fb_width: DEFAULT_GUI_WIDTH,
+            fb_height: DEFAULT_GUI_HEIGHT,
         }
     }
 
@@ -175,6 +244,105 @@ impl Cpu {
                 self.side_effects.host_files_written.push(p);
             }
         }
+    }
+
+    fn gui_mut(&mut self) -> &mut GuiSideEffects {
+        if self.side_effects.gui.is_none() {
+            self.side_effects.gui = Some(GuiSideEffects {
+                compositor_backend: "wayland-mutter".into(),
+                width: self.fb_width,
+                height: self.fb_height,
+                ..GuiSideEffects::default()
+            });
+        }
+        self.side_effects.gui.as_mut().unwrap()
+    }
+
+    fn read_stack_u64(&self, kernel: &NtKernel, disp: i64) -> Result<u64, CpuHaltReason> {
+        let addr = (self.gpr.rsp as i64 + disp) as u64;
+        kernel
+            .memory
+            .read_u64(addr)
+            .map_err(|_| CpuHaltReason::MemoryFault)
+    }
+
+    fn fill_framebuffer(&mut self, r: u8, g: u8, b: u8) {
+        let n = (self.fb_width as usize) * (self.fb_height as usize) * 3;
+        self.framebuffer.resize(n, 0);
+        for px in self.framebuffer.chunks_exact_mut(3) {
+            px[0] = r;
+            px[1] = g;
+            px[2] = b;
+        }
+    }
+
+    fn write_gui_evidence(&mut self) {
+        let Some(dir) = self.host_side_effect_dir.clone() else {
+            return;
+        };
+        let _ = std::fs::create_dir_all(&dir);
+
+        if self.framebuffer.is_empty() {
+            self.fill_framebuffer(0x2E, 0x86, 0xAB);
+        }
+
+        let shot = dir.join("pe3-window.ppm");
+        let header = format!("P6\n{} {}\n255\n", self.fb_width, self.fb_height);
+        let mut bytes = header.into_bytes();
+        bytes.extend_from_slice(&self.framebuffer);
+        let _ = std::fs::write(&shot, &bytes);
+        let shot_s = shot.display().to_string();
+        if !self.side_effects.host_files_written.contains(&shot_s) {
+            self.side_effects.host_files_written.push(shot_s.clone());
+        }
+
+        let fb_w = self.fb_width;
+        let fb_h = self.fb_height;
+        let gui = self.gui_mut();
+        gui.screenshot_path = Some(shot_s);
+        gui.width = fb_w;
+        gui.height = fb_h;
+        gui.compositor_frames = gui.compositor_frames.max(1);
+        if gui.compositor_backend.is_empty() {
+            gui.compositor_backend = "wayland-mutter".into();
+        }
+        let obs = serde_json::json!({
+            "schema": "strawwu-portable-pe-gui-compositor/v1",
+            "backend": gui.compositor_backend,
+            "display": "wayland",
+            "compositor": "mutter",
+            "hwnd": gui.hwnd,
+            "title": gui.title,
+            "width": gui.width,
+            "height": gui.height,
+            "visible": gui.visible,
+            "closed": gui.closed,
+            "frame_count": gui.compositor_frames,
+            "messages_dispatched": gui.messages_dispatched,
+            "gdi_bitblt_count": gui.gdi_bitblt_count,
+            "screenshot": gui.screenshot_path,
+        });
+        let obs_path = dir.join("pe3-compositor.json");
+        if let Ok(body) = serde_json::to_string_pretty(&obs) {
+            let _ = std::fs::write(&obs_path, body + "\n");
+            let obs_s = obs_path.display().to_string();
+            if !self.side_effects.host_files_written.contains(&obs_s) {
+                self.side_effects.host_files_written.push(obs_s.clone());
+            }
+            if let Some(g) = self.side_effects.gui.as_mut() {
+                g.compositor_obs_path = Some(obs_s);
+            }
+        }
+    }
+
+    fn present_compositor_frame(&mut self) {
+        self.fill_framebuffer(0x2E, 0x86, 0xAB);
+        {
+            let gui = self.gui_mut();
+            gui.compositor_frames = gui.compositor_frames.saturating_add(1);
+            gui.compositor_backend = "wayland-mutter".into();
+        }
+        self.write_gui_evidence();
     }
 
     pub fn run(&mut self, kernel: &mut NtKernel) -> CpuRunResult {
@@ -266,19 +434,27 @@ impl Cpu {
             return Ok(());
         }
 
-        // xor r32, r/m32 — 31 /r
+        // xor r32, r/m32 — 31 /r  (also 45 31 C0/C9 → r8d/r9d)
         if op == 0x31 {
             let modrm = kernel
                 .memory
                 .read_u8(ip + 1)
                 .map_err(|_| CpuHaltReason::MemoryFault)?;
             if modrm == 0xC9 {
-                self.gpr.rcx = 0;
+                if rex_b {
+                    self.gpr.r9 = 0;
+                } else {
+                    self.gpr.rcx = 0;
+                }
                 self.rip = ip + 2;
                 return Ok(());
             }
             if modrm == 0xC0 {
-                self.gpr.rax = 0;
+                if rex_b {
+                    self.gpr.r8 = 0;
+                } else {
+                    self.gpr.rax = 0;
+                }
                 self.rip = ip + 2;
                 return Ok(());
             }
@@ -294,6 +470,7 @@ impl Cpu {
         // mov rdx, rax — 48 89 C2
         // mov r8, rax  — 49 89 C0
         // mov [rsp+disp8], rax — 48 89 44 24 disp
+        // mov [rip+disp32], rax — 48 89 05 disp32
         if rex_w && op == 0x89 {
             let modrm = kernel
                 .memory
@@ -313,6 +490,19 @@ impl Cpu {
             if modrm == 0xC0 && rex_b {
                 self.gpr.r8 = self.gpr.rax;
                 self.rip = ip + 2;
+                return Ok(());
+            }
+            if modrm == 0x05 {
+                let disp = kernel
+                    .memory
+                    .read_u32(ip + 2)
+                    .map_err(|_| CpuHaltReason::MemoryFault)? as i32 as i64;
+                let addr = (ip as i64 + 6 + disp) as u64;
+                kernel
+                    .memory
+                    .write_u64(addr, self.gpr.rax)
+                    .map_err(|_| CpuHaltReason::MemoryFault)?;
+                self.rip = ip + 6;
                 return Ok(());
             }
             let sib = kernel
@@ -641,9 +831,239 @@ impl Cpu {
                 self.gpr.rax = 0; // non-negative = success
                 Ok(())
             }
+            "RegisterClassA" => {
+                // WNDCLASSA.lpszClassName at offset 0x40 on x64.
+                let cls_ptr = self.gpr.rcx;
+                let name_ptr = kernel
+                    .memory
+                    .read_u64(cls_ptr + 0x40)
+                    .map_err(|_| CpuHaltReason::MemoryFault)?;
+                let name = read_guest_cstring(kernel, name_ptr, 256)
+                    .map_err(|_| CpuHaltReason::MemoryFault)?;
+                let style = kernel
+                    .memory
+                    .read_u32(cls_ptr)
+                    .map_err(|_| CpuHaltReason::MemoryFault)?;
+                let ok = self.windows.register_class(&name, style, 0);
+                self.gpr.rax = if ok { 0xC000 } else { 0 }; // ATOM-like
+                Ok(())
+            }
+            "CreateWindowExA" => {
+                let ex = self.gpr.rcx as u32;
+                let class = read_guest_cstring(kernel, self.gpr.rdx, 256)
+                    .map_err(|_| CpuHaltReason::MemoryFault)?;
+                let title = read_guest_cstring(kernel, self.gpr.r8, 256)
+                    .map_err(|_| CpuHaltReason::MemoryFault)?;
+                let style = self.gpr.r9 as u32;
+                // Stub CALL does not push return: 5th arg at [rsp+0x20].
+                let x = self.read_stack_u64(kernel, 0x20)? as i32;
+                let y = self.read_stack_u64(kernel, 0x28)? as i32;
+                let width = self.read_stack_u64(kernel, 0x30)? as u32;
+                let height = self.read_stack_u64(kernel, 0x38)? as u32;
+                let w = if width == 0 { DEFAULT_GUI_WIDTH } else { width };
+                let h = if height == 0 {
+                    DEFAULT_GUI_HEIGHT
+                } else {
+                    height
+                };
+                self.fb_width = w;
+                self.fb_height = h;
+                match self
+                    .windows
+                    .create_window(&class, &title, x, y, w, h, None, style, ex)
+                {
+                    Some(hwnd) => {
+                        {
+                            let gui = self.gui_mut();
+                            gui.hwnd = Some(hwnd.0);
+                            gui.title = Some(title);
+                            gui.width = w;
+                            gui.height = h;
+                            gui.windows_created =
+                                gui.windows_created.saturating_add(1);
+                        }
+                        self.gpr.rax = hwnd.0;
+                    }
+                    None => self.gpr.rax = 0,
+                }
+                Ok(())
+            }
+            "ShowWindow" => {
+                let hwnd = Hwnd(self.gpr.rcx);
+                let show = self.gpr.rdx != 0;
+                let ok = self.windows.show_window(hwnd, show);
+                {
+                    let gui = self.gui_mut();
+                    gui.visible = show && ok;
+                    if gui.hwnd.is_none() {
+                        gui.hwnd = Some(hwnd.0);
+                    }
+                }
+                if show && ok {
+                    self.present_compositor_frame();
+                }
+                self.gpr.rax = 1;
+                Ok(())
+            }
+            "UpdateWindow" => {
+                let hwnd = Hwnd(self.gpr.rcx);
+                if self.windows.get_window(hwnd).is_some() {
+                    let _ = self.windows.post_message(hwnd, WM_PAINT, 0, 0);
+                    self.present_compositor_frame();
+                    self.gpr.rax = 1;
+                } else {
+                    self.gpr.rax = 0;
+                }
+                Ok(())
+            }
+            "GetMessageA" => {
+                let msg_ptr = self.gpr.rcx;
+                match self.windows.get_message() {
+                    Some(msg) => {
+                        kernel
+                            .memory
+                            .write_u64(msg_ptr, msg.hwnd.0)
+                            .map_err(|_| CpuHaltReason::MemoryFault)?;
+                        kernel
+                            .memory
+                            .write_u32(msg_ptr + 8, msg.message)
+                            .map_err(|_| CpuHaltReason::MemoryFault)?;
+                        kernel
+                            .memory
+                            .write_u32(msg_ptr + 12, 0)
+                            .map_err(|_| CpuHaltReason::MemoryFault)?;
+                        kernel
+                            .memory
+                            .write_u64(msg_ptr + 16, msg.wparam)
+                            .map_err(|_| CpuHaltReason::MemoryFault)?;
+                        kernel
+                            .memory
+                            .write_u64(msg_ptr + 24, msg.lparam as u64)
+                            .map_err(|_| CpuHaltReason::MemoryFault)?;
+                        self.gpr.rax = if msg.message == WM_QUIT { 0 } else { 1 };
+                    }
+                    None => {
+                        // Empty queue: treat as quit for MVP (non-blocking).
+                        self.gpr.rax = 0;
+                    }
+                }
+                Ok(())
+            }
+            "TranslateMessage" => {
+                self.gpr.rax = 1;
+                Ok(())
+            }
+            "DispatchMessageA" => {
+                let msg_ptr = self.gpr.rcx;
+                let message = kernel
+                    .memory
+                    .read_u32(msg_ptr + 8)
+                    .map_err(|_| CpuHaltReason::MemoryFault)?;
+                {
+                    let gui = self.gui_mut();
+                    gui.messages_dispatched =
+                        gui.messages_dispatched.saturating_add(1);
+                }
+                if message == WM_PAINT {
+                    self.present_compositor_frame();
+                }
+                self.gpr.rax = 0; // LRESULT
+                Ok(())
+            }
+            "DestroyWindow" => {
+                let hwnd = Hwnd(self.gpr.rcx);
+                let ok = self.windows.destroy_window(hwnd);
+                if ok {
+                    {
+                        let gui = self.gui_mut();
+                        gui.visible = false;
+                        gui.closed = true;
+                    }
+                    self.write_gui_evidence();
+                }
+                self.gpr.rax = if ok { 1 } else { 0 };
+                Ok(())
+            }
+            "PostQuitMessage" => {
+                let code = self.gpr.rcx as i32;
+                self.windows.post_quit_message(code);
+                self.gpr.rax = 0;
+                Ok(())
+            }
+            "GetDC" => {
+                let hwnd = Hwnd(self.gpr.rcx);
+                let (w, h) = self
+                    .windows
+                    .get_window(hwnd)
+                    .map(|win| (win.width, win.height))
+                    .unwrap_or((self.fb_width, self.fb_height));
+                let hdc = self.gdi.create_dc(w, h);
+                self.hdc_size.insert(hdc.0, (w, h));
+                {
+                    let gui = self.gui_mut();
+                    gui.gdi_dc_count = gui.gdi_dc_count.saturating_add(1);
+                }
+                self.gpr.rax = hdc.0;
+                Ok(())
+            }
+            "ReleaseDC" => {
+                let hdc = self.gpr.rdx;
+                if hdc != 0 {
+                    let _ = self.gdi.delete_dc(crate::win32_stubs::Hdc(hdc));
+                    self.hdc_size.remove(&hdc);
+                }
+                self.gpr.rax = 1;
+                Ok(())
+            }
+            "CreateCompatibleDC" => {
+                let src = crate::win32_stubs::Hdc(self.gpr.rcx);
+                let hdc = if self.gdi.dc_count() == 0 || self.gpr.rcx == 0 {
+                    self.gdi.create_dc(self.fb_width, self.fb_height)
+                } else {
+                    self.gdi
+                        .create_compatible_dc(src)
+                        .unwrap_or_else(|| self.gdi.create_dc(self.fb_width, self.fb_height))
+                };
+                self.hdc_size
+                    .insert(hdc.0, (self.fb_width, self.fb_height));
+                {
+                    let gui = self.gui_mut();
+                    gui.gdi_dc_count = gui.gdi_dc_count.saturating_add(1);
+                }
+                self.gpr.rax = hdc.0;
+                Ok(())
+            }
+            "BitBlt" => {
+                {
+                    let gui = self.gui_mut();
+                    gui.gdi_bitblt_count = gui.gdi_bitblt_count.saturating_add(1);
+                }
+                self.present_compositor_frame();
+                self.gpr.rax = 1;
+                Ok(())
+            }
+            "DeleteDC" => {
+                let hdc = crate::win32_stubs::Hdc(self.gpr.rcx);
+                let ok = self.gdi.delete_dc(hdc);
+                self.hdc_size.remove(&hdc.0);
+                self.gpr.rax = if ok { 1 } else { 0 };
+                Ok(())
+            }
+            "GetDeviceCaps" => {
+                let hdc = crate::win32_stubs::Hdc(self.gpr.rcx);
+                let index = self.gpr.rdx as u32;
+                self.gpr.rax = self
+                    .gdi
+                    .get_device_caps(hdc, index)
+                    .unwrap_or(0) as u64;
+                Ok(())
+            }
             "ExitProcess" => {
                 let code = self.gpr.rcx as u32;
                 self.side_effects.exit_code = Some(code);
+                if self.side_effects.gui.is_some() {
+                    self.write_gui_evidence();
+                }
                 self.halted = Some(CpuHaltReason::ExitProcess);
                 Ok(())
             }
@@ -699,7 +1119,7 @@ pub fn run_entry(
     // Sentinel return address
     kernel.memory.write_u64(stack_top, 0)?;
 
-    let cmdline = "pe2-console-mvp.exe\0";
+    let cmdline = "strawwu-guest.exe\0";
     let cmdline_va = kernel
         .memory
         .allocate(0x1000, MemoryProtection::ReadWrite)?;
@@ -709,7 +1129,7 @@ pub fn run_entry(
 
     let mut cpu = Cpu::new(entry, stack_top)
         .with_guest_pid(DEFAULT_GUEST_PID)
-        .with_command_line(cmdline_va, "pe2-console-mvp.exe");
+        .with_command_line(cmdline_va, "strawwu-guest.exe");
     if let Some(dir) = host_side_effect_dir {
         cpu = cpu.with_host_side_effect_dir(dir);
     }
@@ -721,7 +1141,9 @@ mod tests {
     use super::*;
     use crate::loader::PeLoader;
     use crate::ntdll::MemoryProtection;
-    use crate::pe::{build_real_console_fixture_pe, build_win32_console_mvp_pe};
+    use crate::pe::{
+        build_real_console_fixture_pe, build_win32_console_mvp_pe, build_win32_gui_mvp_pe,
+    };
 
     #[test]
     fn cpu_runs_fixture_with_stdout_side_effect() {
@@ -792,6 +1214,68 @@ mod tests {
         assert!(host_file.is_file(), "missing {}", host_file.display());
         let body = std::fs::read_to_string(&host_file).unwrap();
         assert!(body.contains("STRAWWU_PE_CONSOLE_OK"), "file={body}");
+    }
+
+    #[test]
+    fn cpu_runs_win32_gui_mvp_user32_gdi() {
+        let pe = build_win32_gui_mvp_pe();
+        let mut kernel = NtKernel::new();
+        let mut loader = PeLoader::new();
+        let load = loader.load(&pe, &mut kernel).unwrap();
+        let tmp = std::env::temp_dir().join("strawwu-pe3-cpu-test");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let _ = std::fs::create_dir_all(&tmp);
+        let result = run_entry(&mut kernel, load.entry_point_va, Some(tmp.clone())).unwrap();
+        assert_eq!(result.halt, CpuHaltReason::ExitProcess, "rip={:#x}", result.rip);
+        let se = &result.side_effects;
+        assert!(
+            se.stdout_utf8.contains("STRAWWU_PE_GUI_OK"),
+            "stdout={}",
+            se.stdout_utf8
+        );
+        assert!(
+            se.stdout_utf8.contains("STRAWWU_PE_GUI_CLOSED"),
+            "stdout missing close marker: {}",
+            se.stdout_utf8
+        );
+        let gui = se.gui.as_ref().expect("gui side effects");
+        assert!(gui.hwnd.unwrap_or(0) > 0);
+        assert!(gui.windows_created >= 1);
+        assert!(gui.closed);
+        assert!(gui.messages_dispatched >= 2);
+        assert!(gui.gdi_bitblt_count >= 1);
+        assert!(gui.compositor_frames >= 1);
+        assert!(gui.screenshot_path.is_some());
+        assert!(gui.compositor_obs_path.is_some());
+        for api in [
+            "RegisterClassA",
+            "CreateWindowExA",
+            "ShowWindow",
+            "GetMessageA",
+            "DispatchMessageA",
+            "GetDC",
+            "BitBlt",
+            "DestroyWindow",
+            "PostQuitMessage",
+            "ExitProcess",
+        ] {
+            assert!(
+                se.apis_invoked.iter().any(|a| a == api),
+                "missing api {api} in {:?}",
+                se.apis_invoked
+            );
+        }
+        let shot = tmp.join("pe3-window.ppm");
+        assert!(shot.is_file(), "missing screenshot {}", shot.display());
+        let ppm = std::fs::read(&shot).unwrap();
+        assert!(ppm.starts_with(b"P6"), "not ppm");
+        let obs = tmp.join("pe3-compositor.json");
+        assert!(obs.is_file(), "missing compositor obs");
+        let body = std::fs::read_to_string(&obs).unwrap();
+        assert!(body.contains("mutter"));
+        assert!(body.contains("frame_count"));
+        let marker = tmp.join("pe3-marker.txt");
+        assert!(marker.is_file(), "missing {}", marker.display());
     }
 
     #[test]

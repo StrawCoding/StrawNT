@@ -600,6 +600,16 @@ mod tests {
         assert_eq!(pe.subsystem, PeSubsystem::WindowsCui);
         assert_eq!(pe.entry_point, 0x1000);
     }
+
+    #[test]
+    fn win32_gui_mvp_fixture_parses_as_amd64_gui() {
+        let data = build_win32_gui_mvp_pe();
+        let pe = PeFile::parse(&data).unwrap();
+        assert!(pe.is_valid);
+        assert_eq!(pe.machine, PeMachine::Amd64);
+        assert_eq!(pe.subsystem, PeSubsystem::WindowsGui);
+        assert_eq!(pe.entry_point, 0x1000);
+    }
 }
 
 /// Minimal AMD64 console PE with real x86-64 opcodes that call fixed
@@ -931,6 +941,283 @@ pub fn build_win32_console_mvp_pe() -> Vec<u8> {
     pe[text + crt_off..text + crt_off + crt_msg.len()].copy_from_slice(crt_msg);
     pe[text + file_off..text + file_off + filename.len()].copy_from_slice(filename);
     pe[text + written_off..text + written_off + 4].copy_from_slice(&0u32.to_le_bytes());
+
+    pe
+}
+
+/// pe3 GUI user32/gdi MVP fixture: RegisterClass → CreateWindow → ShowWindow →
+/// message pump → GetDC/BitBlt → DestroyWindow/PostQuitMessage, with host
+/// screenshot + compositor observation side effects (Windows GUI subsystem).
+pub fn build_win32_gui_mvp_pe() -> Vec<u8> {
+    use crate::cpu::{
+        STUB_BIT_BLT, STUB_CLOSE_HANDLE, STUB_CREATE_FILE_A, STUB_CREATE_WINDOW_EX_A,
+        STUB_DESTROY_WINDOW, STUB_DISPATCH_MESSAGE_A, STUB_EXIT_PROCESS, STUB_GET_DC,
+        STUB_GET_MESSAGE_A, STUB_POST_QUIT_MESSAGE, STUB_PUTS, STUB_REGISTER_CLASS_A,
+        STUB_RELEASE_DC, STUB_SHOW_WINDOW, STUB_TRANSLATE_MESSAGE, STUB_UPDATE_WINDOW,
+        STUB_WRITE_FILE,
+    };
+
+    let mut pe = vec![0u8; 0x1200];
+    pe[0] = 0x4D;
+    pe[1] = 0x5A;
+    pe[0x3C..0x40].copy_from_slice(&0x50u32.to_le_bytes());
+
+    let pe_off = 0x50usize;
+    pe[pe_off..pe_off + 4].copy_from_slice(&PE_SIGNATURE);
+
+    let coff = pe_off + 4;
+    pe[coff..coff + 2].copy_from_slice(&(PeMachine::Amd64 as u16).to_le_bytes());
+    pe[coff + 2..coff + 4].copy_from_slice(&1u16.to_le_bytes());
+    pe[coff + 16..coff + 18].copy_from_slice(&240u16.to_le_bytes());
+    pe[coff + 18..coff + 20].copy_from_slice(&0x0022u16.to_le_bytes());
+
+    let opt = coff + 20;
+    pe[opt..opt + 2].copy_from_slice(&0x020Bu16.to_le_bytes());
+    pe[opt + 16..opt + 20].copy_from_slice(&0x1000u32.to_le_bytes());
+    pe[opt + 24..opt + 32].copy_from_slice(&0x0000_0001_4000_0000u64.to_le_bytes());
+    pe[opt + 32..opt + 36].copy_from_slice(&0x1000u32.to_le_bytes());
+    pe[opt + 36..opt + 40].copy_from_slice(&0x200u32.to_le_bytes());
+    pe[opt + 56..opt + 60].copy_from_slice(&0x4000u32.to_le_bytes());
+    pe[opt + 60..opt + 64].copy_from_slice(&0x200u32.to_le_bytes());
+    pe[opt + 68..opt + 70].copy_from_slice(&(PeSubsystem::WindowsGui as u16).to_le_bytes());
+    pe[opt + 108..opt + 112].copy_from_slice(&16u32.to_le_bytes());
+
+    let sec = opt + 240;
+    pe[sec..sec + 5].copy_from_slice(b".text");
+    pe[sec + 8..sec + 12].copy_from_slice(&0x1000u32.to_le_bytes());
+    pe[sec + 12..sec + 16].copy_from_slice(&0x1000u32.to_le_bytes());
+    pe[sec + 16..sec + 20].copy_from_slice(&0xA00u32.to_le_bytes());
+    pe[sec + 20..sec + 24].copy_from_slice(&0x200u32.to_le_bytes());
+    pe[sec + 36..sec + 40].copy_from_slice(&0x6000_0020u32.to_le_bytes());
+
+    let text = 0x200usize;
+    let class_name = b"StrawWUGuiClass\0";
+    let title = b"StrawWU PE3 GUI\0";
+    let file_marker = b"STRAWWU_PE_GUI_OK\n";
+    let ok_msg = b"STRAWWU_PE_GUI_OK\0";
+    let closed = b"STRAWWU_PE_GUI_CLOSED\0";
+    let filename = b"pe3-marker.txt\0";
+
+    // Layout (offsets from text start, after code_capacity pad):
+    let code_capacity = 720usize;
+    let class_off = code_capacity;
+    let title_off = class_off + class_name.len();
+    let file_marker_off = title_off + title.len();
+    let ok_off = file_marker_off + file_marker.len();
+    let closed_off = ok_off + ok_msg.len();
+    let file_off = closed_off + closed.len();
+    let written_off = file_off + filename.len();
+    let wndclass_off = written_off + 4;
+    let msg_off = wndclass_off + 0x48;
+
+    let mut code: Vec<u8> = Vec::with_capacity(code_capacity);
+    let emit = |code: &mut Vec<u8>, bytes: &[u8]| code.extend_from_slice(bytes);
+    let emit_u64 = |code: &mut Vec<u8>, v: u64| {
+        code.push(0x48);
+        code.push(0xB8);
+        code.extend_from_slice(&v.to_le_bytes());
+    };
+    let emit_call_rax = |code: &mut Vec<u8>| emit(code, &[0xFF, 0xD0]);
+    let emit_lea = |code: &mut Vec<u8>, rex_reg: u8, modrm_reg: u8, target_off: usize| {
+        code.push(rex_reg);
+        code.push(0x8D);
+        code.push(modrm_reg);
+        let disp = (target_off as i32) - ((code.len() as i32) + 4);
+        code.extend_from_slice(&disp.to_le_bytes());
+    };
+    let emit_stack_imm = |code: &mut Vec<u8>, disp: u8, imm: u32| {
+        emit(
+            code,
+            &[0x48, 0xC7, 0x44, 0x24, disp],
+        );
+        code.extend_from_slice(&imm.to_le_bytes());
+    };
+
+    // sub rsp, 0x68 — shadow + CreateWindowEx stack args
+    emit(&mut code, &[0x48, 0x83, 0xEC, 0x68]);
+
+    // Zero WNDCLASSA (0x48 bytes) at wndclass_off via overlapping stores is heavy;
+    // fixture data section is pre-zeroed — only set lpszClassName pointer.
+    // lea rax, [rip+class]; mov [rip+wndclass+0x40], rax
+    emit_lea(&mut code, 0x48, 0x05, class_off); // lea rax, class
+    // mov [rip+disp], rax — 48 89 05 disp32
+    {
+        code.push(0x48);
+        code.push(0x89);
+        code.push(0x05);
+        let target = wndclass_off + 0x40;
+        let disp = (target as i32) - ((code.len() as i32) + 4);
+        code.extend_from_slice(&disp.to_le_bytes());
+    }
+
+    // RegisterClassA(&wndclass)
+    emit_lea(&mut code, 0x48, 0x0D, wndclass_off); // lea rcx
+    emit_u64(&mut code, STUB_REGISTER_CLASS_A);
+    emit_call_rax(&mut code);
+
+    // CreateWindowExA(0, class, title, WS_OVERLAPPEDWINDOW, 100,100,640,480,0,0,0,0)
+    emit(&mut code, &[0x31, 0xC9]); // xor ecx, ecx  exStyle
+    emit_lea(&mut code, 0x48, 0x15, class_off); // lea rdx, class
+    emit_lea(&mut code, 0x4C, 0x05, title_off); // lea r8, title — 4C 8D 05
+    emit(&mut code, &[0x41, 0xB9, 0x00, 0x00, 0xCF, 0x00]); // mov r9d, 0x00CF0000
+    emit_stack_imm(&mut code, 0x20, 100); // x
+    emit_stack_imm(&mut code, 0x28, 100); // y
+    emit_stack_imm(&mut code, 0x30, 640); // width
+    emit_stack_imm(&mut code, 0x38, 480); // height
+    emit_stack_imm(&mut code, 0x40, 0); // parent
+    emit_stack_imm(&mut code, 0x48, 0); // menu
+    emit_stack_imm(&mut code, 0x50, 0); // instance
+    emit_stack_imm(&mut code, 0x58, 0); // lpParam
+    emit_u64(&mut code, STUB_CREATE_WINDOW_EX_A);
+    emit_call_rax(&mut code);
+    emit(&mut code, &[0x48, 0x89, 0x44, 0x24, 0x60]); // mov [rsp+0x60], hwnd
+
+    // ShowWindow(hwnd, SW_SHOW=5)
+    emit(&mut code, &[0x48, 0x89, 0xC1]); // mov rcx, rax
+    emit(&mut code, &[0xBA, 0x05, 0x00, 0x00, 0x00]); // mov edx, 5
+    emit_u64(&mut code, STUB_SHOW_WINDOW);
+    emit_call_rax(&mut code);
+
+    // UpdateWindow(hwnd)
+    emit(&mut code, &[0x48, 0x8B, 0x4C, 0x24, 0x60]);
+    emit_u64(&mut code, STUB_UPDATE_WINDOW);
+    emit_call_rax(&mut code);
+
+    // Message pump iteration 1: GetMessage / Translate / Dispatch (WM_CREATE)
+    emit_lea(&mut code, 0x48, 0x0D, msg_off);
+    emit(&mut code, &[0x31, 0xD2]); // xor edx, edx
+    emit(&mut code, &[0x45, 0x31, 0xC0]); // xor r8d, r8d
+    emit(&mut code, &[0x45, 0x31, 0xC9]); // xor r9d, r9d
+    emit_u64(&mut code, STUB_GET_MESSAGE_A);
+    emit_call_rax(&mut code);
+    emit_lea(&mut code, 0x48, 0x0D, msg_off);
+    emit_u64(&mut code, STUB_TRANSLATE_MESSAGE);
+    emit_call_rax(&mut code);
+    emit_lea(&mut code, 0x48, 0x0D, msg_off);
+    emit_u64(&mut code, STUB_DISPATCH_MESSAGE_A);
+    emit_call_rax(&mut code);
+
+    // Message pump iteration 2 (WM_PAINT from ShowWindow)
+    emit_lea(&mut code, 0x48, 0x0D, msg_off);
+    emit(&mut code, &[0x31, 0xD2]);
+    emit(&mut code, &[0x45, 0x31, 0xC0]);
+    emit(&mut code, &[0x45, 0x31, 0xC9]);
+    emit_u64(&mut code, STUB_GET_MESSAGE_A);
+    emit_call_rax(&mut code);
+    emit_lea(&mut code, 0x48, 0x0D, msg_off);
+    emit_u64(&mut code, STUB_TRANSLATE_MESSAGE);
+    emit_call_rax(&mut code);
+    emit_lea(&mut code, 0x48, 0x0D, msg_off);
+    emit_u64(&mut code, STUB_DISPATCH_MESSAGE_A);
+    emit_call_rax(&mut code);
+
+    // GetDC(hwnd); BitBlt(...); ReleaseDC(hwnd, hdc)
+    emit(&mut code, &[0x48, 0x8B, 0x4C, 0x24, 0x60]);
+    emit_u64(&mut code, STUB_GET_DC);
+    emit_call_rax(&mut code);
+    emit(&mut code, &[0x48, 0x89, 0x44, 0x24, 0x58]); // save hdc
+    // BitBlt(hdc,0,0,640,480,hdc,0,0,SRCCOPY) — MVP only needs the call
+    emit(&mut code, &[0x48, 0x89, 0xC1]); // mov rcx, hdc
+    emit(&mut code, &[0x31, 0xD2]); // xor edx, edx
+    emit(&mut code, &[0x45, 0x31, 0xC0]); // xor r8d
+    emit(&mut code, &[0x41, 0xB9, 0x80, 0x02, 0x00, 0x00]); // mov r9d, 640
+    emit_u64(&mut code, STUB_BIT_BLT);
+    emit_call_rax(&mut code);
+    emit(&mut code, &[0x48, 0x8B, 0x4C, 0x24, 0x60]); // hwnd
+    emit(&mut code, &[0x48, 0x8B, 0x54, 0x24, 0x58]); // hdc
+    emit_u64(&mut code, STUB_RELEASE_DC);
+    emit_call_rax(&mut code);
+
+    // DestroyWindow(hwnd); PostQuitMessage(0)
+    emit(&mut code, &[0x48, 0x8B, 0x4C, 0x24, 0x60]);
+    emit_u64(&mut code, STUB_DESTROY_WINDOW);
+    emit_call_rax(&mut code);
+    emit(&mut code, &[0x31, 0xC9]);
+    emit_u64(&mut code, STUB_POST_QUIT_MESSAGE);
+    emit_call_rax(&mut code);
+
+    // Drain WM_DESTROY + WM_QUIT
+    emit_lea(&mut code, 0x48, 0x0D, msg_off);
+    emit(&mut code, &[0x31, 0xD2]);
+    emit(&mut code, &[0x45, 0x31, 0xC0]);
+    emit(&mut code, &[0x45, 0x31, 0xC9]);
+    emit_u64(&mut code, STUB_GET_MESSAGE_A);
+    emit_call_rax(&mut code);
+    emit_lea(&mut code, 0x48, 0x0D, msg_off);
+    emit_u64(&mut code, STUB_DISPATCH_MESSAGE_A);
+    emit_call_rax(&mut code);
+    emit_lea(&mut code, 0x48, 0x0D, msg_off);
+    emit(&mut code, &[0x31, 0xD2]);
+    emit(&mut code, &[0x45, 0x31, 0xC0]);
+    emit(&mut code, &[0x45, 0x31, 0xC9]);
+    emit_u64(&mut code, STUB_GET_MESSAGE_A);
+    emit_call_rax(&mut code);
+
+    // CreateFileA + WriteFile marker
+    emit_lea(&mut code, 0x48, 0x0D, file_off);
+    emit_u64(&mut code, STUB_CREATE_FILE_A);
+    emit_call_rax(&mut code);
+    emit(&mut code, &[0x48, 0x89, 0x44, 0x24, 0x50]);
+    emit(&mut code, &[0x48, 0x89, 0xC1]);
+    emit_lea(&mut code, 0x48, 0x15, file_marker_off);
+    emit(
+        &mut code,
+        &[
+            0x41,
+            0xB8,
+            file_marker.len() as u8,
+            0x00,
+            0x00,
+            0x00,
+        ],
+    );
+    emit_lea(&mut code, 0x4C, 0x0D, written_off);
+    emit_stack_imm(&mut code, 0x20, 0);
+    emit_u64(&mut code, STUB_WRITE_FILE);
+    emit_call_rax(&mut code);
+    emit(&mut code, &[0x48, 0x8B, 0x4C, 0x24, 0x50]);
+    emit_u64(&mut code, STUB_CLOSE_HANDLE);
+    emit_call_rax(&mut code);
+
+    // puts(ok); puts(closed)
+    emit_lea(&mut code, 0x48, 0x0D, ok_off);
+    emit_u64(&mut code, STUB_PUTS);
+    emit_call_rax(&mut code);
+    emit_lea(&mut code, 0x48, 0x0D, closed_off);
+    emit_u64(&mut code, STUB_PUTS);
+    emit_call_rax(&mut code);
+
+    // ExitProcess(0)
+    emit(&mut code, &[0x31, 0xC9]);
+    emit_u64(&mut code, STUB_EXIT_PROCESS);
+    emit_call_rax(&mut code);
+
+    assert!(
+        code.len() <= code_capacity,
+        "pe3 fixture code {} exceeds pad {}",
+        code.len(),
+        code_capacity
+    );
+    while code.len() < code_capacity {
+        code.push(0x90);
+    }
+
+    let data_end = msg_off + 0x30;
+    assert!(
+        text + data_end <= pe.len(),
+        "pe3 data overflow {} > {}",
+        text + data_end,
+        pe.len()
+    );
+
+    pe[text..text + code.len()].copy_from_slice(&code);
+    pe[text + class_off..text + class_off + class_name.len()].copy_from_slice(class_name);
+    pe[text + title_off..text + title_off + title.len()].copy_from_slice(title);
+    pe[text + file_marker_off..text + file_marker_off + file_marker.len()]
+        .copy_from_slice(file_marker);
+    pe[text + ok_off..text + ok_off + ok_msg.len()].copy_from_slice(ok_msg);
+    pe[text + closed_off..text + closed_off + closed.len()].copy_from_slice(closed);
+    pe[text + file_off..text + file_off + filename.len()].copy_from_slice(filename);
 
     pe
 }

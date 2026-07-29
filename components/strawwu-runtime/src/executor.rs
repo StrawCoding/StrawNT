@@ -181,10 +181,17 @@ pub fn execute_pe_with_side_effect_dir(
             side_effect_dir,
         ) {
             Ok(cpu) => {
+                let gui_real = cpu
+                    .side_effects
+                    .gui
+                    .as_ref()
+                    .map(|g| g.hwnd.unwrap_or(0) > 0 && g.compositor_frames > 0)
+                    .unwrap_or(false);
                 let real = matches!(cpu.halt, CpuHaltReason::ExitProcess)
                     && (!cpu.side_effects.stdout.is_empty()
                         || !cpu.side_effects.host_files_written.is_empty()
-                        || cpu.side_effects.exit_code.is_some());
+                        || cpu.side_effects.exit_code.is_some()
+                        || gui_real);
                 let mode = if real {
                     "real".to_string()
                 } else {
@@ -248,7 +255,7 @@ mod tests {
     use super::*;
     use strawwu_nt::pe::{
         build_pe_with_imports, build_real_console_fixture_pe, build_stub_pe,
-        build_win32_console_mvp_pe, PeMachine, PeSubsystem,
+        build_win32_console_mvp_pe, build_win32_gui_mvp_pe, PeMachine, PeSubsystem,
     };
 
     #[test]
@@ -307,6 +314,35 @@ mod tests {
         assert!(se.apis_invoked.iter().any(|a| a == "ReadFile"));
         assert!(se.apis_invoked.iter().any(|a| a == "malloc"));
         assert!(se.apis_invoked.iter().any(|a| a == "GetCurrentProcessId"));
+    }
+
+    #[test]
+    fn execute_win32_gui_mvp_fixture() {
+        let mut orch = RuntimeOrchestrator::new();
+        let profile = AppProfile::default_win32("pe3-gui-mvp");
+        let pe_data = build_win32_gui_mvp_pe();
+        let tmp = std::env::temp_dir().join("strawwu-pe3-exec-test");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let _ = std::fs::create_dir_all(&tmp);
+
+        let result =
+            execute_pe_with_side_effect_dir(&mut orch, &profile, &pe_data, Some(tmp.clone()));
+        assert_eq!(result.state, ExecState::Running);
+        assert_eq!(result.mode, "real");
+        assert!(result.cpu_executed);
+        let se = result.side_effects.expect("side effects");
+        assert!(se.stdout_utf8.contains("STRAWWU_PE_GUI_OK"));
+        assert!(se.stdout_utf8.contains("STRAWWU_PE_GUI_CLOSED"));
+        let gui = se.gui.expect("gui");
+        assert!(gui.hwnd.unwrap_or(0) > 0);
+        assert!(gui.closed);
+        assert!(gui.compositor_frames >= 1);
+        assert!(tmp.join("pe3-window.ppm").is_file());
+        assert!(tmp.join("pe3-compositor.json").is_file());
+        assert!(tmp.join("pe3-marker.txt").is_file());
+        assert!(se.apis_invoked.iter().any(|a| a == "CreateWindowExA"));
+        assert!(se.apis_invoked.iter().any(|a| a == "BitBlt"));
+        assert!(se.apis_invoked.iter().any(|a| a == "DestroyWindow"));
     }
 
     #[test]

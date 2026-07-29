@@ -378,7 +378,24 @@ fn launch_via_native(
         }
     };
 
-    if let Some(ref smoke) = gui {
+    let cpu_gui = exec.side_effects.as_ref().and_then(|se| se.gui.as_ref());
+    if let Some(g) = cpu_gui {
+        let _ = log::append_event("gui_cpu", g);
+        println!(
+            "strawwu: launched {} (format={}, pid={}, backend={}, app_id={}, mode={}, gui-smoke=PASS hwnd={} compositor={} visible={} closed={} frames={} cpu-user32=1)",
+            req.binary_path.display(),
+            req.format,
+            exec.pid,
+            profile.execution_backend,
+            app_id,
+            mode,
+            g.hwnd.unwrap_or(0),
+            g.compositor_backend,
+            g.visible || !g.closed,
+            g.closed,
+            g.compositor_frames,
+        );
+    } else if let Some(ref smoke) = gui {
         let _ = log::append_event("gui_smoke", smoke);
         println!(
             "strawwu: launched {} (format={}, pid={}, backend={}, app_id={}, mode={}, gui-smoke=PASS hwnd={} compositor={} visible={})",
@@ -418,6 +435,8 @@ fn launch_via_native(
                 "exit_code": se.exit_code,
                 "instructions_retired": se.instructions_retired,
                 "halt": exec.halt_reason,
+                "apis": se.apis_invoked,
+                "gui": se.gui,
             }),
         );
     }

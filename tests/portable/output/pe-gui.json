@@ -1,0 +1,145 @@
+{
+  "schema": "strawwu-portable-pe-gui/v1",
+  "stage": "pe3-gui-user32-mvp",
+  "status": "PASS",
+  "version": "0.7.1.21",
+  "backend": "native",
+  "execution_backend": "native",
+  "mode": "real",
+  "generated_at": "2026-07-29T06:04:13Z",
+  "fixture": {
+    "path": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/fixtures/pe3-gui-mvp.exe",
+    "sha256": "4078d4a95562c29eb0c92b37b07e97fc1d318618e93e0b3b85caf45920708666",
+    "kind": "win32-gui-mvp-amd64",
+    "subsystem": "WindowsGui",
+    "markers": [
+      "STRAWWU_PE_GUI_OK",
+      "STRAWWU_PE_GUI_CLOSED"
+    ]
+  },
+  "api_paths": {
+    "user32": [
+      "RegisterClassA",
+      "CreateWindowExA",
+      "ShowWindow",
+      "UpdateWindow",
+      "GetMessageA",
+      "TranslateMessage",
+      "DispatchMessageA",
+      "DestroyWindow",
+      "PostQuitMessage",
+      "GetDC",
+      "ReleaseDC"
+    ],
+    "gdi32": [
+      "BitBlt",
+      "CreateCompatibleDC",
+      "GetDeviceCaps",
+      "DeleteDC"
+    ],
+    "not_stub_only": true
+  },
+  "window": {
+    "hwnd": 65536,
+    "title": "StrawWU PE3 GUI",
+    "width": 640,
+    "height": 480,
+    "closed": true,
+    "messages_dispatched": 3
+  },
+  "compositor": {
+    "display": "wayland",
+    "name": "mutter",
+    "backend": "wayland-mutter",
+    "frame_count": 5,
+    "observation_path": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe3-side-effects/pe3-compositor.json"
+  },
+  "screenshot": {
+    "path": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe3-side-effects/pe3-window.ppm",
+    "format": "ppm-p6"
+  },
+  "side_effects": {
+    "stdout_file": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe3-side-effects/pe-stdout.txt",
+    "stdout": "STRAWWU_PE_GUI_OK\nSTRAWWU_PE_GUI_CLOSED",
+    "marker_file": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe3-side-effects/pe3-marker.txt",
+    "marker_file_body": "STRAWWU_PE_GUI_OK",
+    "dir": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe3-side-effects"
+  },
+  "launcher": {
+    "command": "strawwu run <fixture> --backend native",
+    "output": [
+      "strawwu: launched /mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/fixtures/pe3-gui-mvp.exe (format=PE, pid=1000, backend=native, app_id=pe3-gui-mvp, mode=real, gui-smoke=PASS hwnd=65536 compositor=wayland-mutter visible=false closed=true frames=5 cpu-user32=1)",
+      "STRAWWU_PE_GUI_OK",
+      "STRAWWU_PE_GUI_CLOSED"
+    ],
+    "require_real_exec": true
+  },
+  "checks": [
+    {
+      "name": "mode_real",
+      "status": "PASS"
+    },
+    {
+      "name": "backend_native",
+      "status": "PASS"
+    },
+    {
+      "name": "gui_subsystem",
+      "status": "PASS"
+    },
+    {
+      "name": "stdout_gui_marker",
+      "status": "PASS"
+    },
+    {
+      "name": "stdout_close_marker",
+      "status": "PASS"
+    },
+    {
+      "name": "host_file_side_effect",
+      "status": "PASS"
+    },
+    {
+      "name": "screenshot_ppm",
+      "status": "PASS"
+    },
+    {
+      "name": "compositor_observation",
+      "status": "PASS"
+    },
+    {
+      "name": "cpu_user32_gdi_dispatch_test",
+      "status": "PASS"
+    },
+    {
+      "name": "runtime_exec_test",
+      "status": "PASS"
+    },
+    {
+      "name": "no_wine_substrate",
+      "status": "PASS"
+    }
+  ],
+  "pending": [],
+  "evidence": [
+    "tests/portable/output/pe-gui.json",
+    "tests/portable/fixtures/pe3-gui-mvp.exe",
+    "tests/portable/output/pe3-side-effects/pe3-window.ppm",
+    "tests/portable/output/pe3-side-effects/pe3-compositor.json",
+    "components/strawwu-nt/src/cpu.rs",
+    "components/strawwu-nt/src/pe.rs",
+    "components/strawwu-nt/src/win32_stubs.rs"
+  ],
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
+    "no Wine/Proton substrate; execution_backend=native",
+    "no WinBox naming",
+    "no full Windows compatibility claim",
+    "mode=simulated is not accepted as success",
+    "not stub-only: real CPU dispatch of user32/gdi + message loop"
+  ],
+  "git": {
+    "branch": "main",
+    "commit": "3f594bf1d"
+  }
+}
