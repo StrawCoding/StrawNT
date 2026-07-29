@@ -99,7 +99,7 @@ else
 fi
 
 # --- Step 2: run → desktop icon ---
-if "${STRAWWU_BIN}" run "${notepad_exe}" | grep -q 'gui-smoke=PASS'; then
+if "${STRAWWU_BIN}" run "${notepad_exe}" --backend native | grep -q 'gui-smoke=PASS'; then
     pass "E2E step icon: strawwu run creates GUI smoke"
 else
     fail "E2E step icon: run missing gui-smoke=PASS"

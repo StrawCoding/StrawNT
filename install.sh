@@ -178,6 +178,70 @@ chmod 755 "${WRAPPER}"
 mkdir -p "${BIN_DIR}"
 ln -sfn "${WRAPPER}" "${BIN_DIR}/strawwu"
 
+# Real PE execution requires Wine. Try to install when missing.
+ensure_wine() {
+  if command -v wine >/dev/null 2>&1 || command -v wine64 >/dev/null 2>&1; then
+    log "Wine already present: $(command -v wine64 2>/dev/null || command -v wine)"
+    return 0
+  fi
+  log "Wine not found — installing (needed to actually run .exe / .msi)"
+  if command -v apt-get >/dev/null 2>&1; then
+    if command -v sudo >/dev/null 2>&1; then
+      sudo apt-get update -y && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y wine wine64 wine32 2>/dev/null \
+        || sudo DEBIAN_FRONTEND=noninteractive apt-get install -y wine 2>/dev/null \
+        || true
+    else
+      apt-get update -y && DEBIAN_FRONTEND=noninteractive apt-get install -y wine wine64 2>/dev/null || true
+    fi
+  elif command -v dnf >/dev/null 2>&1; then
+    if command -v sudo >/dev/null 2>&1; then
+      sudo dnf install -y wine || true
+    else
+      dnf install -y wine || true
+    fi
+  elif command -v pacman >/dev/null 2>&1; then
+    if command -v sudo >/dev/null 2>&1; then
+      sudo pacman -Sy --noconfirm wine || true
+    else
+      pacman -Sy --noconfirm wine || true
+    fi
+  elif command -v zypper >/dev/null 2>&1; then
+    if command -v sudo >/dev/null 2>&1; then
+      sudo zypper --non-interactive install wine || true
+    else
+      zypper --non-interactive install wine || true
+    fi
+  else
+    log "WARNING: unknown package manager — install Wine manually"
+  fi
+  if command -v wine >/dev/null 2>&1 || command -v wine64 >/dev/null 2>&1; then
+    log "Wine installed: $(wine --version 2>/dev/null || wine64 --version 2>/dev/null || echo ok)"
+    return 0
+  fi
+  log "WARNING: Wine still missing — strawwu open/run will fail until Wine is installed"
+  return 1
+}
+
+WINE_RC=0
+ensure_wine || WINE_RC=$?
+
+# Persist Wine prefix under the portable install tree.
+export WINEPREFIX="${WINEPREFIX:-${PREFIX}/var/lib/strawwu/wineprefix}"
+mkdir -p "${WINEPREFIX}"
+# Seed wrapper env so every strawwu invocation uses the same prefix.
+cat > "${WRAPPER}" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+export STRAWWU_PREFIX="${PREFIX}"
+export STRAWWU_APP_REGISTRY="\${STRAWWU_APP_REGISTRY:-\${STRAWWU_PREFIX}/var/lib/strawwu/app-registry.json}"
+export STRAWWU_BACKEND="\${STRAWWU_BACKEND:-wine}"
+export WINEPREFIX="\${WINEPREFIX:-\${STRAWWU_PREFIX}/var/lib/strawwu/wineprefix}"
+export PATH="\${STRAWWU_PREFIX}/bin:\${PATH}"
+export LD_LIBRARY_PATH="\${STRAWWU_PREFIX}/lib/strawwu:\${STRAWWU_PREFIX}/lib\${LD_LIBRARY_PATH:+:\${LD_LIBRARY_PATH}}"
+exec "\${STRAWWU_PREFIX}/bin/strawwu" "\$@"
+EOF
+chmod 755 "${WRAPPER}"
+
 # Click-to-open: MIME handler so double-clicking .exe/.msi installs & launches.
 export PATH="${BIN_DIR}:${PATH}"
 export STRAWWU_PREFIX="${PREFIX}"
@@ -185,7 +249,7 @@ export STRAWWU_BIN="${BIN_DIR}/strawwu"
 export STRAWWU_APP_REGISTRY="${STRAWWU_APP_REGISTRY:-${PREFIX}/var/lib/strawwu/app-registry.json}"
 INTEGRATE_RC=0
 if "${BIN_DIR}/strawwu" integrate; then
-  log "desktop click-to-open enabled (.exe / .msi)"
+  log "desktop click-to-open enabled (.exe / .msi → Wine)"
 else
   INTEGRATE_RC=$?
   log "WARNING: strawwu integrate failed (exit ${INTEGRATE_RC}) — run: strawwu integrate"
@@ -194,6 +258,7 @@ fi
 # Smoke
 VER_OUT="$("${BIN_DIR}/strawwu" --version 2>&1 || true)"
 [[ -n "${VER_OUT}" ]] || die "post-install --version failed"
+STATUS_OUT="$("${BIN_DIR}/strawwu" status 2>&1 || true)"
 STATUS_RC=0
 "${BIN_DIR}/strawwu" status >/dev/null 2>&1 || STATUS_RC=$?
 
@@ -207,17 +272,26 @@ StrawWU Portable Core installed.
   version : ${VER_OUT}
   status  : exit ${STATUS_RC}
   click   : integrate exit ${INTEGRATE_RC}
+  wine    : setup exit ${WINE_RC}
+  winepfx : ${WINEPREFIX}
+
+${STATUS_OUT}
 
 Try:
   strawwu --version
   strawwu status
-  strawwu integrate          # re-enable click-to-open if needed
-  strawwu open setup.exe     # install + launch + app-menu shortcut
+  strawwu open setup.exe     # REAL install via Wine + app-menu shortcut
   # Or double-click any .exe / .msi in your file manager
 
 If 'strawwu' is not found, add to PATH:
   export PATH="${BIN_DIR}:\$PATH"
 
-Honest note: this is the portable Win-compat *core* (CLI/runtime).
-It does not claim full Windows app compatibility, and it is not the StrawWU ISO/desktop OS.
+If Wine is missing:
+  Ubuntu/Debian: sudo apt install -y wine
+  Fedora:        sudo dnf install -y wine
+  Arch:          sudo pacman -S wine
+
+Note: real .exe/.msi execution uses Wine under StrawWU UX (click / open / install).
+Not every Windows app will run; anti-cheat / kernel drivers may still fail.
+This is not the StrawWU ISO/desktop OS.
 EOF

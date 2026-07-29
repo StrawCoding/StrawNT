@@ -9,6 +9,7 @@ use strawwu_launcher::log;
 use strawwu_launcher::open::{self, OpenAction};
 use strawwu_launcher::pe_loader;
 use strawwu_launcher::registry::{self, derive_app_name};
+use strawwu_launcher::wine_backend;
 use strawwu_runtime::executor::ExecState;
 use strawwu_runtime::orchestrator::RuntimeOrchestrator;
 use strawwu_runtime::profile::AppProfile;
@@ -55,7 +56,15 @@ fn main() {
             bundle,
             ..
         } => {
-            if let Err(code) = launch_pe(&binary, &app_args, backend.as_deref(), &bundle, false) {
+            let install_mode = open::looks_like_installer(&binary);
+            if let Err(code) = launch_pe(
+                &binary,
+                &app_args,
+                backend.as_deref(),
+                &bundle,
+                false,
+                install_mode,
+            ) {
                 process::exit(code);
             }
         }
@@ -65,8 +74,9 @@ fn main() {
                 OpenMode::Install => OpenAction::InstallAndRun,
                 OpenMode::Auto => open::decide_open_action(&path),
             };
+            let install_mode = matches!(action, OpenAction::InstallAndRun);
 
-            if matches!(action, OpenAction::InstallAndRun) {
+            if install_mode {
                 match registry::register_install(&path) {
                     Ok(app_id) => {
                         println!(
@@ -86,7 +96,7 @@ fn main() {
                 "StrawWU",
                 &format!(
                     "{} {}",
-                    if matches!(action, OpenAction::InstallAndRun) {
+                    if install_mode {
                         "Installing & launching"
                     } else {
                         "Launching"
@@ -95,7 +105,7 @@ fn main() {
                 ),
             );
 
-            if let Err(code) = launch_pe(&path, &[], None, &[], true) {
+            if let Err(code) = launch_pe(&path, &[], None, &[], true, install_mode) {
                 open::notify("StrawWU", &format!("Failed to open {name}"));
                 process::exit(code);
             }
@@ -128,9 +138,16 @@ fn main() {
                             );
                         }
                     }
+                    // Actually run the installer through Wine (not registry-only stub).
+                    if let Err(code) =
+                        launch_pe(&installer, &[], Some("wine"), &[], false, true)
+                    {
+                        open::notify("StrawWU", &format!("Install failed: {app_name}"));
+                        process::exit(code);
+                    }
                     open::notify(
                         "StrawWU",
-                        &format!("{app_name} registered — click the app menu entry to launch"),
+                        &format!("{app_name} installed — use the app menu or strawwu open to launch"),
                     );
                 }
                 Err(e) => {
@@ -224,6 +241,10 @@ fn main() {
                     sessions,
                     apps.len()
                 );
+                println!("strawwu: {}", wine_backend::status_line());
+                println!(
+                    "strawwu: default backend=wine (real PE); use --backend native for simulated nt"
+                );
             }
             Err(e) => {
                 eprintln!("strawwu: status failed: {e}");
@@ -236,7 +257,20 @@ fn main() {
     }
 }
 
-/// Shared PE launch path used by `run` and `open`.
+/// Resolve execution backend. Default is **wine** (real PE via Wine).
+/// `native` / `container` / `microvm` keep the in-process strawwu-nt path.
+fn resolve_backend(requested: Option<&str>) -> String {
+    match requested {
+        Some(b) if !b.is_empty() => b.to_string(),
+        _ => std::env::var("STRAWWU_BACKEND").unwrap_or_else(|_| "wine".into()),
+    }
+}
+
+fn backend_is_wine(backend: &str) -> bool {
+    matches!(backend, "wine" | "proton" | "real")
+}
+
+/// Shared PE launch path used by `run`, `open`, and `install`.
 /// Returns Ok(()) or Err(exit_code).
 fn launch_pe(
     binary: &Path,
@@ -244,18 +278,24 @@ fn launch_pe(
     backend: Option<&str>,
     bundle: &[PathBuf],
     from_open: bool,
+    install_mode: bool,
 ) -> Result<(), i32> {
     let format = detect_from_path(binary).unwrap_or(BinaryFormat::Unknown);
+    let backend_name = resolve_backend(backend);
     let mut req = LaunchRequest::new(binary.to_path_buf(), format).with_args(app_args.to_vec());
-    if let Some(b) = backend {
-        req = req.with_backend(b);
-    }
+    req = req.with_backend(&backend_name);
     if !bundle.is_empty() {
         req = req.with_bundle(bundle.to_vec());
     }
 
-    if let Err(e) = req.validate() {
-        eprintln!("strawwu: launch validation failed: {e}");
+    // Wine path: skip PE-byte validation that exists for the simulated loader.
+    if !backend_is_wine(&backend_name) {
+        if let Err(e) = req.validate() {
+            eprintln!("strawwu: launch validation failed: {e}");
+            return Err(1);
+        }
+    } else if !binary.is_file() {
+        eprintln!("strawwu: file not found: {}", binary.display());
         return Err(1);
     }
 
@@ -279,7 +319,7 @@ fn launch_pe(
     let app_id = match registry::register_launch(
         binary,
         format,
-        backend,
+        Some(backend_name.as_str()),
         desktop_entry.clone(),
     ) {
         Ok(id) => id,
@@ -289,6 +329,92 @@ fn launch_pe(
         }
     };
 
+    if backend_is_wine(&backend_name) {
+        return launch_via_wine(binary, app_args, &app_id, install_mode, from_open, desktop_entry);
+    }
+
+    launch_via_native(
+        binary,
+        format,
+        &backend_name,
+        &app_id,
+        &app_name,
+        &req,
+        from_open,
+        desktop_entry,
+    )
+}
+
+fn launch_via_wine(
+    binary: &Path,
+    app_args: &[String],
+    app_id: &str,
+    install_mode: bool,
+    from_open: bool,
+    desktop_entry: Option<String>,
+) -> Result<(), i32> {
+    // Installers: wait for Wine so the wizard can finish.
+    // Regular apps from open/desktop: wait too (file managers expect a session).
+    // CLI `run` without install: wait as well so stdout/stderr and exit code are useful.
+    let result = match wine_backend::run_wait(binary, app_args, install_mode) {
+        Ok(r) => r,
+        Err(e) => {
+            eprintln!("strawwu: Wine launch failed:\n{e}");
+            return Err(1);
+        }
+    };
+
+    let code = result.exit_code.unwrap_or(0);
+    println!(
+        "strawwu: launched {} (backend=wine, app_id={}, wine={}, prefix={}, exit={code})",
+        binary.display(),
+        app_id,
+        result.wine_bin.display(),
+        result.prefix.display(),
+    );
+    let _ = log::append_event(
+        "wine_launch",
+        &serde_json::json!({
+            "app_id": app_id,
+            "path": binary.display().to_string(),
+            "wine": result.wine_bin.display().to_string(),
+            "prefix": result.prefix.display().to_string(),
+            "cmdline": result.cmdline,
+            "exit_code": code,
+            "install_mode": install_mode,
+            "from_open": from_open,
+        }),
+    );
+    if let Some(path) = desktop_entry {
+        let _ = log::append_event(
+            "desktop_entry",
+            &serde_json::json!({
+                "app_id": app_id,
+                "path": path,
+                "from_open": from_open,
+                "backend": "wine",
+            }),
+        );
+    }
+    // Non-zero Wine exit is reported but not always fatal for GUI apps that
+    // return odd codes; still surface failure for clear install errors.
+    if install_mode && code != 0 {
+        eprintln!("strawwu: installer exited with code {code}");
+        return Err(code);
+    }
+    Ok(())
+}
+
+fn launch_via_native(
+    binary: &Path,
+    format: BinaryFormat,
+    backend_name: &str,
+    app_id: &str,
+    app_name: &str,
+    req: &LaunchRequest,
+    from_open: bool,
+    desktop_entry: Option<String>,
+) -> Result<(), i32> {
     let pe_data = match pe_loader::load_pe_bytes(binary, format, pe_loader::smoke_mode()) {
         Ok(data) => data,
         Err(e) => {
@@ -298,10 +424,8 @@ fn launch_pe(
     };
 
     let mut orch = RuntimeOrchestrator::new();
-    let mut profile = AppProfile::default_win32(&app_id);
-    if let Some(b) = backend {
-        profile.execution_backend = b.to_string();
-    }
+    let mut profile = AppProfile::default_win32(app_id);
+    profile.execution_backend = backend_name.to_string();
 
     let exec = execute_pe(&mut orch, &profile, &pe_data);
     if exec.state != ExecState::Running {
@@ -312,7 +436,7 @@ fn launch_pe(
         return Err(1);
     }
 
-    let gui = match maybe_run_gui_smoke(&pe_data, &app_id, &app_name) {
+    let gui = match maybe_run_gui_smoke(&pe_data, app_id, app_name) {
         Ok(result) => result,
         Err(e) => {
             eprintln!("strawwu: gui-smoke failed: {e}");
@@ -351,6 +475,7 @@ fn launch_pe(
                 "app_id": app_id,
                 "path": path,
                 "from_open": from_open,
+                "backend": backend_name,
             }),
         );
     }
@@ -360,17 +485,18 @@ fn launch_pe(
 
 fn print_help() {
     println!(
-        "strawwu {VERSION} — StrawWU application launcher
+        "strawwu {VERSION} — StrawWU portable Windows app launcher
 
 USAGE:
     strawwu <COMMAND> [OPTIONS]
 
 COMMANDS:
     open <file.exe|.msi> [--auto|--run|--install]
-        Click-to-open: install (if installer) and launch; writes app-menu launcher
-    run <binary> [--backend native|container|microvm] [--bundle a,b,c]
-    install <installer.exe>
-        Register installer + write desktop launcher
+        Click-to-open: run via Wine (real PE); installers wait for the wizard
+    run <binary> [--backend wine|native|container|microvm] [--bundle a,b,c]
+        Default backend=wine (real execution). native = simulated strawwu-nt.
+    install <installer.exe|.msi>
+        Register + actually run the installer through Wine
     integrate
         Enable double-click for .exe/.msi (MIME + desktop handler)
     apps list
@@ -383,17 +509,18 @@ COMMANDS:
     help
 
 CLICK TO INSTALL & LAUNCH:
-    1) strawwu integrate          # once after install.sh
-    2) double-click any .exe/.msi in the file manager
-    3) app also appears under ~/.local/share/applications for one-click relaunch
+    1) curl …/install.sh | bash   # installs StrawWU + Wine when possible
+    2) strawwu integrate          # if needed after desktop change
+    3) double-click any .exe/.msi — runs for real via Wine
+    4) relaunch from the app menu (~/.local/share/applications)
+
+WINE:
+    WINEPREFIX default: $STRAWWU_PREFIX/var/lib/strawwu/wineprefix
+    Override: STRAWWU_WINE / STRAWWU_WINEPREFIX / WINEPREFIX / STRAWWU_BACKEND
 
 REGISTRY:
     run/install/open register apps in the local app-registry
     (override with STRAWWU_APP_REGISTRY)
-
-GUI SMOKE (W5-W4):
-    PE GUI apps create Win32 HWND + Wayland present bridge (mutter contract)
-    Desktop entry written to ~/.local/share/applications (STRAWWU_DESKTOP_DIR)
 "
     );
 }

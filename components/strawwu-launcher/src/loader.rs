@@ -51,7 +51,9 @@ impl LaunchRequest {
             return Err("cannot launch unknown binary format".into());
         }
         if let Some(ref backend) = self.backend_override {
-            if !["native", "container", "microvm"].contains(&backend.as_str()) {
+            if !["native", "container", "microvm", "wine", "proton", "real"]
+                .contains(&backend.as_str())
+            {
                 return Err(format!("invalid backend override: {backend}"));
             }
         }
@@ -73,7 +75,7 @@ impl LaunchRequest {
             return b.as_str();
         }
         match self.format.as_str() {
-            "PE" => "native",
+            "PE" | "MSI" => "wine",
             "ELF" => "native",
             _ => "container",
         }
@@ -204,9 +206,9 @@ mod tests {
     }
 
     #[test]
-    fn estimated_backend_pe_native() {
+    fn estimated_backend_pe_wine() {
         let req = LaunchRequest::new(PathBuf::from("/app/game.exe"), BinaryFormat::PE);
-        assert_eq!(req.estimated_backend(), "native");
+        assert_eq!(req.estimated_backend(), "wine");
     }
 
     #[test]

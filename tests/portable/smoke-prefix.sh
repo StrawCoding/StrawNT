@@ -74,7 +74,7 @@ doc = {
     "checks": checks,
     "exclusions_honored": [
         "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
-        "no Wine/Proton substrate",
+        "Wine is the default real-PE backend (not claimed as full Windows OS)",
         "no WinBox naming",
         "no full Windows compatibility claim",
     ],

@@ -70,13 +70,13 @@ export STRAWWU_SMOKE=1
 export STRAWWU_WINCOMPAT_LOG="${tmp_dir}/wincompat.log"
 notepad_exe="${tmp_dir}/notepad.exe"
 
-if "${STRAWWU_BIN}" run "${notepad_exe}" | grep -q 'gui-smoke=PASS'; then
+if "${STRAWWU_BIN}" run "${notepad_exe}" --backend native | grep -q 'gui-smoke=PASS'; then
     pass "strawwu run notepad gui-smoke PASS"
 else
     fail "strawwu run notepad gui-smoke output missing"
 fi
 
-if "${STRAWWU_BIN}" run "${notepad_exe}" | grep -q 'compositor=mutter'; then
+if "${STRAWWU_BIN}" run "${notepad_exe}" --backend native | grep -q 'compositor=mutter'; then
     pass "strawwu run reports mutter compositor"
 else
     fail "strawwu run missing compositor=mutter"

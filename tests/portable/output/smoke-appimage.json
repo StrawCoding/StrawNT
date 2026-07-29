@@ -2,13 +2,13 @@
   "schema": "strawwu-portable-smoke-appimage/v1",
   "stage": "pc2-appimage",
   "status": "PASS",
-  "version": "0.7.1.16",
+  "version": "0.7.1.17",
   "dist": "/mnt/data/code/project/StrawCoding/StrawWU-portable/components/packaging/portable/appimage/dist",
-  "generated_at": "2026-07-29T04:37:53Z",
+  "generated_at": "2026-07-29T05:01:53Z",
   "checks": {
     "version": {
       "status": "PASS",
-      "output": "strawwu 0.7.1-preview.16"
+      "output": "strawwu 0.7.1-preview.17"
     },
     "status_cmd": {
       "status": "PASS",
@@ -33,7 +33,10 @@
         "StrawWU-Core-0.7.1.15-x86_64.portable.tar.gz",
         "StrawWU-Core-0.7.1.16-x86_64.AppDir",
         "StrawWU-Core-0.7.1.16-x86_64.AppImage",
-        "StrawWU-Core-0.7.1.16-x86_64.portable.tar.gz"
+        "StrawWU-Core-0.7.1.16-x86_64.portable.tar.gz",
+        "StrawWU-Core-0.7.1.17-x86_64.AppDir",
+        "StrawWU-Core-0.7.1.17-x86_64.AppImage",
+        "StrawWU-Core-0.7.1.17-x86_64.portable.tar.gz"
       ]
     }
   },

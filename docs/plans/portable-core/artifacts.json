@@ -1,29 +1,30 @@
 {
   "schema": "strawwu-portable-artifacts/v1",
-  "version": "0.7.1.16",
-  "generated_at": "2026-07-29T04:37:58Z",
+  "version": "0.7.1.17",
+  "generated_at": "2026-07-29T05:02:08Z",
   "artifacts": [
     {
-      "name": "StrawWU-Core-0.7.1.16-x86_64.AppImage",
+      "name": "StrawWU-Core-0.7.1.17-x86_64.AppImage",
       "kind": "AppImage",
-      "path": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.16-x86_64.AppImage",
-      "sha256": "93ae553d38e1dbea24e9daf2e22619e860a92731226fb3c5f182d48e0251eb63",
-      "size_bytes": 1350136,
-      "built_version_tag": "StrawWU-Core-0.7.1.16-x86_64.AppImage"
+      "path": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.17-x86_64.AppImage",
+      "sha256": "fe0eb5b3de8eecdad4be1d951e5616ef1b0849bf61a4286feb84f10b10ec920b",
+      "size_bytes": 1362424,
+      "built_version_tag": "StrawWU-Core-0.7.1.17-x86_64.AppImage"
     },
     {
-      "name": "StrawWU-Core-0.7.1.16-x86_64.portable.tar.gz",
+      "name": "StrawWU-Core-0.7.1.17-x86_64.portable.tar.gz",
       "kind": "portable.tar.gz",
-      "path": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.16-x86_64.portable.tar.gz",
-      "sha256": "c0bee7618554046063d97deb955d0a8463a1cbfc9e82129edf45e5f9abda8d62",
-      "size_bytes": 435827,
-      "built_version_tag": "StrawWU-Core-0.7.1.16-x86_64.portable.tar.gz"
+      "path": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.17-x86_64.portable.tar.gz",
+      "sha256": "301474a54aa67ee71d1ba85dcde8c2a409e29b7307e207f90d2943a178f46339",
+      "size_bytes": 446318,
+      "built_version_tag": "StrawWU-Core-0.7.1.17-x86_64.portable.tar.gz"
     }
   ],
   "sha256sums": "tests/portable/output/SHA256SUMS",
   "notes": [
     "Portable Core redistribution artifacts for GitHub Releases.",
-    "Click-to-open: strawwu integrate + open .exe/.msi",
-    "Not a full Windows compatibility claim."
+    "Default PE backend=wine (real execution); install.sh installs Wine when possible.",
+    "Click-to-open: strawwu integrate + double-click .exe/.msi",
+    "Not a full Windows OS claim; anti-cheat may fail."
   ]
 }

@@ -3,8 +3,10 @@
 Track **A+3**：在通用 Linux（deb／rpm／Arch 等）以最少系統依賴執行
 StrawWU **Win 相容核心**（runtime／nt／launcher／graphics·audio／Hub／CLI）。
 
-> **誠實邊界**：本指南**不宣稱**完整 Windows 應用相容；不使用 Wine／Proton 當底層；
-> 不引入 `WinBox`／`winbox` 命名。Flatpak 對 PE／SubsystemSession 為 **PARTIAL**。
+> **誠實邊界**：預設以 **Wine** 真實執行 `.exe`／`.msi`（可點擊安裝與啟動）。
+> 不保證所有 Windows 軟體都可跑；反作弊／核心驅動可能失敗。
+> Flatpak 對 PE／SubsystemSession 為 **PARTIAL**。不是 ISO／桌面發行版。
+> `--backend native` 僅供自研 strawwu-nt 模擬測試，不能當真實執行。
 
 ## 選擇哪一種包裝
 

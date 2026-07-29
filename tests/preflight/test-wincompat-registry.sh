@@ -93,7 +93,7 @@ export STRAWWU_APP_REGISTRY_LOG="${tmp_dir}/app-registry.log"
 demo_exe="${tmp_dir}/games/demo-app.exe"
 mkdir -p "$(dirname "${demo_exe}")"
 
-if "${STRAWWU_BIN}" run "${demo_exe}" | grep -q 'app_id=demo-app'; then
+if "${STRAWWU_BIN}" run "${demo_exe}" --backend native | grep -q 'app_id=demo-app'; then
     pass "strawwu run registers app_id"
 else
     fail "strawwu run missing app_id in output"

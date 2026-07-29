@@ -4,9 +4,8 @@
 - **A（核心範圍）**：Win 相容核心 — `strawwu-runtime` / `strawwu-nt` / `strawwu-launcher` / graphics·audio bridge / Hub / CLI  
 - **3（發行形態）**：真正跨發行版 — 優先 **自含 prefix + AppImage**；Flatpak 次之（誠實標 PARTIAL 若需 host 權限）  
 - **排除**：桌面策展、Plymouth、Calamares、自訂 kernel、initrd、ISO、drivers meta  
-- **禁止**：Wine/Proton 當底層、`WinBox`/`winbox` 命名、per-app sandbox 預設、宣稱完整 Windows 相容  
-- **並行**：不取代 StrawWU ISO／`post-hw-t1-live-usb`；獨立 worktree `StrawWU-portable` / branch `portable-core-a3`
-
+- **執行**：預設 Wine 真實跑 `.exe`／`.msi`；禁宣稱完整 Windows OS／反作弊通過；仍禁 `WinBox`／`winbox` 命名、per-app sandbox 預設
+- **並行**：不取代 StrawWU ISO／`post-hw-t1-live-usb`；獨立 repo `StrawWU-portable`
 ## 目標（最大可能）
 
 在通用 Linux（deb／rpm／Arch 等）上，以**最少系統依賴**安裝並執行 StrawWU Win 相容核心：
