@@ -6,11 +6,11 @@
   "track": "game-compat",
   "backend": "native",
   "execution_backend": "native",
-  "generated_at": "2026-07-29T09:57:21Z",
+  "generated_at": "2026-07-29T09:57:32Z",
   "git": {
     "branch": "main",
-    "head": "e6447d71cc1af610f892ac16cc03b3ee1f7ae231",
-    "origin_main": "e6447d71cc1af610f892ac16cc03b3ee1f7ae231",
+    "head": "5c0f8977cdf92b2998860f7530e79b01a2da8848",
+    "origin_main": "5c0f8977cdf92b2998860f7530e79b01a2da8848",
     "merged_to_main": true,
     "skip_merge_check": false
   },
