@@ -13,6 +13,7 @@
 |------|------|------------------------|
 | [install-guide.md](install-guide.md) | Live USB、試用、安裝、首次設定（firstboot） | [html/install-guide.html](html/install-guide.html) |
 | [rescue-guide.md](rescue-guide.md) | Live 救援、狀態修復、安裝失敗排除 | [html/rescue-guide.html](html/rescue-guide.html) |
+| [portable-guide.md](portable-guide.md) | Portable Core（跨發行版可攜核心，非 ISO） | 見 `docs/plans/portable-core/` |
 
 ## 完整手冊（W8-DOC）
 

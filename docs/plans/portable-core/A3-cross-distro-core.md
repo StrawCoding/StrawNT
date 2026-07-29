@@ -31,7 +31,9 @@
 | 2 | `pc2-appimage` | 產出可執行 AppImage（或等價 bundle）；SHA256；乾淨容器煙測 PASS |
 | 3 | `pc3-flatpak` | Flatpak manifest + build；煙測結果 JSON（允許誠實 PARTIAL）；文件說明權限需求 |
 | 4 | `pc4-cross-distro-smoke` | ≥3 發行版容器矩陣煙測報告 JSON 頂層 `status=PASS`（核心 CLI／runtime 啟動） |
-| 5 | `pc5-closeout` | 文件、產物、SHA256、version bump、merge/push `main`、HTML 交付證據 |
+| 5 | `pc5-closeout` | 文件、產物、SHA256、version bump、merge/push `main`、HTML 交付證據（`tests/portable/output/closeout.json`） |
+
+Closeout 產物：`USER-GUIDE.md`、`artifacts.json`、`closeout-report.md` + HTML、`tests/portable/closeout.sh`。
 
 ## 驗收權威
 

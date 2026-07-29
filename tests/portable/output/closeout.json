@@ -1,0 +1,79 @@
+{
+  "schema": "strawwu-portable-closeout/v1",
+  "stage": "pc5-closeout",
+  "status": "PASS",
+  "version": "0.7.1.13",
+  "track": "A+3",
+  "generated_at": "2026-07-29T04:02:28Z",
+  "git": {
+    "branch": "portable-core-a3",
+    "head": "e5b49238986c6ec15b77752bc74810157b344c21",
+    "origin_main": "610b130e117ae8e0bf654a0ec6af3f4d47d48caa",
+    "merged_to_main": false,
+    "skip_merge_check": true
+  },
+  "stages": {
+    "pc0-portable-scaffold": {
+      "status": "PASS",
+      "evidence": [
+        "docs/plans/portable-core/A3-cross-distro-core.md",
+        "docs/plans/portable-core/inventory.json",
+        "components/packaging/portable/README.md"
+      ]
+    },
+    "pc1-self-contained-prefix": {
+      "status": "PASS",
+      "evidence": [
+        "tests/portable/output/smoke-prefix.json"
+      ]
+    },
+    "pc2-appimage": {
+      "status": "PASS",
+      "evidence": [
+        "tests/portable/output/smoke-appimage.json",
+        "tests/portable/output/SHA256SUMS"
+      ]
+    },
+    "pc3-flatpak": {
+      "status": "PARTIAL",
+      "evidence": [
+        "tests/portable/output/smoke-flatpak.json",
+        "components/packaging/portable/flatpak/org.strawwu.Core.yaml"
+      ]
+    },
+    "pc4-cross-distro-smoke": {
+      "status": "PASS",
+      "evidence": [
+        "tests/portable/output/matrix.json"
+      ]
+    },
+    "pc5-closeout": {
+      "status": "PASS",
+      "evidence": [
+        "tests/portable/output/closeout.json",
+        "docs/plans/portable-core"
+      ]
+    }
+  },
+  "docs": {
+    "user_guide": "docs/plans/portable-core/USER-GUIDE.md",
+    "user_facing": "docs/user/portable-guide.md",
+    "closeout_report": "docs/plans/portable-core/closeout-report.md",
+    "html": "docs/plans/portable-core/html/portable-closeout-report.html",
+    "kickoff": "docs/plans/kickoff/PC5-closeout.md",
+    "artifacts_index": "docs/plans/portable-core/artifacts.json"
+  },
+  "artifacts": {
+    "index": "docs/plans/portable-core/artifacts.json",
+    "sha256sums": "tests/portable/output/SHA256SUMS",
+    "sha256_present": true
+  },
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
+    "no Wine/Proton substrate",
+    "no WinBox naming",
+    "no full Windows compatibility claim",
+    "Flatpak PARTIAL kept honest (not rewritten as PASS)",
+    "ISO/T1 main worktree not modified"
+  ]
+}

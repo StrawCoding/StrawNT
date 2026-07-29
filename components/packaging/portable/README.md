@@ -57,12 +57,19 @@ jq .status tests/portable/output/smoke-flatpak.json
 make test-portable-matrix                      # ≥3 distro containers → matrix.json
 jq .status tests/portable/output/matrix.json
 jq '.distros | length' tests/portable/output/matrix.json
+
+make test-portable-closeout                    # docs + artifacts + SHA256 + merge → closeout.json
+jq .status tests/portable/output/closeout.json
 ```
+
+User guide: `docs/plans/portable-core/USER-GUIDE.md`  
+Artifact index: `docs/plans/portable-core/artifacts.json`
 
 Full prefix `--version` / `status` without system `strawwu-*` debs is **pc1**.  
 AppImage／portable bundle + SHA256 + clean-container smoke is **pc2**.  
 Flatpak manifest + build；PE／session 需 host FS → 誠實 **PARTIAL** 是 **pc3**.  
-Cross-distro container matrix（Ubuntu LTS／Fedora／Arch；禁 ISO 實機）是 **pc4**.
+Cross-distro container matrix（Ubuntu LTS／Fedora／Arch；禁 ISO 實機）是 **pc4**.  
+Closeout（文件／索引／SHA256／merge main／`closeout.json`）是 **pc5**.
 
 ## Explicit non-goals
 
