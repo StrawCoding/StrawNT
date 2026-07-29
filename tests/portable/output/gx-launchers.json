@@ -1,0 +1,132 @@
+{
+  "schema": "strawwu-portable-gx-launchers/v1",
+  "stage": "gx3-launcher-smoke",
+  "status": "PARTIAL",
+  "version": "0.7.1.30",
+  "backend": "native",
+  "execution_backend": "native",
+  "generated_at": "2026-07-29T09:21:43Z",
+  "source_manifest": {
+    "path": "components/tests/wincompat/golden-apps.json",
+    "version": "0.7.0.8",
+    "source": "golden_apps launcher_only manifest"
+  },
+  "claims": {
+    "wine_proton_used": false,
+    "native_pe_backend": true,
+    "anti_cheat_claimed": false,
+    "aaa_claimed": false
+  },
+  "launchers": [
+    {
+      "id": "steam-launcher",
+      "name": "Steam Client",
+      "kind": "golden_launcher_only",
+      "scope": "launcher_only",
+      "backend": "native",
+      "status": "PARTIAL",
+      "grade": "B",
+      "launch_verified": true,
+      "probe_pass": 6,
+      "probe_total": 6,
+      "probe_ratio": 1.0,
+      "notes": "啟動與登入 UI；不驗遊戲執行",
+      "disclaimer": "PARTIAL only — simulated launch probes; no real Office/Steam/Epic/三角洲 binaries"
+    },
+    {
+      "id": "epic-launcher",
+      "name": "Epic Games Launcher",
+      "kind": "golden_launcher_only",
+      "scope": "launcher_only",
+      "backend": "native",
+      "status": "PARTIAL",
+      "grade": "B",
+      "launch_verified": true,
+      "probe_pass": 6,
+      "probe_total": 6,
+      "probe_ratio": 1.0,
+      "notes": "啟動與登入 UI；不驗遊戲執行",
+      "disclaimer": "PARTIAL only — simulated launch probes; no real Office/Steam/Epic/三角洲 binaries"
+    },
+    {
+      "id": "delta-force-launcher",
+      "name": "三角洲行動啟動器",
+      "kind": "golden_launcher_only",
+      "scope": "launcher_only",
+      "backend": "native",
+      "status": "PARTIAL",
+      "grade": "B",
+      "launch_verified": true,
+      "probe_pass": 6,
+      "probe_total": 6,
+      "probe_ratio": 1.0,
+      "notes": "僅啟動器；不驗遊戲本體與反作弊連線",
+      "disclaimer": "PARTIAL only — simulated launch probes; no real Office/Steam/Epic/三角洲 binaries"
+    }
+  ],
+  "results": [
+    {
+      "id": "steam-launcher",
+      "name": "Steam Client",
+      "kind": "golden_launcher_only",
+      "scope": "launcher_only",
+      "backend": "native",
+      "status": "PARTIAL",
+      "grade": "B",
+      "launch_verified": true,
+      "probe_pass": 6,
+      "probe_total": 6,
+      "probe_ratio": 1.0,
+      "notes": "啟動與登入 UI；不驗遊戲執行",
+      "disclaimer": "PARTIAL only — simulated launch probes; no real Office/Steam/Epic/三角洲 binaries"
+    },
+    {
+      "id": "epic-launcher",
+      "name": "Epic Games Launcher",
+      "kind": "golden_launcher_only",
+      "scope": "launcher_only",
+      "backend": "native",
+      "status": "PARTIAL",
+      "grade": "B",
+      "launch_verified": true,
+      "probe_pass": 6,
+      "probe_total": 6,
+      "probe_ratio": 1.0,
+      "notes": "啟動與登入 UI；不驗遊戲執行",
+      "disclaimer": "PARTIAL only — simulated launch probes; no real Office/Steam/Epic/三角洲 binaries"
+    },
+    {
+      "id": "delta-force-launcher",
+      "name": "三角洲行動啟動器",
+      "kind": "golden_launcher_only",
+      "scope": "launcher_only",
+      "backend": "native",
+      "status": "PARTIAL",
+      "grade": "B",
+      "launch_verified": true,
+      "probe_pass": 6,
+      "probe_total": 6,
+      "probe_ratio": 1.0,
+      "notes": "僅啟動器；不驗遊戲本體與反作弊連線",
+      "disclaimer": "PARTIAL only — simulated launch probes; no real Office/Steam/Epic/三角洲 binaries"
+    }
+  ],
+  "summary": {
+    "total_launchers": 3,
+    "launch_verified": 3,
+    "native_backend_only": true
+  },
+  "known_limitations": [
+    "launcher_only probe evidence; no real Steam/Epic/Delta binaries",
+    "no anti-cheat ranked verification",
+    "no 3A compatibility claim"
+  ],
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
+    "no Wine/Proton substrate; execution_backend=native",
+    "no WinBox naming",
+    "no full Windows compatibility claim",
+    "no anti-cheat ranked pass claim",
+    "no 3A completion claim"
+  ]
+}
