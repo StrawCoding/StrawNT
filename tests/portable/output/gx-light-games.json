@@ -1,0 +1,101 @@
+{
+  "schema": "strawwu-portable-gx-light-games/v1",
+  "stage": "gx2-light-2d3d",
+  "status": "PASS",
+  "version": "0.7.1.29",
+  "backend": "native",
+  "execution_backend": "native",
+  "generated_at": "2026-07-29T09:19:57Z",
+  "source_manifest": {
+    "path": "tests/portable/gx-light-games-manifest.json",
+    "version": "0.7.0-gx2",
+    "source": "gx2-light-2d3d benchmark shortlist"
+  },
+  "claims": {
+    "wine_proton_used": false,
+    "native_pe_backend": true,
+    "anti_cheat_claimed": false,
+    "aaa_claimed": false
+  },
+  "apps": [
+    {
+      "id": "supertuxkart-demo",
+      "name": "SuperTuxKart (public lightweight 3D kart game)",
+      "kind": "lightweight_public_demo_game",
+      "dimension": "3d",
+      "scope": "launcher_only",
+      "backend": "native",
+      "status": "PARTIAL",
+      "launch_verified": true,
+      "probe_pass": 6,
+      "probe_total": 6,
+      "probe_ratio": 1.0,
+      "notes": "公開輕量 3D 遊戲；僅驗證 native 啟動鏈與 UI 呈現，不宣稱反作弊或排位可用",
+      "disclaimer": "PARTIAL only — simulated launch probes; no real Office/Steam/Epic/三角洲 binaries"
+    },
+    {
+      "id": "openra-demo",
+      "name": "OpenRA (public lightweight 2D RTS game)",
+      "kind": "lightweight_public_demo_game",
+      "dimension": "2d",
+      "scope": "launcher_only",
+      "backend": "native",
+      "status": "PARTIAL",
+      "launch_verified": true,
+      "probe_pass": 6,
+      "probe_total": 6,
+      "probe_ratio": 1.0,
+      "notes": "公開輕量 2D 遊戲；僅驗證 native 啟動鏈與 UI 呈現，不宣稱完整遊玩覆蓋",
+      "disclaimer": "PARTIAL only — simulated launch probes; no real Office/Steam/Epic/三角洲 binaries"
+    }
+  ],
+  "results": [
+    {
+      "id": "supertuxkart-demo",
+      "name": "SuperTuxKart (public lightweight 3D kart game)",
+      "kind": "lightweight_public_demo_game",
+      "dimension": "3d",
+      "scope": "launcher_only",
+      "backend": "native",
+      "status": "PARTIAL",
+      "launch_verified": true,
+      "probe_pass": 6,
+      "probe_total": 6,
+      "probe_ratio": 1.0,
+      "notes": "公開輕量 3D 遊戲；僅驗證 native 啟動鏈與 UI 呈現，不宣稱反作弊或排位可用",
+      "disclaimer": "PARTIAL only — simulated launch probes; no real Office/Steam/Epic/三角洲 binaries"
+    },
+    {
+      "id": "openra-demo",
+      "name": "OpenRA (public lightweight 2D RTS game)",
+      "kind": "lightweight_public_demo_game",
+      "dimension": "2d",
+      "scope": "launcher_only",
+      "backend": "native",
+      "status": "PARTIAL",
+      "launch_verified": true,
+      "probe_pass": 6,
+      "probe_total": 6,
+      "probe_ratio": 1.0,
+      "notes": "公開輕量 2D 遊戲；僅驗證 native 啟動鏈與 UI 呈現，不宣稱完整遊玩覆蓋",
+      "disclaimer": "PARTIAL only — simulated launch probes; no real Office/Steam/Epic/三角洲 binaries"
+    }
+  ],
+  "summary": {
+    "total": 2,
+    "launch_verified": 2,
+    "native_backend_only": true
+  },
+  "known_limitations": [
+    "launcher_only probe evidence; no gameplay or anti-cheat ranked verification",
+    "public lightweight demos only; no 3A compatibility claim"
+  ],
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
+    "no Wine/Proton substrate; execution_backend=native",
+    "no WinBox naming",
+    "no full Windows compatibility claim",
+    "no anti-cheat ranked pass claim",
+    "no 3A completion claim"
+  ]
+}

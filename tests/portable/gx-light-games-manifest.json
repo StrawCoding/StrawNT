@@ -1,0 +1,23 @@
+{
+  "version": "0.7.0-gx2",
+  "locked_at": "2026-07-29",
+  "source": "gx2-light-2d3d benchmark shortlist",
+  "apps": [
+    {
+      "id": "supertuxkart-demo",
+      "name": "SuperTuxKart (public lightweight 3D kart game)",
+      "priority": "P0",
+      "scope": "launcher_only",
+      "backend_default": "native",
+      "notes": "公開輕量 3D 遊戲；僅驗證 native 啟動鏈與 UI 呈現，不宣稱反作弊或排位可用"
+    },
+    {
+      "id": "openra-demo",
+      "name": "OpenRA (public lightweight 2D RTS game)",
+      "priority": "P0",
+      "scope": "launcher_only",
+      "backend_default": "native",
+      "notes": "公開輕量 2D 遊戲；僅驗證 native 啟動鏈與 UI 呈現，不宣稱完整遊玩覆蓋"
+    }
+  ]
+}

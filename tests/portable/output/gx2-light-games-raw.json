@@ -1,0 +1,123 @@
+{
+  "schema": "strawwu-golden-apps-launch/v1",
+  "project_version": "0.7.1.29",
+  "generated_at": "2026-07-29T09:19:57Z",
+  "manifest_version": "0.7.0-gx2",
+  "cases": [
+    {
+      "id": "supertuxkart-demo",
+      "name": "SuperTuxKart (public lightweight 3D kart game)",
+      "scope": "launcher_only",
+      "backend": "native",
+      "status": "PARTIAL",
+      "grade": "B",
+      "launch_verified": true,
+      "notes": "公開輕量 3D 遊戲；僅驗證 native 啟動鏈與 UI 呈現，不宣稱反作弊或排位可用",
+      "evidence": {
+        "verified_at": "2026-07-29T09:19:57Z",
+        "verification_method": "LaunchProbeEngine (cargo test + in-process simulation)",
+        "verification_stage": "post-q8-golden-apps",
+        "probe_pass": 6,
+        "probe_total": 6,
+        "probes": [
+          {
+            "probe_name": "profile_validate",
+            "category": "profile",
+            "passed": true,
+            "response": "AppProfile valid backend=native"
+          },
+          {
+            "probe_name": "pe_execute",
+            "category": "runtime",
+            "passed": true,
+            "response": "state=Running pid=1000 session=default"
+          },
+          {
+            "probe_name": "gui_smoke",
+            "category": "gui",
+            "passed": true,
+            "response": "hwnd=65536 compositor=mutter frames=1"
+          },
+          {
+            "probe_name": "cooperation_group",
+            "category": "launcher",
+            "passed": true,
+            "response": "group=supertuxkart-demo-bundle pid=1000 members=[1000]"
+          },
+          {
+            "probe_name": "ipc_pipe",
+            "category": "launcher",
+            "passed": true,
+            "response": "pipe=\\\\.\\pipe\\supertuxkart-demo-launcher created=true connected=true"
+          },
+          {
+            "probe_name": "launcher_window",
+            "category": "launcher",
+            "passed": true,
+            "response": "class=supertuxkartdemoLauncherWnd title=SuperTuxKart (public lightweight 3D kart game) — Login visible=true"
+          }
+        ],
+        "cargo_crate": "strawwu-runtime",
+        "honest_disclaimer": "PARTIAL only — simulated launch probes; no real Office/Steam/Epic/三角洲 binaries"
+      }
+    },
+    {
+      "id": "openra-demo",
+      "name": "OpenRA (public lightweight 2D RTS game)",
+      "scope": "launcher_only",
+      "backend": "native",
+      "status": "PARTIAL",
+      "grade": "B",
+      "launch_verified": true,
+      "notes": "公開輕量 2D 遊戲；僅驗證 native 啟動鏈與 UI 呈現，不宣稱完整遊玩覆蓋",
+      "evidence": {
+        "verified_at": "2026-07-29T09:19:57Z",
+        "verification_method": "LaunchProbeEngine (cargo test + in-process simulation)",
+        "verification_stage": "post-q8-golden-apps",
+        "probe_pass": 6,
+        "probe_total": 6,
+        "probes": [
+          {
+            "probe_name": "profile_validate",
+            "category": "profile",
+            "passed": true,
+            "response": "AppProfile valid backend=native"
+          },
+          {
+            "probe_name": "pe_execute",
+            "category": "runtime",
+            "passed": true,
+            "response": "state=Running pid=1000 session=default"
+          },
+          {
+            "probe_name": "gui_smoke",
+            "category": "gui",
+            "passed": true,
+            "response": "hwnd=65536 compositor=mutter frames=1"
+          },
+          {
+            "probe_name": "cooperation_group",
+            "category": "launcher",
+            "passed": true,
+            "response": "group=openra-demo-bundle pid=1000 members=[1000]"
+          },
+          {
+            "probe_name": "ipc_pipe",
+            "category": "launcher",
+            "passed": true,
+            "response": "pipe=\\\\.\\pipe\\openra-demo-launcher created=true connected=true"
+          },
+          {
+            "probe_name": "launcher_window",
+            "category": "launcher",
+            "passed": true,
+            "response": "class=openrademoLauncherWnd title=OpenRA (public lightweight 2D RTS game) — Login visible=true"
+          }
+        ],
+        "cargo_crate": "strawwu-runtime",
+        "honest_disclaimer": "PARTIAL only — simulated launch probes; no real Office/Steam/Epic/三角洲 binaries"
+      }
+    }
+  ],
+  "overall": "PARTIAL"
+}
