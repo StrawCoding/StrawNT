@@ -1,31 +1,32 @@
 {
-  "schema": "strawwu-portable-artifacts/v1",
-  "version": "0.7.1.32",
-  "generated_at": "2026-07-29T09:55:00Z",
+  "schema": "strawnt-artifacts/v1",
+  "product": "StrawNT",
+  "version": "0.7.1.38",
+  "generated_at": "2026-07-29T15:12:00Z",
   "artifacts": [
     {
-      "name": "StrawWU-Core-0.7.1.32-x86_64.AppImage",
+      "name": "StrawNT-0.7.1.38-x86_64.AppImage",
       "kind": "AppImage",
-      "path": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.32-x86_64.AppImage",
-      "sha256": "d5c578ac58179fd64fc668497a137e2330887cd5d889ca4e68ddc8455cc1bab8",
-      "size_bytes": 1403384,
-      "built_version_tag": "StrawWU-Core-0.7.1.32-x86_64.AppImage"
+      "path": "components/packaging/portable/appimage/dist/StrawNT-0.7.1.38-x86_64.AppImage",
+      "sha256": "c6675bd300c9320970d070cbba73f82ab09ea0f94232772fcdd279484bf5c94b",
+      "size_bytes": 1866232,
+      "built_version_tag": "StrawNT-0.7.1.38-x86_64.AppImage"
     },
     {
-      "name": "StrawWU-Core-0.7.1.32-x86_64.portable.tar.gz",
+      "name": "StrawNT-0.7.1.38-x86_64.portable.tar.gz",
       "kind": "portable.tar.gz",
-      "path": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.32-x86_64.portable.tar.gz",
-      "sha256": "7890357ad0c2435bf47b126cf02b0403bb8bffbfbc20ead8a619e96d6266d962",
-      "size_bytes": 499157,
-      "built_version_tag": "StrawWU-Core-0.7.1.32-x86_64.portable.tar.gz"
+      "path": "components/packaging/portable/appimage/dist/StrawNT-0.7.1.38-x86_64.portable.tar.gz",
+      "sha256": "3a83305fcde2efb642ef529b3cfa2547fbf29a5d772b0e3f823acd474bd80bf6",
+      "size_bytes": 995093,
+      "built_version_tag": "StrawNT-0.7.1.38-x86_64.portable.tar.gz"
     }
   ],
   "sha256sums": "tests/portable/output/SHA256SUMS",
   "notes": [
-    "Portable Core redistribution artifacts for GitHub Releases (gx5-closeout / game-compat).",
-    "Default PE backend=native (strawwu-nt); Wine/Proton removed from product path.",
-    "Game Compat: gx0 graphics VK/GL, gx1 audio/input, gx2 light games, gx3 launchers PARTIAL (launch-only), gx4 anticheat PARTIAL (probe matrix; no ranked play claim).",
-    "pe6 golden smoke remains honest PARTIAL for public 7za/BusyBox.",
+    "StrawNT redistribution artifacts for GitHub Releases (nt5-youwan-closeout).",
+    "Default PE backend=native (strawnt-native); Wine/Proton not used as substrate.",
+    "Youwan: nt1 real graphics, nt2 real light games, nt3 launchers PARTIAL (launch-only), nt4 anticheat PARTIAL (probe matrix; no ranked play claim).",
+    "Product is independent of StrawWU OS/ISO/desktop/kernel.",
     "Not a full Windows OS claim; anti-cheat may fail; no 3A complete claim."
   ]
 }

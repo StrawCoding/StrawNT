@@ -2,9 +2,9 @@
   "schema": "strawwu-portable-cross-distro-matrix/v1",
   "stage": "pc4-cross-distro-smoke",
   "status": "PASS",
-  "version": "0.7.1.32",
-  "dist": "/mnt/data/code/project/StrawCoding/StrawWU-portable/components/packaging/portable/appimage/dist",
-  "generated_at": "2026-07-29T09:56:00Z",
+  "version": "0.7.1.38",
+  "dist": "/mnt/data/code/project/StrawCoding/StrawNT/components/packaging/portable/appimage/dist",
+  "generated_at": "2026-07-29T15:13:56Z",
   "distros": [
     {
       "id": "ubuntu-24.04",
@@ -32,10 +32,10 @@
       "family": "debian",
       "status": "PASS",
       "artifact_kind": "portable.tar.gz",
-      "version_output": "strawwu 0.7.1-preview.32",
-      "status_output": "strawwu: status — runtime idle, 0 session(s), 0 app(s) registered",
+      "version_output": "strawnt 0.7.1-preview.38",
+      "status_output": "strawnt: status — runtime idle, 0 session(s), 0 app(s) registered",
       "detail": "ok",
-      "checked_at": "2026-07-29T09:55:57Z"
+      "checked_at": "2026-07-29T15:13:51Z"
     },
     {
       "id": "fedora-41",
@@ -43,10 +43,10 @@
       "family": "rpm",
       "status": "PASS",
       "artifact_kind": "portable.tar.gz",
-      "version_output": "strawwu 0.7.1-preview.32",
-      "status_output": "strawwu: status — runtime idle, 0 session(s), 0 app(s) registered",
+      "version_output": "strawnt 0.7.1-preview.38",
+      "status_output": "strawnt: status — runtime idle, 0 session(s), 0 app(s) registered",
       "detail": "ok",
-      "checked_at": "2026-07-29T09:55:59Z"
+      "checked_at": "2026-07-29T15:13:54Z"
     },
     {
       "id": "archlinux",
@@ -54,10 +54,10 @@
       "family": "arch",
       "status": "PASS",
       "artifact_kind": "portable.tar.gz",
-      "version_output": "strawwu 0.7.1-preview.32",
-      "status_output": "strawwu: status — runtime idle, 0 session(s), 0 app(s) registered",
+      "version_output": "strawnt 0.7.1-preview.38",
+      "status_output": "strawnt: status — runtime idle, 0 session(s), 0 app(s) registered",
       "detail": "ok",
-      "checked_at": "2026-07-29T09:56:00Z"
+      "checked_at": "2026-07-29T15:13:56Z"
     }
   ],
   "summary": {

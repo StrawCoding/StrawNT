@@ -106,9 +106,16 @@ if [[ "${DRY_RUN}" -eq 1 ]]; then
     exit 0
 fi
 
-# Ensure artifacts exist.
+# Ensure artifacts exist. Prefer StrawNT-*; legacy StrawWU-Core-* as fallback.
+pick_newest() {
+    local pattern="$1"
+    compgen -G "${pattern}" 2>/dev/null | sort -V | tail -n1 || true
+}
+
 need_build=0
-if [[ ! -d "${DIST}" ]] || ! compgen -G "${DIST}/StrawWU-Core-*-x86_64.AppDir/AppRun" >/dev/null; then
+APPDIR="$(pick_newest "${DIST}/StrawNT-*-x86_64.AppDir")"
+[[ -n "${APPDIR}" ]] || APPDIR="$(pick_newest "${DIST}/StrawWU-Core-*-x86_64.AppDir")"
+if [[ -z "${APPDIR}" || ! -x "${APPDIR}/AppRun" ]]; then
     need_build=1
 fi
 if [[ ! -f "${SUMS}" ]]; then
@@ -118,7 +125,9 @@ fi
 if [[ "${need_build}" -eq 1 ]]; then
     if [[ "${BUILD_IF_MISSING}" -eq 1 ]]; then
         log "artifacts missing — invoking build-appimage.sh"
-        STRAWWU_APPIMAGE_OUT="${DIST}" \
+        STRAWNT_APPIMAGE_OUT="${DIST}" \
+            STRAWWU_APPIMAGE_OUT="${DIST}" \
+            STRAWNT_PORTABLE_SHA256SUMS="${SUMS}" \
             STRAWWU_PORTABLE_SHA256SUMS="${SUMS}" \
             bash "${PORTABLE_ROOT}/build-appimage.sh" \
             || fail_json "build-appimage.sh failed"
@@ -129,10 +138,13 @@ fi
 
 [[ -f "${SUMS}" ]] || fail_json "missing ${SUMS}"
 
-# Locate primary artifacts.
-PORTABLE_TGZ="$(compgen -G "${DIST}/StrawWU-Core-*-x86_64.portable.tar.gz" | head -n1 || true)"
-APPIMAGE="$(compgen -G "${DIST}/StrawWU-Core-*-x86_64.AppImage" | head -n1 || true)"
-APPDIR="$(compgen -G "${DIST}/StrawWU-Core-*-x86_64.AppDir" | head -n1 || true)"
+# Locate primary artifacts (newest StrawNT preferred).
+PORTABLE_TGZ="$(pick_newest "${DIST}/StrawNT-*-x86_64.portable.tar.gz")"
+[[ -n "${PORTABLE_TGZ}" ]] || PORTABLE_TGZ="$(pick_newest "${DIST}/StrawWU-Core-*-x86_64.portable.tar.gz")"
+APPIMAGE="$(pick_newest "${DIST}/StrawNT-*-x86_64.AppImage")"
+[[ -n "${APPIMAGE}" ]] || APPIMAGE="$(pick_newest "${DIST}/StrawWU-Core-*-x86_64.AppImage")"
+APPDIR="$(pick_newest "${DIST}/StrawNT-*-x86_64.AppDir")"
+[[ -n "${APPDIR}" ]] || APPDIR="$(pick_newest "${DIST}/StrawWU-Core-*-x86_64.AppDir")"
 
 [[ -n "${PORTABLE_TGZ}" || -n "${APPIMAGE}" || -n "${APPDIR}" ]] \
     || fail_json "no AppImage / portable.tar.gz / AppDir found in ${DIST}"

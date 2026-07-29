@@ -1,0 +1,115 @@
+{
+  "schema": "strawnt-nt5-youwan-closeout/v1",
+  "stage": "nt5-youwan-closeout",
+  "product": "StrawNT",
+  "name": "StrawNT",
+  "status": "PASS",
+  "version": "0.7.1.38",
+  "track": "youwan",
+  "backend": "native",
+  "execution_backend": "native",
+  "cli": "strawnt",
+  "github": "StrawCoding/StrawNT",
+  "generated_at": "2026-07-29T15:14:24Z",
+  "git": {
+    "branch": "main",
+    "head": "68566cbeb3e62b89001ba1568fa6ab6aa3766645",
+    "origin_main": "68566cbeb3e62b89001ba1568fa6ab6aa3766645",
+    "merged_to_main": true,
+    "skip_merge_check": true
+  },
+  "stages": {
+    "nt0-rebrand-disconnect": {
+      "status": "PASS",
+      "evidence": [
+        "tests/strawnt/output/nt0-rebrand.json"
+      ],
+      "acceptable": true
+    },
+    "nt1-real-graphics": {
+      "status": "PASS",
+      "evidence": [
+        "tests/strawnt/output/nt1-graphics.json"
+      ],
+      "acceptable": true
+    },
+    "nt2-real-light-games": {
+      "status": "PASS",
+      "evidence": [
+        "tests/strawnt/output/nt2-light-games.json"
+      ],
+      "acceptable": true
+    },
+    "nt3-real-launchers": {
+      "status": "PARTIAL",
+      "evidence": [
+        "tests/strawnt/output/nt3-launchers.json"
+      ],
+      "acceptable": true
+    },
+    "nt4-anticheat-honest": {
+      "status": "PARTIAL",
+      "evidence": [
+        "tests/strawnt/output/nt4-anticheat.json"
+      ],
+      "acceptable": true
+    },
+    "pc4-cross-distro-smoke": {
+      "status": "PASS",
+      "evidence": [
+        "tests/portable/output/matrix.json"
+      ],
+      "acceptable": true
+    },
+    "nt5-youwan-closeout": {
+      "status": "PASS",
+      "evidence": [
+        "tests/strawnt/output/nt5-closeout.json",
+        "docs/plans/portable-core"
+      ],
+      "acceptable": true
+    }
+  },
+  "docs": {
+    "user_guide": "docs/plans/portable-core/USER-GUIDE.md",
+    "user_facing": "docs/user/portable-guide.md",
+    "closeout_report": "docs/plans/portable-core/nt5-closeout-report.md",
+    "html": "docs/plans/portable-core/html/nt5-closeout-report.html",
+    "kickoff": "docs/plans/kickoff/NT5-youwan-closeout.md",
+    "stage_report": "docs/plans/stage-reports/NT5-youwan-closeout-report.md",
+    "artifacts_index": "docs/plans/portable-core/artifacts.json",
+    "readme": "README.md"
+  },
+  "artifacts": {
+    "index": "docs/plans/portable-core/artifacts.json",
+    "sha256sums": "tests/portable/output/SHA256SUMS",
+    "sha256_present": true,
+    "appimage": "components/packaging/portable/appimage/dist/StrawNT-0.7.1.38-x86_64.AppImage",
+    "portable_tar_gz": "components/packaging/portable/appimage/dist/StrawNT-0.7.1.38-x86_64.portable.tar.gz",
+    "appimage_present": true,
+    "portable_tar_gz_present": true
+  },
+  "honesty": {
+    "nt0_rebrand": "PASS",
+    "nt1_graphics": "PASS",
+    "nt2_light_games": "PASS",
+    "nt3_launchers": "PARTIAL",
+    "nt4_anticheat": "PARTIAL",
+    "cross_distro_matrix": "PASS",
+    "full_windows_claim": false,
+    "anti_cheat_ranked_claim": false,
+    "aaa_complete_claim": false,
+    "wine_substrate": false,
+    "forbidden_claim_hits": []
+  },
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop / StrawWU OS changes",
+    "no Wine/Proton substrate; execution_backend=native",
+    "no WinBox naming",
+    "no full Windows compatibility claim",
+    "no anti-cheat ranked / 排位通過 claim",
+    "nt3 launchers PARTIAL kept honest (launcher-only; not full game play)",
+    "nt4 anticheat PARTIAL kept honest (probe matrix; not ranked pass)",
+    "cross-distro matrix via smoke-matrix.sh (containers; not Live USB ISO)"
+  ]
+}

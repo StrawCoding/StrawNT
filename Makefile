@@ -7,7 +7,7 @@
 	portable-prefix test-portable-prefix portable-appimage test-portable-appimage \
 	portable-flatpak test-portable-flatpak test-portable-matrix test-portable-closeout \
 	test-portable-pe-closeout test-portable-gx-graphics test-portable-gx-audio-input \
-	test-portable-gx-closeout test-strawnt-nt1-graphics
+	test-portable-gx-closeout test-strawnt-nt1-graphics test-strawnt-nt5-closeout
 
 REPO_ROOT := $(abspath .)
 SCRIPTS   := os-image/scripts
@@ -144,6 +144,7 @@ help:
 	@echo "  test-portable-gx-graphics     DXGI/D3D11→VK + wgl present → gx-graphics.json (gx0)"
 	@echo "  test-portable-gx-audio-input  WASAPI→PipeWire/equiv + XInput → gx-audio-input.json (gx1)"
 	@echo "  test-portable-gx-closeout     Game Compat closeout → gx-closeout.json (gx5)"
+	@echo "  test-strawnt-nt5-closeout     StrawNT youwan closeout → nt5-closeout.json"
 
 preflight:
 	bash tests/preflight/test-ubuntu-clone.sh
@@ -704,6 +705,9 @@ test-portable-gx-anticheat:
 
 test-portable-gx-closeout:
 	bash tests/portable/gx-closeout.sh
+
+test-strawnt-nt5-closeout:
+	bash tests/strawnt/nt5-youwan-closeout.sh
 
 build-os-debs:
 	bash $(SCRIPTS)/build-os-debs.sh

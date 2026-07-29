@@ -83,9 +83,23 @@ jq .status tests/portable/output/matrix.json
 
 舊 `STRAWWU_*` 變數仍可讀作相容層，新部署請改用 `STRAWNT_*`。
 
+## 優玩軌道（nt0–nt5）摘要
+
+| 階段 | 證據 | 誠實狀態 |
+|------|------|----------|
+| nt0 更名 | `tests/strawnt/output/nt0-rebrand.json` | PASS |
+| nt1 圖形 | `nt1-graphics.json` | PASS（真實 present／triangle） |
+| nt2 輕量遊戲 | `nt2-light-games.json` | PASS（真實二進位） |
+| nt3 啟動器 | `nt3-launchers.json` | **PARTIAL**（僅驗啟動） |
+| nt4 反作弊 | `nt4-anticheat.json` | **PARTIAL**（探測矩陣；禁排位宣稱） |
+| nt5 closeout | `nt5-closeout.json` | 本輪 closeout |
+
+Closeout 報告：`docs/plans/portable-core/nt5-closeout-report.md`（HTML：`html/nt5-closeout-report.html`）。
+
 ## 誠實非目標
 
 - 不宣稱完整 Windows 應用相容／反作弊排位通過／官方 AC 簽章通過／3A 全開
+- 啟動器（nt3）僅驗啟動；**不**保證遊戲本體完整暢玩
 - 反作弊為探測矩陣（誠實 PARTIAL；grade A/B/C/F，Vanguard=F）；見 `tests/strawnt/output/nt4-anticheat.json`
 - 不使用 Wine／Proton 當底層
 - 不使用 `WinBox`／`winbox` 命名

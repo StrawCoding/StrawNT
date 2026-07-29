@@ -123,27 +123,39 @@ if [[ "${DRY_RUN}" -eq 1 ]]; then
 fi
 
 # Ensure portable artifacts exist (reuse pc2 builder).
+# Prefer StrawNT-* (current product); accept legacy StrawWU-Core-* only as fallback.
+pick_newest() {
+    local pattern="$1"
+    compgen -G "${pattern}" 2>/dev/null | sort -V | tail -n1 || true
+}
+
 need_build=0
-if [[ ! -d "${DIST}" ]] || ! compgen -G "${DIST}/StrawWU-Core-*-x86_64.portable.tar.gz" >/dev/null; then
-    if [[ ! -d "${DIST}" ]] || ! compgen -G "${DIST}/StrawWU-Core-*-x86_64.AppDir/AppRun" >/dev/null; then
-        need_build=1
-    fi
+PORTABLE_TGZ="$(pick_newest "${DIST}/StrawNT-*-x86_64.portable.tar.gz")"
+[[ -n "${PORTABLE_TGZ}" ]] || PORTABLE_TGZ="$(pick_newest "${DIST}/StrawWU-Core-*-x86_64.portable.tar.gz")"
+APPDIR="$(pick_newest "${DIST}/StrawNT-*-x86_64.AppDir")"
+[[ -n "${APPDIR}" ]] || APPDIR="$(pick_newest "${DIST}/StrawWU-Core-*-x86_64.AppDir")"
+
+if [[ -z "${PORTABLE_TGZ}" && ( -z "${APPDIR}" || ! -x "${APPDIR}/AppRun" ) ]]; then
+    need_build=1
 fi
 
 if [[ "${need_build}" -eq 1 ]]; then
     if [[ "${BUILD_IF_MISSING}" -eq 1 ]]; then
         log "artifacts missing — invoking build-appimage.sh"
-        STRAWWU_APPIMAGE_OUT="${DIST}" \
+        STRAWNT_APPIMAGE_OUT="${DIST}" \
+            STRAWWU_APPIMAGE_OUT="${DIST}" \
+            STRAWNT_PORTABLE_SHA256SUMS="${SUMS}" \
             STRAWWU_PORTABLE_SHA256SUMS="${SUMS}" \
             bash "${PORTABLE_ROOT}/build-appimage.sh" \
             || fail_matrix "build-appimage.sh failed"
+        PORTABLE_TGZ="$(pick_newest "${DIST}/StrawNT-*-x86_64.portable.tar.gz")"
+        [[ -n "${PORTABLE_TGZ}" ]] || PORTABLE_TGZ="$(pick_newest "${DIST}/StrawWU-Core-*-x86_64.portable.tar.gz")"
+        APPDIR="$(pick_newest "${DIST}/StrawNT-*-x86_64.AppDir")"
+        [[ -n "${APPDIR}" ]] || APPDIR="$(pick_newest "${DIST}/StrawWU-Core-*-x86_64.AppDir")"
     else
         fail_matrix "artifacts missing under ${DIST} (use without --no-build)"
     fi
 fi
-
-PORTABLE_TGZ="$(compgen -G "${DIST}/StrawWU-Core-*-x86_64.portable.tar.gz" | head -n1 || true)"
-APPDIR="$(compgen -G "${DIST}/StrawWU-Core-*-x86_64.AppDir" | head -n1 || true)"
 
 SMOKE_SRC=""
 SMOKE_KIND=""

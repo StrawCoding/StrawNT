@@ -7,10 +7,12 @@
 
 - 預設執行路徑為自研 **native PE**／`execution_backend=native`
 - **不宣稱**完整 Windows 應用相容／反作弊排位可用／3A 全開
+- 啟動器僅驗啟動（誠實 PARTIAL）；反作弊為探測矩陣（誠實 PARTIAL；禁排位／官方通過宣稱）
 - **不使用** Wine／Proton 當底層
 - **不使用** `WinBox`／`winbox` 命名
 - Flatpak 對 PE／SubsystemSession：**PARTIAL**（需 host filesystem）
 - StrawNT **不是** OS／ISO／桌面發行版；與其他產品無執行依賴
+- 優玩 closeout 報告：`docs/plans/portable-core/nt5-closeout-report.md`
 
 ## 一鍵安裝（推薦）
 
