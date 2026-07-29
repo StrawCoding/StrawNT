@@ -21,7 +21,15 @@ strawwu status
 ```
 
 腳本從 GitHub Releases 下載 `portable.tar.gz`，裝到
-`~/.local/share/strawwu-core`，並把 `strawwu` 連到 `~/.local/bin`。
+`~/.local/share/strawwu-core`，把 `strawwu` 連到 `~/.local/bin`，
+並執行 `strawwu integrate` 啟用 **雙擊 .exe/.msi → 安裝與啟動**。
+
+```bash
+strawwu integrate              # 重裝／換桌面後再開
+strawwu open setup.exe         # 或直接雙擊檔案
+```
+
+安裝／開啟後會在 `~/.local/share/applications/` 寫入捷徑，可從應用選單再開。
 
 ## 三種形態（手動／建置）
 

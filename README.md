@@ -11,11 +11,27 @@
 curl -fsSL https://raw.githubusercontent.com/StrawCoding/StrawWU-portable/main/install.sh | bash
 ```
 
-安裝後：
+安裝後會自動啟用 **點擊安裝／啟動**（`.exe` / `.msi` MIME 關聯）。
 
 ```bash
 strawwu --version
 strawwu status
+strawwu integrate   # 若換桌面／重裝後需再開一次
+```
+
+### 點擊就能安裝與啟動
+
+1. 檔案管理員裡 **雙擊** 任何 `.exe` / `.msi`
+2. StrawWU 會登錄應用、寫入應用選單捷徑，並啟動
+3. 之後也可從應用選單一鍵再開
+
+或用指令：
+
+```bash
+strawwu open setup.exe          # 安裝程式 → 登錄 + 啟動 + 捷徑
+strawwu open game.exe           # 一般程式 → 啟動 + 捷徑
+strawwu open --install foo.exe  # 強制當安裝程式
+strawwu open --run foo.exe      # 強制只啟動
 ```
 
 預設裝到 `~/.local/share/strawwu-core`，並把 `strawwu` 連到 `~/.local/bin`。
@@ -24,7 +40,7 @@ strawwu status
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/StrawCoding/StrawWU-portable/main/install.sh | bash -s -- --prefix "$HOME/.local/strawwu"
-curl -fsSL https://raw.githubusercontent.com/StrawCoding/StrawWU-portable/main/install.sh | bash -s -- --version 0.7.1.15
+curl -fsSL https://raw.githubusercontent.com/StrawCoding/StrawWU-portable/main/install.sh | bash -s -- --version 0.7.1.16
 ```
 
 ## 誠實邊界
@@ -33,6 +49,7 @@ curl -fsSL https://raw.githubusercontent.com/StrawCoding/StrawWU-portable/main/i
 - **不使用** Wine／Proton 當底層
 - Flatpak 對 PE／session 為 **PARTIAL**（常需 host filesystem）
 - **不是** StrawWU ISO／桌面安裝器
+- 點擊開啟走自有 PE runtime；複雜安裝精靈／反作弊仍可能失敗
 
 已煙測容器：Ubuntu 24.04、Fedora 41、Arch Linux。
 
@@ -49,6 +66,7 @@ curl -fsSL https://raw.githubusercontent.com/StrawCoding/StrawWU-portable/main/i
 ```bash
 tar -xzf StrawWU-Core-*-x86_64.portable.tar.gz
 ./StrawWU-Core-*-x86_64.AppDir/AppRun --version
+./StrawWU-Core-*-x86_64.AppDir/AppRun integrate
 ```
 
 ## 從原始碼建置

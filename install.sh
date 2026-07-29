@@ -178,8 +178,20 @@ chmod 755 "${WRAPPER}"
 mkdir -p "${BIN_DIR}"
 ln -sfn "${WRAPPER}" "${BIN_DIR}/strawwu"
 
-# Smoke
+# Click-to-open: MIME handler so double-clicking .exe/.msi installs & launches.
 export PATH="${BIN_DIR}:${PATH}"
+export STRAWWU_PREFIX="${PREFIX}"
+export STRAWWU_BIN="${BIN_DIR}/strawwu"
+export STRAWWU_APP_REGISTRY="${STRAWWU_APP_REGISTRY:-${PREFIX}/var/lib/strawwu/app-registry.json}"
+INTEGRATE_RC=0
+if "${BIN_DIR}/strawwu" integrate; then
+  log "desktop click-to-open enabled (.exe / .msi)"
+else
+  INTEGRATE_RC=$?
+  log "WARNING: strawwu integrate failed (exit ${INTEGRATE_RC}) — run: strawwu integrate"
+fi
+
+# Smoke
 VER_OUT="$("${BIN_DIR}/strawwu" --version 2>&1 || true)"
 [[ -n "${VER_OUT}" ]] || die "post-install --version failed"
 STATUS_RC=0
@@ -194,10 +206,14 @@ StrawWU Portable Core installed.
   command : ${BIN_DIR}/strawwu
   version : ${VER_OUT}
   status  : exit ${STATUS_RC}
+  click   : integrate exit ${INTEGRATE_RC}
 
 Try:
   strawwu --version
   strawwu status
+  strawwu integrate          # re-enable click-to-open if needed
+  strawwu open setup.exe     # install + launch + app-menu shortcut
+  # Or double-click any .exe / .msi in your file manager
 
 If 'strawwu' is not found, add to PATH:
   export PATH="${BIN_DIR}:\$PATH"

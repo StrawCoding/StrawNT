@@ -1,10 +1,12 @@
+use std::path::{Path, PathBuf};
 use std::process;
 
-use strawwu_launcher::cli::{self, Command};
+use strawwu_launcher::cli::{self, Command, OpenMode};
 use strawwu_launcher::desktop;
 use strawwu_launcher::detect::{detect_from_path, BinaryFormat};
 use strawwu_launcher::loader::LaunchRequest;
 use strawwu_launcher::log;
+use strawwu_launcher::open::{self, OpenAction};
 use strawwu_launcher::pe_loader;
 use strawwu_launcher::registry::{self, derive_app_name};
 use strawwu_runtime::executor::ExecState;
@@ -53,119 +55,82 @@ fn main() {
             bundle,
             ..
         } => {
-            let format = detect_from_path(&binary).unwrap_or(BinaryFormat::Unknown);
-            let mut req = LaunchRequest::new(binary.clone(), format).with_args(app_args);
-            if let Some(ref b) = backend {
-                req = req.with_backend(b);
+            if let Err(code) = launch_pe(&binary, &app_args, backend.as_deref(), &bundle, false) {
+                process::exit(code);
             }
-            if !bundle.is_empty() {
-                req = req.with_bundle(bundle);
+        }
+        Command::Open { path, mode } => {
+            let action = match mode {
+                OpenMode::Run => OpenAction::Run,
+                OpenMode::Install => OpenAction::InstallAndRun,
+                OpenMode::Auto => open::decide_open_action(&path),
+            };
+
+            if matches!(action, OpenAction::InstallAndRun) {
+                match registry::register_install(&path) {
+                    Ok(app_id) => {
+                        println!(
+                            "strawwu: open/install registered pending app_id={app_id} ({})",
+                            path.display()
+                        );
+                    }
+                    Err(e) => {
+                        eprintln!("strawwu: open install register failed: {e}");
+                        process::exit(1);
+                    }
+                }
             }
 
-            if let Err(e) = req.validate() {
-                eprintln!("strawwu: launch validation failed: {e}");
-                process::exit(1);
-            }
-
-            let app_name = derive_app_name(&binary);
-            let desktop_path = desktop::write_launcher_desktop(
-                &registry::derive_app_id(&binary),
-                &binary,
-                Some(&app_name),
+            let name = derive_app_name(&path);
+            open::notify(
+                "StrawWU",
+                &format!(
+                    "{} {}",
+                    if matches!(action, OpenAction::InstallAndRun) {
+                        "Installing & launching"
+                    } else {
+                        "Launching"
+                    },
+                    name
+                ),
             );
 
-            let desktop_entry = match desktop_path {
-                Ok(path) => Some(path.to_string_lossy().into_owned()),
-                Err(e) => {
-                    eprintln!("strawwu: desktop entry skipped: {e}");
-                    None
-                }
-            };
-
-            let app_id = match registry::register_launch(
-                &binary,
-                format,
-                backend.as_deref(),
-                desktop_entry.clone(),
-            ) {
-                Ok(id) => id,
-                Err(e) => {
-                    eprintln!("strawwu: registry register failed: {e}");
-                    process::exit(1);
-                }
-            };
-
-            let pe_data = match pe_loader::load_pe_bytes(&binary, format, pe_loader::smoke_mode()) {
-                Ok(data) => data,
-                Err(e) => {
-                    eprintln!("strawwu: PE load failed: {e}");
-                    process::exit(1);
-                }
-            };
-
-            let mut orch = RuntimeOrchestrator::new();
-            let mut profile = AppProfile::default_win32(&app_id);
-            if let Some(ref b) = backend {
-                profile.execution_backend = b.clone();
+            if let Err(code) = launch_pe(&path, &[], None, &[], true) {
+                open::notify("StrawWU", &format!("Failed to open {name}"));
+                process::exit(code);
             }
-
-            let exec = execute_pe(&mut orch, &profile, &pe_data);
-            if exec.state != ExecState::Running {
-                eprintln!(
-                    "strawwu: launch failed: {}",
-                    exec.error.unwrap_or_else(|| "unknown error".into())
-                );
-                process::exit(1);
-            }
-
-            let gui = match maybe_run_gui_smoke(&pe_data, &app_id, &app_name) {
-                Ok(result) => result,
-                Err(e) => {
-                    eprintln!("strawwu: gui-smoke failed: {e}");
-                    process::exit(1);
-                }
-            };
-
-            if let Some(ref smoke) = gui {
-                let _ = log::append_event("gui_smoke", smoke);
-                println!(
-                    "strawwu: launched {} (format={}, pid={}, backend={}, app_id={}, mode=simulated, gui-smoke=PASS hwnd={} compositor={} visible={})",
-                    req.binary_path.display(),
-                    req.format,
-                    exec.pid,
-                    profile.execution_backend,
-                    app_id,
-                    smoke.hwnd,
-                    smoke.compositor,
-                    smoke.visible,
-                );
-            } else {
-                println!(
-                    "strawwu: launched {} (format={}, pid={}, backend={}, app_id={}, mode=simulated, gui-smoke=SKIP subsystem=non-gui)",
-                    req.binary_path.display(),
-                    req.format,
-                    exec.pid,
-                    profile.execution_backend,
-                    app_id,
-                );
-            }
-
-            if let Some(path) = desktop_entry {
-                let _ = log::append_event(
-                    "desktop_entry",
-                    &serde_json::json!({
-                        "app_id": app_id,
-                        "path": path,
-                    }),
-                );
-            }
+            open::notify(
+                "StrawWU",
+                &format!("{name} ready — also available from the app menu"),
+            );
         }
         Command::Install { installer } => {
             match registry::register_install(&installer) {
                 Ok(app_id) => {
-                    println!(
-                        "strawwu: install {} (stub — registered pending app_id={app_id})",
-                        installer.display()
+                    let app_name = derive_app_name(&installer);
+                    let desktop_path = desktop::write_launcher_desktop(
+                        &app_id,
+                        &installer,
+                        Some(&app_name),
+                    );
+                    match desktop_path {
+                        Ok(path) => {
+                            println!(
+                                "strawwu: install {} (registered pending app_id={app_id}; desktop={})",
+                                installer.display(),
+                                path.display()
+                            );
+                        }
+                        Err(e) => {
+                            println!(
+                                "strawwu: install {} (registered pending app_id={app_id}; desktop skipped: {e})",
+                                installer.display()
+                            );
+                        }
+                    }
+                    open::notify(
+                        "StrawWU",
+                        &format!("{app_name} registered — click the app menu entry to launch"),
                     );
                 }
                 Err(e) => {
@@ -174,6 +139,22 @@ fn main() {
                 }
             }
         }
+        Command::Integrate => match desktop::install_desktop_integration() {
+            Ok(path) => {
+                println!(
+                    "strawwu: desktop integration installed\n  handler: {}\n  tip: double-click .exe / .msi to install & launch",
+                    path.display()
+                );
+                open::notify(
+                    "StrawWU",
+                    "Click-to-open enabled for Windows .exe / .msi files",
+                );
+            }
+            Err(e) => {
+                eprintln!("strawwu: integrate failed: {e}");
+                process::exit(1);
+            }
+        },
         Command::Apps(sub) => match sub {
             cli::AppsSubcommand::List => match registry::list_registered_apps() {
                 Ok(apps) if apps.is_empty() => {
@@ -192,7 +173,7 @@ fn main() {
         },
         Command::Devices(sub) => match sub {
             cli::DevicesSubcommand::List { json } => {
-                use strawwu_cli::devices::{ListFormat, list_devices};
+                use strawwu_cli::devices::{list_devices, ListFormat};
                 let format = if json {
                     ListFormat::Json
                 } else {
@@ -209,8 +190,12 @@ fn main() {
         },
         Command::Mfp(sub) => match sub {
             cli::MfpSubcommand::Smoke { json } => {
-                use strawwu_cli::mfp::{MfpFormat, mfp_smoke_passed, run_mfp_smoke_command};
-                let format = if json { MfpFormat::Json } else { MfpFormat::Text };
+                use strawwu_cli::mfp::{mfp_smoke_passed, run_mfp_smoke_command, MfpFormat};
+                let format = if json {
+                    MfpFormat::Json
+                } else {
+                    MfpFormat::Text
+                };
                 match run_mfp_smoke_command(format) {
                     Ok((out, payload)) => {
                         println!("{out}");
@@ -231,26 +216,146 @@ fn main() {
         Command::Repair { app_id } => {
             println!("strawwu: repair {app_id} (stub)");
         }
-        Command::Status => {
-            match registry::list_registered_apps() {
-                Ok(apps) => {
-                    let sessions = RuntimeOrchestrator::new().session_count();
-                    println!(
-                        "strawwu: status — runtime idle, {} session(s), {} app(s) registered",
-                        sessions,
-                        apps.len()
-                    );
-                }
-                Err(e) => {
-                    eprintln!("strawwu: status failed: {e}");
-                    process::exit(1);
-                }
+        Command::Status => match registry::list_registered_apps() {
+            Ok(apps) => {
+                let sessions = RuntimeOrchestrator::new().session_count();
+                println!(
+                    "strawwu: status — runtime idle, {} session(s), {} app(s) registered",
+                    sessions,
+                    apps.len()
+                );
             }
-        }
+            Err(e) => {
+                eprintln!("strawwu: status failed: {e}");
+                process::exit(1);
+            }
+        },
         Command::Config(_) => {
             println!("strawwu: config (stub)");
         }
     }
+}
+
+/// Shared PE launch path used by `run` and `open`.
+/// Returns Ok(()) or Err(exit_code).
+fn launch_pe(
+    binary: &Path,
+    app_args: &[String],
+    backend: Option<&str>,
+    bundle: &[PathBuf],
+    from_open: bool,
+) -> Result<(), i32> {
+    let format = detect_from_path(binary).unwrap_or(BinaryFormat::Unknown);
+    let mut req = LaunchRequest::new(binary.to_path_buf(), format).with_args(app_args.to_vec());
+    if let Some(b) = backend {
+        req = req.with_backend(b);
+    }
+    if !bundle.is_empty() {
+        req = req.with_bundle(bundle.to_vec());
+    }
+
+    if let Err(e) = req.validate() {
+        eprintln!("strawwu: launch validation failed: {e}");
+        return Err(1);
+    }
+
+    let app_name = derive_app_name(binary);
+    let desktop_path =
+        desktop::write_launcher_desktop(&registry::derive_app_id(binary), binary, Some(&app_name));
+
+    let desktop_entry = match desktop_path {
+        Ok(path) => {
+            if from_open {
+                println!("strawwu: desktop launcher → {}", path.display());
+            }
+            Some(path.to_string_lossy().into_owned())
+        }
+        Err(e) => {
+            eprintln!("strawwu: desktop entry skipped: {e}");
+            None
+        }
+    };
+
+    let app_id = match registry::register_launch(
+        binary,
+        format,
+        backend,
+        desktop_entry.clone(),
+    ) {
+        Ok(id) => id,
+        Err(e) => {
+            eprintln!("strawwu: registry register failed: {e}");
+            return Err(1);
+        }
+    };
+
+    let pe_data = match pe_loader::load_pe_bytes(binary, format, pe_loader::smoke_mode()) {
+        Ok(data) => data,
+        Err(e) => {
+            eprintln!("strawwu: PE load failed: {e}");
+            return Err(1);
+        }
+    };
+
+    let mut orch = RuntimeOrchestrator::new();
+    let mut profile = AppProfile::default_win32(&app_id);
+    if let Some(b) = backend {
+        profile.execution_backend = b.to_string();
+    }
+
+    let exec = execute_pe(&mut orch, &profile, &pe_data);
+    if exec.state != ExecState::Running {
+        eprintln!(
+            "strawwu: launch failed: {}",
+            exec.error.unwrap_or_else(|| "unknown error".into())
+        );
+        return Err(1);
+    }
+
+    let gui = match maybe_run_gui_smoke(&pe_data, &app_id, &app_name) {
+        Ok(result) => result,
+        Err(e) => {
+            eprintln!("strawwu: gui-smoke failed: {e}");
+            return Err(1);
+        }
+    };
+
+    if let Some(ref smoke) = gui {
+        let _ = log::append_event("gui_smoke", smoke);
+        println!(
+            "strawwu: launched {} (format={}, pid={}, backend={}, app_id={}, mode=simulated, gui-smoke=PASS hwnd={} compositor={} visible={})",
+            req.binary_path.display(),
+            req.format,
+            exec.pid,
+            profile.execution_backend,
+            app_id,
+            smoke.hwnd,
+            smoke.compositor,
+            smoke.visible,
+        );
+    } else {
+        println!(
+            "strawwu: launched {} (format={}, pid={}, backend={}, app_id={}, mode=simulated, gui-smoke=SKIP subsystem=non-gui)",
+            req.binary_path.display(),
+            req.format,
+            exec.pid,
+            profile.execution_backend,
+            app_id,
+        );
+    }
+
+    if let Some(path) = desktop_entry {
+        let _ = log::append_event(
+            "desktop_entry",
+            &serde_json::json!({
+                "app_id": app_id,
+                "path": path,
+                "from_open": from_open,
+            }),
+        );
+    }
+
+    Ok(())
 }
 
 fn print_help() {
@@ -261,8 +366,13 @@ USAGE:
     strawwu <COMMAND> [OPTIONS]
 
 COMMANDS:
+    open <file.exe|.msi> [--auto|--run|--install]
+        Click-to-open: install (if installer) and launch; writes app-menu launcher
     run <binary> [--backend native|container|microvm] [--bundle a,b,c]
     install <installer.exe>
+        Register installer + write desktop launcher
+    integrate
+        Enable double-click for .exe/.msi (MIME + desktop handler)
     apps list
     devices list [--json]
     mfp smoke [--json]
@@ -272,8 +382,13 @@ COMMANDS:
     version
     help
 
+CLICK TO INSTALL & LAUNCH:
+    1) strawwu integrate          # once after install.sh
+    2) double-click any .exe/.msi in the file manager
+    3) app also appears under ~/.local/share/applications for one-click relaunch
+
 REGISTRY:
-    run/install register apps in /var/lib/strawwu/app-registry.json
+    run/install/open register apps in the local app-registry
     (override with STRAWWU_APP_REGISTRY)
 
 GUI SMOKE (W5-W4):

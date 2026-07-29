@@ -1,5 +1,6 @@
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::process::Command;
 
 use crate::registry::derive_app_name;
 
@@ -13,14 +14,47 @@ pub fn desktop_dir() -> PathBuf {
     PathBuf::from("/var/lib/strawwu/applications")
 }
 
+pub fn mime_packages_dir() -> PathBuf {
+    if let Ok(dir) = std::env::var("STRAWWU_MIME_DIR") {
+        return PathBuf::from(dir);
+    }
+    if let Ok(home) = std::env::var("HOME") {
+        return PathBuf::from(home).join(".local/share/mime/packages");
+    }
+    PathBuf::from("/var/lib/strawwu/mime/packages")
+}
+
 pub fn desktop_path_for(app_id: &str) -> PathBuf {
     desktop_dir().join(format!("{app_id}.desktop"))
 }
 
+/// Absolute path to the `strawwu` binary for Exec= lines (desktop envs often have a thin PATH).
+pub fn strawwu_bin_for_exec() -> String {
+    if let Ok(p) = std::env::var("STRAWWU_BIN") {
+        if !p.is_empty() {
+            return p;
+        }
+    }
+    if let Ok(exe) = std::env::current_exe() {
+        if let Ok(canon) = exe.canonicalize() {
+            return canon.display().to_string();
+        }
+        return exe.display().to_string();
+    }
+    if let Ok(prefix) = std::env::var("STRAWWU_PREFIX") {
+        let candidate = PathBuf::from(&prefix).join("bin/strawwu-portable");
+        if candidate.is_file() {
+            return candidate.display().to_string();
+        }
+        let candidate = PathBuf::from(&prefix).join("bin/strawwu");
+        if candidate.is_file() {
+            return candidate.display().to_string();
+        }
+    }
+    "strawwu".to_string()
+}
+
 /// Reject an app_id that is unsafe as a filename component or .desktop key value.
-/// app_id becomes the `<app_id>.desktop` filename and several key values, so a
-/// value with path separators (traversal) or control chars (line injection) must
-/// never reach the filesystem or the file body.
 fn validate_app_id(app_id: &str) -> Result<(), String> {
     if app_id.is_empty() || app_id == "." || app_id == ".." {
         return Err(format!("invalid app_id: {app_id:?}"));
@@ -36,8 +70,7 @@ fn validate_app_id(app_id: &str) -> Result<(), String> {
     Ok(())
 }
 
-/// Escape a value per the Desktop Entry spec and drop other control chars so a
-/// crafted app name or binary path cannot inject extra keys/lines.
+/// Escape a value per the Desktop Entry spec and drop other control chars.
 fn desktop_escape(value: &str) -> String {
     let mut out = String::with_capacity(value.len());
     for c in value.chars() {
@@ -53,8 +86,7 @@ fn desktop_escape(value: &str) -> String {
     out
 }
 
-/// Quote a single Exec argument per the Desktop Entry spec (double-quoted, with
-/// reserved chars backslash-escaped) after control-char escaping.
+/// Quote a single Exec argument per the Desktop Entry spec.
 fn desktop_exec_arg(value: &str) -> String {
     let escaped = desktop_escape(value);
     let mut out = String::with_capacity(escaped.len() + 2);
@@ -92,7 +124,12 @@ pub fn write_launcher_desktop_in(
             .map(|s| s.to_string())
             .unwrap_or_else(|| derive_app_name(binary)),
     );
-    let exec = format!("strawwu run {}", desktop_exec_arg(&binary.display().to_string()));
+    let strawwu = strawwu_bin_for_exec();
+    let exec = format!(
+        "{} run {}",
+        desktop_exec_arg(&strawwu),
+        desktop_exec_arg(&binary.display().to_string())
+    );
     let path = dir.join(format!("{app_id}.desktop"));
 
     fs::create_dir_all(dir).map_err(|e| e.to_string())?;
@@ -101,6 +138,7 @@ pub fn write_launcher_desktop_in(
         "[Desktop Entry]\n\
          Type=Application\n\
          Name={display_name}\n\
+         Comment=Launch with StrawWU Portable Core\n\
          Exec={exec}\n\
          Icon=application-x-ms-dos-executable\n\
          Terminal=false\n\
@@ -115,6 +153,93 @@ pub fn write_launcher_desktop_in(
     Ok(path)
 }
 
+const OPEN_HANDLER_ID: &str = "strawwu-open";
+
+const MIME_TYPES: &[&str] = &[
+    "application/x-ms-dos-executable",
+    "application/x-msdownload",
+    "application/vnd.microsoft.portable-executable",
+    "application/x-msi",
+    "application/x-ms-shortcut",
+];
+
+/// Install MIME handler so double-clicking .exe/.msi opens with StrawWU.
+pub fn install_desktop_integration() -> Result<PathBuf, String> {
+    install_desktop_integration_in(&desktop_dir(), &mime_packages_dir(), &strawwu_bin_for_exec())
+}
+
+pub fn install_desktop_integration_in(
+    apps_dir: &Path,
+    mime_dir: &Path,
+    strawwu_bin: &str,
+) -> Result<PathBuf, String> {
+    fs::create_dir_all(apps_dir).map_err(|e| e.to_string())?;
+    fs::create_dir_all(mime_dir).map_err(|e| e.to_string())?;
+
+    let mime_list = MIME_TYPES.join(";");
+    let handler = apps_dir.join(format!("{OPEN_HANDLER_ID}.desktop"));
+    let exec = format!("{} open %f", desktop_exec_arg(strawwu_bin));
+    let body = format!(
+        "[Desktop Entry]\n\
+         Type=Application\n\
+         Name=StrawWU\n\
+         GenericName=Windows App Launcher\n\
+         Comment=Install or run Windows .exe/.msi with StrawWU Portable Core\n\
+         Exec={exec}\n\
+         TryExec={try_exec}\n\
+         Icon=strawwu\n\
+         Terminal=false\n\
+         Categories=System;Utility;\n\
+         MimeType={mime_list};\n\
+         NoDisplay=false\n\
+         StartupNotify=true\n\
+         X-StrawWU-Kind=open-handler\n",
+        try_exec = desktop_escape(strawwu_bin),
+        mime_list = mime_list,
+    );
+    fs::write(&handler, body).map_err(|e| e.to_string())?;
+
+    // Ensure .exe/.msi are recognized even on minimal environments.
+    let mime_xml = mime_dir.join("strawwu-win32.xml");
+    let xml = r#"<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/vnd.microsoft.portable-executable">
+    <comment>Windows Portable Executable</comment>
+    <glob pattern="*.exe"/>
+    <glob pattern="*.dll"/>
+  </mime-type>
+  <mime-type type="application/x-msi">
+    <comment>Windows Installer Package</comment>
+    <glob pattern="*.msi"/>
+  </mime-type>
+</mime-info>
+"#;
+    fs::write(&mime_xml, xml).map_err(|e| e.to_string())?;
+
+    // Best-effort host integration (ignore failures in containers/CI).
+    let _ = Command::new("update-desktop-database")
+        .arg(apps_dir)
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .status();
+    if let Some(mime_root) = mime_dir.parent() {
+        let _ = Command::new("update-mime-database")
+            .arg(mime_root)
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .status();
+    }
+    for mime in MIME_TYPES {
+        let _ = Command::new("xdg-mime")
+            .args(["default", &format!("{OPEN_HANDLER_ID}.desktop"), mime])
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .status();
+    }
+
+    Ok(handler)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -123,13 +248,17 @@ mod tests {
     #[test]
     fn write_desktop_entry() {
         let dir = tempdir().unwrap();
+        std::env::set_var("STRAWWU_BIN", "/opt/strawwu/bin/strawwu");
         let binary = Path::new("/tmp/apps/notepad.exe");
-        let path = write_launcher_desktop_in(dir.path(), "notepad", binary, Some("Notepad")).unwrap();
+        let path =
+            write_launcher_desktop_in(dir.path(), "notepad", binary, Some("Notepad")).unwrap();
         assert!(path.exists());
         let content = fs::read_to_string(&path).unwrap();
         assert!(content.contains("Name=Notepad"));
         assert!(content.contains("X-StrawWU-App-Id=notepad"));
-        assert!(content.contains("strawwu run"));
+        assert!(content.contains("strawwu"));
+        assert!(content.contains(" run "));
+        std::env::remove_var("STRAWWU_BIN");
     }
 
     #[test]
@@ -152,8 +281,25 @@ mod tests {
         )
         .unwrap();
         let content = fs::read_to_string(&path).unwrap();
-        // The injected newline must not create a second Exec line.
         assert_eq!(content.matches("\nExec=").count(), 1);
         assert!(content.contains("Name=Evil\\nExec=/bin/sh -c pwned"));
+    }
+
+    #[test]
+    fn install_open_handler() {
+        let apps = tempdir().unwrap();
+        let mime = tempdir().unwrap();
+        let path = install_desktop_integration_in(
+            apps.path(),
+            mime.path(),
+            "/home/u/.local/bin/strawwu",
+        )
+        .unwrap();
+        assert!(path.exists());
+        let content = fs::read_to_string(&path).unwrap();
+        assert!(content.contains("MimeType="));
+        assert!(content.contains(" open %f"));
+        assert!(content.contains("application/x-ms-dos-executable"));
+        assert!(mime.path().join("strawwu-win32.xml").exists());
     }
 }

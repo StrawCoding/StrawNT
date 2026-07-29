@@ -3,6 +3,7 @@ pub mod loader;
 pub mod cli;
 pub mod registry;
 pub mod desktop;
+pub mod open;
 pub mod log;
 pub mod pe_loader;
 

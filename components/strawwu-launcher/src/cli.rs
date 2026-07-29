@@ -1,5 +1,15 @@
 use std::path::PathBuf;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OpenMode {
+    /// Auto: installer heuristic → install+run, else run.
+    Auto,
+    /// Force run pipeline.
+    Run,
+    /// Force install registration + run pipeline.
+    Install,
+}
+
 #[derive(Debug, Clone)]
 pub enum Command {
     Run {
@@ -9,9 +19,16 @@ pub enum Command {
         bundle: Vec<PathBuf>,
         profile: Option<PathBuf>,
     },
+    /// File-manager / double-click entry: install and/or launch a Win32 file.
+    Open {
+        path: PathBuf,
+        mode: OpenMode,
+    },
     Install {
         installer: PathBuf,
     },
+    /// Register MIME handler so .exe/.msi open with StrawWU on click.
+    Integrate,
     Apps(AppsSubcommand),
     Devices(DevicesSubcommand),
     Mfp(MfpSubcommand),
@@ -59,7 +76,9 @@ pub fn parse_args(args: &[String]) -> Result<Command, String> {
 
     match args[0].as_str() {
         "run" => parse_run(&args[1..]),
+        "open" => parse_open(&args[1..]),
         "install" => parse_install(&args[1..]),
+        "integrate" | "desktop-integrate" => Ok(Command::Integrate),
         "apps" => parse_apps(&args[1..]),
         "devices" => parse_devices(&args[1..]),
         "mfp" => parse_mfp(&args[1..]),
@@ -78,6 +97,31 @@ pub fn parse_args(args: &[String]) -> Result<Command, String> {
         "--help" | "help" => Ok(Command::Help),
         _ => Err(format!("unknown command: {}", args[0])),
     }
+}
+
+fn parse_open(args: &[String]) -> Result<Command, String> {
+    if args.is_empty() {
+        return Err("open requires a file path (.exe / .msi)".into());
+    }
+    let mut mode = OpenMode::Auto;
+    let mut path = None;
+    let mut i = 0;
+    while i < args.len() {
+        match args[i].as_str() {
+            "--install" => mode = OpenMode::Install,
+            "--run" => mode = OpenMode::Run,
+            "--auto" => mode = OpenMode::Auto,
+            other => {
+                if path.is_some() {
+                    return Err(format!("unexpected argument for open: {other}"));
+                }
+                path = Some(PathBuf::from(other));
+            }
+        }
+        i += 1;
+    }
+    let path = path.ok_or_else(|| "open requires a file path (.exe / .msi)".to_string())?;
+    Ok(Command::Open { path, mode })
 }
 
 fn parse_run(args: &[String]) -> Result<Command, String> {
@@ -288,6 +332,38 @@ mod tests {
             }
             _ => panic!("expected Install"),
         }
+    }
+
+    #[test]
+    fn parse_open_auto() {
+        let cmd = parse_args(&args("open game.exe")).unwrap();
+        match cmd {
+            Command::Open { path, mode } => {
+                assert_eq!(path, PathBuf::from("game.exe"));
+                assert_eq!(mode, OpenMode::Auto);
+            }
+            _ => panic!("expected Open"),
+        }
+    }
+
+    #[test]
+    fn parse_open_install_flag() {
+        let cmd = parse_args(&args("open --install setup.exe")).unwrap();
+        match cmd {
+            Command::Open { path, mode } => {
+                assert_eq!(path, PathBuf::from("setup.exe"));
+                assert_eq!(mode, OpenMode::Install);
+            }
+            _ => panic!("expected Open"),
+        }
+    }
+
+    #[test]
+    fn parse_integrate() {
+        let cmd = parse_args(&args("integrate")).unwrap();
+        assert!(matches!(cmd, Command::Integrate));
+        let cmd2 = parse_args(&args("desktop-integrate")).unwrap();
+        assert!(matches!(cmd2, Command::Integrate));
     }
 
     #[test]

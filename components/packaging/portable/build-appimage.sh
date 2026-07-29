@@ -125,13 +125,35 @@ EOF
 [Desktop Entry]
 Type=Application
 Name=StrawWU Core
-Comment=StrawWU Portable Win-compat core (CLI) — not a full Windows compatibility claim
+Comment=StrawWU Portable Win-compat core — click .exe to install & launch
 Exec=strawwu
 Icon=strawwu
 Categories=System;
 Terminal=true
 EOF
     cp -a "${APPDIR}/strawwu.desktop" "${APPDIR}/usr/share/applications/strawwu.desktop"
+
+    # Prefer packaged open-handler from prefix when present.
+    if [[ -f "${PREFIX}/share/applications/strawwu-open.desktop" ]]; then
+        install -m 644 "${PREFIX}/share/applications/strawwu-open.desktop" \
+            "${APPDIR}/usr/share/applications/strawwu-open.desktop"
+    else
+        cat > "${APPDIR}/usr/share/applications/strawwu-open.desktop" <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=StrawWU
+Comment=Install or run Windows .exe/.msi with StrawWU Portable Core
+Exec=strawwu open %f
+TryExec=strawwu
+Icon=strawwu
+Terminal=false
+Categories=System;Utility;
+MimeType=application/x-ms-dos-executable;application/x-msdownload;application/vnd.microsoft.portable-executable;application/x-msi;
+NoDisplay=false
+StartupNotify=true
+X-StrawWU-Kind=open-handler
+EOF
+    fi
 
     cat > "${APPDIR}/AppRun" <<'EOF'
 #!/usr/bin/env bash

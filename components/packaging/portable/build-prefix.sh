@@ -20,6 +20,7 @@ command -v python3 >/dev/null 2>&1 || die "python3 required"
 log "building strawwu ${VERSION} → ${PREFIX}"
 
 mkdir -p "${PREFIX}/bin" "${PREFIX}/lib" "${PREFIX}/share/strawwu" \
+    "${PREFIX}/share/applications" "${PREFIX}/share/mime/packages" \
     "${PREFIX}/share/doc/strawwu-portable" "${PREFIX}/var/lib/strawwu"
 
 # Link with $ORIGIN/../lib rpath so bundled .so resolve relative to the binary.
@@ -145,6 +146,7 @@ Layout:
   bin/strawwu              CLI entry (runtime/nt/launcher/cli/graphics linked in)
   lib/                     Bundled non-baseline shared objects + \$ORIGIN rpath
   share/strawwu/           Baseline + portable-prefix.json
+  share/applications/      Click-to-open handler template (strawwu-open.desktop)
   var/lib/strawwu/         Local app-registry (no system /var/lib required)
 
 Usage:
@@ -152,8 +154,32 @@ Usage:
   export STRAWWU_APP_REGISTRY=\$STRAWWU_PREFIX/var/lib/strawwu/app-registry.json
   \$STRAWWU_PREFIX/bin/strawwu --version
   \$STRAWWU_PREFIX/bin/strawwu status
+  \$STRAWWU_PREFIX/bin/strawwu integrate
+  \$STRAWWU_PREFIX/bin/strawwu open setup.exe
+
+Click-to-open:
+  After \`strawwu integrate\`, double-click .exe/.msi in the file manager.
+  Apps also get ~/.local/share/applications/<app>.desktop for one-click relaunch.
 
 This prefix does not depend on system strawwu-* Debian packages.
+EOF
+
+# Template desktop handler (install.sh / \`strawwu integrate\` writes the live copy).
+cat > "${PREFIX}/share/applications/strawwu-open.desktop" <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=StrawWU
+GenericName=Windows App Launcher
+Comment=Install or run Windows .exe/.msi with StrawWU Portable Core
+Exec=strawwu open %f
+TryExec=strawwu
+Icon=strawwu
+Terminal=false
+Categories=System;Utility;
+MimeType=application/x-ms-dos-executable;application/x-msdownload;application/vnd.microsoft.portable-executable;application/x-msi;application/x-ms-shortcut;
+NoDisplay=false
+StartupNotify=true
+X-StrawWU-Kind=open-handler
 EOF
 
 # Wrapper that sets local registry when invoked from prefix.
