@@ -691,5 +691,8 @@ test-portable-gx-graphics:
 test-portable-gx-audio-input:
 	bash tests/portable/smoke-gx-audio-input.sh
 
+test-portable-gx-anticheat:
+	bash tests/portable/smoke-gx-anticheat.sh
+
 build-os-debs:
 	bash $(SCRIPTS)/build-os-debs.sh

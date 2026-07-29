@@ -1,4 +1,4 @@
-//! Substantive anti-cheat verification evidence for POST-W7 compat-matrix.
+//! Substantive anti-cheat verification evidence for GX4 anticheat matrix.
 //!
 //! Runs ProbeEngine suites and emits honest PARTIAL grades — never claims full
 //! Windows anti-cheat compatibility or ranked-play readiness.
@@ -26,6 +26,7 @@ pub struct SubstantiveEvidence {
     pub probe_total: usize,
     pub probes: Vec<ProbeEvidence>,
     pub cargo_crate: String,
+    pub bridge_policy_side_effect: bool,
     pub honest_disclaimer: String,
 }
 
@@ -65,9 +66,9 @@ fn run_substantive_probes(ac_type: AnticheatType) -> Vec<ProbeResult> {
 }
 
 fn grade_for_ratio(ratio: f64) -> CompatGrade {
-    if ratio >= 0.9 {
-        CompatGrade::A
-    } else if ratio >= 0.7 {
+    // Hub meaning: A=可玩 / B=可啟動 / C=探測通過 / F=崩潰.
+    // Anti-cheat matrix never claims "可玩" (ranked/signature), so cap at B.
+    if ratio >= 0.7 {
         CompatGrade::B
     } else if ratio >= 0.5 {
         CompatGrade::C
@@ -77,9 +78,8 @@ fn grade_for_ratio(ratio: f64) -> CompatGrade {
 }
 
 fn status_for_ratio(ratio: f64) -> CompatStatus {
-    if ratio >= 1.0 {
-        CompatStatus::Partial // v3.0: never PASS for anticheat
-    } else if ratio >= 0.5 {
+    // Honest: never claim PASS for anticheat (ranked / official signature).
+    if ratio >= 0.5 {
         CompatStatus::Partial
     } else {
         CompatStatus::Fail
@@ -96,8 +96,16 @@ fn build_case(name: &str, ac_type: AnticheatType, notes: &str) -> SubstantiveCas
         0.0
     };
 
-    let grade = grade_for_ratio(ratio);
+    // Vanguard remains grade F by policy (kernel/TPM cannot be fully simulated).
+    let grade = if matches!(ac_type, AnticheatType::Vanguard) {
+        CompatGrade::F
+    } else {
+        grade_for_ratio(ratio)
+    };
     let status = status_for_ratio(ratio);
+    let bridge_side = results
+        .iter()
+        .any(|r| r.probe_name.starts_with("bridge_"));
 
     SubstantiveCase {
         name: name.into(),
@@ -109,14 +117,16 @@ fn build_case(name: &str, ac_type: AnticheatType, notes: &str) -> SubstantiveCas
         notes: notes.into(),
         evidence: SubstantiveEvidence {
             verified_at: Utc::now().format("%Y-%m-%dT%H:%M:%SZ").to_string(),
-            verification_method: "ProbeEngine integration (cargo test + probe suite)".into(),
-            verification_stage: "post-w7-anticheat-substantive".into(),
+            verification_method: "ProbeEngine + strawwu-bridge PolicySet (native)".into(),
+            verification_stage: "gx4-anticheat-matrix".into(),
             probe_pass: pass,
             probe_total: total,
             probes: results.iter().map(probe_to_evidence).collect(),
             cargo_crate: "strawwu-anticheat".into(),
-            honest_disclaimer: "PARTIAL only — does not guarantee ranked play or official AC signature pass"
-                .into(),
+            bridge_policy_side_effect: bridge_side,
+            honest_disclaimer:
+                "PARTIAL only — does not guarantee ranked play or official AC signature pass"
+                    .into(),
         },
     }
 }
@@ -126,23 +136,29 @@ pub fn generate_substantive_report(project_version: &str) -> SubstantiveReport {
         build_case(
             "eac_driver_probe",
             AnticheatType::EasyAntiCheat,
-            "driver stub via strawwu_ipc; DLL integrity partial",
+            "driver stub via strawwu_ipc; DLL integrity partial; bridge seccomp applied",
         ),
         build_case(
             "battleye_init",
             AnticheatType::BattlEye,
-            "kernel scan intercepted; process not crash",
+            "kernel scan intercepted; process not crash; bridge policy deny init_module",
         ),
         build_case(
             "vanguard_tpm_probe",
             AnticheatType::Vanguard,
-            "TPM stub partial; kernel driver not loaded — policy deny",
+            "TPM stub partial; kernel driver not loaded — policy deny; grade F honest",
+        ),
+        build_case(
+            "custom_ac_window_process",
+            AnticheatType::CustomAc,
+            "custom window/process/debugger stubs; game syscall profile; no ranked claim",
         ),
     ];
 
     // Sanity: matrix generator agrees on case count
-    let _matrix = AnticheatMatrix::generate();
+    let matrix = AnticheatMatrix::generate();
     let _ = probes::simulate_eac_probes();
+    assert_eq!(matrix.cases.len(), cases.len());
 
     SubstantiveReport {
         schema: "strawwu-anticheat-substantive/v1".into(),
@@ -162,25 +178,26 @@ mod tests {
     use super::*;
 
     #[test]
-    fn substantive_report_has_three_cases() {
-        let report = generate_substantive_report("0.7.0.5");
-        assert_eq!(report.cases.len(), 3);
+    fn substantive_report_has_four_cases() {
+        let report = generate_substantive_report("0.7.1.31");
+        assert_eq!(report.cases.len(), 4);
         assert_eq!(report.overall, "PARTIAL");
     }
 
     #[test]
     fn all_cases_substantive_verified() {
-        let report = generate_substantive_report("0.7.0.5");
+        let report = generate_substantive_report("0.7.1.31");
         for case in &report.cases {
             assert!(case.substantive_verified);
             assert!(!case.evidence.probes.is_empty());
             assert!(case.status == "PARTIAL" || case.status == "FAIL");
+            assert!(case.evidence.bridge_policy_side_effect);
         }
     }
 
     #[test]
     fn never_claims_full_pass() {
-        let report = generate_substantive_report("0.7.0.5");
+        let report = generate_substantive_report("0.7.1.31");
         for case in &report.cases {
             assert_ne!(case.status, "PASS");
             assert!(case.evidence.honest_disclaimer.contains("PARTIAL"));
@@ -188,10 +205,35 @@ mod tests {
     }
 
     #[test]
+    fn vanguard_grade_is_f() {
+        let report = generate_substantive_report("0.7.1.31");
+        let vg = report
+            .cases
+            .iter()
+            .find(|c| c.name == "vanguard_tpm_probe")
+            .unwrap();
+        assert_eq!(vg.grade, "F");
+    }
+
+    #[test]
+    fn never_claims_playable_grade_a() {
+        let report = generate_substantive_report("0.7.1.31");
+        for case in &report.cases {
+            assert_ne!(
+                case.grade, "A",
+                "anticheat must not claim Hub grade A (可玩): {}",
+                case.name
+            );
+        }
+    }
+
+    #[test]
     fn json_roundtrip() {
-        let report = generate_substantive_report("0.7.0.5");
+        let report = generate_substantive_report("0.7.1.31");
         let json = report_to_json(&report);
         assert!(json.contains("substantive_verified"));
         assert!(json.contains("eac_driver_probe"));
+        assert!(json.contains("custom_ac_window_process"));
+        assert!(json.contains("gx4-anticheat-matrix"));
     }
 }

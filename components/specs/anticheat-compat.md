@@ -20,10 +20,10 @@
 
 | 反作弊 | 常見探測 | v3.0 策略 | 狀態 |
 |--------|----------|-----------|------|
-| EasyAntiCheat | 驅動簽章、核心回調 | strawwu_ipc 驅動 stub + 完整性回應 | FUNCTIONAL — ProbeEngine stateful 探測通過，grade B |
-| BattlEye | 核心掃描、DLL 完整性 | bridge syscall 攔截 + 假驅動介面 | FUNCTIONAL — 探測通過，grade B |
+| EasyAntiCheat | 驅動簽章、核心回調 | strawwu_ipc 驅動 stub + 完整性回應 | FUNCTIONAL — ProbeEngine + bridge PolicySet，誠實 grade B/C（禁排位宣稱） |
+| BattlEye | 核心掃描、DLL 完整性 | bridge syscall 攔截 + 假驅動介面 | FUNCTIONAL — 探測通過、不崩潰，誠實 grade B |
 | Vanguard | TPM、啟動時核心載入 | microvm + TPM stub | FUNCTIONAL（受限）— TPM stub 就位，grade F（核心載入無法完整模擬） |
-| 自訂 AC | 視窗/debugger 探測 | native 協作 + 偵測 API 回應；必要時 container 覆寫 | FUNCTIONAL — 8 類 probe category、ProcessScan/WindowEnum 模擬 |
+| 自訂 AC | 視窗/debugger 探測 | native 協作 + 偵測 API 回應；必要時 container 覆寫 | FUNCTIONAL — Window/Process/Debugger + bridge game profile |
 
 ## kernel 橋接（Phase 2 協同）
 

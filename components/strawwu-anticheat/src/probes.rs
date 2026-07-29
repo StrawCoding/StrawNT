@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use strawwu_bridge::policy::{PolicyDecision, PolicySet, SeccompProfile};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum AnticheatType {
@@ -175,6 +176,69 @@ pub fn simulate_vanguard_probes() -> Vec<ProbeResult> {
     ]
 }
 
+/// Custom / unknown AC probes — window + debugger surface only (no kernel claim).
+pub fn simulate_custom_ac_probes() -> Vec<ProbeResult> {
+    let mut results = simulate_window_enumeration_probes();
+    results.extend(simulate_process_scan_probes());
+    results.push(ProbeResult {
+        category: ProbeCategory::DebuggerDetection,
+        probe_name: "custom_debugger_check".into(),
+        passed: true,
+        response: "NtQueryInformationProcess stub: no debugger attached".into(),
+    });
+    results
+}
+
+/// Real bridge-policy side effect: anticheat seccomp profile blocks kernel module loads.
+pub fn simulate_bridge_policy_probes(ac_type: AnticheatType) -> Vec<ProbeResult> {
+    let profile_name = ac_type.recommended_syscall_profile();
+    let profile = SeccompProfile::from_str(profile_name).unwrap_or(SeccompProfile::Daily);
+    let policy = PolicySet::new(profile);
+
+    let init_module = policy.evaluate("init_module");
+    let ptrace = policy.evaluate("ptrace");
+    let openat = policy.evaluate("openat");
+
+    let expect_strict = matches!(
+        ac_type,
+        AnticheatType::EasyAntiCheat | AnticheatType::BattlEye | AnticheatType::Vanguard
+    );
+
+    vec![
+        ProbeResult {
+            category: ProbeCategory::KernelCallback,
+            probe_name: "bridge_seccomp_profile".into(),
+            passed: true,
+            response: format!(
+                "strawwu-bridge PolicySet profile={} applied without crash",
+                profile.as_str()
+            ),
+        },
+        ProbeResult {
+            category: ProbeCategory::KernelModuleScan,
+            probe_name: "bridge_block_init_module".into(),
+            passed: if expect_strict {
+                init_module == PolicyDecision::Deny
+            } else {
+                true
+            },
+            response: format!("init_module decision={:?}", init_module),
+        },
+        ProbeResult {
+            category: ProbeCategory::DebuggerDetection,
+            probe_name: "bridge_block_ptrace".into(),
+            passed: ptrace == PolicyDecision::Deny || matches!(profile, SeccompProfile::Game),
+            response: format!("ptrace decision={:?}", ptrace),
+        },
+        ProbeResult {
+            category: ProbeCategory::ProcessScan,
+            probe_name: "bridge_allow_openat".into(),
+            passed: openat == PolicyDecision::Allow,
+            response: format!("openat decision={:?} (must remain Allow)", openat),
+        },
+    ]
+}
+
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -196,13 +260,18 @@ impl ProbeEngine {
             AnticheatType::EasyAntiCheat => simulate_eac_probes(),
             AnticheatType::BattlEye => simulate_battleye_probes(),
             AnticheatType::Vanguard => simulate_vanguard_probes(),
-            AnticheatType::CustomAc | AnticheatType::None => {
-                simulate_process_scan_probes()
-            }
+            AnticheatType::CustomAc => simulate_custom_ac_probes(),
+            AnticheatType::None => simulate_process_scan_probes(),
         };
 
-        results.extend(simulate_window_enumeration_probes());
-        results.extend(simulate_process_scan_probes());
+        // Shared surface probes (window / process) for vendor suites.
+        if !matches!(ac_type, AnticheatType::CustomAc) {
+            results.extend(simulate_window_enumeration_probes());
+            results.extend(simulate_process_scan_probes());
+        }
+
+        // Real strawwu-bridge PolicySet side effect (no Wine; native profile only).
+        results.extend(simulate_bridge_policy_probes(ac_type));
 
         self.run_count += 1;
         let key = ac_type.as_str().to_string();
@@ -323,5 +392,33 @@ mod tests {
 
         assert_eq!(count2, count1 * 2);
         assert_eq!(engine.total_runs(), 2);
+    }
+
+    #[test]
+    fn custom_ac_probes_run_without_crash() {
+        let results = simulate_custom_ac_probes();
+        assert!(!results.is_empty());
+        assert!(results.iter().any(|r| r.probe_name == "custom_debugger_check"));
+    }
+
+    #[test]
+    fn bridge_policy_probes_anticheat_profile() {
+        let results = simulate_bridge_policy_probes(AnticheatType::EasyAntiCheat);
+        assert_eq!(results.len(), 4);
+        assert!(results.iter().all(|r| r.passed));
+        let profile = results
+            .iter()
+            .find(|r| r.probe_name == "bridge_seccomp_profile")
+            .unwrap();
+        assert!(profile.response.contains("anticheat"));
+    }
+
+    #[test]
+    fn probe_engine_includes_bridge_side_effect() {
+        let mut engine = ProbeEngine::new();
+        let results = engine.run_probe_suite(AnticheatType::BattlEye);
+        assert!(results
+            .iter()
+            .any(|r| r.probe_name == "bridge_block_init_module"));
     }
 }

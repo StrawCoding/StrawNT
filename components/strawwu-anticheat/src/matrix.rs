@@ -106,6 +106,32 @@ impl AnticheatMatrix {
             probe_total_count: vg_results.len(),
         });
 
+        // Custom AC
+        let custom_results = probes::simulate_custom_ac_probes();
+        let custom_pass = custom_results.iter().filter(|r| r.passed).count();
+        let custom_ratio = if custom_results.is_empty() {
+            0.0
+        } else {
+            custom_pass as f64 / custom_results.len() as f64
+        };
+        let (custom_status, custom_grade) = if custom_ratio >= 0.75 {
+            (CompatStatus::Partial, CompatGrade::B)
+        } else if custom_ratio >= 0.5 {
+            (CompatStatus::Partial, CompatGrade::C)
+        } else {
+            (CompatStatus::Fail, CompatGrade::F)
+        };
+        cases.push(CompatCase {
+            name: "custom_ac_window_process".into(),
+            anticheat_type: AnticheatType::CustomAc.as_str().into(),
+            backend: AnticheatType::CustomAc.recommended_backend().into(),
+            status: custom_status,
+            grade: custom_grade,
+            notes: "window/process/debugger stubs; no ranked/signature claim".into(),
+            probe_pass_count: custom_pass,
+            probe_total_count: custom_results.len(),
+        });
+
         Self {
             matrix_version: "1".into(),
             cases,
@@ -133,7 +159,8 @@ impl AnticheatMatrix {
         let ratio = pass_count as f64 / total as f64;
 
         let (status, grade) = if ratio >= 1.0 {
-            (CompatStatus::Pass, CompatGrade::A)
+            // Never claim full anticheat PASS / Hub A (可玩).
+            (CompatStatus::Partial, CompatGrade::B)
         } else if ratio >= 0.75 {
             (CompatStatus::Partial, CompatGrade::B)
         } else if ratio >= 0.5 {
@@ -219,7 +246,7 @@ mod tests {
     fn matrix_generate() {
         let matrix = AnticheatMatrix::generate();
         assert_eq!(matrix.matrix_version, "1");
-        assert_eq!(matrix.cases.len(), 3);
+        assert_eq!(matrix.cases.len(), 4);
     }
 
     #[test]
@@ -248,6 +275,7 @@ mod tests {
         assert!(json.contains("eac_driver_probe"));
         assert!(json.contains("battleye_init"));
         assert!(json.contains("vanguard_tpm_probe"));
+        assert!(json.contains("custom_ac_window_process"));
     }
 
     #[test]

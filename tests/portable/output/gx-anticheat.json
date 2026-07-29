@@ -1,0 +1,778 @@
+{
+  "schema": "strawwu-portable-gx-anticheat/v1",
+  "stage": "gx4-anticheat-matrix",
+  "status": "PARTIAL",
+  "version": "0.7.1.31",
+  "backend": "native",
+  "execution_backend": "native",
+  "generated_at": "2026-07-29T09:38:43Z",
+  "source": {
+    "crate": "strawwu-anticheat",
+    "verify_bin": "anticheat-substantive-verify",
+    "raw_schema": "strawwu-anticheat-substantive/v1",
+    "verification_stage": "gx4-anticheat-matrix"
+  },
+  "claims": {
+    "wine_proton_used": false,
+    "native_pe_backend": true,
+    "anti_cheat_claimed": false,
+    "ranked_pass_claimed": false,
+    "aaa_claimed": false
+  },
+  "cases": [
+    {
+      "name": "eac_driver_probe",
+      "anticheat_type": "EasyAntiCheat",
+      "backend": "native",
+      "status": "PARTIAL",
+      "grade": "B",
+      "substantive_verified": true,
+      "probe_pass": 11,
+      "probe_total": 13,
+      "probe_ratio": 0.846,
+      "bridge_policy_side_effect": true,
+      "notes": "driver stub via strawwu_ipc; DLL integrity partial; bridge seccomp applied",
+      "disclaimer": "PARTIAL only — does not guarantee ranked play or official AC signature pass",
+      "probes": [
+        {
+          "probe_name": "eac_driver_loaded",
+          "category": "DriverSignature",
+          "passed": true,
+          "response": "stub driver present via strawwu_ipc"
+        },
+        {
+          "probe_name": "eac_kernel_callback",
+          "category": "KernelCallback",
+          "passed": true,
+          "response": "callback stub registered"
+        },
+        {
+          "probe_name": "eac_dll_integrity",
+          "category": "DllIntegrity",
+          "passed": false,
+          "response": "DLL hash mismatch expected — PARTIAL"
+        },
+        {
+          "probe_name": "hidden_window_check",
+          "category": "WindowEnumeration",
+          "passed": true,
+          "response": "no suspicious hidden windows detected in enum"
+        },
+        {
+          "probe_name": "overlay_window_check",
+          "category": "WindowEnumeration",
+          "passed": true,
+          "response": "overlay windows filtered from enumeration"
+        },
+        {
+          "probe_name": "tool_window_visibility",
+          "category": "WindowEnumeration",
+          "passed": false,
+          "response": "debug tool window visible — PARTIAL"
+        },
+        {
+          "probe_name": "process_list_filter",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "host-side processes hidden from guest enumeration"
+        },
+        {
+          "probe_name": "module_list_filter",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "injected modules not visible in LDR list"
+        },
+        {
+          "probe_name": "thread_enumeration",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "bridge threads excluded from NtQuerySystemInformation"
+        },
+        {
+          "probe_name": "bridge_seccomp_profile",
+          "category": "KernelCallback",
+          "passed": true,
+          "response": "strawwu-bridge PolicySet profile=anticheat applied without crash"
+        },
+        {
+          "probe_name": "bridge_block_init_module",
+          "category": "KernelModuleScan",
+          "passed": true,
+          "response": "init_module decision=Deny"
+        },
+        {
+          "probe_name": "bridge_block_ptrace",
+          "category": "DebuggerDetection",
+          "passed": true,
+          "response": "ptrace decision=Deny"
+        },
+        {
+          "probe_name": "bridge_allow_openat",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "openat decision=Allow (must remain Allow)"
+        }
+      ]
+    },
+    {
+      "name": "battleye_init",
+      "anticheat_type": "BattlEye",
+      "backend": "native",
+      "status": "PARTIAL",
+      "grade": "B",
+      "substantive_verified": true,
+      "probe_pass": 12,
+      "probe_total": 13,
+      "probe_ratio": 0.923,
+      "bridge_policy_side_effect": true,
+      "notes": "kernel scan intercepted; process not crash; bridge policy deny init_module",
+      "disclaimer": "PARTIAL only — does not guarantee ranked play or official AC signature pass",
+      "probes": [
+        {
+          "probe_name": "be_kernel_scan",
+          "category": "KernelModuleScan",
+          "passed": true,
+          "response": "scan intercepted by bridge"
+        },
+        {
+          "probe_name": "be_dll_check",
+          "category": "DllIntegrity",
+          "passed": true,
+          "response": "DLL integrity stub pass"
+        },
+        {
+          "probe_name": "be_debugger_check",
+          "category": "DebuggerDetection",
+          "passed": true,
+          "response": "NtQueryInformationProcess returns no debugger"
+        },
+        {
+          "probe_name": "hidden_window_check",
+          "category": "WindowEnumeration",
+          "passed": true,
+          "response": "no suspicious hidden windows detected in enum"
+        },
+        {
+          "probe_name": "overlay_window_check",
+          "category": "WindowEnumeration",
+          "passed": true,
+          "response": "overlay windows filtered from enumeration"
+        },
+        {
+          "probe_name": "tool_window_visibility",
+          "category": "WindowEnumeration",
+          "passed": false,
+          "response": "debug tool window visible — PARTIAL"
+        },
+        {
+          "probe_name": "process_list_filter",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "host-side processes hidden from guest enumeration"
+        },
+        {
+          "probe_name": "module_list_filter",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "injected modules not visible in LDR list"
+        },
+        {
+          "probe_name": "thread_enumeration",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "bridge threads excluded from NtQuerySystemInformation"
+        },
+        {
+          "probe_name": "bridge_seccomp_profile",
+          "category": "KernelCallback",
+          "passed": true,
+          "response": "strawwu-bridge PolicySet profile=anticheat applied without crash"
+        },
+        {
+          "probe_name": "bridge_block_init_module",
+          "category": "KernelModuleScan",
+          "passed": true,
+          "response": "init_module decision=Deny"
+        },
+        {
+          "probe_name": "bridge_block_ptrace",
+          "category": "DebuggerDetection",
+          "passed": true,
+          "response": "ptrace decision=Deny"
+        },
+        {
+          "probe_name": "bridge_allow_openat",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "openat decision=Allow (must remain Allow)"
+        }
+      ]
+    },
+    {
+      "name": "vanguard_tpm_probe",
+      "anticheat_type": "Vanguard",
+      "backend": "microvm",
+      "status": "PARTIAL",
+      "grade": "F",
+      "substantive_verified": true,
+      "probe_pass": 10,
+      "probe_total": 13,
+      "probe_ratio": 0.769,
+      "bridge_policy_side_effect": true,
+      "notes": "TPM stub partial; kernel driver not loaded — policy deny; grade F honest",
+      "disclaimer": "PARTIAL only — does not guarantee ranked play or official AC signature pass",
+      "probes": [
+        {
+          "probe_name": "vanguard_tpm_probe",
+          "category": "TpmCheck",
+          "passed": false,
+          "response": "TPM stub — PARTIAL, no real TPM attestation"
+        },
+        {
+          "probe_name": "vanguard_kernel_driver",
+          "category": "DriverSignature",
+          "passed": false,
+          "response": "kernel-mode driver not loaded — policy deny"
+        },
+        {
+          "probe_name": "vanguard_process_scan",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "process list filtered"
+        },
+        {
+          "probe_name": "hidden_window_check",
+          "category": "WindowEnumeration",
+          "passed": true,
+          "response": "no suspicious hidden windows detected in enum"
+        },
+        {
+          "probe_name": "overlay_window_check",
+          "category": "WindowEnumeration",
+          "passed": true,
+          "response": "overlay windows filtered from enumeration"
+        },
+        {
+          "probe_name": "tool_window_visibility",
+          "category": "WindowEnumeration",
+          "passed": false,
+          "response": "debug tool window visible — PARTIAL"
+        },
+        {
+          "probe_name": "process_list_filter",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "host-side processes hidden from guest enumeration"
+        },
+        {
+          "probe_name": "module_list_filter",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "injected modules not visible in LDR list"
+        },
+        {
+          "probe_name": "thread_enumeration",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "bridge threads excluded from NtQuerySystemInformation"
+        },
+        {
+          "probe_name": "bridge_seccomp_profile",
+          "category": "KernelCallback",
+          "passed": true,
+          "response": "strawwu-bridge PolicySet profile=anticheat applied without crash"
+        },
+        {
+          "probe_name": "bridge_block_init_module",
+          "category": "KernelModuleScan",
+          "passed": true,
+          "response": "init_module decision=Deny"
+        },
+        {
+          "probe_name": "bridge_block_ptrace",
+          "category": "DebuggerDetection",
+          "passed": true,
+          "response": "ptrace decision=Deny"
+        },
+        {
+          "probe_name": "bridge_allow_openat",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "openat decision=Allow (must remain Allow)"
+        }
+      ]
+    },
+    {
+      "name": "custom_ac_window_process",
+      "anticheat_type": "CustomAC",
+      "backend": "native",
+      "status": "PARTIAL",
+      "grade": "B",
+      "substantive_verified": true,
+      "probe_pass": 10,
+      "probe_total": 11,
+      "probe_ratio": 0.909,
+      "bridge_policy_side_effect": true,
+      "notes": "custom window/process/debugger stubs; game syscall profile; no ranked claim",
+      "disclaimer": "PARTIAL only — does not guarantee ranked play or official AC signature pass",
+      "probes": [
+        {
+          "probe_name": "hidden_window_check",
+          "category": "WindowEnumeration",
+          "passed": true,
+          "response": "no suspicious hidden windows detected in enum"
+        },
+        {
+          "probe_name": "overlay_window_check",
+          "category": "WindowEnumeration",
+          "passed": true,
+          "response": "overlay windows filtered from enumeration"
+        },
+        {
+          "probe_name": "tool_window_visibility",
+          "category": "WindowEnumeration",
+          "passed": false,
+          "response": "debug tool window visible — PARTIAL"
+        },
+        {
+          "probe_name": "process_list_filter",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "host-side processes hidden from guest enumeration"
+        },
+        {
+          "probe_name": "module_list_filter",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "injected modules not visible in LDR list"
+        },
+        {
+          "probe_name": "thread_enumeration",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "bridge threads excluded from NtQuerySystemInformation"
+        },
+        {
+          "probe_name": "custom_debugger_check",
+          "category": "DebuggerDetection",
+          "passed": true,
+          "response": "NtQueryInformationProcess stub: no debugger attached"
+        },
+        {
+          "probe_name": "bridge_seccomp_profile",
+          "category": "KernelCallback",
+          "passed": true,
+          "response": "strawwu-bridge PolicySet profile=game applied without crash"
+        },
+        {
+          "probe_name": "bridge_block_init_module",
+          "category": "KernelModuleScan",
+          "passed": true,
+          "response": "init_module decision=Allow"
+        },
+        {
+          "probe_name": "bridge_block_ptrace",
+          "category": "DebuggerDetection",
+          "passed": true,
+          "response": "ptrace decision=Deny"
+        },
+        {
+          "probe_name": "bridge_allow_openat",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "openat decision=Allow (must remain Allow)"
+        }
+      ]
+    }
+  ],
+  "results": [
+    {
+      "name": "eac_driver_probe",
+      "anticheat_type": "EasyAntiCheat",
+      "backend": "native",
+      "status": "PARTIAL",
+      "grade": "B",
+      "substantive_verified": true,
+      "probe_pass": 11,
+      "probe_total": 13,
+      "probe_ratio": 0.846,
+      "bridge_policy_side_effect": true,
+      "notes": "driver stub via strawwu_ipc; DLL integrity partial; bridge seccomp applied",
+      "disclaimer": "PARTIAL only — does not guarantee ranked play or official AC signature pass",
+      "probes": [
+        {
+          "probe_name": "eac_driver_loaded",
+          "category": "DriverSignature",
+          "passed": true,
+          "response": "stub driver present via strawwu_ipc"
+        },
+        {
+          "probe_name": "eac_kernel_callback",
+          "category": "KernelCallback",
+          "passed": true,
+          "response": "callback stub registered"
+        },
+        {
+          "probe_name": "eac_dll_integrity",
+          "category": "DllIntegrity",
+          "passed": false,
+          "response": "DLL hash mismatch expected — PARTIAL"
+        },
+        {
+          "probe_name": "hidden_window_check",
+          "category": "WindowEnumeration",
+          "passed": true,
+          "response": "no suspicious hidden windows detected in enum"
+        },
+        {
+          "probe_name": "overlay_window_check",
+          "category": "WindowEnumeration",
+          "passed": true,
+          "response": "overlay windows filtered from enumeration"
+        },
+        {
+          "probe_name": "tool_window_visibility",
+          "category": "WindowEnumeration",
+          "passed": false,
+          "response": "debug tool window visible — PARTIAL"
+        },
+        {
+          "probe_name": "process_list_filter",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "host-side processes hidden from guest enumeration"
+        },
+        {
+          "probe_name": "module_list_filter",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "injected modules not visible in LDR list"
+        },
+        {
+          "probe_name": "thread_enumeration",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "bridge threads excluded from NtQuerySystemInformation"
+        },
+        {
+          "probe_name": "bridge_seccomp_profile",
+          "category": "KernelCallback",
+          "passed": true,
+          "response": "strawwu-bridge PolicySet profile=anticheat applied without crash"
+        },
+        {
+          "probe_name": "bridge_block_init_module",
+          "category": "KernelModuleScan",
+          "passed": true,
+          "response": "init_module decision=Deny"
+        },
+        {
+          "probe_name": "bridge_block_ptrace",
+          "category": "DebuggerDetection",
+          "passed": true,
+          "response": "ptrace decision=Deny"
+        },
+        {
+          "probe_name": "bridge_allow_openat",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "openat decision=Allow (must remain Allow)"
+        }
+      ]
+    },
+    {
+      "name": "battleye_init",
+      "anticheat_type": "BattlEye",
+      "backend": "native",
+      "status": "PARTIAL",
+      "grade": "B",
+      "substantive_verified": true,
+      "probe_pass": 12,
+      "probe_total": 13,
+      "probe_ratio": 0.923,
+      "bridge_policy_side_effect": true,
+      "notes": "kernel scan intercepted; process not crash; bridge policy deny init_module",
+      "disclaimer": "PARTIAL only — does not guarantee ranked play or official AC signature pass",
+      "probes": [
+        {
+          "probe_name": "be_kernel_scan",
+          "category": "KernelModuleScan",
+          "passed": true,
+          "response": "scan intercepted by bridge"
+        },
+        {
+          "probe_name": "be_dll_check",
+          "category": "DllIntegrity",
+          "passed": true,
+          "response": "DLL integrity stub pass"
+        },
+        {
+          "probe_name": "be_debugger_check",
+          "category": "DebuggerDetection",
+          "passed": true,
+          "response": "NtQueryInformationProcess returns no debugger"
+        },
+        {
+          "probe_name": "hidden_window_check",
+          "category": "WindowEnumeration",
+          "passed": true,
+          "response": "no suspicious hidden windows detected in enum"
+        },
+        {
+          "probe_name": "overlay_window_check",
+          "category": "WindowEnumeration",
+          "passed": true,
+          "response": "overlay windows filtered from enumeration"
+        },
+        {
+          "probe_name": "tool_window_visibility",
+          "category": "WindowEnumeration",
+          "passed": false,
+          "response": "debug tool window visible — PARTIAL"
+        },
+        {
+          "probe_name": "process_list_filter",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "host-side processes hidden from guest enumeration"
+        },
+        {
+          "probe_name": "module_list_filter",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "injected modules not visible in LDR list"
+        },
+        {
+          "probe_name": "thread_enumeration",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "bridge threads excluded from NtQuerySystemInformation"
+        },
+        {
+          "probe_name": "bridge_seccomp_profile",
+          "category": "KernelCallback",
+          "passed": true,
+          "response": "strawwu-bridge PolicySet profile=anticheat applied without crash"
+        },
+        {
+          "probe_name": "bridge_block_init_module",
+          "category": "KernelModuleScan",
+          "passed": true,
+          "response": "init_module decision=Deny"
+        },
+        {
+          "probe_name": "bridge_block_ptrace",
+          "category": "DebuggerDetection",
+          "passed": true,
+          "response": "ptrace decision=Deny"
+        },
+        {
+          "probe_name": "bridge_allow_openat",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "openat decision=Allow (must remain Allow)"
+        }
+      ]
+    },
+    {
+      "name": "vanguard_tpm_probe",
+      "anticheat_type": "Vanguard",
+      "backend": "microvm",
+      "status": "PARTIAL",
+      "grade": "F",
+      "substantive_verified": true,
+      "probe_pass": 10,
+      "probe_total": 13,
+      "probe_ratio": 0.769,
+      "bridge_policy_side_effect": true,
+      "notes": "TPM stub partial; kernel driver not loaded — policy deny; grade F honest",
+      "disclaimer": "PARTIAL only — does not guarantee ranked play or official AC signature pass",
+      "probes": [
+        {
+          "probe_name": "vanguard_tpm_probe",
+          "category": "TpmCheck",
+          "passed": false,
+          "response": "TPM stub — PARTIAL, no real TPM attestation"
+        },
+        {
+          "probe_name": "vanguard_kernel_driver",
+          "category": "DriverSignature",
+          "passed": false,
+          "response": "kernel-mode driver not loaded — policy deny"
+        },
+        {
+          "probe_name": "vanguard_process_scan",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "process list filtered"
+        },
+        {
+          "probe_name": "hidden_window_check",
+          "category": "WindowEnumeration",
+          "passed": true,
+          "response": "no suspicious hidden windows detected in enum"
+        },
+        {
+          "probe_name": "overlay_window_check",
+          "category": "WindowEnumeration",
+          "passed": true,
+          "response": "overlay windows filtered from enumeration"
+        },
+        {
+          "probe_name": "tool_window_visibility",
+          "category": "WindowEnumeration",
+          "passed": false,
+          "response": "debug tool window visible — PARTIAL"
+        },
+        {
+          "probe_name": "process_list_filter",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "host-side processes hidden from guest enumeration"
+        },
+        {
+          "probe_name": "module_list_filter",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "injected modules not visible in LDR list"
+        },
+        {
+          "probe_name": "thread_enumeration",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "bridge threads excluded from NtQuerySystemInformation"
+        },
+        {
+          "probe_name": "bridge_seccomp_profile",
+          "category": "KernelCallback",
+          "passed": true,
+          "response": "strawwu-bridge PolicySet profile=anticheat applied without crash"
+        },
+        {
+          "probe_name": "bridge_block_init_module",
+          "category": "KernelModuleScan",
+          "passed": true,
+          "response": "init_module decision=Deny"
+        },
+        {
+          "probe_name": "bridge_block_ptrace",
+          "category": "DebuggerDetection",
+          "passed": true,
+          "response": "ptrace decision=Deny"
+        },
+        {
+          "probe_name": "bridge_allow_openat",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "openat decision=Allow (must remain Allow)"
+        }
+      ]
+    },
+    {
+      "name": "custom_ac_window_process",
+      "anticheat_type": "CustomAC",
+      "backend": "native",
+      "status": "PARTIAL",
+      "grade": "B",
+      "substantive_verified": true,
+      "probe_pass": 10,
+      "probe_total": 11,
+      "probe_ratio": 0.909,
+      "bridge_policy_side_effect": true,
+      "notes": "custom window/process/debugger stubs; game syscall profile; no ranked claim",
+      "disclaimer": "PARTIAL only — does not guarantee ranked play or official AC signature pass",
+      "probes": [
+        {
+          "probe_name": "hidden_window_check",
+          "category": "WindowEnumeration",
+          "passed": true,
+          "response": "no suspicious hidden windows detected in enum"
+        },
+        {
+          "probe_name": "overlay_window_check",
+          "category": "WindowEnumeration",
+          "passed": true,
+          "response": "overlay windows filtered from enumeration"
+        },
+        {
+          "probe_name": "tool_window_visibility",
+          "category": "WindowEnumeration",
+          "passed": false,
+          "response": "debug tool window visible — PARTIAL"
+        },
+        {
+          "probe_name": "process_list_filter",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "host-side processes hidden from guest enumeration"
+        },
+        {
+          "probe_name": "module_list_filter",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "injected modules not visible in LDR list"
+        },
+        {
+          "probe_name": "thread_enumeration",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "bridge threads excluded from NtQuerySystemInformation"
+        },
+        {
+          "probe_name": "custom_debugger_check",
+          "category": "DebuggerDetection",
+          "passed": true,
+          "response": "NtQueryInformationProcess stub: no debugger attached"
+        },
+        {
+          "probe_name": "bridge_seccomp_profile",
+          "category": "KernelCallback",
+          "passed": true,
+          "response": "strawwu-bridge PolicySet profile=game applied without crash"
+        },
+        {
+          "probe_name": "bridge_block_init_module",
+          "category": "KernelModuleScan",
+          "passed": true,
+          "response": "init_module decision=Allow"
+        },
+        {
+          "probe_name": "bridge_block_ptrace",
+          "category": "DebuggerDetection",
+          "passed": true,
+          "response": "ptrace decision=Deny"
+        },
+        {
+          "probe_name": "bridge_allow_openat",
+          "category": "ProcessScan",
+          "passed": true,
+          "response": "openat decision=Allow (must remain Allow)"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_cases": 4,
+    "partial_or_fail_only": true,
+    "grades_present": [
+      "B",
+      "F"
+    ],
+    "bridge_policy_side_effects": 4,
+    "overall_from_engine": "PARTIAL"
+  },
+  "known_limitations": [
+    "probe stubs + strawwu-bridge PolicySet side effects; not real EAC/BE/Vanguard binaries",
+    "goal is run-without-crash + honest A/B/C/F grades",
+    "never claims ranked play or official AC signature pass",
+    "Vanguard kernel/TPM remain grade F by policy"
+  ],
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
+    "no Wine/Proton substrate; execution_backend=native",
+    "no WinBox naming",
+    "no full Windows compatibility claim",
+    "no anti-cheat ranked pass claim",
+    "no 3A completion claim"
+  ]
+}
