@@ -1,0 +1,135 @@
+{
+  "track": "A+3",
+  "stage": "pc0-portable-scaffold",
+  "description": "Portable Core crate→artifact inventory for self-contained prefix / AppImage / Flatpak. Not a full Windows compatibility claim.",
+  "prefix_env": "STRAWWU_PREFIX",
+  "components": {
+    "runtime": {
+      "crate": "strawwu-runtime",
+      "path": "components/strawwu-runtime",
+      "kind": "rust-lib",
+      "artifact": "libstrawwu_runtime.rlib",
+      "linked_into": ["strawwu"],
+      "role": "SubsystemSession orchestrator, process graph, workload scheduling",
+      "shared_libs_host": ["libc.so.6"],
+      "packaging": {
+        "prefix": "lib/",
+        "appimage": "usr/lib/strawwu/",
+        "flatpak": "lib/strawwu/"
+      }
+    },
+    "nt": {
+      "crate": "strawwu-nt",
+      "path": "components/strawwu-nt",
+      "kind": "rust-lib",
+      "artifact": "libstrawwu_nt.rlib",
+      "linked_into": ["strawwu"],
+      "role": "NT/PE loader stubs, registry, TEB/WoW64 helpers",
+      "shared_libs_host": ["libc.so.6"],
+      "packaging": {
+        "prefix": "lib/",
+        "appimage": "usr/lib/strawwu/",
+        "flatpak": "lib/strawwu/"
+      }
+    },
+    "launcher": {
+      "crate": "strawwu-launcher",
+      "path": "components/strawwu-launcher",
+      "kind": "rust-bin",
+      "artifact": "strawwu",
+      "role": "PE/ELF dispatch CLI entrypoint",
+      "shared_libs_host": ["libc.so.6", "libgcc_s.so.1", "libm.so.6", "libpthread.so.0", "libdl.so.2"],
+      "packaging": {
+        "prefix": "bin/strawwu",
+        "appimage": "usr/bin/strawwu",
+        "flatpak": "bin/strawwu"
+      }
+    },
+    "cli": {
+      "crate": "strawwu-cli",
+      "path": "components/strawwu-cli",
+      "kind": "rust-lib",
+      "artifact": "libstrawwu_cli.rlib",
+      "linked_into": ["strawwu"],
+      "role": "status/devices/mfp CLI surfaces used by launcher",
+      "shared_libs_host": ["libc.so.6"],
+      "packaging": {
+        "prefix": "lib/",
+        "appimage": "usr/lib/strawwu/",
+        "flatpak": "lib/strawwu/"
+      }
+    },
+    "graphics": {
+      "crate": "strawwu-graphics",
+      "path": "components/strawwu-graphics",
+      "kind": "rust-lib",
+      "artifact": "libstrawwu_graphics.rlib",
+      "linked_into": ["strawwu"],
+      "role": "graphics bridge (DXGI/D3D11/Vulkan/OpenGL present path)",
+      "shared_libs_host": ["libc.so.6", "libvulkan.so.1", "libGL.so.1"],
+      "notes": "Host GPU ICD may remain PARTIAL under Flatpak sandbox",
+      "packaging": {
+        "prefix": "lib/",
+        "appimage": "usr/lib/strawwu/",
+        "flatpak": "lib/strawwu/"
+      }
+    },
+    "audio": {
+      "crate": "strawwu-audio",
+      "path": "components/strawwu-audio",
+      "kind": "rust-lib",
+      "artifact": "libstrawwu_audio.rlib",
+      "linked_into": ["strawwu"],
+      "role": "audio / input bridge (WASAPI stubs, XInput path)",
+      "shared_libs_host": ["libc.so.6", "libpulse.so.0", "libasound.so.2"],
+      "notes": "Pulse/PipeWire host access may require Flatpak --socket=pulseaudio",
+      "packaging": {
+        "prefix": "lib/",
+        "appimage": "usr/lib/strawwu/",
+        "flatpak": "lib/strawwu/"
+      }
+    },
+    "hub": {
+      "crate": "strawwu-hub",
+      "path": "hub",
+      "kind": "electron-app",
+      "artifact": "strawwu-hub",
+      "role": "System settings / subsystem status UI (optional in core prefix)",
+      "shared_libs_host": ["libgtk-3.so.0", "libnss3.so", "libX11.so.6"],
+      "notes": "Optional for minimal CLI-only prefix; AppImage/Flatpak may ship separately",
+      "packaging": {
+        "prefix": "opt/strawwu-hub/",
+        "appimage": "optional",
+        "flatpak": "optional"
+      }
+    }
+  },
+  "support_crates": {
+    "bridge": {
+      "crate": "strawwu-bridge",
+      "path": "components/strawwu-bridge",
+      "linked_into": ["strawwu"]
+    },
+    "app_registry": {
+      "crate": "strawwu-app-registry",
+      "path": "components/strawwu-app-registry",
+      "linked_into": ["strawwu"]
+    },
+    "device_proxy": {
+      "crate": "strawwu-device-proxy",
+      "path": "components/strawwu-device-proxy",
+      "linked_into": ["strawwu"]
+    }
+  },
+  "packaging_targets": {
+    "prefix": "components/packaging/portable/prefix",
+    "appimage": "components/packaging/portable/appimage",
+    "flatpak": "components/packaging/portable/flatpak"
+  },
+  "exclusions": [
+    "Wine/Proton as substrate",
+    "WinBox/winbox naming",
+    "ISO/os-image/Plymouth/Calamares/kernel/desktop session",
+    "full Windows compatibility claims"
+  ]
+}
