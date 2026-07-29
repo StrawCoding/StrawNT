@@ -1,4 +1,8 @@
-# StrawWU
+# StrawWU Portable
+
+> **獨立倉庫**：本目錄是 `StrawCoding/StrawWU-portable`（https://github.com/StrawCoding/StrawWU-portable），與 StrawWU ISO／T1 發行版 repo **分開**。預設分支唯一 `main`。焦點＝可攜 Win 相容核心（prefix／AppImage／Flatpak），不是 ISO 建置軌道。
+
+# StrawWU（上游同源樹說明）
 
 StrawWU 是以 **Ubuntu 官方 live 映像為基底**的桌面作業系統，透過 **clone → 替換自訂 kernel → 疊加 StrawWU 元件** 的方式建置，目標是在單一 OS 內提供 Windows 與 Linux 應用程式同級的 runtime 調度能力。
 
