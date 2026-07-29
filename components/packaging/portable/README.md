@@ -1,79 +1,45 @@
-# StrawWU Portable Core packaging
+# StrawNT packaging
 
-Track **A+3** skeleton for a **cross-distro, self-contained Win-compat core**
+Cross-distro, self-contained **native PE／NT ABI** core
 (runtime / nt / launcher / graphics·audio / Hub / CLI).
 
 This directory does **not** claim full Windows compatibility. It does **not**
 use Wine/Proton as a substrate, and it does **not** introduce `WinBox` /
-`winbox` naming or per-app sandbox defaults.
+`winbox` naming or per-app sandbox defaults. StrawNT is an independent
+product — not an OS / ISO / desktop distribution.
 
 ## Layout
 
 | Path | Purpose | Stage |
 |------|---------|-------|
-| `prefix/` | Self-contained `$STRAWWU_PREFIX` (bundled libs + rpath) | pc1 |
+| `prefix/` | Self-contained `$STRAWNT_PREFIX` (bundled libs + rpath) | pc1 |
 | `appimage/` | AppImage (or equivalent single-dir bundle) recipes | pc2 |
 | `flatpak/` | Flatpak manifest + notes (honest PARTIAL allowed) | pc3 |
-| `../` (deb) | Existing Debian packaging — unchanged ISO/deb track | — |
 
-## Inventory
-
-Crate → artifact mapping lives in:
-
-`docs/plans/portable-core/inventory.json`
-
-Required core keys: `runtime`, `nt`, `launcher`, `cli`, `graphics`, `audio`, `hub`.
-
-## Build (pc1 / pc2 / pc3)
+## Build
 
 ```bash
 make portable-prefix
-# or: bash components/packaging/portable/build-prefix.sh
-
 make portable-appimage
-# or: bash components/packaging/portable/build-appimage.sh
-
 make portable-flatpak
-# or: bash components/packaging/portable/build-flatpak.sh
 ```
 
-Optional Hub bundling: `STRAWWU_PORTABLE_WITH_HUB=1 make portable-prefix`.
+Optional Hub bundling: `STRAWNT_PORTABLE_WITH_HUB=1 make portable-prefix`.
+
+Primary CLI binary: **`strawnt`** (`bin/strawwu` is a deprecated compat alias).
 
 ## Smoke
 
 ```bash
-bash tests/portable/smoke-prefix.sh --help
-bash tests/portable/smoke-prefix.sh --dry-run   # scaffold + inventory only
-make test-portable-prefix                      # builds if needed; writes smoke-prefix.json
+make test-portable-prefix
 jq .status tests/portable/output/smoke-prefix.json
-
-make test-portable-appimage                    # clean-container smoke → smoke-appimage.json
-jq .status tests/portable/output/smoke-appimage.json
-test -f tests/portable/output/SHA256SUMS
-
-make test-portable-flatpak                     # Flatpak smoke → smoke-flatpak.json (PASS|PARTIAL)
-jq .status tests/portable/output/smoke-flatpak.json
-
-make test-portable-matrix                      # ≥3 distro containers → matrix.json
-jq .status tests/portable/output/matrix.json
-jq '.distros | length' tests/portable/output/matrix.json
-
-make test-portable-closeout                    # docs + artifacts + SHA256 + merge → closeout.json
-jq .status tests/portable/output/closeout.json
 ```
 
-User guide: `docs/plans/portable-core/USER-GUIDE.md`  
-Artifact index: `docs/plans/portable-core/artifacts.json`
-
-Full prefix `--version` / `status` without system `strawwu-*` debs is **pc1**.  
-AppImage／portable bundle + SHA256 + clean-container smoke is **pc2**.  
-Flatpak manifest + build；PE／session 需 host FS → 誠實 **PARTIAL** 是 **pc3**.  
-Cross-distro container matrix（Ubuntu LTS／Fedora／Arch；禁 ISO 實機）是 **pc4**.  
-Closeout（文件／索引／SHA256／merge main／`closeout.json`）是 **pc5**.
+User guide: `docs/plans/portable-core/USER-GUIDE.md`
 
 ## Explicit non-goals
 
 - ISO / os-image / Plymouth / Calamares / kernel / desktop session changes
-- Replacing the StrawWU Live USB / installed-distro track
 - Declaring complete Windows application compatibility
 - Declaring full Flatpak sandbox compatibility for PE / SubsystemSession
+- Wine / Proton as execution substrate

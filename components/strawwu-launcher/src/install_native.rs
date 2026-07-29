@@ -1,5 +1,5 @@
 //! Native EXE/MSI install path: unpack → app registry → desktop shortcut.
-//! Shared by `strawwu install` and `strawwu open` (install mode). No Wine.
+//! Shared by `strawnt install` and `strawnt open` (install mode). No Wine.
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -27,23 +27,27 @@ pub struct NativeInstallReport {
 }
 
 fn apps_root() -> PathBuf {
-    if let Ok(dir) = std::env::var("STRAWWU_APPS_DIR") {
-        if !dir.is_empty() {
-            return PathBuf::from(dir);
+    for key in ["STRAWNT_APPS_DIR", "STRAWWU_APPS_DIR"] {
+        if let Ok(dir) = std::env::var(key) {
+            if !dir.is_empty() {
+                return PathBuf::from(dir);
+            }
         }
     }
-    if let Ok(side) = std::env::var("STRAWWU_PE_SIDE_EFFECT_DIR") {
-        if !side.is_empty() {
-            return PathBuf::from(side).join("apps");
+    for key in ["STRAWNT_PE_SIDE_EFFECT_DIR", "STRAWWU_PE_SIDE_EFFECT_DIR"] {
+        if let Ok(side) = std::env::var(key) {
+            if !side.is_empty() {
+                return PathBuf::from(side).join("apps");
+            }
         }
     }
     if let Ok(home) = std::env::var("HOME") {
-        return PathBuf::from(home).join(".local/share/strawwu/apps");
+        return PathBuf::from(home).join(".local/share/strawnt/apps");
     }
-    PathBuf::from("/var/lib/strawwu/apps")
+    PathBuf::from("/var/lib/strawnt/apps")
 }
 
-/// True when the on-disk installer carries a StrawWU native SWUP/SWUM archive.
+/// True when the on-disk installer carries a StrawNT native SWUP/SWUM archive.
 pub fn installer_has_native_package(path: &Path) -> bool {
     match fs::read(path) {
         Ok(data) if !data.is_empty() => is_native_installer_blob(&data),

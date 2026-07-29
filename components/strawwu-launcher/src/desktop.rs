@@ -5,32 +5,32 @@ use std::process::Command;
 use crate::registry::derive_app_name;
 
 pub fn desktop_dir() -> PathBuf {
-    if let Ok(dir) = std::env::var("STRAWWU_DESKTOP_DIR") {
+    if let Ok(dir) = std::env::var("STRAWNT_DESKTOP_DIR").or_else(|_| std::env::var("STRAWWU_DESKTOP_DIR")) {
         return PathBuf::from(dir);
     }
     if let Ok(home) = std::env::var("HOME") {
         return PathBuf::from(home).join(".local/share/applications");
     }
-    PathBuf::from("/var/lib/strawwu/applications")
+    PathBuf::from("/var/lib/strawnt/applications")
 }
 
 pub fn mime_packages_dir() -> PathBuf {
-    if let Ok(dir) = std::env::var("STRAWWU_MIME_DIR") {
+    if let Ok(dir) = std::env::var("STRAWNT_MIME_DIR").or_else(|_| std::env::var("STRAWWU_MIME_DIR")) {
         return PathBuf::from(dir);
     }
     if let Ok(home) = std::env::var("HOME") {
         return PathBuf::from(home).join(".local/share/mime/packages");
     }
-    PathBuf::from("/var/lib/strawwu/mime/packages")
+    PathBuf::from("/var/lib/strawnt/mime/packages")
 }
 
 pub fn desktop_path_for(app_id: &str) -> PathBuf {
     desktop_dir().join(format!("{app_id}.desktop"))
 }
 
-/// Absolute path to the `strawwu` binary for Exec= lines (desktop envs often have a thin PATH).
+/// Absolute path to the `strawnt` binary for Exec= lines (desktop envs often have a thin PATH).
 pub fn strawwu_bin_for_exec() -> String {
-    if let Ok(p) = std::env::var("STRAWWU_BIN") {
+    if let Ok(p) = std::env::var("STRAWNT_BIN").or_else(|_| std::env::var("STRAWWU_BIN")) {
         if !p.is_empty() {
             return p;
         }
@@ -41,17 +41,15 @@ pub fn strawwu_bin_for_exec() -> String {
         }
         return exe.display().to_string();
     }
-    if let Ok(prefix) = std::env::var("STRAWWU_PREFIX") {
-        let candidate = PathBuf::from(&prefix).join("bin/strawwu-portable");
-        if candidate.is_file() {
-            return candidate.display().to_string();
-        }
-        let candidate = PathBuf::from(&prefix).join("bin/strawwu");
-        if candidate.is_file() {
-            return candidate.display().to_string();
+    if let Ok(prefix) = std::env::var("STRAWNT_PREFIX").or_else(|_| std::env::var("STRAWWU_PREFIX")) {
+        for name in ["strawnt-portable", "strawwu-portable", "strawnt", "strawwu"] {
+            let candidate = PathBuf::from(&prefix).join("bin").join(name);
+            if candidate.is_file() {
+                return candidate.display().to_string();
+            }
         }
     }
-    "strawwu".to_string()
+    "strawnt".to_string()
 }
 
 /// Reject an app_id that is unsafe as a filename component or .desktop key value.
@@ -139,23 +137,23 @@ pub fn write_launcher_desktop_in(
         "[Desktop Entry]\n\
          Type=Application\n\
          Name={display_name}\n\
-         Comment=Launch with StrawWU Portable Core (native strawwu-nt)\n\
+         Comment=Launch with StrawNT (native PE)\n\
          Exec={exec}\n\
          Icon=application-x-ms-dos-executable\n\
          Terminal=false\n\
          Categories=Utility;\n\
          StartupWMClass={app_id}\n\
-         X-StrawWU-App-Id={app_id}\n\
-         X-StrawWU-Source=launcher\n\
-         X-StrawWU-Kind=win32\n\
-         X-StrawWU-Backend=native\n"
+         X-StrawNT-App-Id={app_id}\n\
+         X-StrawNT-Source=launcher\n\
+         X-StrawNT-Kind=win32\n\
+         X-StrawNT-Backend=native\n"
     );
 
     fs::write(&path, body).map_err(|e| e.to_string())?;
     Ok(path)
 }
 
-const OPEN_HANDLER_ID: &str = "strawwu-open";
+const OPEN_HANDLER_ID: &str = "strawnt-open";
 
 const MIME_TYPES: &[&str] = &[
     "application/x-ms-dos-executable",
@@ -165,7 +163,7 @@ const MIME_TYPES: &[&str] = &[
     "application/x-ms-shortcut",
 ];
 
-/// Install MIME handler so double-clicking .exe/.msi opens with StrawWU.
+/// Install MIME handler so double-clicking .exe/.msi opens with StrawNT.
 pub fn install_desktop_integration() -> Result<PathBuf, String> {
     install_desktop_integration_in(&desktop_dir(), &mime_packages_dir(), &strawwu_bin_for_exec())
 }
@@ -180,31 +178,31 @@ pub fn install_desktop_integration_in(
 
     let mime_list = MIME_TYPES.join(";");
     let handler = apps_dir.join(format!("{OPEN_HANDLER_ID}.desktop"));
-    // Double-click MIME path: strawwu open → native strawwu-nt only.
+    // Double-click MIME path: strawnt open → native PE only.
     let exec = format!("{} open %f", desktop_exec_arg(strawwu_bin));
     let body = format!(
         "[Desktop Entry]\n\
          Type=Application\n\
-         Name=StrawWU\n\
+         Name=StrawNT\n\
          GenericName=Windows App Launcher\n\
-         Comment=Install or run Windows .exe/.msi via native strawwu-nt\n\
+         Comment=Install or run Windows .exe/.msi via StrawNT native PE\n\
          Exec={exec}\n\
          TryExec={try_exec}\n\
-         Icon=strawwu\n\
+         Icon=strawnt\n\
          Terminal=false\n\
          Categories=System;Utility;\n\
          MimeType={mime_list};\n\
          NoDisplay=false\n\
          StartupNotify=true\n\
-         X-StrawWU-Kind=open-handler\n\
-         X-StrawWU-Backend=native\n",
+         X-StrawNT-Kind=open-handler\n\
+         X-StrawNT-Backend=native\n",
         try_exec = desktop_escape(strawwu_bin),
         mime_list = mime_list,
     );
     fs::write(&handler, body).map_err(|e| e.to_string())?;
 
     // Ensure .exe/.msi are recognized even on minimal environments.
-    let mime_xml = mime_dir.join("strawwu-win32.xml");
+    let mime_xml = mime_dir.join("strawnt-win32.xml");
     let xml = r#"<?xml version="1.0" encoding="UTF-8"?>
 <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
   <mime-type type="application/vnd.microsoft.portable-executable">
@@ -252,18 +250,18 @@ mod tests {
     #[test]
     fn write_desktop_entry() {
         let dir = tempdir().unwrap();
-        std::env::set_var("STRAWWU_BIN", "/opt/strawwu/bin/strawwu");
+        std::env::set_var("STRAWNT_BIN", "/opt/strawnt/bin/strawnt");
         let binary = Path::new("/tmp/apps/notepad.exe");
         let path =
             write_launcher_desktop_in(dir.path(), "notepad", binary, Some("Notepad")).unwrap();
         assert!(path.exists());
         let content = fs::read_to_string(&path).unwrap();
         assert!(content.contains("Name=Notepad"));
-        assert!(content.contains("X-StrawWU-App-Id=notepad"));
-        assert!(content.contains("strawwu"));
+        assert!(content.contains("X-StrawNT-App-Id=notepad"));
+        assert!(content.contains("strawnt"));
         assert!(content.contains(" run --backend native "));
-        assert!(content.contains("X-StrawWU-Backend=native"));
-        std::env::remove_var("STRAWWU_BIN");
+        assert!(content.contains("X-StrawNT-Backend=native"));
+        std::env::remove_var("STRAWNT_BIN");
     }
 
     #[test]
@@ -297,7 +295,7 @@ mod tests {
         let path = install_desktop_integration_in(
             apps.path(),
             mime.path(),
-            "/home/u/.local/bin/strawwu",
+            "/home/u/.local/bin/strawnt",
         )
         .unwrap();
         assert!(path.exists());
@@ -305,8 +303,8 @@ mod tests {
         assert!(content.contains("MimeType="));
         assert!(content.contains(" open %f"));
         assert!(content.contains("application/x-ms-dos-executable"));
-        assert!(content.contains("X-StrawWU-Backend=native"));
+        assert!(content.contains("X-StrawNT-Backend=native"));
         assert!(!content.to_lowercase().contains("wine"));
-        assert!(mime.path().join("strawwu-win32.xml").exists());
+        assert!(mime.path().join("strawnt-win32.xml").exists());
     }
 }

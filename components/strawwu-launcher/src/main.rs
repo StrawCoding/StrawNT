@@ -18,7 +18,7 @@ use strawwu_runtime::maybe_run_gui_smoke;
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 // Restore default SIGPIPE so the CLI is terminated by the signal (like any Unix
-// filter) when a downstream reader closes the pipe early — e.g. `strawwu ... |
+// filter) when a downstream reader closes the pipe early — e.g. `strawnt ... |
 // grep -q` / `| head`. Rust otherwise ignores SIGPIPE and panics on the failed
 // stdout write ("Broken pipe"). Must run before any stdout output.
 #[cfg(unix)]
@@ -37,14 +37,14 @@ fn main() {
     let cmd = match cli::parse_args(&args) {
         Ok(cmd) => cmd,
         Err(e) => {
-            eprintln!("strawwu: {e}");
+            eprintln!("strawnt: {e}");
             process::exit(1);
         }
     };
 
     match cmd {
         Command::Version => {
-            println!("strawwu {VERSION}");
+            println!("strawnt {VERSION}");
         }
         Command::Help => {
             print_help();
@@ -80,7 +80,7 @@ fn main() {
                 match install_native::native_install(&path) {
                     Ok(report) => {
                         println!(
-                            "strawwu: open/install native unpack app_id={} type={} install_path={} main={} desktop={} backend=native mode=real files={}",
+                            "strawnt: open/install native unpack app_id={} type={} install_path={} main={} desktop={} backend=native mode=real files={}",
                             report.app_id,
                             report.installer_type,
                             report.install_path,
@@ -91,7 +91,7 @@ fn main() {
                         let _ = log::append_event("native_install", &report);
                         let main = PathBuf::from(&report.main_exe);
                         open::notify(
-                            "StrawWU",
+                            "StrawNT",
                             &format!("Installing & launching {}", report.app_name),
                         );
                         if let Err(code) = launch_pe_with_registry(
@@ -103,16 +103,16 @@ fn main() {
                             false,
                             Some(&report.app_id),
                         ) {
-                            open::notify("StrawWU", &format!("Failed to open {}", report.app_name));
+                            open::notify("StrawNT", &format!("Failed to open {}", report.app_name));
                             process::exit(code);
                         }
                         open::notify(
-                            "StrawWU",
+                            "StrawNT",
                             &format!("{} ready — also available from the app menu", report.app_name),
                         );
                     }
                     Err(e) => {
-                        eprintln!("strawwu: native install failed: {e}");
+                        eprintln!("strawnt: native install failed: {e}");
                         process::exit(1);
                     }
                 }
@@ -121,12 +121,12 @@ fn main() {
                     match registry::register_install(&path) {
                         Ok(app_id) => {
                             println!(
-                                "strawwu: open/install registered pending app_id={app_id} ({})",
+                                "strawnt: open/install registered pending app_id={app_id} ({})",
                                 path.display()
                             );
                         }
                         Err(e) => {
-                            eprintln!("strawwu: open install register failed: {e}");
+                            eprintln!("strawnt: open install register failed: {e}");
                             process::exit(1);
                         }
                     }
@@ -134,7 +134,7 @@ fn main() {
 
                 let name = derive_app_name(&path);
                 open::notify(
-                    "StrawWU",
+                    "StrawNT",
                     &format!(
                         "{} {}",
                         if install_mode {
@@ -150,11 +150,11 @@ fn main() {
                 if let Err(code) =
                     launch_pe(&path, &[], Some("native"), &[], true, install_mode)
                 {
-                    open::notify("StrawWU", &format!("Failed to open {name}"));
+                    open::notify("StrawNT", &format!("Failed to open {name}"));
                     process::exit(code);
                 }
                 open::notify(
-                    "StrawWU",
+                    "StrawNT",
                     &format!("{name} ready — also available from the app menu"),
                 );
             }
@@ -164,7 +164,7 @@ fn main() {
                 match install_native::native_install(&installer) {
                     Ok(report) => {
                         println!(
-                            "strawwu: install {} (native unpack app_id={}; type={}; install_path={}; desktop={}; backend=native; mode=real)",
+                            "strawnt: install {} (native unpack app_id={}; type={}; install_path={}; desktop={}; backend=native; mode=real)",
                             installer.display(),
                             report.app_id,
                             report.installer_type,
@@ -185,21 +185,21 @@ fn main() {
                             Some(&report.app_id),
                         ) {
                             open::notify(
-                                "StrawWU",
+                                "StrawNT",
                                 &format!("Installed main launch failed: {}", report.app_name),
                             );
                             process::exit(code);
                         }
                         open::notify(
-                            "StrawWU",
+                            "StrawNT",
                             &format!(
-                                "{} installed — use the app menu or strawwu open to launch",
+                                "{} installed — use the app menu or strawnt open to launch",
                                 report.app_name
                             ),
                         );
                     }
                     Err(e) => {
-                        eprintln!("strawwu: native install failed: {e}");
+                        eprintln!("strawnt: native install failed: {e}");
                         process::exit(1);
                     }
                 }
@@ -215,32 +215,32 @@ fn main() {
                         match desktop_path {
                             Ok(path) => {
                                 println!(
-                                    "strawwu: install {} (registered pending app_id={app_id}; desktop={})",
+                                    "strawnt: install {} (registered pending app_id={app_id}; desktop={})",
                                     installer.display(),
                                     path.display()
                                 );
                             }
                             Err(e) => {
                                 println!(
-                                    "strawwu: install {} (registered pending app_id={app_id}; desktop skipped: {e})",
+                                    "strawnt: install {} (registered pending app_id={app_id}; desktop skipped: {e})",
                                     installer.display()
                                 );
                             }
                         }
-                        // Run the installer through the native strawwu-nt path.
+                        // Run the installer through the native strawnt-native path.
                         if let Err(code) =
                             launch_pe(&installer, &[], Some("native"), &[], false, true)
                         {
-                            open::notify("StrawWU", &format!("Install failed: {app_name}"));
+                            open::notify("StrawNT", &format!("Install failed: {app_name}"));
                             process::exit(code);
                         }
                         open::notify(
-                            "StrawWU",
-                            &format!("{app_name} installed — use the app menu or strawwu open to launch"),
+                            "StrawNT",
+                            &format!("{app_name} installed — use the app menu or strawnt open to launch"),
                         );
                     }
                     Err(e) => {
-                        eprintln!("strawwu: registry register failed: {e}");
+                        eprintln!("strawnt: registry register failed: {e}");
                         process::exit(1);
                     }
                 }
@@ -249,23 +249,23 @@ fn main() {
         Command::Integrate => match desktop::install_desktop_integration() {
             Ok(path) => {
                 println!(
-                    "strawwu: desktop integration installed\n  handler: {}\n  backend: native (strawwu-nt)\n  tip: double-click .exe / .msi to install & launch",
+                    "strawnt: desktop integration installed\n  handler: {}\n  backend: native (strawnt-native)\n  tip: double-click .exe / .msi to install & launch",
                     path.display()
                 );
                 open::notify(
-                    "StrawWU",
+                    "StrawNT",
                     "Click-to-open enabled for Windows .exe / .msi (native)",
                 );
             }
             Err(e) => {
-                eprintln!("strawwu: integrate failed: {e}");
+                eprintln!("strawnt: integrate failed: {e}");
                 process::exit(1);
             }
         },
         Command::Apps(sub) => match sub {
             cli::AppsSubcommand::List => match registry::list_registered_apps() {
                 Ok(apps) if apps.is_empty() => {
-                    println!("strawwu: no apps registered");
+                    println!("strawnt: no apps registered");
                 }
                 Ok(apps) => {
                     for (id, name, kind) in apps {
@@ -273,7 +273,7 @@ fn main() {
                     }
                 }
                 Err(e) => {
-                    eprintln!("strawwu: registry list failed: {e}");
+                    eprintln!("strawnt: registry list failed: {e}");
                     process::exit(1);
                 }
             },
@@ -289,7 +289,7 @@ fn main() {
                 match list_devices(format) {
                     Ok(out) => println!("{out}"),
                     Err(e) => {
-                        eprintln!("strawwu: devices list failed: {e}");
+                        eprintln!("strawnt: devices list failed: {e}");
                         process::exit(1);
                     }
                 }
@@ -311,45 +311,47 @@ fn main() {
                         }
                     }
                     Err(e) => {
-                        eprintln!("strawwu: mfp smoke failed: {e}");
+                        eprintln!("strawnt: mfp smoke failed: {e}");
                         process::exit(1);
                     }
                 }
             }
         },
         Command::Profile(_) => {
-            println!("strawwu: profile (stub)");
+            println!("strawnt: profile (stub)");
         }
         Command::Repair { app_id } => {
-            println!("strawwu: repair {app_id} (stub)");
+            println!("strawnt: repair {app_id} (stub)");
         }
         Command::Status => match registry::list_registered_apps() {
             Ok(apps) => {
                 let sessions = RuntimeOrchestrator::new().session_count();
                 println!(
-                    "strawwu: status — runtime idle, {} session(s), {} app(s) registered",
+                    "strawnt: status — runtime idle, {} session(s), {} app(s) registered",
                     sessions,
                     apps.len()
                 );
-                println!("strawwu: execution_backend=native (strawwu-nt)");
-                println!("strawwu: default backend=native");
+                println!("strawnt: execution_backend=native (strawnt-native)");
+                println!("strawnt: default backend=native");
             }
             Err(e) => {
-                eprintln!("strawwu: status failed: {e}");
+                eprintln!("strawnt: status failed: {e}");
                 process::exit(1);
             }
         },
         Command::Config(_) => {
-            println!("strawwu: config (stub)");
+            println!("strawnt: config (stub)");
         }
     }
 }
 
-/// Resolve execution backend. Default is **native** (self-built strawwu-nt).
+/// Resolve execution backend. Default is **native** (self-built strawnt-native).
 fn resolve_backend(requested: Option<&str>) -> String {
     match requested {
         Some(b) if !b.is_empty() => b.to_string(),
-        _ => std::env::var("STRAWWU_BACKEND").unwrap_or_else(|_| "native".into()),
+        _ => std::env::var("STRAWNT_BACKEND")
+            .or_else(|_| std::env::var("STRAWWU_BACKEND"))
+            .unwrap_or_else(|_| "native".into()),
     }
 }
 
@@ -385,7 +387,7 @@ fn launch_pe_with_registry(
     }
 
     if let Err(e) = req.validate() {
-        eprintln!("strawwu: launch validation failed: {e}");
+        eprintln!("strawnt: launch validation failed: {e}");
         return Err(1);
     }
 
@@ -400,12 +402,12 @@ fn launch_pe_with_registry(
         let desktop_entry = match desktop_path {
             Ok(path) => {
                 if from_open {
-                    println!("strawwu: desktop launcher → {}", path.display());
+                    println!("strawnt: desktop launcher → {}", path.display());
                 }
                 Some(path.to_string_lossy().into_owned())
             }
             Err(e) => {
-                eprintln!("strawwu: desktop entry skipped: {e}");
+                eprintln!("strawnt: desktop entry skipped: {e}");
                 None
             }
         };
@@ -425,7 +427,7 @@ fn launch_pe_with_registry(
                 }
             }
             Err(e) => {
-                eprintln!("strawwu: registry register failed: {e}");
+                eprintln!("strawnt: registry register failed: {e}");
                 return Err(1);
             }
         };
@@ -459,7 +461,7 @@ fn launch_via_native(
     let pe_data = match pe_loader::load_pe_bytes(binary, format, pe_loader::smoke_mode()) {
         Ok(data) => data,
         Err(e) => {
-            eprintln!("strawwu: PE load failed: {e}");
+            eprintln!("strawnt: PE load failed: {e}");
             return Err(1);
         }
     };
@@ -468,7 +470,7 @@ fn launch_via_native(
     let mut profile = AppProfile::default_win32(app_id);
     profile.execution_backend = backend_name.to_string();
 
-    let side_dir = std::env::var_os("STRAWWU_PE_SIDE_EFFECT_DIR").map(std::path::PathBuf::from);
+    let side_dir = std::env::var_os("STRAWNT_PE_SIDE_EFFECT_DIR").or_else(|| std::env::var_os("STRAWWU_PE_SIDE_EFFECT_DIR")).map(std::path::PathBuf::from);
     let exec = strawwu_runtime::execute_pe_with_side_effect_dir(
         &mut orch,
         &profile,
@@ -477,7 +479,7 @@ fn launch_via_native(
     );
     if exec.state != ExecState::Running {
         eprintln!(
-            "strawwu: launch failed: {}",
+            "strawnt: launch failed: {}",
             exec.error.unwrap_or_else(|| "unknown error".into())
         );
         return Err(1);
@@ -485,7 +487,7 @@ fn launch_via_native(
 
     // Always persist exec summary when side-effect dir is set (pe6 golden evidence).
     if let Some(ref se) = exec.side_effects {
-        if let Some(dir) = std::env::var_os("STRAWWU_PE_SIDE_EFFECT_DIR") {
+        if let Some(dir) = std::env::var_os("STRAWNT_PE_SIDE_EFFECT_DIR").or_else(|| std::env::var_os("STRAWWU_PE_SIDE_EFFECT_DIR")) {
             let summary = serde_json::json!({
                 "mode": exec.mode,
                 "cpu_executed": exec.cpu_executed,
@@ -516,15 +518,15 @@ fn launch_via_native(
     }
 
     let mode = exec.mode.as_str();
-    if mode == "simulated" && std::env::var_os("STRAWWU_REQUIRE_REAL_EXEC").is_some() {
-        eprintln!("strawwu: real CPU execution required but mode=simulated");
+    if mode == "simulated" && std::env::var_os("STRAWNT_REQUIRE_REAL_EXEC").or_else(|| std::env::var_os("STRAWWU_REQUIRE_REAL_EXEC")).is_some() {
+        eprintln!("strawnt: real CPU execution required but mode=simulated");
         return Err(1);
     }
 
     let gui = match maybe_run_gui_smoke(&pe_data, app_id, app_name) {
         Ok(result) => result,
         Err(e) => {
-            eprintln!("strawwu: gui-smoke failed: {e}");
+            eprintln!("strawnt: gui-smoke failed: {e}");
             return Err(1);
         }
     };
@@ -533,7 +535,7 @@ fn launch_via_native(
     if let Some(g) = cpu_gui {
         let _ = log::append_event("gui_cpu", g);
         println!(
-            "strawwu: launched {} (format={}, pid={}, backend={}, app_id={}, mode={}, gui-smoke=PASS hwnd={} compositor={} visible={} closed={} frames={} cpu-user32=1)",
+            "strawnt: launched {} (format={}, pid={}, backend={}, app_id={}, mode={}, gui-smoke=PASS hwnd={} compositor={} visible={} closed={} frames={} cpu-user32=1)",
             req.binary_path.display(),
             req.format,
             exec.pid,
@@ -549,7 +551,7 @@ fn launch_via_native(
     } else if let Some(ref smoke) = gui {
         let _ = log::append_event("gui_smoke", smoke);
         println!(
-            "strawwu: launched {} (format={}, pid={}, backend={}, app_id={}, mode={}, gui-smoke=PASS hwnd={} compositor={} visible={})",
+            "strawnt: launched {} (format={}, pid={}, backend={}, app_id={}, mode={}, gui-smoke=PASS hwnd={} compositor={} visible={})",
             req.binary_path.display(),
             req.format,
             exec.pid,
@@ -562,7 +564,7 @@ fn launch_via_native(
         );
     } else {
         println!(
-            "strawwu: launched {} (format={}, pid={}, backend={}, app_id={}, mode={}, gui-smoke=SKIP subsystem=non-gui)",
+            "strawnt: launched {} (format={}, pid={}, backend={}, app_id={}, mode={}, gui-smoke=SKIP subsystem=non-gui)",
             req.binary_path.display(),
             req.format,
             exec.pid,
@@ -609,16 +611,16 @@ fn launch_via_native(
 
 fn print_help() {
     println!(
-        "strawwu {VERSION} — StrawWU portable Windows app launcher
+        "strawnt {VERSION} — StrawNT native PE / NT ABI runtime
 
 USAGE:
-    strawwu <COMMAND> [OPTIONS]
+    strawnt <COMMAND> [OPTIONS]
 
 COMMANDS:
     open <file.exe|.msi> [--auto|--run|--install]
-        Click-to-open via native strawwu-nt (execution_backend=native)
+        Click-to-open via native strawnt-native (execution_backend=native)
     run <binary> [--backend native|container|microvm] [--bundle a,b,c]
-        Default backend=native (self-built PE / strawwu-nt)
+        Default backend=native (self-built PE / strawnt-native)
     install <installer.exe|.msi>
         Native unpack (SWUP/SWUM) → app-registry + shortcut; else pending + run
     integrate
@@ -634,17 +636,17 @@ COMMANDS:
 
 CLICK TO INSTALL & LAUNCH:
     1) curl …/install.sh | bash
-    2) strawwu integrate          # if needed after desktop change
-    3) double-click any .exe/.msi — native strawwu-nt path
+    2) strawnt integrate          # if needed after desktop change
+    3) double-click any .exe/.msi — native strawnt-native path
     4) relaunch from the app menu (~/.local/share/applications)
 
 BACKEND:
-    Default: native (STRAWWU_BACKEND unset or native)
-    Override: STRAWWU_BACKEND=native|container|microvm
+    Default: native (STRAWNT_BACKEND / STRAWWU_BACKEND unset or native)
+    Override: STRAWNT_BACKEND=native|container|microvm
 
 REGISTRY:
     run/install/open register apps in the local app-registry
-    (override with STRAWWU_APP_REGISTRY)
+    (override with STRAWNT_APP_REGISTRY; STRAWWU_* accepted as compat)
 "
     );
 }

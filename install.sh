@@ -1,37 +1,38 @@
 #!/usr/bin/env bash
-# StrawWU Portable Core — one-line installer for generic Linux.
+# StrawNT — one-line installer for generic Linux (native PE / NT ABI runtime).
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/StrawCoding/StrawWU-portable/main/install.sh | bash
-#   curl -fsSL ... | bash -s -- --prefix "$HOME/.local/strawwu"
-#   curl -fsSL ... | bash -s -- --version 0.7.1.18
+#   curl -fsSL https://raw.githubusercontent.com/StrawCoding/StrawNT/main/install.sh | bash
+#   curl -fsSL ... | bash -s -- --prefix "$HOME/.local/strawnt"
+#   curl -fsSL ... | bash -s -- --version 0.7.1.33
 #
-# Env overrides: STRAWWU_PREFIX, STRAWWU_BIN_DIR, STRAWWU_VERSION, STRAWWU_REPO
+# Env overrides: STRAWNT_PREFIX, STRAWNT_BIN_DIR, STRAWNT_VERSION, STRAWNT_REPO
+# Compat (deprecated): STRAWWU_PREFIX, STRAWWU_BIN_DIR, STRAWWU_VERSION, STRAWWU_REPO
 set -euo pipefail
 
-REPO="${STRAWWU_REPO:-StrawCoding/StrawWU-portable}"
-PREFIX="${STRAWWU_PREFIX:-${HOME}/.local/share/strawwu-core}"
-BIN_DIR="${STRAWWU_BIN_DIR:-${HOME}/.local/bin}"
-REQUESTED_VERSION="${STRAWWU_VERSION:-}"
+REPO="${STRAWNT_REPO:-${STRAWWU_REPO:-StrawCoding/StrawNT}}"
+PREFIX="${STRAWNT_PREFIX:-${STRAWWU_PREFIX:-${HOME}/.local/share/strawnt}}"
+BIN_DIR="${STRAWNT_BIN_DIR:-${STRAWWU_BIN_DIR:-${HOME}/.local/bin}}"
+REQUESTED_VERSION="${STRAWNT_VERSION:-${STRAWWU_VERSION:-}}"
 ARCH="$(uname -m)"
 TMPDIR_ROOT="${TMPDIR:-/tmp}"
 WORK=""
 
 die() { echo "ERROR: $*" >&2; exit 1; }
-log() { echo "[strawwu-install] $*" >&2; }
+log() { echo "[strawnt-install] $*" >&2; }
 
 usage() {
   cat <<'EOF'
-StrawWU Portable Core installer
+StrawNT installer
 
 Options:
-  --prefix DIR     Install root (default: ~/.local/share/strawwu-core)
+  --prefix DIR     Install root (default: ~/.local/share/strawnt)
   --bin-dir DIR    Symlink directory (default: ~/.local/bin)
   --version VER    Release tag/version (default: latest GitHub release)
   --help           Show this help
 
 Examples:
-  curl -fsSL https://raw.githubusercontent.com/StrawCoding/StrawWU-portable/main/install.sh | bash
-  curl -fsSL ... | bash -s -- --prefix "$HOME/.local/strawwu"
+  curl -fsSL https://raw.githubusercontent.com/StrawCoding/StrawNT/main/install.sh | bash
+  curl -fsSL ... | bash -s -- --prefix "$HOME/.local/strawnt"
 EOF
 }
 
@@ -107,7 +108,7 @@ log "repo=${REPO} release=${RELEASE_TAG} asset=${ASSET_NAME}"
 log "prefix=${PREFIX}"
 log "bin-dir=${BIN_DIR}"
 
-WORK="$(mktemp -d "${TMPDIR_ROOT}/strawwu-install.XXXXXX")"
+WORK="$(mktemp -d "${TMPDIR_ROOT}/strawnt-install.XXXXXX")"
 ASSET_PATH="${WORK}/${ASSET_NAME}"
 log "downloading ${ASSET_URL}"
 curl -fL --progress-bar -o "${ASSET_PATH}" "${ASSET_URL}" \
@@ -131,7 +132,7 @@ STAGE="${WORK}/stage"
 mkdir -p "${STAGE}"
 if [[ "${ASSET_NAME}" == *.portable.tar.gz ]]; then
   tar -xzf "${ASSET_PATH}" -C "${STAGE}"
-  APPDIR="$(find "${STAGE}" -maxdepth 1 -type d -name 'StrawWU-Core-*-x86_64.AppDir' | head -n1 || true)"
+  APPDIR="$(find "${STAGE}" -maxdepth 1 -type d \( -name 'StrawNT-*-x86_64.AppDir' -o -name 'StrawWU-Core-*-x86_64.AppDir' \) | head -n1 || true)"
   [[ -n "${APPDIR}" && -x "${APPDIR}/AppRun" ]] || die "portable archive missing AppDir/AppRun"
   SRC_ROOT="${APPDIR}/usr"
 elif [[ "${ASSET_NAME}" == *.AppImage ]]; then
@@ -152,77 +153,106 @@ else
   die "unsupported asset type: ${ASSET_NAME}"
 fi
 
-[[ -x "${SRC_ROOT}/bin/strawwu" ]] || die "missing bin/strawwu in artifact"
+CLI_SRC=""
+for cand in strawnt strawwu; do
+  if [[ -x "${SRC_ROOT}/bin/${cand}" ]]; then
+    CLI_SRC="${cand}"
+    break
+  fi
+done
+[[ -n "${CLI_SRC}" ]] || die "missing bin/strawnt (or legacy bin/strawwu) in artifact"
 
 log "installing into ${PREFIX}"
 mkdir -p "${PREFIX}"
 # Replace previous install contents but keep the prefix directory itself.
 find "${PREFIX}" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
 cp -a "${SRC_ROOT}/." "${PREFIX}/"
-chmod 755 "${PREFIX}/bin/strawwu" 2>/dev/null || true
+
+# Ensure primary CLI is named strawnt.
+if [[ ! -x "${PREFIX}/bin/strawnt" && -x "${PREFIX}/bin/strawwu" ]]; then
+  cp -a "${PREFIX}/bin/strawwu" "${PREFIX}/bin/strawnt"
+fi
+chmod 755 "${PREFIX}/bin/strawnt" 2>/dev/null || true
+[[ -x "${PREFIX}/bin/strawnt-env" ]] && chmod 755 "${PREFIX}/bin/strawnt-env" || true
 [[ -x "${PREFIX}/bin/strawwu-env" ]] && chmod 755 "${PREFIX}/bin/strawwu-env" || true
 
-# Wrapper so STRAWWU_PREFIX points at the installed tree.
-WRAPPER="${PREFIX}/bin/strawwu-portable"
+# Wrapper so STRAWNT_PREFIX points at the installed tree.
+WRAPPER="${PREFIX}/bin/strawnt-portable"
 cat > "${WRAPPER}" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
-export STRAWWU_PREFIX="${PREFIX}"
-export STRAWWU_APP_REGISTRY="\${STRAWWU_APP_REGISTRY:-\${STRAWWU_PREFIX}/var/lib/strawwu/app-registry.json}"
-export STRAWWU_BACKEND="\${STRAWWU_BACKEND:-native}"
-export PATH="\${STRAWWU_PREFIX}/bin:\${PATH}"
-export LD_LIBRARY_PATH="\${STRAWWU_PREFIX}/lib/strawwu:\${STRAWWU_PREFIX}/lib\${LD_LIBRARY_PATH:+:\${LD_LIBRARY_PATH}}"
-exec "\${STRAWWU_PREFIX}/bin/strawwu" "\$@"
+export STRAWNT_PREFIX="${PREFIX}"
+export STRAWWU_PREFIX="\${STRAWWU_PREFIX:-\${STRAWNT_PREFIX}}"
+export STRAWNT_APP_REGISTRY="\${STRAWNT_APP_REGISTRY:-\${STRAWWU_APP_REGISTRY:-\${STRAWNT_PREFIX}/var/lib/strawnt/app-registry.json}}"
+export STRAWWU_APP_REGISTRY="\${STRAWWU_APP_REGISTRY:-\${STRAWNT_APP_REGISTRY}}"
+export STRAWNT_BACKEND="\${STRAWNT_BACKEND:-\${STRAWWU_BACKEND:-native}}"
+export STRAWWU_BACKEND="\${STRAWWU_BACKEND:-\${STRAWNT_BACKEND}}"
+export PATH="\${STRAWNT_PREFIX}/bin:\${PATH}"
+export LD_LIBRARY_PATH="\${STRAWNT_PREFIX}/lib/strawnt:\${STRAWNT_PREFIX}/lib/strawwu:\${STRAWNT_PREFIX}/lib\${LD_LIBRARY_PATH:+:\${LD_LIBRARY_PATH}}"
+exec "\${STRAWNT_PREFIX}/bin/strawnt" "\$@"
 EOF
 chmod 755 "${WRAPPER}"
 
 mkdir -p "${BIN_DIR}"
+ln -sfn "${WRAPPER}" "${BIN_DIR}/strawnt"
+# Compat alias (deprecated) — main path is strawnt.
 ln -sfn "${WRAPPER}" "${BIN_DIR}/strawwu"
 
 # Click-to-open: MIME handler so double-clicking .exe/.msi installs & launches.
 export PATH="${BIN_DIR}:${PATH}"
+export STRAWNT_PREFIX="${PREFIX}"
 export STRAWWU_PREFIX="${PREFIX}"
-export STRAWWU_BIN="${BIN_DIR}/strawwu"
-export STRAWWU_APP_REGISTRY="${STRAWWU_APP_REGISTRY:-${PREFIX}/var/lib/strawwu/app-registry.json}"
+export STRAWNT_BIN="${BIN_DIR}/strawnt"
+export STRAWWU_BIN="${BIN_DIR}/strawnt"
+mkdir -p "${PREFIX}/var/lib/strawnt" "${PREFIX}/var/lib/strawwu"
+if [[ ! -f "${PREFIX}/var/lib/strawnt/app-registry.json" ]]; then
+  if [[ -f "${PREFIX}/var/lib/strawwu/app-registry.json" ]]; then
+    cp -a "${PREFIX}/var/lib/strawwu/app-registry.json" "${PREFIX}/var/lib/strawnt/app-registry.json"
+  else
+    printf '%s\n' '{"schema_version":"1.0","apps":[]}' > "${PREFIX}/var/lib/strawnt/app-registry.json"
+  fi
+fi
+export STRAWNT_APP_REGISTRY="${STRAWNT_APP_REGISTRY:-${PREFIX}/var/lib/strawnt/app-registry.json}"
+export STRAWWU_APP_REGISTRY="${STRAWWU_APP_REGISTRY:-${STRAWNT_APP_REGISTRY}}"
 INTEGRATE_RC=0
-if "${BIN_DIR}/strawwu" integrate; then
-  log "desktop click-to-open enabled (.exe / .msi → native strawwu-nt)"
+if "${BIN_DIR}/strawnt" integrate; then
+  log "desktop click-to-open enabled (.exe / .msi → native PE)"
 else
   INTEGRATE_RC=$?
-  log "WARNING: strawwu integrate failed (exit ${INTEGRATE_RC}) — run: strawwu integrate"
+  log "WARNING: strawnt integrate failed (exit ${INTEGRATE_RC}) — run: strawnt integrate"
 fi
 
 # Smoke
-VER_OUT="$("${BIN_DIR}/strawwu" --version 2>&1 || true)"
+VER_OUT="$("${BIN_DIR}/strawnt" --version 2>&1 || true)"
 [[ -n "${VER_OUT}" ]] || die "post-install --version failed"
-STATUS_OUT="$("${BIN_DIR}/strawwu" status 2>&1 || true)"
+STATUS_OUT="$("${BIN_DIR}/strawnt" status 2>&1 || true)"
 STATUS_RC=0
-"${BIN_DIR}/strawwu" status >/dev/null 2>&1 || STATUS_RC=$?
+"${BIN_DIR}/strawnt" status >/dev/null 2>&1 || STATUS_RC=$?
 
 cat <<EOF
 
-StrawWU Portable Core installed.
+StrawNT installed.
 
   release : ${RELEASE_TAG}
   prefix  : ${PREFIX}
-  command : ${BIN_DIR}/strawwu
+  command : ${BIN_DIR}/strawnt
   version : ${VER_OUT}
   status  : exit ${STATUS_RC}
   click   : integrate exit ${INTEGRATE_RC}
-  backend : native (strawwu-nt)
+  backend : native (StrawNT PE)
 
 ${STATUS_OUT}
 
 Try:
-  strawwu --version
-  strawwu status
-  strawwu open setup.exe     # native strawwu-nt path + app-menu shortcut
+  strawnt --version
+  strawnt status
+  strawnt open setup.exe     # native PE path + app-menu shortcut
   # Or double-click any .exe / .msi in your file manager
 
-If 'strawwu' is not found, add to PATH:
+If 'strawnt' is not found, add to PATH:
   export PATH="${BIN_DIR}:\$PATH"
 
-Note: .exe/.msi execution uses self-built strawwu-nt (execution_backend=native).
+Note: .exe/.msi execution uses StrawNT native PE (execution_backend=native).
 Not every Windows app will run; anti-cheat / kernel drivers may still fail.
-This is not the StrawWU ISO/desktop OS.
+StrawNT is an independent product — not an OS / ISO / desktop distribution.
 EOF

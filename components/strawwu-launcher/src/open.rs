@@ -64,7 +64,7 @@ pub fn looks_like_installer(path: &Path) -> bool {
 /// Optional desktop notification (no-op when notify-send is unavailable).
 pub fn notify(title: &str, body: &str) {
     let _ = std::process::Command::new("notify-send")
-        .args(["--app-name=StrawWU", title, body])
+        .args(["--app-name=StrawNT", title, body])
         .stdout(std::process::Stdio::null())
         .stderr(std::process::Stdio::null())
         .status();

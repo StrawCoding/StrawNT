@@ -6,18 +6,18 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
-VERSION="${STRAWWU_VERSION:-$(tr -d '[:space:]' < "${REPO_ROOT}/VERSION")}"
-PREFIX="${STRAWWU_PREFIX:-${SCRIPT_DIR}/prefix}"
-OUT_DIR="${STRAWWU_APPIMAGE_OUT:-${SCRIPT_DIR}/appimage/dist}"
-APPDIR_NAME="StrawWU-Core-${VERSION}-x86_64.AppDir"
+VERSION="${STRAWNT_VERSION:-${STRAWWU_VERSION:-$(tr -d '[:space:]' < "${REPO_ROOT}/VERSION")}}"
+PREFIX="${STRAWNT_PREFIX:-${STRAWWU_PREFIX:-${SCRIPT_DIR}/prefix}}"
+OUT_DIR="${STRAWNT_APPIMAGE_OUT:-${STRAWWU_APPIMAGE_OUT:-${SCRIPT_DIR}/appimage/dist}}"
+APPDIR_NAME="StrawNT-${VERSION}-x86_64.AppDir"
 APPDIR="${OUT_DIR}/${APPDIR_NAME}"
 ARCH="x86_64"
-ARTIFACT_STEM="StrawWU-Core-${VERSION}-${ARCH}"
+ARTIFACT_STEM="StrawNT-${VERSION}-${ARCH}"
 PORTABLE_TGZ="${OUT_DIR}/${ARTIFACT_STEM}.portable.tar.gz"
 APPIMAGE_PATH="${OUT_DIR}/${ARTIFACT_STEM}.AppImage"
 TOOLS_DIR="${SCRIPT_DIR}/appimage/.tools"
-SUMS_OUT="${STRAWWU_PORTABLE_SHA256SUMS:-${REPO_ROOT}/tests/portable/output/SHA256SUMS}"
-FORCE_BUNDLE_ONLY="${STRAWWU_PORTABLE_BUNDLE_ONLY:-0}"
+SUMS_OUT="${STRAWNT_PORTABLE_SHA256SUMS:-${STRAWWU_PORTABLE_SHA256SUMS:-${REPO_ROOT}/tests/portable/output/SHA256SUMS}}"
+FORCE_BUNDLE_ONLY="${STRAWNT_PORTABLE_BUNDLE_ONLY:-${STRAWWU_PORTABLE_BUNDLE_ONLY:-0}}"
 
 die() { echo "ERROR: $*" >&2; exit 1; }
 log() { echo "[portable-appimage] $*" >&2; }
@@ -26,12 +26,12 @@ command -v python3 >/dev/null 2>&1 || die "python3 required"
 command -v tar >/dev/null 2>&1 || die "tar required"
 
 ensure_prefix() {
-    if [[ ! -x "${PREFIX}/bin/strawwu" ]]; then
+    if [[ ! -x "${PREFIX}/bin/strawnt" ]]; then
         log "prefix missing — invoking build-prefix.sh"
-        STRAWWU_PREFIX="${PREFIX}" bash "${SCRIPT_DIR}/build-prefix.sh" \
+        STRAWNT_PREFIX="${PREFIX}" bash "${SCRIPT_DIR}/build-prefix.sh" \
             || die "build-prefix.sh failed"
     fi
-    [[ -x "${PREFIX}/bin/strawwu" ]] || die "prefix binary missing: ${PREFIX}/bin/strawwu"
+    [[ -x "${PREFIX}/bin/strawnt" ]] || die "prefix binary missing: ${PREFIX}/bin/strawnt"
 }
 
 fetch_appimagetool() {
@@ -61,49 +61,60 @@ stage_appdir() {
     rm -rf "${APPDIR}"
     mkdir -p \
         "${APPDIR}/usr/bin" \
-        "${APPDIR}/usr/lib/strawwu" \
-        "${APPDIR}/usr/share/strawwu" \
+        "${APPDIR}/usr/lib/strawnt" \
+        "${APPDIR}/usr/share/strawnt" \
         "${APPDIR}/usr/share/applications" \
         "${APPDIR}/usr/share/icons/hicolor/256x256/apps" \
-        "${APPDIR}/usr/share/doc/strawwu-portable" \
-        "${APPDIR}/usr/var/lib/strawwu"
+        "${APPDIR}/usr/share/doc/strawnt" \
+        "${APPDIR}/usr/var/lib/strawnt"
 
-    install -m 755 "${PREFIX}/bin/strawwu" "${APPDIR}/usr/bin/strawwu"
-    if [[ -x "${PREFIX}/bin/strawwu-env" ]]; then
-        install -m 755 "${PREFIX}/bin/strawwu-env" "${APPDIR}/usr/bin/strawwu-env"
+    install -m 755 "${PREFIX}/bin/strawnt" "${APPDIR}/usr/bin/strawnt"
+    if [[ -x "${PREFIX}/bin/strawwu" ]]; then
+        install -m 755 "${PREFIX}/bin/strawwu" "${APPDIR}/usr/bin/strawwu"
+    else
+        ln -sfn strawnt "${APPDIR}/usr/bin/strawwu"
+    fi
+    if [[ -x "${PREFIX}/bin/strawnt-env" ]]; then
+        install -m 755 "${PREFIX}/bin/strawnt-env" "${APPDIR}/usr/bin/strawnt-env"
+    elif [[ -x "${PREFIX}/bin/strawwu-env" ]]; then
+        install -m 755 "${PREFIX}/bin/strawwu-env" "${APPDIR}/usr/bin/strawnt-env"
     fi
 
-    # Bundled libs: inventory path usr/lib/strawwu + keep $ORIGIN/../lib fallback.
+    # Bundled libs: inventory path usr/lib/strawnt + keep $ORIGIN/../lib fallback.
     if [[ -d "${PREFIX}/lib" ]]; then
         find "${PREFIX}/lib" -maxdepth 1 -type f \( -name '*.so' -o -name '*.so.*' \) \
-            -exec cp -a {} "${APPDIR}/usr/lib/strawwu/" \;
+            -exec cp -a {} "${APPDIR}/usr/lib/strawnt/" \;
         # Symlink tree so existing rpath $ORIGIN/../lib still resolves.
         mkdir -p "${APPDIR}/usr/lib"
-        if compgen -G "${APPDIR}/usr/lib/strawwu/*" >/dev/null; then
-            for so in "${APPDIR}/usr/lib/strawwu/"*; do
+        if compgen -G "${APPDIR}/usr/lib/strawnt/*" >/dev/null; then
+            for so in "${APPDIR}/usr/lib/strawnt/"*; do
                 base="$(basename "${so}")"
-                ln -sfn "strawwu/${base}" "${APPDIR}/usr/lib/${base}"
+                ln -sfn "strawnt/${base}" "${APPDIR}/usr/lib/${base}"
             done
         fi
     fi
 
     if command -v patchelf >/dev/null 2>&1; then
-        patchelf --set-rpath '$ORIGIN/../lib/strawwu:$ORIGIN/../lib' \
-            "${APPDIR}/usr/bin/strawwu" 2>/dev/null \
+        patchelf --set-rpath '$ORIGIN/../lib/strawnt:$ORIGIN/../lib' \
+            "${APPDIR}/usr/bin/strawnt" 2>/dev/null \
             || log "patchelf rpath skipped"
     fi
 
-    if [[ -d "${PREFIX}/share/strawwu" ]]; then
-        cp -a "${PREFIX}/share/strawwu/." "${APPDIR}/usr/share/strawwu/"
+    if [[ -d "${PREFIX}/share/strawnt" ]]; then
+        cp -a "${PREFIX}/share/strawnt/." "${APPDIR}/usr/share/strawnt/"
+    elif [[ -d "${PREFIX}/share/strawwu" ]]; then
+        cp -a "${PREFIX}/share/strawwu/." "${APPDIR}/usr/share/strawnt/"
     fi
-    if [[ -d "${PREFIX}/share/doc/strawwu-portable" ]]; then
-        cp -a "${PREFIX}/share/doc/strawwu-portable/." \
-            "${APPDIR}/usr/share/doc/strawwu-portable/"
+    if [[ -d "${PREFIX}/share/doc/strawnt" ]]; then
+        cp -a "${PREFIX}/share/doc/strawnt/." \
+            "${APPDIR}/usr/share/doc/strawnt/"
     fi
-    if [[ -d "${PREFIX}/var/lib/strawwu" ]]; then
-        cp -a "${PREFIX}/var/lib/strawwu/." "${APPDIR}/usr/var/lib/strawwu/"
+    if [[ -d "${PREFIX}/var/lib/strawnt" ]]; then
+        cp -a "${PREFIX}/var/lib/strawnt/." "${APPDIR}/usr/var/lib/strawnt/"
+    elif [[ -d "${PREFIX}/var/lib/strawwu" ]]; then
+        cp -a "${PREFIX}/var/lib/strawwu/." "${APPDIR}/usr/var/lib/strawnt/"
     else
-        cat > "${APPDIR}/usr/var/lib/strawwu/app-registry.json" <<'EOF'
+        cat > "${APPDIR}/usr/var/lib/strawnt/app-registry.json" <<'EOF'
 {
   "schema_version": "1.0",
   "apps": []
@@ -117,54 +128,56 @@ EOF
         icon_src="${REPO_ROOT}/os-image/config/branding/source/strawwu-logo-icon.png"
     fi
     [[ -f "${icon_src}" ]] || die "missing branding icon for AppImage"
-    install -m 644 "${icon_src}" "${APPDIR}/strawwu.png"
+    install -m 644 "${icon_src}" "${APPDIR}/strawnt.png"
     install -m 644 "${icon_src}" \
-        "${APPDIR}/usr/share/icons/hicolor/256x256/apps/strawwu.png"
+        "${APPDIR}/usr/share/icons/hicolor/256x256/apps/strawnt.png"
 
-    cat > "${APPDIR}/strawwu.desktop" <<EOF
+    cat > "${APPDIR}/strawnt.desktop" <<EOF
 [Desktop Entry]
 Type=Application
-Name=StrawWU Core
-Comment=StrawWU Portable Win-compat core — click .exe to install & launch
-Exec=strawwu
-Icon=strawwu
+Name=StrawNT
+Comment=StrawNT native PE runtime — click .exe to install & launch
+Exec=strawnt
+Icon=strawnt
 Categories=System;
 Terminal=true
 EOF
-    cp -a "${APPDIR}/strawwu.desktop" "${APPDIR}/usr/share/applications/strawwu.desktop"
+    cp -a "${APPDIR}/strawnt.desktop" "${APPDIR}/usr/share/applications/strawnt.desktop"
 
     # Prefer packaged open-handler from prefix when present.
-    if [[ -f "${PREFIX}/share/applications/strawwu-open.desktop" ]]; then
-        install -m 644 "${PREFIX}/share/applications/strawwu-open.desktop" \
-            "${APPDIR}/usr/share/applications/strawwu-open.desktop"
+    if [[ -f "${PREFIX}/share/applications/strawnt-open.desktop" ]]; then
+        install -m 644 "${PREFIX}/share/applications/strawnt-open.desktop" \
+            "${APPDIR}/usr/share/applications/strawnt-open.desktop"
     else
-        cat > "${APPDIR}/usr/share/applications/strawwu-open.desktop" <<'EOF'
+        cat > "${APPDIR}/usr/share/applications/strawnt-open.desktop" <<'EOF'
 [Desktop Entry]
 Type=Application
-Name=StrawWU
-Comment=Install or run Windows .exe/.msi with StrawWU Portable Core
-Exec=strawwu open %f
-TryExec=strawwu
-Icon=strawwu
+Name=StrawNT
+Comment=Install or run Windows .exe/.msi with StrawNT native PE
+Exec=strawnt open %f
+TryExec=strawnt
+Icon=strawnt
 Terminal=false
 Categories=System;Utility;
 MimeType=application/x-ms-dos-executable;application/x-msdownload;application/vnd.microsoft.portable-executable;application/x-msi;
 NoDisplay=false
 StartupNotify=true
-X-StrawWU-Kind=open-handler
+X-StrawNT-Kind=open-handler
 EOF
     fi
 
     cat > "${APPDIR}/AppRun" <<'EOF'
 #!/usr/bin/env bash
-# AppRun — StrawWU Portable Core entry (AppImage / AppDir).
+# AppRun — StrawNT entry (AppImage / AppDir).
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-export STRAWWU_PREFIX="${STRAWWU_PREFIX:-${HERE}/usr}"
-export STRAWWU_APP_REGISTRY="${STRAWWU_APP_REGISTRY:-${STRAWWU_PREFIX}/var/lib/strawwu/app-registry.json}"
-export PATH="${STRAWWU_PREFIX}/bin:${PATH}"
-export LD_LIBRARY_PATH="${STRAWWU_PREFIX}/lib/strawwu:${STRAWWU_PREFIX}/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"
-exec "${STRAWWU_PREFIX}/bin/strawwu" "$@"
+export STRAWNT_PREFIX="${STRAWNT_PREFIX:-${STRAWWU_PREFIX:-${HERE}/usr}}"
+export STRAWWU_PREFIX="${STRAWWU_PREFIX:-${STRAWNT_PREFIX}}"
+export STRAWNT_APP_REGISTRY="${STRAWNT_APP_REGISTRY:-${STRAWWU_APP_REGISTRY:-${STRAWNT_PREFIX}/var/lib/strawnt/app-registry.json}}"
+export STRAWWU_APP_REGISTRY="${STRAWWU_APP_REGISTRY:-${STRAWNT_APP_REGISTRY}}"
+export PATH="${STRAWNT_PREFIX}/bin:${PATH}"
+export LD_LIBRARY_PATH="${STRAWNT_PREFIX}/lib/strawnt:${STRAWNT_PREFIX}/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"
+exec "${STRAWNT_PREFIX}/bin/strawnt" "$@"
 EOF
     chmod 755 "${APPDIR}/AppRun"
 
@@ -173,29 +186,30 @@ EOF
 import json, os, sys, time
 appdir, version, prefix = sys.argv[1], sys.argv[2], sys.argv[3]
 libs = []
-lib_dir = os.path.join(appdir, "usr", "lib", "strawwu")
+lib_dir = os.path.join(appdir, "usr", "lib", "strawnt")
 if os.path.isdir(lib_dir):
     libs = sorted(
         f for f in os.listdir(lib_dir)
         if f.endswith(".so") or ".so." in f
     )
 manifest = {
-    "schema": "strawwu-portable-appimage/v1",
+    "schema": "strawnt-appimage/v1",
+    "product": "StrawNT",
     "stage": "pc2-appimage",
     "version": version,
     "built_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     "appdir": appdir,
     "source_prefix": prefix,
     "entry": "AppRun",
-    "binary": "usr/bin/strawwu",
+    "binary": "usr/bin/strawnt",
     "bundled_libs": libs,
     "notes": [
         "Portable Core AppImage / AppDir bundle; host glibc remains ABI baseline.",
-        "Default execution_backend=native (strawwu-nt); not a full Windows OS claim; anti-cheat may fail.",
+        "Default execution_backend=native; not a full Windows OS claim; anti-cheat may fail. Independent of OS/ISO tracks.",
         "No WinBox naming.",
     ],
 }
-path = os.path.join(appdir, "usr", "share", "strawwu", "portable-appimage.json")
+path = os.path.join(appdir, "usr", "share", "strawnt", "portable-appimage.json")
 os.makedirs(os.path.dirname(path), exist_ok=True)
 with open(path, "w", encoding="utf-8") as fh:
     json.dump(manifest, fh, indent=2, ensure_ascii=False)
@@ -214,7 +228,7 @@ pack_portable_tgz() {
 
 build_appimage() {
     if [[ "${FORCE_BUNDLE_ONLY}" == "1" ]]; then
-        log "STRAWWU_PORTABLE_BUNDLE_ONLY=1 — skipping real AppImage"
+        log "STRAWNT_PORTABLE_BUNDLE_ONLY=1 — skipping real AppImage"
         rm -f "${APPIMAGE_PATH}"
         return 0
     fi
@@ -260,13 +274,14 @@ write_sha256sums() {
 
 self_check() {
     log "self-check AppDir AppRun"
-    export STRAWWU_APP_REGISTRY="${APPDIR}/usr/var/lib/strawwu/app-registry.json"
+    export STRAWNT_APP_REGISTRY="${APPDIR}/usr/var/lib/strawnt/app-registry.json"
+    export STRAWWU_APP_REGISTRY="${STRAWNT_APP_REGISTRY}"
     "${APPDIR}/AppRun" --version || die "AppRun --version failed"
     "${APPDIR}/AppRun" status || die "AppRun status failed"
 }
 
 main() {
-    log "building StrawWU Core AppImage/bundle ${VERSION}"
+    log "building StrawNT AppImage/bundle ${VERSION}"
     ensure_prefix
     mkdir -p "${OUT_DIR}"
     stage_appdir

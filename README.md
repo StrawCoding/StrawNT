@@ -1,14 +1,14 @@
-# StrawWU Portable
+# StrawNT
 
-跨發行版可攜 **Windows 應用執行核心**（prefix／AppImage／CLI）。  
-獨立倉庫：與 [StrawWU ISO／桌面發行版](https://github.com/StrawCoding/StrawWU-v2) 分開。
+跨發行版可攜 **native PE／NT ABI 執行核心**（prefix／AppImage／CLI）。  
+獨立產品倉庫：[StrawCoding/StrawNT](https://github.com/StrawCoding/StrawNT)。
 
 **授權：MIT（開源）** · 預設分支唯一 `main`
 
 ## 一鍵安裝（Linux x86_64）
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/StrawCoding/StrawWU-portable/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/StrawCoding/StrawNT/main/install.sh | bash
 ```
 
 安裝時會：
@@ -16,45 +16,45 @@ curl -fsSL https://raw.githubusercontent.com/StrawCoding/StrawWU-portable/main/i
 2. 啟用 **雙擊 .exe / .msi → 安裝／啟動**（`execution_backend=native`）
 
 ```bash
-strawwu --version
-strawwu status          # 應顯示 backend=native
-strawwu integrate       # 換桌面後再開一次
+strawnt --version
+strawnt status          # 應顯示 backend=native
+strawnt integrate       # 換桌面後再開一次
 ```
 
 ### 點擊就能安裝與啟動
 
 1. 檔案管理員 **雙擊** `.exe` / `.msi`
-2. StrawWU 經自研 **strawwu-nt**（`execution_backend=native`）處理安裝／啟動
+2. StrawNT 經自研 **native PE**（`execution_backend=native`）處理安裝／啟動
 3. 寫入應用選單捷徑，之後可一鍵再開
 
 ```bash
-strawwu open setup.exe          # 安裝程式 → native + 捷徑
-strawwu open game.exe           # 一般程式 → native + 捷徑
-strawwu install setup.exe       # 同上（安裝模式）
-strawwu run app.exe             # 預設 backend=native
+strawnt open setup.exe          # 安裝程式 → native + 捷徑
+strawnt open game.exe           # 一般程式 → native + 捷徑
+strawnt install setup.exe       # 同上（安裝模式）
+strawnt run app.exe             # 預設 backend=native
 ```
 
-預設裝到 `~/.local/share/strawwu-core`。
+預設裝到 `~/.local/share/strawnt`。對外 CLI 為 `strawnt`（舊 `strawwu` 僅相容別名，非主路徑）。
 
 ## 誠實邊界
 
-- 預設執行路徑為自研 **strawwu-nt**／`execution_backend=native`（**不**使用 Wine／Proton）
+- 預設執行路徑為自研 **native PE**／`execution_backend=native`（**不**使用 Wine／Proton）
 - **不保證**所有 Windows 軟體都可跑（反作弊／核心驅動／部分遊戲可能失敗）
 - Game Compat：圖形／音訊橋接可證；輕量遊戲可啟動；商店／啟動器**僅驗啟動**；反作弊為探測矩陣（誠實 PARTIAL）— **禁止**宣稱排位／官方 AC 簽章通過或 3A 全開
 - Flatpak 對 PE／session 為 **PARTIAL**
-- **不是** StrawWU ISO／桌面安裝器
+- **不是**任何作業系統 ISO／桌面發行版；與其他 StrawCoding 產品無執行依賴
 
 已煙測容器：Ubuntu 24.04、Fedora 41、Arch Linux。
 
 ## 手動下載
 
-到 [Releases](https://github.com/StrawCoding/StrawWU-portable/releases) 下載 `*.portable.tar.gz` / AppImage / `SHA256SUMS`。
+到 [Releases](https://github.com/StrawCoding/StrawNT/releases) 下載 `*.portable.tar.gz` / AppImage / `SHA256SUMS`。
 
 ## 從原始碼建置
 
 ```bash
-git clone https://github.com/StrawCoding/StrawWU-portable.git
-cd StrawWU-portable
+git clone https://github.com/StrawCoding/StrawNT.git
+cd StrawNT
 make portable-prefix
 make portable-appimage
 make test-portable-prefix

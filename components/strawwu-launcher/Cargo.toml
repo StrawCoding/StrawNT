@@ -5,6 +5,11 @@ edition.workspace = true
 description = "StrawWU PE/ELF launcher skeleton — binary format detection and dispatch"
 license.workspace = true
 [[bin]]
+name = "strawnt"
+path = "src/main.rs"
+
+# Deprecated compat alias — primary CLI is strawnt.
+[[bin]]
 name = "strawwu"
 path = "src/main.rs"
 

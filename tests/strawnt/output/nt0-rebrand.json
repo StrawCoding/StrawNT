@@ -1,0 +1,43 @@
+{
+  "schema": "strawnt-nt0-rebrand/v1",
+  "stage": "nt0-rebrand-disconnect",
+  "product": "StrawNT",
+  "name": "StrawNT",
+  "status": "PASS",
+  "version": "0.7.1.33",
+  "cli": "strawnt",
+  "github": "StrawCoding/StrawNT",
+  "remote_url": "https://github.com/StrawCoding/StrawNT.git",
+  "remote_ok": true,
+  "execution_backend": "native",
+  "backend_native_observed": true,
+  "version_output": "strawnt 0.7.1-preview.33",
+  "status_output": "strawnt: status — runtime idle, 0 session(s), 0 app(s) registered\nstrawnt: execution_backend=native (strawnt-native)\nstrawnt: default backend=native",
+  "checks": [
+    "PASS: README mentions StrawNT",
+    "PASS: no forbidden StrawWU Portable / OS-dependency narrative in README/install.sh",
+    "PASS: GitHub URLs point to StrawCoding/StrawNT",
+    "PASS: CLI name strawnt present in README/install",
+    "PASS: Cargo [[bin]] name=strawnt",
+    "PASS: cargo build --release --bin strawnt",
+    "PASS: strawnt --version prints strawnt prefix (strawnt 0.7.1-preview.33)",
+    "PASS: strawnt status reports native backend",
+    "PASS: git remote points at StrawNT (https://github.com/StrawCoding/StrawNT.git)",
+    "PASS: no Wine/Proton substrate claim in README/install"
+  ],
+  "failures": [],
+  "disconnect": {
+    "from": "StrawWU-portable / StrawWU product narrative",
+    "cleared_phrases": [
+      "StrawWU Portable",
+      "依賴 StrawWU OS",
+      "part of StrawWU"
+    ],
+    "notes": [
+      "Independent product; not an OS/ISO/desktop/kernel distribution.",
+      "Primary CLI is strawnt; legacy strawwu binary retained only as compat alias.",
+      "STRAWNT_* env is primary; STRAWWU_* accepted as deprecated compat."
+    ]
+  },
+  "built_at": "2026-07-29T13:54:48Z"
+}

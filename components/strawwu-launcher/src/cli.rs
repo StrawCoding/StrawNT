@@ -27,7 +27,7 @@ pub enum Command {
     Install {
         installer: PathBuf,
     },
-    /// Register MIME handler so .exe/.msi open with StrawWU on click.
+    /// Register MIME handler so .exe/.msi open with StrawNT on click.
     Integrate,
     Apps(AppsSubcommand),
     Devices(DevicesSubcommand),
