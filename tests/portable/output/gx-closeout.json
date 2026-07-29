@@ -6,13 +6,13 @@
   "track": "game-compat",
   "backend": "native",
   "execution_backend": "native",
-  "generated_at": "2026-07-29T09:56:44Z",
+  "generated_at": "2026-07-29T09:57:21Z",
   "git": {
     "branch": "main",
-    "head": "af8244d3580eb6f25b5083b2b81c4fbf6db9e41f",
-    "origin_main": "af8244d3580eb6f25b5083b2b81c4fbf6db9e41f",
+    "head": "e6447d71cc1af610f892ac16cc03b3ee1f7ae231",
+    "origin_main": "e6447d71cc1af610f892ac16cc03b3ee1f7ae231",
     "merged_to_main": true,
-    "skip_merge_check": true
+    "skip_merge_check": false
   },
   "stages": {
     "gx0-graphics-vk-gl": {
