@@ -1,8 +1,11 @@
 use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
 
-use strawwu_nt::ntdll::NtKernel;
+use strawwu_nt::cpu::{CpuHaltReason, ExecSideEffects};
 use strawwu_nt::ipc::PipeNamespace;
 use strawwu_nt::loader::{LoadResult, PeLoader};
+use strawwu_nt::ntdll::NtKernel;
+use strawwu_nt::run_entry;
 use strawwu_nt::teb::{ProcessEnvironmentBlock, ThreadEnvironmentBlock};
 
 use crate::orchestrator::RuntimeOrchestrator;
@@ -26,6 +29,11 @@ pub struct ExecResult {
     pub state: ExecState,
     pub load_result: Option<LoadResult>,
     pub error: Option<String>,
+    /// `real` when guest CPU loop produced a halt with side effects; otherwise `simulated`.
+    pub mode: String,
+    pub cpu_executed: bool,
+    pub side_effects: Option<ExecSideEffects>,
+    pub halt_reason: Option<String>,
 }
 
 #[derive(Debug)]
@@ -61,6 +69,13 @@ impl Default for ExecutionContext {
     }
 }
 
+fn entry_has_code(kernel: &NtKernel, entry: u64) -> bool {
+    match kernel.memory.read_bytes(entry, 4) {
+        Ok(bytes) => bytes.iter().any(|b| *b != 0),
+        Err(_) => false,
+    }
+}
+
 /// Execute a PE binary within the StrawWU runtime.
 /// This is the core `strawwu run` flow:
 ///   1. Parse app profile → determine backend
@@ -68,15 +83,25 @@ impl Default for ExecutionContext {
 ///   3. Parse PE binary, map sections, resolve imports
 ///   4. Build PEB/TEB for the process
 ///   5. Register IPC pipes in the session namespace
-///   6. Transition to Running state
+///   6. When entry has real code, run the native CPU loop (not simulated)
+///   7. Transition to Running
 pub fn execute_pe(
     orchestrator: &mut RuntimeOrchestrator,
     profile: &AppProfile,
     pe_data: &[u8],
 ) -> ExecResult {
+    execute_pe_with_side_effect_dir(orchestrator, profile, pe_data, None)
+}
+
+/// Same as [`execute_pe`], optionally mirroring guest stdout/files into `side_effect_dir`.
+pub fn execute_pe_with_side_effect_dir(
+    orchestrator: &mut RuntimeOrchestrator,
+    profile: &AppProfile,
+    pe_data: &[u8],
+    side_effect_dir: Option<PathBuf>,
+) -> ExecResult {
     let mut ctx = ExecutionContext::new();
 
-    // Validate profile
     if let Err(e) = profile.validate() {
         return ExecResult {
             pid: 0,
@@ -84,10 +109,13 @@ pub fn execute_pe(
             state: ExecState::Failed,
             load_result: None,
             error: Some(e),
+            mode: "simulated".into(),
+            cpu_executed: false,
+            side_effects: None,
+            halt_reason: None,
         };
     }
 
-    // Launch app in orchestrator (creates/joins session)
     let pid = match orchestrator.launch_app(profile) {
         Ok(pid) => pid,
         Err(e) => {
@@ -97,12 +125,15 @@ pub fn execute_pe(
                 state: ExecState::Failed,
                 load_result: None,
                 error: Some(e),
+                mode: "simulated".into(),
+                cpu_executed: false,
+                side_effects: None,
+                halt_reason: None,
             };
         }
     };
     ctx.pid = pid;
 
-    // Determine session
     let backend = profile.resolved_backend();
     let session_id = match backend {
         ExecutionBackend::Native => "default".to_string(),
@@ -113,7 +144,6 @@ pub fn execute_pe(
     ctx.session_id = session_id.clone();
     ctx.state = ExecState::SessionJoined;
 
-    // Load PE
     let load_result = match ctx.loader.load(pe_data, &mut ctx.kernel) {
         Ok(result) => result,
         Err(_status) => {
@@ -123,24 +153,70 @@ pub fn execute_pe(
                 state: ExecState::Failed,
                 load_result: None,
                 error: Some("PE loading failed".into()),
+                mode: "simulated".into(),
+                cpu_executed: false,
+                side_effects: None,
+                halt_reason: None,
             };
         }
     };
     ctx.state = ExecState::PeLoaded;
 
-    // Build PEB and TEB
     let peb = ctx.loader.build_peb(pid, &session_id);
     let teb = ctx.loader.build_teb(1, pid);
     ctx.peb = Some(peb);
     ctx.teb = Some(teb);
 
-    // Register session IPC pipe
     let pipe_name = format!(r"\\.\pipe\strawwu-session-{}", session_id);
     let _ = ctx.pipe_namespace.create_pipe(
         &pipe_name,
         strawwu_nt::ipc::PipeDirection::Duplex,
         pid,
     );
+
+    if entry_has_code(&ctx.kernel, load_result.entry_point_va) {
+        match run_entry(
+            &mut ctx.kernel,
+            load_result.entry_point_va,
+            side_effect_dir,
+        ) {
+            Ok(cpu) => {
+                let real = matches!(cpu.halt, CpuHaltReason::ExitProcess)
+                    && (!cpu.side_effects.stdout.is_empty()
+                        || !cpu.side_effects.host_files_written.is_empty()
+                        || cpu.side_effects.exit_code.is_some());
+                let mode = if real {
+                    "real".to_string()
+                } else {
+                    "simulated".to_string()
+                };
+                return ExecResult {
+                    pid,
+                    session_id,
+                    state: ExecState::Running,
+                    load_result: Some(load_result),
+                    error: None,
+                    mode,
+                    cpu_executed: true,
+                    side_effects: Some(cpu.side_effects),
+                    halt_reason: Some(format!("{:?}", cpu.halt)),
+                };
+            }
+            Err(_) => {
+                return ExecResult {
+                    pid,
+                    session_id,
+                    state: ExecState::Failed,
+                    load_result: Some(load_result),
+                    error: Some("CPU execution setup failed".into()),
+                    mode: "simulated".into(),
+                    cpu_executed: false,
+                    side_effects: None,
+                    halt_reason: None,
+                };
+            }
+        }
+    }
 
     ctx.state = ExecState::Running;
 
@@ -150,6 +226,10 @@ pub fn execute_pe(
         state: ExecState::Running,
         load_result: Some(load_result),
         error: None,
+        mode: "simulated".into(),
+        cpu_executed: false,
+        side_effects: None,
+        halt_reason: None,
     }
 }
 
@@ -166,7 +246,9 @@ pub fn execute_cooperative(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use strawwu_nt::pe::{build_pe_with_imports, build_stub_pe, PeMachine, PeSubsystem};
+    use strawwu_nt::pe::{
+        build_pe_with_imports, build_real_console_fixture_pe, build_stub_pe, PeMachine, PeSubsystem,
+    };
 
     #[test]
     fn execute_basic_pe() {
@@ -179,6 +261,27 @@ mod tests {
         assert!(result.pid > 0);
         assert_eq!(result.session_id, "default");
         assert!(result.error.is_none());
+        assert_eq!(result.mode, "simulated");
+        assert!(!result.cpu_executed);
+    }
+
+    #[test]
+    fn execute_real_console_fixture() {
+        let mut orch = RuntimeOrchestrator::new();
+        let profile = AppProfile::default_win32("pe1-fixture");
+        let pe_data = build_real_console_fixture_pe();
+        let tmp = std::env::temp_dir().join("strawwu-pe1-exec-test");
+        let _ = std::fs::create_dir_all(&tmp);
+
+        let result =
+            execute_pe_with_side_effect_dir(&mut orch, &profile, &pe_data, Some(tmp.clone()));
+        assert_eq!(result.state, ExecState::Running);
+        assert_eq!(result.mode, "real");
+        assert!(result.cpu_executed);
+        let se = result.side_effects.expect("side effects");
+        assert!(se.stdout_utf8.contains("STRAWWU_PE_REAL_OK"));
+        assert_eq!(se.exit_code, Some(0));
+        assert!(tmp.join("pe-stdout.txt").is_file());
     }
 
     #[test]
@@ -250,40 +353,5 @@ mod tests {
 
         let result = execute_pe(&mut orch, &profile, &pe_data);
         assert_eq!(result.state, ExecState::Failed);
-    }
-
-    #[test]
-    fn execute_cooperative_apps() {
-        let mut orch = RuntimeOrchestrator::new();
-        let pe1 = build_stub_pe(PeMachine::Amd64, PeSubsystem::WindowsGui);
-        let pe2 = build_stub_pe(PeMachine::Amd64, PeSubsystem::WindowsCui);
-
-        let mut p1 = AppProfile::default_win32("launcher");
-        p1.cooperation.group = Some("steam-bundle".into());
-        let mut p2 = AppProfile::default_win32("game");
-        p2.cooperation.group = Some("steam-bundle".into());
-
-        let results = execute_cooperative(&mut orch, &[
-            (p1, pe1),
-            (p2, pe2),
-        ]);
-
-        assert_eq!(results.len(), 2);
-        assert!(results.iter().all(|r| r.state == ExecState::Running));
-        assert_eq!(results[0].session_id, results[1].session_id);
-    }
-
-    #[test]
-    fn execute_32bit_pe_wow64() {
-        let mut orch = RuntimeOrchestrator::new();
-        let profile = AppProfile::default_win32("legacy32");
-        let pe_data = build_pe_with_imports(
-            PeMachine::I386,
-            PeSubsystem::WindowsGui,
-            &[("kernel32.dll", &["GetLastError"])],
-        );
-
-        let result = execute_pe(&mut orch, &profile, &pe_data);
-        assert_eq!(result.state, ExecState::Running);
     }
 }

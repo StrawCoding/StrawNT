@@ -60,38 +60,70 @@ impl PeLoader {
 
         // Widen to u64 before adding: virtual_address + size can exceed u32::MAX
         // for a crafted/large PE and must not wrap around.
-        let total_size = pe.sections.iter()
+        let total_size = pe
+            .sections
+            .iter()
             .map(|s| s.virtual_address as u64 + s.virtual_size.max(s.raw_size) as u64)
             .max()
-            .unwrap_or(0x1000);
+            .unwrap_or(0x1000)
+            .max(0x2000);
 
-        let mapped_base = kernel.memory.allocate(total_size, MemoryProtection::ReadExecute)?;
+        let mapped_base = kernel
+            .memory
+            .allocate(total_size, MemoryProtection::ReadWriteExecute)?;
         self.mapped_base = mapped_base;
 
+        // Copy raw section bytes into the guest image (real exec requires this).
         for section in &pe.sections {
-            let _section_base = mapped_base + section.virtual_address as u64;
-            kernel.memory.allocate(
-                section.virtual_size.max(section.raw_size) as u64,
-                section_protection(&section.name),
-            )?;
+            let dst = mapped_base + section.virtual_address as u64;
+            let src_off = section.raw_offset as usize;
+            let raw_size = section.raw_size as usize;
+            if raw_size == 0 {
+                continue;
+            }
+            if src_off.saturating_add(raw_size) > data.len() {
+                continue;
+            }
+            let chunk = &data[src_off..src_off + raw_size];
+            kernel
+                .memory
+                .write_bytes(dst, chunk)
+                .map_err(|_| NtStatus::InvalidParameter)?;
         }
 
         self.state = LoaderState::ResolvingImports;
 
         let mut resolutions = Vec::new();
-        let mut stub_addr: u64 = 0x7FFE_0000_0000;
+        // Fixed stub page shared with cpu.rs host callables.
+        let mut stub_addr: u64 = crate::cpu::STUB_BASE;
+        // Prefer known pe1 stubs at fixed slots when present.
+        let fixed = [
+            ("GetStdHandle", crate::cpu::STUB_GET_STD_HANDLE),
+            ("WriteFile", crate::cpu::STUB_WRITE_FILE),
+            ("ExitProcess", crate::cpu::STUB_EXIT_PROCESS),
+            ("CreateFileA", crate::cpu::STUB_CREATE_FILE_A),
+            ("CloseHandle", crate::cpu::STUB_CLOSE_HANDLE),
+        ];
 
         for import in &pe.imports {
             for func_name in &import.functions {
                 let resolve_status = self.stubs.resolve(&import.dll_name, func_name);
                 let resolved = resolve_status == NtStatus::Success;
+                let addr = fixed
+                    .iter()
+                    .find(|(n, _)| *n == func_name.as_str())
+                    .map(|(_, a)| *a)
+                    .unwrap_or_else(|| {
+                        let a = stub_addr;
+                        stub_addr += 8;
+                        a
+                    });
                 resolutions.push(ImportResolution {
                     dll_name: import.dll_name.clone(),
                     function_name: func_name.clone(),
-                    resolved_address: if resolved { stub_addr } else { 0 },
+                    resolved_address: if resolved { addr } else { 0 },
                     resolved,
                 });
-                stub_addr += 8;
             }
         }
 
@@ -177,14 +209,6 @@ pub struct LoadResult {
     pub total_imports: usize,
     pub resolved_imports: usize,
     pub unresolved_imports: Vec<String>,
-}
-
-fn section_protection(name: &str) -> MemoryProtection {
-    match name {
-        ".text" | ".code" => MemoryProtection::ReadExecute,
-        ".rdata" | ".rodata" => MemoryProtection::ReadOnly,
-        _ => MemoryProtection::ReadWrite,
-    }
 }
 
 #[cfg(test)]

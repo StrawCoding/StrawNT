@@ -62,3 +62,8 @@ components/packaging/portable/flatpak/.build/
 components/packaging/portable/flatpak/.flatpak-builder/
 components/packaging/portable/flatpak/repo/
 components/packaging/portable/flatpak/dist/
+
+# pe1 smoke ephemeral registry/home under side-effects (keep pe-stdout.txt)
+tests/portable/output/pe1-side-effects/home/
+tests/portable/output/pe1-side-effects/app-registry.json
+tests/portable/output/pe1-side-effects/app-registry.json.lock

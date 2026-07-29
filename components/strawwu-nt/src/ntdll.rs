@@ -52,6 +52,9 @@ pub struct VirtualMemoryRegion {
     pub size: u64,
     pub protection: MemoryProtection,
     pub state: MemoryState,
+    /// Host-backed guest bytes for this committed region (skipped in JSON dumps).
+    #[serde(skip)]
+    pub data: Vec<u8>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -97,6 +100,7 @@ impl VirtualMemoryManager {
             size: aligned_size,
             protection,
             state: MemoryState::Committed,
+            data: vec![0u8; aligned_size as usize],
         });
 
         Ok(base)
@@ -105,6 +109,7 @@ impl VirtualMemoryManager {
     pub fn free(&mut self, base_address: u64) -> Result<(), NtStatus> {
         if let Some(idx) = self.regions.iter().position(|r| r.base_address == base_address) {
             self.regions[idx].state = MemoryState::Free;
+            self.regions[idx].data.clear();
             Ok(())
         } else {
             Err(NtStatus::InvalidParameter)
@@ -123,8 +128,78 @@ impl VirtualMemoryManager {
 
     pub fn query(&self, address: u64) -> Option<&VirtualMemoryRegion> {
         self.regions.iter().find(|r| {
-            address >= r.base_address && address < r.base_address + r.size
+            r.state == MemoryState::Committed
+                && address >= r.base_address
+                && address < r.base_address + r.size
         })
+    }
+
+    fn region_mut_for(&mut self, address: u64) -> Option<&mut VirtualMemoryRegion> {
+        self.regions.iter_mut().find(|r| {
+            r.state == MemoryState::Committed
+                && address >= r.base_address
+                && address < r.base_address + r.size
+        })
+    }
+
+    pub fn write_bytes(&mut self, address: u64, bytes: &[u8]) -> Result<(), NtStatus> {
+        if bytes.is_empty() {
+            return Ok(());
+        }
+        let end = address
+            .checked_add(bytes.len() as u64)
+            .ok_or(NtStatus::InvalidParameter)?;
+        let region = self.region_mut_for(address).ok_or(NtStatus::AccessDenied)?;
+        if end > region.base_address + region.size {
+            return Err(NtStatus::InvalidParameter);
+        }
+        let offset = (address - region.base_address) as usize;
+        region.data[offset..offset + bytes.len()].copy_from_slice(bytes);
+        Ok(())
+    }
+
+    pub fn read_bytes(&self, address: u64, len: usize) -> Result<Vec<u8>, NtStatus> {
+        if len == 0 {
+            return Ok(Vec::new());
+        }
+        let end = address
+            .checked_add(len as u64)
+            .ok_or(NtStatus::InvalidParameter)?;
+        let region = self.query(address).ok_or(NtStatus::AccessDenied)?;
+        if end > region.base_address + region.size {
+            return Err(NtStatus::InvalidParameter);
+        }
+        let offset = (address - region.base_address) as usize;
+        Ok(region.data[offset..offset + len].to_vec())
+    }
+
+    pub fn read_u8(&self, address: u64) -> Result<u8, NtStatus> {
+        Ok(self.read_bytes(address, 1)?[0])
+    }
+
+    pub fn read_u16(&self, address: u64) -> Result<u16, NtStatus> {
+        let b = self.read_bytes(address, 2)?;
+        Ok(u16::from_le_bytes([b[0], b[1]]))
+    }
+
+    pub fn read_u32(&self, address: u64) -> Result<u32, NtStatus> {
+        let b = self.read_bytes(address, 4)?;
+        Ok(u32::from_le_bytes([b[0], b[1], b[2], b[3]]))
+    }
+
+    pub fn read_u64(&self, address: u64) -> Result<u64, NtStatus> {
+        let b = self.read_bytes(address, 8)?;
+        Ok(u64::from_le_bytes([
+            b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7],
+        ]))
+    }
+
+    pub fn write_u64(&mut self, address: u64, value: u64) -> Result<(), NtStatus> {
+        self.write_bytes(address, &value.to_le_bytes())
+    }
+
+    pub fn write_u32(&mut self, address: u64, value: u32) -> Result<(), NtStatus> {
+        self.write_bytes(address, &value.to_le_bytes())
     }
 
     pub fn region_count(&self) -> usize {
@@ -284,6 +359,10 @@ impl VirtualFileSystem {
         Ok(data)
     }
 
+    pub fn handle_path(&self, handle: FileHandle) -> Option<String> {
+        self.open_handles.get(&handle.0).map(|f| f.path.clone())
+    }
+
     pub fn write_file(&mut self, handle: FileHandle, data: &[u8]) -> Result<usize, NtStatus> {
         let file = self.open_handles.get_mut(&handle.0)
             .ok_or(NtStatus::InvalidHandle)?;
@@ -299,8 +378,7 @@ impl VirtualFileSystem {
         file.content[pos..pos + data.len()].copy_from_slice(data);
         file.position += data.len() as u64;
 
-        let path = file.path.clone();
-        let content = file.content.clone();
+        let path = file.path.clone();        let content = file.content.clone();
         self.files.insert(path, content);
 
         Ok(data.len())

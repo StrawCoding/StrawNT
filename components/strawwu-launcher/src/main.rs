@@ -12,7 +12,7 @@ use strawwu_launcher::registry::{self, derive_app_name};
 use strawwu_runtime::executor::ExecState;
 use strawwu_runtime::orchestrator::RuntimeOrchestrator;
 use strawwu_runtime::profile::AppProfile;
-use strawwu_runtime::{execute_pe, maybe_run_gui_smoke};
+use strawwu_runtime::maybe_run_gui_smoke;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -349,12 +349,24 @@ fn launch_via_native(
     let mut profile = AppProfile::default_win32(app_id);
     profile.execution_backend = backend_name.to_string();
 
-    let exec = execute_pe(&mut orch, &profile, &pe_data);
+    let side_dir = std::env::var_os("STRAWWU_PE_SIDE_EFFECT_DIR").map(std::path::PathBuf::from);
+    let exec = strawwu_runtime::execute_pe_with_side_effect_dir(
+        &mut orch,
+        &profile,
+        &pe_data,
+        side_dir,
+    );
     if exec.state != ExecState::Running {
         eprintln!(
             "strawwu: launch failed: {}",
             exec.error.unwrap_or_else(|| "unknown error".into())
         );
+        return Err(1);
+    }
+
+    let mode = exec.mode.as_str();
+    if mode == "simulated" && std::env::var_os("STRAWWU_REQUIRE_REAL_EXEC").is_some() {
+        eprintln!("strawwu: real CPU execution required but mode=simulated");
         return Err(1);
     }
 
@@ -369,24 +381,44 @@ fn launch_via_native(
     if let Some(ref smoke) = gui {
         let _ = log::append_event("gui_smoke", smoke);
         println!(
-            "strawwu: launched {} (format={}, pid={}, backend={}, app_id={}, mode=simulated, gui-smoke=PASS hwnd={} compositor={} visible={})",
+            "strawwu: launched {} (format={}, pid={}, backend={}, app_id={}, mode={}, gui-smoke=PASS hwnd={} compositor={} visible={})",
             req.binary_path.display(),
             req.format,
             exec.pid,
             profile.execution_backend,
             app_id,
+            mode,
             smoke.hwnd,
             smoke.compositor,
             smoke.visible,
         );
     } else {
         println!(
-            "strawwu: launched {} (format={}, pid={}, backend={}, app_id={}, mode=simulated, gui-smoke=SKIP subsystem=non-gui)",
+            "strawwu: launched {} (format={}, pid={}, backend={}, app_id={}, mode={}, gui-smoke=SKIP subsystem=non-gui)",
             req.binary_path.display(),
             req.format,
             exec.pid,
             profile.execution_backend,
             app_id,
+            mode,
+        );
+    }
+
+    if let Some(ref se) = exec.side_effects {
+        if !se.stdout_utf8.is_empty() {
+            print!("{}", se.stdout_utf8);
+        }
+        let _ = log::append_event(
+            "pe_side_effects",
+            &serde_json::json!({
+                "mode": mode,
+                "cpu_executed": exec.cpu_executed,
+                "stdout": se.stdout_utf8,
+                "host_files": se.host_files_written,
+                "exit_code": se.exit_code,
+                "instructions_retired": se.instructions_retired,
+                "halt": exec.halt_reason,
+            }),
         );
     }
 

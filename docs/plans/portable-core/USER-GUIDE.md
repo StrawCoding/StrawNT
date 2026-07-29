@@ -6,7 +6,7 @@ StrawWU **Win 相容核心**（runtime／nt／launcher／graphics·audio／Hub�
 > **誠實邊界**：預設以自研 **strawwu-nt**（`execution_backend=native`）處理 `.exe`／`.msi`。
 > **不**使用 Wine／Proton。不保證所有 Windows 軟體都可跑；反作弊／核心驅動可能失敗。
 > Flatpak 對 PE／SubsystemSession 為 **PARTIAL**。不是 ISO／桌面發行版。
-> 真實 CPU 執行能力依 pe1+ 階段推進；現階段仍可能標 `mode=simulated`。
+> pe1 起：最小 console PE fixture 經 native CPU 迴圈可產生可觀測副作用（`mode=real`）；更大範圍相容仍依 pe2+ 推進。
 
 ## 選擇哪一種包裝
 

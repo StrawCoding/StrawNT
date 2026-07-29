@@ -1,0 +1,68 @@
+{
+  "schema": "strawwu-portable-pe-real-exec/v1",
+  "stage": "pe1-real-cpu-exec",
+  "status": "PASS",
+  "version": "0.7.1.19",
+  "backend": "native",
+  "execution_backend": "native",
+  "mode": "real",
+  "generated_at": "2026-07-29T05:28:38Z",
+  "fixture": {
+    "path": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/fixtures/pe1-console-hello.exe",
+    "sha256": "ac65eef8b4d7a172550c07ab6f3e02c0b585490377cb58b71f9b19da1724ab4d",
+    "kind": "minimal-amd64-console-pe",
+    "marker": "STRAWWU_PE_REAL_OK"
+  },
+  "side_effects": {
+    "stdout_file": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe1-side-effects/pe-stdout.txt",
+    "stdout": "STRAWWU_PE_REAL_OK",
+    "dir": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe1-side-effects"
+  },
+  "launcher": {
+    "command": "strawwu run <fixture> --backend native",
+    "output": [
+      "strawwu: launched /mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/fixtures/pe1-console-hello.exe (format=PE, pid=1000, backend=native, app_id=pe1-console-hello, mode=real, gui-smoke=SKIP subsystem=non-gui)",
+      "STRAWWU_PE_REAL_OK"
+    ],
+    "require_real_exec": true
+  },
+  "checks": [
+    {
+      "name": "mode_real",
+      "status": "PASS"
+    },
+    {
+      "name": "backend_native",
+      "status": "PASS"
+    },
+    {
+      "name": "stdout_marker",
+      "status": "PASS"
+    },
+    {
+      "name": "host_side_effect_file",
+      "status": "PASS"
+    },
+    {
+      "name": "no_wine_substrate",
+      "status": "PASS"
+    }
+  ],
+  "evidence": [
+    "tests/portable/output/pe-real-exec.json",
+    "tests/portable/fixtures/pe1-console-hello.exe",
+    "components/strawwu-nt/src/cpu.rs",
+    "components/strawwu-runtime/src/executor.rs"
+  ],
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
+    "no Wine/Proton substrate; execution_backend=native",
+    "no WinBox naming",
+    "no full Windows compatibility claim",
+    "mode=simulated is not accepted as success"
+  ],
+  "git": {
+    "branch": "main",
+    "commit": "bb720918a"
+  }
+}

@@ -579,4 +579,133 @@ mod tests {
         let pe = PeFile::parse(&data).unwrap();
         assert!(pe.imports.is_empty());
     }
+
+    #[test]
+    fn real_console_fixture_parses_as_amd64_cui() {
+        let data = build_real_console_fixture_pe();
+        let pe = PeFile::parse(&data).unwrap();
+        assert!(pe.is_valid);
+        assert_eq!(pe.machine, PeMachine::Amd64);
+        assert_eq!(pe.subsystem, PeSubsystem::WindowsCui);
+        assert_eq!(pe.entry_point, 0x1000);
+        assert!(!pe.sections.is_empty());
+    }
+}
+
+/// Minimal AMD64 console PE with real x86-64 opcodes that call fixed
+/// strawwu-nt stubs (GetStdHandle / WriteFile / ExitProcess) to emit
+/// the observable marker `STRAWWU_PE_REAL_OK`.
+pub fn build_real_console_fixture_pe() -> Vec<u8> {
+    use crate::cpu::{STUB_EXIT_PROCESS, STUB_GET_STD_HANDLE, STUB_WRITE_FILE};
+
+    let mut pe = vec![0u8; 0x800];
+    pe[0] = 0x4D;
+    pe[1] = 0x5A;
+    pe[0x3C..0x40].copy_from_slice(&0x50u32.to_le_bytes());
+
+    let pe_off = 0x50usize;
+    pe[pe_off..pe_off + 4].copy_from_slice(&PE_SIGNATURE);
+
+    let coff = pe_off + 4;
+    pe[coff..coff + 2].copy_from_slice(&(PeMachine::Amd64 as u16).to_le_bytes());
+    pe[coff + 2..coff + 4].copy_from_slice(&1u16.to_le_bytes());
+    pe[coff + 16..coff + 18].copy_from_slice(&240u16.to_le_bytes());
+    pe[coff + 18..coff + 20].copy_from_slice(&0x0022u16.to_le_bytes());
+
+    let opt = coff + 20;
+    pe[opt..opt + 2].copy_from_slice(&0x020Bu16.to_le_bytes());
+    pe[opt + 16..opt + 20].copy_from_slice(&0x1000u32.to_le_bytes());
+    pe[opt + 24..opt + 32].copy_from_slice(&0x0000_0001_4000_0000u64.to_le_bytes());
+    pe[opt + 32..opt + 36].copy_from_slice(&0x1000u32.to_le_bytes());
+    pe[opt + 36..opt + 40].copy_from_slice(&0x200u32.to_le_bytes());
+    pe[opt + 56..opt + 60].copy_from_slice(&0x3000u32.to_le_bytes());
+    pe[opt + 60..opt + 64].copy_from_slice(&0x200u32.to_le_bytes());
+    pe[opt + 68..opt + 70].copy_from_slice(&(PeSubsystem::WindowsCui as u16).to_le_bytes());
+    pe[opt + 108..opt + 112].copy_from_slice(&16u32.to_le_bytes());
+
+    let sec = opt + 240;
+    pe[sec..sec + 5].copy_from_slice(b".text");
+    pe[sec + 8..sec + 12].copy_from_slice(&0x1000u32.to_le_bytes());
+    pe[sec + 12..sec + 16].copy_from_slice(&0x1000u32.to_le_bytes());
+    pe[sec + 16..sec + 20].copy_from_slice(&0x400u32.to_le_bytes());
+    pe[sec + 20..sec + 24].copy_from_slice(&0x200u32.to_le_bytes());
+    pe[sec + 36..sec + 40].copy_from_slice(&0x6000_0020u32.to_le_bytes());
+
+    let text = 0x200usize;
+    let msg = b"STRAWWU_PE_REAL_OK\n";
+    // Code ends at offset 83 within .text; message + written follow.
+    let msg_off = 83usize;
+    let written_off = msg_off + msg.len();
+
+    let mut o = text;
+    // sub rsp, 0x28
+    pe[o..o + 4].copy_from_slice(&[0x48, 0x83, 0xEC, 0x28]);
+    o += 4;
+    // mov ecx, -11
+    pe[o..o + 5].copy_from_slice(&[0xB9, 0xF5, 0xFF, 0xFF, 0xFF]);
+    o += 5;
+    // mov rax, STUB_GET_STD_HANDLE
+    pe[o] = 0x48;
+    pe[o + 1] = 0xB8;
+    pe[o + 2..o + 10].copy_from_slice(&STUB_GET_STD_HANDLE.to_le_bytes());
+    o += 10;
+    // call rax
+    pe[o] = 0xFF;
+    pe[o + 1] = 0xD0;
+    o += 2;
+    // mov rcx, rax
+    pe[o..o + 3].copy_from_slice(&[0x48, 0x89, 0xC1]);
+    o += 3;
+    // lea rdx, [rip+msg]
+    pe[o] = 0x48;
+    pe[o + 1] = 0x8D;
+    pe[o + 2] = 0x15;
+    let lea_rdx_disp = (msg_off as i32) - ((o - text) as i32 + 7);
+    pe[o + 3..o + 7].copy_from_slice(&lea_rdx_disp.to_le_bytes());
+    o += 7;
+    // mov r8d, 19
+    pe[o..o + 6].copy_from_slice(&[0x41, 0xB8, 0x13, 0x00, 0x00, 0x00]);
+    o += 6;
+    // lea r9, [rip+written]
+    pe[o] = 0x4C;
+    pe[o + 1] = 0x8D;
+    pe[o + 2] = 0x0D;
+    let lea_r9_disp = (written_off as i32) - ((o - text) as i32 + 7);
+    pe[o + 3..o + 7].copy_from_slice(&lea_r9_disp.to_le_bytes());
+    o += 7;
+    // mov qword [rsp+0x20], 0
+    pe[o..o + 9].copy_from_slice(&[0x48, 0xC7, 0x44, 0x24, 0x20, 0x00, 0x00, 0x00, 0x00]);
+    o += 9;
+    // mov rax, STUB_WRITE_FILE
+    pe[o] = 0x48;
+    pe[o + 1] = 0xB8;
+    pe[o + 2..o + 10].copy_from_slice(&STUB_WRITE_FILE.to_le_bytes());
+    o += 10;
+    // call rax
+    pe[o] = 0xFF;
+    pe[o + 1] = 0xD0;
+    o += 2;
+    // add rsp, 0x28
+    pe[o..o + 4].copy_from_slice(&[0x48, 0x83, 0xC4, 0x28]);
+    o += 4;
+    // xor ecx, ecx
+    pe[o] = 0x31;
+    pe[o + 1] = 0xC9;
+    o += 2;
+    // mov rax, STUB_EXIT_PROCESS
+    pe[o] = 0x48;
+    pe[o + 1] = 0xB8;
+    pe[o + 2..o + 10].copy_from_slice(&STUB_EXIT_PROCESS.to_le_bytes());
+    o += 10;
+    // call rax
+    pe[o] = 0xFF;
+    pe[o + 1] = 0xD0;
+    o += 2;
+
+    debug_assert_eq!(o - text, msg_off);
+
+    pe[text + msg_off..text + msg_off + msg.len()].copy_from_slice(msg);
+    pe[text + written_off..text + written_off + 4].copy_from_slice(&0u32.to_le_bytes());
+
+    pe
 }
