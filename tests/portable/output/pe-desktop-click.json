@@ -1,0 +1,127 @@
+{
+  "schema": "strawwu-portable-pe-desktop-click/v1",
+  "stage": "pe5-desktop-click",
+  "status": "PASS",
+  "version": "0.7.1.23",
+  "backend": "native",
+  "execution_backend": "native",
+  "mode": "real",
+  "generated_at": "2026-07-29T06:30:04Z",
+  "integrate": {
+    "command": "strawwu integrate",
+    "handler": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe5-side-effects/home/.local/share/applications/strawwu-open.desktop",
+    "mime_xml": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe5-side-effects/home/.local/share/mime/packages/strawwu-win32.xml",
+    "backend": "native",
+    "output": [
+      "strawwu: desktop integration installed",
+      "  handler: /mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe5-side-effects/home/.local/share/applications/strawwu-open.desktop",
+      "  backend: native (strawwu-nt)",
+      "  tip: double-click .exe / .msi to install & launch"
+    ],
+    "body_preview": [
+      "[Desktop Entry]",
+      "Type=Application",
+      "Name=StrawWU",
+      "GenericName=Windows App Launcher",
+      "Comment=Install or run Windows .exe/.msi via native strawwu-nt",
+      "Exec=\"/mnt/data/code/project/StrawCoding/StrawWU-portable/components/target/release/strawwu\" open %f",
+      "TryExec=/mnt/data/code/project/StrawCoding/StrawWU-portable/components/target/release/strawwu",
+      "Icon=strawwu",
+      "Terminal=false",
+      "Categories=System;Utility;",
+      "MimeType=application/x-ms-dos-executable;application/x-msdownload;application/vnd.microsoft.portable-executable;application/x-msi;application/x-ms-shortcut;",
+      "NoDisplay=false",
+      "StartupNotify=true",
+      "X-StrawWU-Kind=open-handler",
+      "X-StrawWU-Backend=native"
+    ]
+  },
+  "double_click_open": {
+    "command": "strawwu open --install <pe4-setup.exe>",
+    "equiv_mime_exec": "strawwu open %f",
+    "fixture": {
+      "path": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/fixtures/pe4-setup.exe",
+      "sha256": "db2c7727a585025583d02671b2df98b9d9bd616ff5f7f4e637daa48abdfa2e11"
+    },
+    "main_exe": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe5-side-effects/apps/pe4-setup/main.exe",
+    "forced_env_STRAWWU_BACKEND": "container",
+    "still_native": true,
+    "output": [
+      "strawwu: open/install native unpack app_id=pe4-setup type=exe install_path=/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe5-side-effects/apps/pe4-setup main=/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe5-side-effects/apps/pe4-setup/main.exe desktop=/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe5-side-effects/home/.local/share/applications/pe4-setup.desktop backend=native mode=real files=2",
+      "strawwu: launched /mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe5-side-effects/apps/pe4-setup/main.exe (format=PE, pid=1000, backend=native, app_id=pe4-setup, mode=real, gui-smoke=SKIP subsystem=non-gui)",
+      "STRAWWU_PE_CONSOLE_OK",
+      "STRAWWU_PE_CONSOLE_CRT"
+    ],
+    "side_effect_stdout_sha256": "378d6a49afd194d9b2564adba47d65260ae48209352d85ba254426cf88feb9a6"
+  },
+  "menu_relaunch": {
+    "desktop": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe5-side-effects/home/.local/share/applications/pe4-setup.desktop",
+    "exec_pins_backend_native": true,
+    "x_strawwu_backend": true,
+    "output": [
+      "strawwu: launched /mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe5-side-effects/apps/pe4-setup/main.exe (format=PE, pid=1000, backend=native, app_id=main, mode=real, gui-smoke=SKIP subsystem=non-gui)",
+      "STRAWWU_PE_CONSOLE_OK",
+      "STRAWWU_PE_CONSOLE_CRT"
+    ],
+    "side_effect_stdout_sha256": "378d6a49afd194d9b2564adba47d65260ae48209352d85ba254426cf88feb9a6"
+  },
+  "install_sh": {
+    "path": "install.sh",
+    "defaults_backend_native": true,
+    "calls_integrate": true,
+    "no_wine_provision": true
+  },
+  "checks": [
+    {
+      "name": "integrate_mime_handler_native",
+      "status": "PASS"
+    },
+    {
+      "name": "mime_xml_exe_msi",
+      "status": "PASS"
+    },
+    {
+      "name": "double_click_open_install_launch",
+      "status": "PASS"
+    },
+    {
+      "name": "open_ignores_non_native_env",
+      "status": "PASS"
+    },
+    {
+      "name": "menu_shortcut_pins_native",
+      "status": "PASS"
+    },
+    {
+      "name": "menu_relaunch_mode_real",
+      "status": "PASS"
+    },
+    {
+      "name": "install_sh_no_wine",
+      "status": "PASS"
+    },
+    {
+      "name": "no_wine_substrate",
+      "status": "PASS"
+    }
+  ],
+  "pending": [],
+  "evidence": [
+    "tests/portable/output/pe-desktop-click.json",
+    "install.sh",
+    "components/strawwu-launcher/src/desktop.rs",
+    "components/strawwu-launcher/src/main.rs",
+    "tests/portable/smoke-pe-desktop-click.sh"
+  ],
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
+    "no Wine/Proton substrate; execution_backend=native",
+    "no WinBox naming",
+    "no full Windows compatibility claim",
+    "mode=simulated is not accepted as success"
+  ],
+  "git": {
+    "branch": "main",
+    "commit": "35f0fd656"
+  }
+}

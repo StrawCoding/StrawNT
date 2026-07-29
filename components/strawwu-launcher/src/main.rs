@@ -146,7 +146,10 @@ fn main() {
                     ),
                 );
 
-                if let Err(code) = launch_pe(&path, &[], None, &[], true, install_mode) {
+                // Double-click / MIME open always pins native (no Wine env override).
+                if let Err(code) =
+                    launch_pe(&path, &[], Some("native"), &[], true, install_mode)
+                {
                     open::notify("StrawWU", &format!("Failed to open {name}"));
                     process::exit(code);
                 }
@@ -246,12 +249,12 @@ fn main() {
         Command::Integrate => match desktop::install_desktop_integration() {
             Ok(path) => {
                 println!(
-                    "strawwu: desktop integration installed\n  handler: {}\n  tip: double-click .exe / .msi to install & launch",
+                    "strawwu: desktop integration installed\n  handler: {}\n  backend: native (strawwu-nt)\n  tip: double-click .exe / .msi to install & launch",
                     path.display()
                 );
                 open::notify(
                     "StrawWU",
-                    "Click-to-open enabled for Windows .exe / .msi files",
+                    "Click-to-open enabled for Windows .exe / .msi (native)",
                 );
             }
             Err(e) => {

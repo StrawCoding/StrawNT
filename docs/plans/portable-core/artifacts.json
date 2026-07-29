@@ -24,7 +24,7 @@
   "notes": [
     "Portable Core redistribution artifacts for GitHub Releases.",
     "Default PE backend=native (strawwu-nt); Wine/Proton removed from product path.",
-    "Click-to-open: strawwu integrate + double-click .exe/.msi",
+    "Click-to-open: strawwu integrate + double-click .exe/.msi (MIME → open; menu Exec pins --backend native)",
     "Not a full Windows OS claim; anti-cheat may fail."
   ]
 }

@@ -83,4 +83,15 @@ tests/portable/output/pe4-side-effects/home/
 tests/portable/output/pe4-side-effects/apps/
 tests/portable/output/pe4-side-effects/app-registry.json
 tests/portable/output/pe4-side-effects/app-registry.json.lock
+
+# pe5 desktop-click isolated side-effects (JSON evidence kept)
+tests/portable/output/pe5-side-effects/home/
+tests/portable/output/pe5-side-effects/apps/
+tests/portable/output/pe5-side-effects/app-registry.json
+tests/portable/output/pe5-side-effects/app-registry.json.lock
+tests/portable/output/pe5-side-effects/pe-stdout.txt
+tests/portable/output/pe5-side-effects/pe-stderr.txt
+tests/portable/output/pe5-side-effects/pe2-marker.txt
+tests/portable/output/pe5-side-effects/*.log
+tests/portable/output/pe5-side-effects/*.txt
 tests/portable/fixtures/pe4-msi-setup.msi

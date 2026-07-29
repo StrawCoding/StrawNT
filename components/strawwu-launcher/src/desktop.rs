@@ -125,8 +125,9 @@ pub fn write_launcher_desktop_in(
             .unwrap_or_else(|| derive_app_name(binary)),
     );
     let strawwu = strawwu_bin_for_exec();
+    // Menu shortcuts always pin --backend native (no Wine/Proton env override).
     let exec = format!(
-        "{} run {}",
+        "{} run --backend native {}",
         desktop_exec_arg(&strawwu),
         desktop_exec_arg(&binary.display().to_string())
     );
@@ -138,7 +139,7 @@ pub fn write_launcher_desktop_in(
         "[Desktop Entry]\n\
          Type=Application\n\
          Name={display_name}\n\
-         Comment=Launch with StrawWU Portable Core\n\
+         Comment=Launch with StrawWU Portable Core (native strawwu-nt)\n\
          Exec={exec}\n\
          Icon=application-x-ms-dos-executable\n\
          Terminal=false\n\
@@ -146,7 +147,8 @@ pub fn write_launcher_desktop_in(
          StartupWMClass={app_id}\n\
          X-StrawWU-App-Id={app_id}\n\
          X-StrawWU-Source=launcher\n\
-         X-StrawWU-Kind=win32\n"
+         X-StrawWU-Kind=win32\n\
+         X-StrawWU-Backend=native\n"
     );
 
     fs::write(&path, body).map_err(|e| e.to_string())?;
@@ -178,13 +180,14 @@ pub fn install_desktop_integration_in(
 
     let mime_list = MIME_TYPES.join(";");
     let handler = apps_dir.join(format!("{OPEN_HANDLER_ID}.desktop"));
+    // Double-click MIME path: strawwu open → native strawwu-nt only.
     let exec = format!("{} open %f", desktop_exec_arg(strawwu_bin));
     let body = format!(
         "[Desktop Entry]\n\
          Type=Application\n\
          Name=StrawWU\n\
          GenericName=Windows App Launcher\n\
-         Comment=Install or run Windows .exe/.msi with StrawWU Portable Core\n\
+         Comment=Install or run Windows .exe/.msi via native strawwu-nt\n\
          Exec={exec}\n\
          TryExec={try_exec}\n\
          Icon=strawwu\n\
@@ -193,7 +196,8 @@ pub fn install_desktop_integration_in(
          MimeType={mime_list};\n\
          NoDisplay=false\n\
          StartupNotify=true\n\
-         X-StrawWU-Kind=open-handler\n",
+         X-StrawWU-Kind=open-handler\n\
+         X-StrawWU-Backend=native\n",
         try_exec = desktop_escape(strawwu_bin),
         mime_list = mime_list,
     );
@@ -257,7 +261,8 @@ mod tests {
         assert!(content.contains("Name=Notepad"));
         assert!(content.contains("X-StrawWU-App-Id=notepad"));
         assert!(content.contains("strawwu"));
-        assert!(content.contains(" run "));
+        assert!(content.contains(" run --backend native "));
+        assert!(content.contains("X-StrawWU-Backend=native"));
         std::env::remove_var("STRAWWU_BIN");
     }
 
@@ -300,6 +305,8 @@ mod tests {
         assert!(content.contains("MimeType="));
         assert!(content.contains(" open %f"));
         assert!(content.contains("application/x-ms-dos-executable"));
+        assert!(content.contains("X-StrawWU-Backend=native"));
+        assert!(!content.to_lowercase().contains("wine"));
         assert!(mime.path().join("strawwu-win32.xml").exists());
     }
 }
