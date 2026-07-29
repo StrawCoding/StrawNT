@@ -415,6 +415,42 @@ impl RegistryStore {
         Ok(self.data.find(id).expect("just inserted"))
     }
 
+    /// Finalize a native unpack install: mark Installed with install root + desktop.
+    pub fn finalize_install(
+        &mut self,
+        id: &str,
+        name: &str,
+        install_path: Option<String>,
+        desktop_entry: Option<String>,
+        backend: Option<ExecutionBackend>,
+    ) -> Result<&AppEntry, RegistryError> {
+        if let Some(app) = self.data.find_mut(id) {
+            app.name = name.to_string();
+            app.kind = AppKind::Win32;
+            app.source = AppSource::Installer;
+            app.install_state = InstallState::Installed;
+            app.install_path = install_path;
+            app.execution_backend = backend.or(Some(ExecutionBackend::Native));
+            if desktop_entry.is_some() {
+                app.desktop_entry = desktop_entry;
+            }
+            app.touch();
+            self.data.touch();
+            self.flush()?;
+            self.log_event("install-finalize", id);
+            return Ok(self.data.find(id).expect("just updated"));
+        }
+
+        let mut entry = AppEntry::new(id, name, AppKind::Win32, AppSource::Installer);
+        entry.install_state = InstallState::Installed;
+        entry.install_path = install_path;
+        entry.desktop_entry = desktop_entry;
+        entry.execution_backend = backend.or(Some(ExecutionBackend::Native));
+        self.register(entry)?;
+        self.log_event("install-finalize", id);
+        Ok(self.data.find(id).expect("just inserted"))
+    }
+
     pub fn preview_remove(&self, id: &str) -> Result<RemovePreview, RegistryError> {
         let app = self
             .data

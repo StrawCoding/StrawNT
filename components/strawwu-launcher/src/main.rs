@@ -4,6 +4,7 @@ use std::process;
 use strawwu_launcher::cli::{self, Command, OpenMode};
 use strawwu_launcher::desktop;
 use strawwu_launcher::detect::{detect_from_path, BinaryFormat};
+use strawwu_launcher::install_native;
 use strawwu_launcher::loader::LaunchRequest;
 use strawwu_launcher::log;
 use strawwu_launcher::open::{self, OpenAction};
@@ -75,83 +76,170 @@ fn main() {
             };
             let install_mode = matches!(action, OpenAction::InstallAndRun);
 
-            if install_mode {
-                match registry::register_install(&path) {
-                    Ok(app_id) => {
+            if install_mode && install_native::installer_has_native_package(&path) {
+                match install_native::native_install(&path) {
+                    Ok(report) => {
                         println!(
-                            "strawwu: open/install registered pending app_id={app_id} ({})",
-                            path.display()
+                            "strawwu: open/install native unpack app_id={} type={} install_path={} main={} desktop={} backend=native mode=real files={}",
+                            report.app_id,
+                            report.installer_type,
+                            report.install_path,
+                            report.main_exe,
+                            report.desktop_entry.as_deref().unwrap_or("-"),
+                            report.files.len()
+                        );
+                        let _ = log::append_event("native_install", &report);
+                        let main = PathBuf::from(&report.main_exe);
+                        open::notify(
+                            "StrawWU",
+                            &format!("Installing & launching {}", report.app_name),
+                        );
+                        if let Err(code) = launch_pe_with_registry(
+                            &main,
+                            &[],
+                            Some("native"),
+                            &[],
+                            true,
+                            false,
+                            Some(&report.app_id),
+                        ) {
+                            open::notify("StrawWU", &format!("Failed to open {}", report.app_name));
+                            process::exit(code);
+                        }
+                        open::notify(
+                            "StrawWU",
+                            &format!("{} ready — also available from the app menu", report.app_name),
                         );
                     }
                     Err(e) => {
-                        eprintln!("strawwu: open install register failed: {e}");
+                        eprintln!("strawwu: native install failed: {e}");
                         process::exit(1);
                     }
                 }
-            }
-
-            let name = derive_app_name(&path);
-            open::notify(
-                "StrawWU",
-                &format!(
-                    "{} {}",
-                    if install_mode {
-                        "Installing & launching"
-                    } else {
-                        "Launching"
-                    },
-                    name
-                ),
-            );
-
-            if let Err(code) = launch_pe(&path, &[], None, &[], true, install_mode) {
-                open::notify("StrawWU", &format!("Failed to open {name}"));
-                process::exit(code);
-            }
-            open::notify(
-                "StrawWU",
-                &format!("{name} ready — also available from the app menu"),
-            );
-        }
-        Command::Install { installer } => {
-            match registry::register_install(&installer) {
-                Ok(app_id) => {
-                    let app_name = derive_app_name(&installer);
-                    let desktop_path = desktop::write_launcher_desktop(
-                        &app_id,
-                        &installer,
-                        Some(&app_name),
-                    );
-                    match desktop_path {
-                        Ok(path) => {
+            } else {
+                if install_mode {
+                    match registry::register_install(&path) {
+                        Ok(app_id) => {
                             println!(
-                                "strawwu: install {} (registered pending app_id={app_id}; desktop={})",
-                                installer.display(),
+                                "strawwu: open/install registered pending app_id={app_id} ({})",
                                 path.display()
                             );
                         }
                         Err(e) => {
-                            println!(
-                                "strawwu: install {} (registered pending app_id={app_id}; desktop skipped: {e})",
-                                installer.display()
-                            );
+                            eprintln!("strawwu: open install register failed: {e}");
+                            process::exit(1);
                         }
                     }
-                    // Run the installer through the native strawwu-nt path.
-                    if let Err(code) =
-                        launch_pe(&installer, &[], Some("native"), &[], false, true)
-                    {
-                        open::notify("StrawWU", &format!("Install failed: {app_name}"));
-                        process::exit(code);
-                    }
-                    open::notify(
-                        "StrawWU",
-                        &format!("{app_name} installed — use the app menu or strawwu open to launch"),
-                    );
                 }
-                Err(e) => {
-                    eprintln!("strawwu: registry register failed: {e}");
-                    process::exit(1);
+
+                let name = derive_app_name(&path);
+                open::notify(
+                    "StrawWU",
+                    &format!(
+                        "{} {}",
+                        if install_mode {
+                            "Installing & launching"
+                        } else {
+                            "Launching"
+                        },
+                        name
+                    ),
+                );
+
+                if let Err(code) = launch_pe(&path, &[], None, &[], true, install_mode) {
+                    open::notify("StrawWU", &format!("Failed to open {name}"));
+                    process::exit(code);
+                }
+                open::notify(
+                    "StrawWU",
+                    &format!("{name} ready — also available from the app menu"),
+                );
+            }
+        }
+        Command::Install { installer } => {
+            if install_native::installer_has_native_package(&installer) {
+                match install_native::native_install(&installer) {
+                    Ok(report) => {
+                        println!(
+                            "strawwu: install {} (native unpack app_id={}; type={}; install_path={}; desktop={}; backend=native; mode=real)",
+                            installer.display(),
+                            report.app_id,
+                            report.installer_type,
+                            report.install_path,
+                            report.desktop_entry.as_deref().unwrap_or("-"),
+                        );
+                        let _ = log::append_event("native_install", &report);
+                        // Launch the unpacked main.exe through the same native path
+                        // without clobbering the installer registry entry / shortcut.
+                        let main = PathBuf::from(&report.main_exe);
+                        if let Err(code) = launch_pe_with_registry(
+                            &main,
+                            &[],
+                            Some("native"),
+                            &[],
+                            false,
+                            false,
+                            Some(&report.app_id),
+                        ) {
+                            open::notify(
+                                "StrawWU",
+                                &format!("Installed main launch failed: {}", report.app_name),
+                            );
+                            process::exit(code);
+                        }
+                        open::notify(
+                            "StrawWU",
+                            &format!(
+                                "{} installed — use the app menu or strawwu open to launch",
+                                report.app_name
+                            ),
+                        );
+                    }
+                    Err(e) => {
+                        eprintln!("strawwu: native install failed: {e}");
+                        process::exit(1);
+                    }
+                }
+            } else {
+                match registry::register_install(&installer) {
+                    Ok(app_id) => {
+                        let app_name = derive_app_name(&installer);
+                        let desktop_path = desktop::write_launcher_desktop(
+                            &app_id,
+                            &installer,
+                            Some(&app_name),
+                        );
+                        match desktop_path {
+                            Ok(path) => {
+                                println!(
+                                    "strawwu: install {} (registered pending app_id={app_id}; desktop={})",
+                                    installer.display(),
+                                    path.display()
+                                );
+                            }
+                            Err(e) => {
+                                println!(
+                                    "strawwu: install {} (registered pending app_id={app_id}; desktop skipped: {e})",
+                                    installer.display()
+                                );
+                            }
+                        }
+                        // Run the installer through the native strawwu-nt path.
+                        if let Err(code) =
+                            launch_pe(&installer, &[], Some("native"), &[], false, true)
+                        {
+                            open::notify("StrawWU", &format!("Install failed: {app_name}"));
+                            process::exit(code);
+                        }
+                        open::notify(
+                            "StrawWU",
+                            &format!("{app_name} installed — use the app menu or strawwu open to launch"),
+                        );
+                    }
+                    Err(e) => {
+                        eprintln!("strawwu: registry register failed: {e}");
+                        process::exit(1);
+                    }
                 }
             }
         }
@@ -272,6 +360,19 @@ fn launch_pe(
     from_open: bool,
     _install_mode: bool,
 ) -> Result<(), i32> {
+    launch_pe_with_registry(binary, app_args, backend, bundle, from_open, true, None)
+}
+
+/// Like [`launch_pe`], but can skip registry/desktop mutation and force an app_id.
+fn launch_pe_with_registry(
+    binary: &Path,
+    app_args: &[String],
+    backend: Option<&str>,
+    bundle: &[PathBuf],
+    from_open: bool,
+    update_registry: bool,
+    forced_app_id: Option<&str>,
+) -> Result<(), i32> {
     let format = detect_from_path(binary).unwrap_or(BinaryFormat::Unknown);
     let backend_name = resolve_backend(backend);
     let mut req = LaunchRequest::new(binary.to_path_buf(), format).with_args(app_args.to_vec());
@@ -286,33 +387,48 @@ fn launch_pe(
     }
 
     let app_name = derive_app_name(binary);
-    let desktop_path =
-        desktop::write_launcher_desktop(&registry::derive_app_id(binary), binary, Some(&app_name));
+    let app_id_default = registry::derive_app_id(binary);
+    let app_id_str = forced_app_id.unwrap_or(app_id_default.as_str());
 
-    let desktop_entry = match desktop_path {
-        Ok(path) => {
-            if from_open {
-                println!("strawwu: desktop launcher → {}", path.display());
+    let (desktop_entry, app_id) = if update_registry {
+        let desktop_path =
+            desktop::write_launcher_desktop(app_id_str, binary, Some(&app_name));
+
+        let desktop_entry = match desktop_path {
+            Ok(path) => {
+                if from_open {
+                    println!("strawwu: desktop launcher → {}", path.display());
+                }
+                Some(path.to_string_lossy().into_owned())
             }
-            Some(path.to_string_lossy().into_owned())
-        }
-        Err(e) => {
-            eprintln!("strawwu: desktop entry skipped: {e}");
-            None
-        }
-    };
+            Err(e) => {
+                eprintln!("strawwu: desktop entry skipped: {e}");
+                None
+            }
+        };
 
-    let app_id = match registry::register_launch(
-        binary,
-        format,
-        Some(backend_name.as_str()),
-        desktop_entry.clone(),
-    ) {
-        Ok(id) => id,
-        Err(e) => {
-            eprintln!("strawwu: registry register failed: {e}");
-            return Err(1);
-        }
+        let app_id = match registry::register_launch(
+            binary,
+            format,
+            Some(backend_name.as_str()),
+            desktop_entry.clone(),
+        ) {
+            Ok(id) => {
+                if forced_app_id.is_some() && id != app_id_str {
+                    // register_launch derives id from stem; keep caller's id in messages.
+                    app_id_str.to_string()
+                } else {
+                    id
+                }
+            }
+            Err(e) => {
+                eprintln!("strawwu: registry register failed: {e}");
+                return Err(1);
+            }
+        };
+        (desktop_entry, app_id)
+    } else {
+        (None, app_id_str.to_string())
     };
 
     launch_via_native(
@@ -469,7 +585,7 @@ COMMANDS:
     run <binary> [--backend native|container|microvm] [--bundle a,b,c]
         Default backend=native (self-built PE / strawwu-nt)
     install <installer.exe|.msi>
-        Register + run the installer through native strawwu-nt
+        Native unpack (SWUP/SWUM) → app-registry + shortcut; else pending + run
     integrate
         Enable double-click for .exe/.msi (MIME + desktop handler)
     apps list

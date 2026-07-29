@@ -1,0 +1,132 @@
+{
+  "schema": "strawwu-portable-pe-installer/v1",
+  "stage": "pe4-installer-real",
+  "status": "PASS",
+  "version": "0.7.1.22",
+  "backend": "native",
+  "execution_backend": "native",
+  "mode": "real",
+  "generated_at": "2026-07-29T06:17:11Z",
+  "fixtures": {
+    "exe": {
+      "path": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/fixtures/pe4-setup.exe",
+      "sha256": "db2c7727a585025583d02671b2df98b9d9bd616ff5f7f4e637daa48abdfa2e11",
+      "kind": "swup-sfx-amd64"
+    },
+    "msi": {
+      "path": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/fixtures/pe4-setup.msi",
+      "sha256": "b5aef0a6677f51404e4f785180b671f370f83c54a62b8ed14b8b5091d3096696",
+      "kind": "swum-msi-amd64"
+    }
+  },
+  "install": {
+    "command": "strawwu install <pe4-setup.exe>",
+    "path": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe4-side-effects/apps/pe4-setup",
+    "main_exe": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe4-side-effects/apps/pe4-setup/main.exe",
+    "desktop": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe4-side-effects/home/.local/share/applications/pe4-setup.desktop",
+    "output": [
+      "strawwu: install /mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/fixtures/pe4-setup.exe (native unpack app_id=pe4-setup; type=exe; install_path=/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe4-side-effects/apps/pe4-setup; desktop=/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe4-side-effects/home/.local/share/applications/pe4-setup.desktop; backend=native; mode=real)",
+      "strawwu: launched /mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe4-side-effects/apps/pe4-setup/main.exe (format=PE, pid=1000, backend=native, app_id=pe4-setup, mode=real, gui-smoke=SKIP subsystem=non-gui)",
+      "STRAWWU_PE_CONSOLE_OK",
+      "STRAWWU_PE_CONSOLE_CRT"
+    ]
+  },
+  "open": {
+    "command": "strawwu open --install <pe4-setup.exe>",
+    "same_path_as_install": true,
+    "output": [
+      "strawwu: open/install native unpack app_id=pe4-setup type=exe install_path=/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe4-side-effects/apps/pe4-setup main=/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe4-side-effects/apps/pe4-setup/main.exe desktop=/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe4-side-effects/home/.local/share/applications/pe4-setup.desktop backend=native mode=real files=2",
+      "strawwu: launched /mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe4-side-effects/apps/pe4-setup/main.exe (format=PE, pid=1000, backend=native, app_id=pe4-setup, mode=real, gui-smoke=SKIP subsystem=non-gui)",
+      "STRAWWU_PE_CONSOLE_OK",
+      "STRAWWU_PE_CONSOLE_CRT"
+    ]
+  },
+  "msi_install": {
+    "command": "strawwu install <pe4-msi-setup.msi>",
+    "path": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe4-side-effects/apps/pe4-msi-setup",
+    "desktop": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe4-side-effects/home/.local/share/applications/pe4-msi-setup.desktop",
+    "output": [
+      "strawwu: install /mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/fixtures/pe4-msi-setup.msi (native unpack app_id=pe4-msi-setup; type=msi; install_path=/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe4-side-effects/apps/pe4-msi-setup; desktop=/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe4-side-effects/home/.local/share/applications/pe4-msi-setup.desktop; backend=native; mode=real)",
+      "strawwu: launched /mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe4-side-effects/apps/pe4-msi-setup/main.exe (format=PE, pid=1000, backend=native, app_id=pe4-msi-setup, mode=real, gui-smoke=SKIP subsystem=non-gui)",
+      "STRAWWU_PE_CONSOLE_OK",
+      "STRAWWU_PE_CONSOLE_CRT"
+    ]
+  },
+  "app_registry": {
+    "path": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe4-side-effects/app-registry.json",
+    "source": "installer",
+    "install_state": "installed",
+    "execution_backend": "native"
+  },
+  "shortcut": {
+    "path": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe4-side-effects/home/.local/share/applications/pe4-setup.desktop",
+    "points_to_unpacked_main": true,
+    "body_preview": [
+      "[Desktop Entry]",
+      "Type=Application",
+      "Name=pe4-setup",
+      "Comment=Launch with StrawWU Portable Core",
+      "Exec=\"/mnt/data/code/project/StrawCoding/StrawWU-portable/components/target/release/strawwu\" run \"/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe4-side-effects/apps/pe4-setup/main.exe\"",
+      "Icon=application-x-ms-dos-executable",
+      "Terminal=false",
+      "Categories=Utility;",
+      "StartupWMClass=pe4-setup",
+      "X-StrawWU-App-Id=pe4-setup",
+      "X-StrawWU-Source=launcher",
+      "X-StrawWU-Kind=win32"
+    ]
+  },
+  "checks": [
+    {
+      "name": "exe_native_unpack",
+      "status": "PASS"
+    },
+    {
+      "name": "msi_native_unpack",
+      "status": "PASS"
+    },
+    {
+      "name": "app_registry_installed",
+      "status": "PASS"
+    },
+    {
+      "name": "desktop_shortcut_main_exe",
+      "status": "PASS"
+    },
+    {
+      "name": "open_same_native_path",
+      "status": "PASS"
+    },
+    {
+      "name": "mode_real_main_launch",
+      "status": "PASS"
+    },
+    {
+      "name": "backend_native",
+      "status": "PASS"
+    },
+    {
+      "name": "no_wine_substrate",
+      "status": "PASS"
+    }
+  ],
+  "pending": [],
+  "evidence": [
+    "tests/portable/output/pe-installer.json",
+    "tests/portable/fixtures/pe4-setup.exe",
+    "tests/portable/fixtures/pe4-setup.msi",
+    "components/strawwu-nt/src/installer.rs",
+    "components/strawwu-launcher/src/install_native.rs"
+  ],
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
+    "no Wine/Proton substrate; execution_backend=native",
+    "no WinBox naming",
+    "no full Windows compatibility claim",
+    "mode=simulated is not accepted as success"
+  ],
+  "git": {
+    "branch": "main",
+    "commit": "ab1afef55"
+  }
+}
