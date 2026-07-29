@@ -5,6 +5,7 @@ pub mod orchestrator;
 pub mod executor;
 pub mod gui_smoke;
 pub mod golden_apps;
+pub mod graphics_smoke;
 
 pub use session::SubsystemSession;
 pub use process::{ProcessGraph, ProcessNode};
@@ -19,3 +20,4 @@ pub use golden_apps::{
     default_manifest, generate_golden_apps_report, load_manifest_from_json, report_to_json,
     GoldenAppsManifest, GoldenAppsReport,
 };
+pub use graphics_smoke::{run_portable_graphics_smoke, GraphicsSmokeResult};

@@ -6,7 +6,7 @@
 	install-flatpak-setup install-bug-reporter install-calamares-settings install-update-notifier install-target-setup install-firstboot install-wincompat nosnap-harden build-debs bump-version check-version-bump generate-release-manifest release-sign publish-debs publish-fork-debs \
 	portable-prefix test-portable-prefix portable-appimage test-portable-appimage \
 	portable-flatpak test-portable-flatpak test-portable-matrix test-portable-closeout \
-	test-portable-pe-closeout
+	test-portable-pe-closeout test-portable-gx-graphics
 
 REPO_ROOT := $(abspath .)
 SCRIPTS   := os-image/scripts
@@ -140,6 +140,7 @@ help:
 	@echo "  test-portable-matrix          Cross-distro container matrix → matrix.json (pc4)"
 	@echo "  test-portable-closeout        Portable Core closeout → closeout.json (pc5)"
 	@echo "  test-portable-pe-closeout     Native PE closeout → pe-closeout.json (pe7)"
+	@echo "  test-portable-gx-graphics     DXGI/D3D11→VK + wgl present → gx-graphics.json (gx0)"
 
 preflight:
 	bash tests/preflight/test-ubuntu-clone.sh
@@ -682,6 +683,9 @@ test-portable-closeout:
 
 test-portable-pe-closeout:
 	bash tests/portable/pe-closeout.sh
+
+test-portable-gx-graphics:
+	bash tests/portable/smoke-gx-graphics.sh
 
 build-os-debs:
 	bash $(SCRIPTS)/build-os-debs.sh

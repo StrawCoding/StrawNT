@@ -34,16 +34,27 @@ Linux Mesa（RADV/ANV + GL）
 | strawwu-wgl | OpenGL 1.x/2.x 子集 | PASS — 多 context、GL state machine、50+ proc addresses |
 | present-bridge | 全螢幕、vsync、多螢幕 | PASS — Wayland/X11 + vsync + fps 計算 + resize |
 
+## 可攜路徑（Portable gx0）
+
+`strawwu-graphics` 在 Portable native 路徑提供 `GraphicsPipeline`：
+DXGI/D3D11→Vulkan ICD 合約 + wgl→GL/present + 可觀測 triangle PPM。
+證據：`tests/portable/output/gx-graphics.json`（`execution_backend=native`）。
+
+誠實邊界：host Mesa ICD 綁定與 PE import trampoline 列於 evidence `gaps`；禁止宣稱完整 Windows／反作弊通過。
+
 ## 驗收
 
 ```bash
-# 於 container workload 內（strawwu run --backend container …）
-vulkaninfo --summary
-glxinfo | head
-# 自製 triangle + 輕量 D3D11 demo
+# Portable gx0
+bash tests/portable/smoke-gx-graphics.sh
+jq -e '.status == "PASS" or .status == "PARTIAL"' tests/portable/output/gx-graphics.json
+
+# （可選）於有 GPU 的環境
+# vulkaninfo --summary
+# glxinfo | head
 ```
 
-證據：截圖 + `tests/graphics/output/vulkan-opengl-result.json`
+證據：`tests/portable/output/gx-graphics.json` + `gx0-side-effects/gx-triangle.ppm`
 
 ## 遊戲相關
 

@@ -1,0 +1,94 @@
+{
+  "backend": "native",
+  "checks": [
+    {
+      "detail": "adapters=1 frames=5",
+      "name": "dxgi_factory_swapchain",
+      "status": "PASS"
+    },
+    {
+      "detail": "triangles_drawn=1 draw_calls=1 triangle_pixels=63038 target=vulkan",
+      "name": "d3d11_to_vulkan_triangle",
+      "status": "PASS"
+    },
+    {
+      "detail": "icd=strawwu-vk-icd frames=5 swapchain_images=3",
+      "name": "vulkan_icd_present",
+      "status": "PASS"
+    },
+    {
+      "detail": "backend=Egl frames=3 contexts=1",
+      "name": "wgl_to_gl_present",
+      "status": "PASS"
+    },
+    {
+      "detail": "backend=Wayland frames=8 640x480",
+      "name": "present_bridge",
+      "status": "PASS"
+    },
+    {
+      "detail": "triangle_pixels=63038 ppm=/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/gx0-side-effects/gx-triangle.ppm",
+      "name": "triangle_ppm_evidence",
+      "status": "PASS"
+    }
+  ],
+  "claims": {
+    "anticheat_ranked_pass": false,
+    "full_windows_compat": false,
+    "host_mesa_icd_bound": false,
+    "wine_proton_used": false
+  },
+  "component": "strawwu-graphics",
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
+    "no Wine/Proton substrate; execution_backend=native",
+    "no WinBox naming",
+    "no full Windows compatibility claim",
+    "no anti-cheat ranked pass claim"
+  ],
+  "execution_backend": "native",
+  "gaps": [
+    "host Mesa Vulkan ICD (RADV/ANV/lavapipe) not yet bound as Win32-loadable ICD",
+    "real Win PE DXGI/D3D11/wgl import trampolines not yet hooked in strawwu-nt CPU loop",
+    "D3D12 translation out of scope for gx0 (long-term PARTIAL)"
+  ],
+  "generated_at": "2026-07-29T08:11:45Z",
+  "known_limitations": [
+    "host Mesa Vulkan ICD (RADV/ANV/lavapipe) not yet bound as Win32-loadable ICD",
+    "real Win PE DXGI/D3D11/wgl import trampolines not yet hooked in strawwu-nt CPU loop",
+    "D3D12 translation out of scope for gx0 (long-term PARTIAL)"
+  ],
+  "paths": {
+    "dxgi_d3d11_to_vulkan": true,
+    "present_bridge": true,
+    "wgl_to_gl_present": true
+  },
+  "present": {
+    "d3d11_target": "vulkan",
+    "display_backend": "wayland",
+    "dxgi_frames": 5,
+    "observation": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/gx0-side-effects/gx-present.json",
+    "present_frames": 8,
+    "vk_frames": 5,
+    "vk_icd": "strawwu-vk-icd",
+    "wgl_backend": "egl",
+    "wgl_frames": 3
+  },
+  "schema": "strawwu-portable-gx-graphics/v1",
+  "side_effects": {
+    "dir": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/gx0-side-effects",
+    "present_obs": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/gx0-side-effects/gx-present.json",
+    "screenshot": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/gx0-side-effects/gx-triangle.ppm"
+  },
+  "stage": "gx0-graphics-vk-gl",
+  "status": "PASS",
+  "triangle": {
+    "draw_calls": 1,
+    "drawn": 1,
+    "height": 480,
+    "pixels": 63038,
+    "screenshot": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/gx0-side-effects/gx-triangle.ppm",
+    "width": 640
+  },
+  "version": "0.7.1.26"
+}

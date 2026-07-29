@@ -2,11 +2,15 @@
 name = "strawwu-graphics"
 version.workspace = true
 edition.workspace = true
-description = "StrawWU graphics stack — DXGI→Vulkan, wgl→GLX/EGL, D3D11→VK translation stubs"
+description = "StrawWU graphics stack — DXGI→Vulkan, wgl→GLX/EGL, D3D11→VK portable bridge"
 license.workspace = true
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"
+
+[[bin]]
+name = "gx-graphics-verify"
+path = "src/bin/gx_graphics_verify.rs"
 
 [dev-dependencies]
