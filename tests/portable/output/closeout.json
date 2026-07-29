@@ -4,13 +4,13 @@
   "status": "PASS",
   "version": "0.7.1.13",
   "track": "A+3",
-  "generated_at": "2026-07-29T04:02:28Z",
+  "generated_at": "2026-07-29T04:02:54Z",
   "git": {
     "branch": "portable-core-a3",
-    "head": "e5b49238986c6ec15b77752bc74810157b344c21",
-    "origin_main": "610b130e117ae8e0bf654a0ec6af3f4d47d48caa",
-    "merged_to_main": false,
-    "skip_merge_check": true
+    "head": "ca8f9ddbf1f2292b96c63662289e8c23969f78e2",
+    "origin_main": "ca8f9ddbf1f2292b96c63662289e8c23969f78e2",
+    "merged_to_main": true,
+    "skip_merge_check": false
   },
   "stages": {
     "pc0-portable-scaffold": {
