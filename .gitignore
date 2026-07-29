@@ -107,3 +107,9 @@ tests/strawnt/output/nt2-side-effects/cli-light2d/home/
 tests/strawnt/output/nt2-side-effects/cli-light2d/app-registry.json
 tests/strawnt/output/nt2-side-effects/cli-light2d/app-registry.json.lock
 
+
+# nt3 real store/launcher PE cache (downloaded by nt3-real-launchers.sh)
+tests/strawnt/fixtures/launchers/
+
+# nt3 side-effects (JSON evidence nt3-launchers.json kept)
+tests/strawnt/output/nt3-side-effects/

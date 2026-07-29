@@ -1,0 +1,698 @@
+{
+  "schema": "strawnt-nt3-launchers/v1",
+  "stage": "nt3-real-launchers",
+  "product": "StrawNT",
+  "status": "PARTIAL",
+  "version": "0.7.1.36",
+  "commit": "d464d57de",
+  "backend": "native",
+  "execution_backend": "native",
+  "real_binaries": true,
+  "generated_at": "2026-07-29T14:44:44Z",
+  "component": "strawwu-launcher+strawwu-runtime",
+  "claims": {
+    "real_binaries": true,
+    "wine_proton_used": false,
+    "native_pe_backend": true,
+    "aaa_claimed": false,
+    "anti_cheat_claimed": false,
+    "anticheat_ranked_pass": false,
+    "full_windows_compat": false,
+    "simulated_ok": false
+  },
+  "launchers": [
+    {
+      "id": "steam",
+      "name": "Steam Client Setup",
+      "kind": "store_installer_pe",
+      "scope": "launcher_only",
+      "backend": "native",
+      "execution_backend": "native",
+      "status": "PARTIAL",
+      "mode": "simulated",
+      "real_binary": true,
+      "launch_verified": true,
+      "binary": {
+        "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/launchers/SteamSetup.exe",
+        "sha256": "7d3654531c32d941b8cae81c4137fc542172bfa9635f169cb392f245a0a12bcb",
+        "bytes": 2380800,
+        "source": "https://cdn.cloudflare.steamstatic.com/client/installer/SteamSetup.exe",
+        "filename": "SteamSetup.exe"
+      },
+      "process": {
+        "cpu_executed": true,
+        "instructions_retired": 0,
+        "halt_reason": "IllegalInstruction",
+        "load": {
+          "entry_point_va": 68719489974,
+          "mapped_base": 68719476736,
+          "resolved_imports": 166,
+          "total_imports": 166,
+          "unresolved_imports": []
+        },
+        "apis_invoked_count": 0,
+        "apis_invoked_sample": [],
+        "stdout": "",
+        "guest_host_files": []
+      },
+      "side_effects": {
+        "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam",
+        "marker_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/nt3-launch-marker.txt",
+        "log_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/launch.log",
+        "exec_summary": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/pe-exec-summary.json",
+        "host_files": [
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/pe-exec-summary.json",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/nt3-launch-marker.txt",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/launch.log",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/launcher.out",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/home/.local/share/applications/steamsetup.desktop"
+        ],
+        "desktop_entries": [
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/home/.local/share/applications/steamsetup.desktop"
+        ]
+      },
+      "launcher_rc": 0,
+      "launcher_output": [
+        "strawnt: launched /mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/launchers/SteamSetup.exe (format=PE, pid=1000, backend=native, app_id=steamsetup, mode=simulated, gui-smoke=PASS hwnd=65536 compositor=mutter visible=true)"
+      ],
+      "pending": [
+        "real store/installer PE loaded via StrawNT native",
+        "guest CPU did not reach ExitProcess with guest side effects (mode remains simulated)",
+        "installer CRT / Win32 / NSIS / Electron surface incomplete — not claiming launcher UI pass"
+      ],
+      "disclaimer": "launcher/installer smoke only; not full store UI or game download; no anti-cheat / ranked / 3A claim; mode=simulated must not become top-level PASS",
+      "notes": "真實公開商店／啟動器安裝 PE 經 StrawNT native 載入並嘗試 CPU 執行；副作用含 pe-exec-summary／marker／log／desktop"
+    },
+    {
+      "id": "itch",
+      "name": "itch.io Setup",
+      "kind": "store_installer_pe",
+      "scope": "launcher_only",
+      "backend": "native",
+      "execution_backend": "native",
+      "status": "PARTIAL",
+      "mode": "simulated",
+      "real_binary": true,
+      "launch_verified": true,
+      "binary": {
+        "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/launchers/itch-setup.exe",
+        "sha256": "f8fdd73b5de0f06a034e8769db96d54108cf4b17e1be6fa263ba623254ffd8b1",
+        "bytes": 18678744,
+        "source": "https://itch.io/app/download?platform=windows",
+        "filename": "itch-setup.exe"
+      },
+      "process": {
+        "cpu_executed": true,
+        "instructions_retired": 2,
+        "halt_reason": "MemoryFault",
+        "load": {
+          "entry_point_va": 68719481808,
+          "mapped_base": 68719476736,
+          "resolved_imports": 189,
+          "total_imports": 189,
+          "unresolved_imports": []
+        },
+        "apis_invoked_count": 0,
+        "apis_invoked_sample": [],
+        "stdout": "",
+        "guest_host_files": []
+      },
+      "side_effects": {
+        "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch",
+        "marker_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/nt3-launch-marker.txt",
+        "log_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/launch.log",
+        "exec_summary": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/pe-exec-summary.json",
+        "host_files": [
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/pe-exec-summary.json",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/nt3-launch-marker.txt",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/launch.log",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/launcher.out",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/home/.local/share/applications/itch-setup.desktop"
+        ],
+        "desktop_entries": [
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/home/.local/share/applications/itch-setup.desktop"
+        ]
+      },
+      "launcher_rc": 0,
+      "launcher_output": [
+        "strawnt: launched /mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/launchers/itch-setup.exe (format=PE, pid=1000, backend=native, app_id=itch-setup, mode=simulated, gui-smoke=PASS hwnd=65536 compositor=mutter visible=true)"
+      ],
+      "pending": [
+        "real store/installer PE loaded via StrawNT native",
+        "guest CPU did not reach ExitProcess with guest side effects (mode remains simulated)",
+        "installer CRT / Win32 / NSIS / Electron surface incomplete — not claiming launcher UI pass"
+      ],
+      "disclaimer": "launcher/installer smoke only; not full store UI or game download; no anti-cheat / ranked / 3A claim; mode=simulated must not become top-level PASS",
+      "notes": "真實公開商店／啟動器安裝 PE 經 StrawNT native 載入並嘗試 CPU 執行；副作用含 pe-exec-summary／marker／log／desktop"
+    },
+    {
+      "id": "battlenet",
+      "name": "Battle.net Setup",
+      "kind": "store_installer_pe",
+      "scope": "launcher_only",
+      "backend": "native",
+      "execution_backend": "native",
+      "status": "PARTIAL",
+      "mode": "simulated",
+      "real_binary": true,
+      "launch_verified": true,
+      "binary": {
+        "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/launchers/Battle.net-Setup.exe",
+        "sha256": "de5d32d4ea5eed5a9e120027fb68b370976dbfecc8f2a8f91305977f0b87fcaf",
+        "bytes": 4896464,
+        "source": "https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe",
+        "filename": "Battle.net-Setup.exe"
+      },
+      "process": {
+        "cpu_executed": true,
+        "instructions_retired": 1,
+        "halt_reason": "MemoryFault",
+        "load": {
+          "entry_point_va": 68720757110,
+          "mapped_base": 68719476736,
+          "resolved_imports": 435,
+          "total_imports": 435,
+          "unresolved_imports": []
+        },
+        "apis_invoked_count": 0,
+        "apis_invoked_sample": [],
+        "stdout": "",
+        "guest_host_files": []
+      },
+      "side_effects": {
+        "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet",
+        "marker_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/nt3-launch-marker.txt",
+        "log_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/launch.log",
+        "exec_summary": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/pe-exec-summary.json",
+        "host_files": [
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/pe-exec-summary.json",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/nt3-launch-marker.txt",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/launch.log",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/launcher.out",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/home/.local/share/applications/battle.net-setup.desktop"
+        ],
+        "desktop_entries": [
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/home/.local/share/applications/battle.net-setup.desktop"
+        ]
+      },
+      "launcher_rc": 0,
+      "launcher_output": [
+        "strawnt: launched /mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/launchers/Battle.net-Setup.exe (format=PE, pid=1000, backend=native, app_id=battle.net-setup, mode=simulated, gui-smoke=PASS hwnd=65536 compositor=mutter visible=true)"
+      ],
+      "pending": [
+        "real store/installer PE loaded via StrawNT native",
+        "guest CPU did not reach ExitProcess with guest side effects (mode remains simulated)",
+        "installer CRT / Win32 / NSIS / Electron surface incomplete — not claiming launcher UI pass"
+      ],
+      "disclaimer": "launcher/installer smoke only; not full store UI or game download; no anti-cheat / ranked / 3A claim; mode=simulated must not become top-level PASS",
+      "notes": "真實公開商店／啟動器安裝 PE 經 StrawNT native 載入並嘗試 CPU 執行；副作用含 pe-exec-summary／marker／log／desktop"
+    },
+    {
+      "id": "epic-msi",
+      "name": "Epic Games Launcher Installer (MSI)",
+      "kind": "store_install_package",
+      "scope": "package_acquire_only",
+      "backend": "native",
+      "execution_backend": "native",
+      "status": "PARTIAL",
+      "mode": "n/a",
+      "real_binary": true,
+      "launch_verified": false,
+      "binary": {
+        "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/launchers/EpicGamesLauncherInstaller.msi",
+        "sha256": "1513d6cc2afda0367c8375b6f25f490c162da5607ce4b4adbb41906a2d742236",
+        "bytes": 87310336,
+        "source": "https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi",
+        "filename": "EpicGamesLauncherInstaller.msi",
+        "format": "msi"
+      },
+      "side_effects": {
+        "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/epic-msi",
+        "marker_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/epic-msi/package-marker.txt",
+        "host_files": [
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/epic-msi/package-marker.txt"
+        ]
+      },
+      "pending": [
+        "MSI redistributable acquired; full Epic client PE not launched in this stage"
+      ],
+      "disclaimer": "install package acquisition only; not PE launch PASS",
+      "notes": "真實 Epic 安裝包已取得；本階段不把 MSI 假標成 PE 啟動 PASS"
+    }
+  ],
+  "results": [
+    {
+      "id": "steam",
+      "name": "Steam Client Setup",
+      "kind": "store_installer_pe",
+      "scope": "launcher_only",
+      "backend": "native",
+      "execution_backend": "native",
+      "status": "PARTIAL",
+      "mode": "simulated",
+      "real_binary": true,
+      "launch_verified": true,
+      "binary": {
+        "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/launchers/SteamSetup.exe",
+        "sha256": "7d3654531c32d941b8cae81c4137fc542172bfa9635f169cb392f245a0a12bcb",
+        "bytes": 2380800,
+        "source": "https://cdn.cloudflare.steamstatic.com/client/installer/SteamSetup.exe",
+        "filename": "SteamSetup.exe"
+      },
+      "process": {
+        "cpu_executed": true,
+        "instructions_retired": 0,
+        "halt_reason": "IllegalInstruction",
+        "load": {
+          "entry_point_va": 68719489974,
+          "mapped_base": 68719476736,
+          "resolved_imports": 166,
+          "total_imports": 166,
+          "unresolved_imports": []
+        },
+        "apis_invoked_count": 0,
+        "apis_invoked_sample": [],
+        "stdout": "",
+        "guest_host_files": []
+      },
+      "side_effects": {
+        "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam",
+        "marker_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/nt3-launch-marker.txt",
+        "log_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/launch.log",
+        "exec_summary": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/pe-exec-summary.json",
+        "host_files": [
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/pe-exec-summary.json",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/nt3-launch-marker.txt",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/launch.log",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/launcher.out",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/home/.local/share/applications/steamsetup.desktop"
+        ],
+        "desktop_entries": [
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/home/.local/share/applications/steamsetup.desktop"
+        ]
+      },
+      "launcher_rc": 0,
+      "launcher_output": [
+        "strawnt: launched /mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/launchers/SteamSetup.exe (format=PE, pid=1000, backend=native, app_id=steamsetup, mode=simulated, gui-smoke=PASS hwnd=65536 compositor=mutter visible=true)"
+      ],
+      "pending": [
+        "real store/installer PE loaded via StrawNT native",
+        "guest CPU did not reach ExitProcess with guest side effects (mode remains simulated)",
+        "installer CRT / Win32 / NSIS / Electron surface incomplete — not claiming launcher UI pass"
+      ],
+      "disclaimer": "launcher/installer smoke only; not full store UI or game download; no anti-cheat / ranked / 3A claim; mode=simulated must not become top-level PASS",
+      "notes": "真實公開商店／啟動器安裝 PE 經 StrawNT native 載入並嘗試 CPU 執行；副作用含 pe-exec-summary／marker／log／desktop"
+    },
+    {
+      "id": "itch",
+      "name": "itch.io Setup",
+      "kind": "store_installer_pe",
+      "scope": "launcher_only",
+      "backend": "native",
+      "execution_backend": "native",
+      "status": "PARTIAL",
+      "mode": "simulated",
+      "real_binary": true,
+      "launch_verified": true,
+      "binary": {
+        "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/launchers/itch-setup.exe",
+        "sha256": "f8fdd73b5de0f06a034e8769db96d54108cf4b17e1be6fa263ba623254ffd8b1",
+        "bytes": 18678744,
+        "source": "https://itch.io/app/download?platform=windows",
+        "filename": "itch-setup.exe"
+      },
+      "process": {
+        "cpu_executed": true,
+        "instructions_retired": 2,
+        "halt_reason": "MemoryFault",
+        "load": {
+          "entry_point_va": 68719481808,
+          "mapped_base": 68719476736,
+          "resolved_imports": 189,
+          "total_imports": 189,
+          "unresolved_imports": []
+        },
+        "apis_invoked_count": 0,
+        "apis_invoked_sample": [],
+        "stdout": "",
+        "guest_host_files": []
+      },
+      "side_effects": {
+        "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch",
+        "marker_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/nt3-launch-marker.txt",
+        "log_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/launch.log",
+        "exec_summary": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/pe-exec-summary.json",
+        "host_files": [
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/pe-exec-summary.json",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/nt3-launch-marker.txt",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/launch.log",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/launcher.out",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/home/.local/share/applications/itch-setup.desktop"
+        ],
+        "desktop_entries": [
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/home/.local/share/applications/itch-setup.desktop"
+        ]
+      },
+      "launcher_rc": 0,
+      "launcher_output": [
+        "strawnt: launched /mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/launchers/itch-setup.exe (format=PE, pid=1000, backend=native, app_id=itch-setup, mode=simulated, gui-smoke=PASS hwnd=65536 compositor=mutter visible=true)"
+      ],
+      "pending": [
+        "real store/installer PE loaded via StrawNT native",
+        "guest CPU did not reach ExitProcess with guest side effects (mode remains simulated)",
+        "installer CRT / Win32 / NSIS / Electron surface incomplete — not claiming launcher UI pass"
+      ],
+      "disclaimer": "launcher/installer smoke only; not full store UI or game download; no anti-cheat / ranked / 3A claim; mode=simulated must not become top-level PASS",
+      "notes": "真實公開商店／啟動器安裝 PE 經 StrawNT native 載入並嘗試 CPU 執行；副作用含 pe-exec-summary／marker／log／desktop"
+    },
+    {
+      "id": "battlenet",
+      "name": "Battle.net Setup",
+      "kind": "store_installer_pe",
+      "scope": "launcher_only",
+      "backend": "native",
+      "execution_backend": "native",
+      "status": "PARTIAL",
+      "mode": "simulated",
+      "real_binary": true,
+      "launch_verified": true,
+      "binary": {
+        "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/launchers/Battle.net-Setup.exe",
+        "sha256": "de5d32d4ea5eed5a9e120027fb68b370976dbfecc8f2a8f91305977f0b87fcaf",
+        "bytes": 4896464,
+        "source": "https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe",
+        "filename": "Battle.net-Setup.exe"
+      },
+      "process": {
+        "cpu_executed": true,
+        "instructions_retired": 1,
+        "halt_reason": "MemoryFault",
+        "load": {
+          "entry_point_va": 68720757110,
+          "mapped_base": 68719476736,
+          "resolved_imports": 435,
+          "total_imports": 435,
+          "unresolved_imports": []
+        },
+        "apis_invoked_count": 0,
+        "apis_invoked_sample": [],
+        "stdout": "",
+        "guest_host_files": []
+      },
+      "side_effects": {
+        "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet",
+        "marker_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/nt3-launch-marker.txt",
+        "log_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/launch.log",
+        "exec_summary": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/pe-exec-summary.json",
+        "host_files": [
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/pe-exec-summary.json",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/nt3-launch-marker.txt",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/launch.log",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/launcher.out",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/home/.local/share/applications/battle.net-setup.desktop"
+        ],
+        "desktop_entries": [
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/home/.local/share/applications/battle.net-setup.desktop"
+        ]
+      },
+      "launcher_rc": 0,
+      "launcher_output": [
+        "strawnt: launched /mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/launchers/Battle.net-Setup.exe (format=PE, pid=1000, backend=native, app_id=battle.net-setup, mode=simulated, gui-smoke=PASS hwnd=65536 compositor=mutter visible=true)"
+      ],
+      "pending": [
+        "real store/installer PE loaded via StrawNT native",
+        "guest CPU did not reach ExitProcess with guest side effects (mode remains simulated)",
+        "installer CRT / Win32 / NSIS / Electron surface incomplete — not claiming launcher UI pass"
+      ],
+      "disclaimer": "launcher/installer smoke only; not full store UI or game download; no anti-cheat / ranked / 3A claim; mode=simulated must not become top-level PASS",
+      "notes": "真實公開商店／啟動器安裝 PE 經 StrawNT native 載入並嘗試 CPU 執行；副作用含 pe-exec-summary／marker／log／desktop"
+    },
+    {
+      "id": "epic-msi",
+      "name": "Epic Games Launcher Installer (MSI)",
+      "kind": "store_install_package",
+      "scope": "package_acquire_only",
+      "backend": "native",
+      "execution_backend": "native",
+      "status": "PARTIAL",
+      "mode": "n/a",
+      "real_binary": true,
+      "launch_verified": false,
+      "binary": {
+        "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/launchers/EpicGamesLauncherInstaller.msi",
+        "sha256": "1513d6cc2afda0367c8375b6f25f490c162da5607ce4b4adbb41906a2d742236",
+        "bytes": 87310336,
+        "source": "https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi",
+        "filename": "EpicGamesLauncherInstaller.msi",
+        "format": "msi"
+      },
+      "side_effects": {
+        "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/epic-msi",
+        "marker_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/epic-msi/package-marker.txt",
+        "host_files": [
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/epic-msi/package-marker.txt"
+        ]
+      },
+      "pending": [
+        "MSI redistributable acquired; full Epic client PE not launched in this stage"
+      ],
+      "disclaimer": "install package acquisition only; not PE launch PASS",
+      "notes": "真實 Epic 安裝包已取得；本階段不把 MSI 假標成 PE 啟動 PASS"
+    }
+  ],
+  "apps": [
+    {
+      "id": "steam",
+      "name": "Steam Client Setup",
+      "kind": "store_installer_pe",
+      "scope": "launcher_only",
+      "backend": "native",
+      "execution_backend": "native",
+      "status": "PARTIAL",
+      "mode": "simulated",
+      "real_binary": true,
+      "launch_verified": true,
+      "binary": {
+        "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/launchers/SteamSetup.exe",
+        "sha256": "7d3654531c32d941b8cae81c4137fc542172bfa9635f169cb392f245a0a12bcb",
+        "bytes": 2380800,
+        "source": "https://cdn.cloudflare.steamstatic.com/client/installer/SteamSetup.exe",
+        "filename": "SteamSetup.exe"
+      },
+      "process": {
+        "cpu_executed": true,
+        "instructions_retired": 0,
+        "halt_reason": "IllegalInstruction",
+        "load": {
+          "entry_point_va": 68719489974,
+          "mapped_base": 68719476736,
+          "resolved_imports": 166,
+          "total_imports": 166,
+          "unresolved_imports": []
+        },
+        "apis_invoked_count": 0,
+        "apis_invoked_sample": [],
+        "stdout": "",
+        "guest_host_files": []
+      },
+      "side_effects": {
+        "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam",
+        "marker_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/nt3-launch-marker.txt",
+        "log_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/launch.log",
+        "exec_summary": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/pe-exec-summary.json",
+        "host_files": [
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/pe-exec-summary.json",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/nt3-launch-marker.txt",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/launch.log",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/launcher.out",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/home/.local/share/applications/steamsetup.desktop"
+        ],
+        "desktop_entries": [
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/steam/home/.local/share/applications/steamsetup.desktop"
+        ]
+      },
+      "launcher_rc": 0,
+      "launcher_output": [
+        "strawnt: launched /mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/launchers/SteamSetup.exe (format=PE, pid=1000, backend=native, app_id=steamsetup, mode=simulated, gui-smoke=PASS hwnd=65536 compositor=mutter visible=true)"
+      ],
+      "pending": [
+        "real store/installer PE loaded via StrawNT native",
+        "guest CPU did not reach ExitProcess with guest side effects (mode remains simulated)",
+        "installer CRT / Win32 / NSIS / Electron surface incomplete — not claiming launcher UI pass"
+      ],
+      "disclaimer": "launcher/installer smoke only; not full store UI or game download; no anti-cheat / ranked / 3A claim; mode=simulated must not become top-level PASS",
+      "notes": "真實公開商店／啟動器安裝 PE 經 StrawNT native 載入並嘗試 CPU 執行；副作用含 pe-exec-summary／marker／log／desktop"
+    },
+    {
+      "id": "itch",
+      "name": "itch.io Setup",
+      "kind": "store_installer_pe",
+      "scope": "launcher_only",
+      "backend": "native",
+      "execution_backend": "native",
+      "status": "PARTIAL",
+      "mode": "simulated",
+      "real_binary": true,
+      "launch_verified": true,
+      "binary": {
+        "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/launchers/itch-setup.exe",
+        "sha256": "f8fdd73b5de0f06a034e8769db96d54108cf4b17e1be6fa263ba623254ffd8b1",
+        "bytes": 18678744,
+        "source": "https://itch.io/app/download?platform=windows",
+        "filename": "itch-setup.exe"
+      },
+      "process": {
+        "cpu_executed": true,
+        "instructions_retired": 2,
+        "halt_reason": "MemoryFault",
+        "load": {
+          "entry_point_va": 68719481808,
+          "mapped_base": 68719476736,
+          "resolved_imports": 189,
+          "total_imports": 189,
+          "unresolved_imports": []
+        },
+        "apis_invoked_count": 0,
+        "apis_invoked_sample": [],
+        "stdout": "",
+        "guest_host_files": []
+      },
+      "side_effects": {
+        "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch",
+        "marker_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/nt3-launch-marker.txt",
+        "log_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/launch.log",
+        "exec_summary": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/pe-exec-summary.json",
+        "host_files": [
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/pe-exec-summary.json",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/nt3-launch-marker.txt",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/launch.log",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/launcher.out",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/home/.local/share/applications/itch-setup.desktop"
+        ],
+        "desktop_entries": [
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/itch/home/.local/share/applications/itch-setup.desktop"
+        ]
+      },
+      "launcher_rc": 0,
+      "launcher_output": [
+        "strawnt: launched /mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/launchers/itch-setup.exe (format=PE, pid=1000, backend=native, app_id=itch-setup, mode=simulated, gui-smoke=PASS hwnd=65536 compositor=mutter visible=true)"
+      ],
+      "pending": [
+        "real store/installer PE loaded via StrawNT native",
+        "guest CPU did not reach ExitProcess with guest side effects (mode remains simulated)",
+        "installer CRT / Win32 / NSIS / Electron surface incomplete — not claiming launcher UI pass"
+      ],
+      "disclaimer": "launcher/installer smoke only; not full store UI or game download; no anti-cheat / ranked / 3A claim; mode=simulated must not become top-level PASS",
+      "notes": "真實公開商店／啟動器安裝 PE 經 StrawNT native 載入並嘗試 CPU 執行；副作用含 pe-exec-summary／marker／log／desktop"
+    },
+    {
+      "id": "battlenet",
+      "name": "Battle.net Setup",
+      "kind": "store_installer_pe",
+      "scope": "launcher_only",
+      "backend": "native",
+      "execution_backend": "native",
+      "status": "PARTIAL",
+      "mode": "simulated",
+      "real_binary": true,
+      "launch_verified": true,
+      "binary": {
+        "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/launchers/Battle.net-Setup.exe",
+        "sha256": "de5d32d4ea5eed5a9e120027fb68b370976dbfecc8f2a8f91305977f0b87fcaf",
+        "bytes": 4896464,
+        "source": "https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe",
+        "filename": "Battle.net-Setup.exe"
+      },
+      "process": {
+        "cpu_executed": true,
+        "instructions_retired": 1,
+        "halt_reason": "MemoryFault",
+        "load": {
+          "entry_point_va": 68720757110,
+          "mapped_base": 68719476736,
+          "resolved_imports": 435,
+          "total_imports": 435,
+          "unresolved_imports": []
+        },
+        "apis_invoked_count": 0,
+        "apis_invoked_sample": [],
+        "stdout": "",
+        "guest_host_files": []
+      },
+      "side_effects": {
+        "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet",
+        "marker_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/nt3-launch-marker.txt",
+        "log_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/launch.log",
+        "exec_summary": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/pe-exec-summary.json",
+        "host_files": [
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/pe-exec-summary.json",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/nt3-launch-marker.txt",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/launch.log",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/launcher.out",
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/home/.local/share/applications/battle.net-setup.desktop"
+        ],
+        "desktop_entries": [
+          "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects/battlenet/home/.local/share/applications/battle.net-setup.desktop"
+        ]
+      },
+      "launcher_rc": 0,
+      "launcher_output": [
+        "strawnt: launched /mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/launchers/Battle.net-Setup.exe (format=PE, pid=1000, backend=native, app_id=battle.net-setup, mode=simulated, gui-smoke=PASS hwnd=65536 compositor=mutter visible=true)"
+      ],
+      "pending": [
+        "real store/installer PE loaded via StrawNT native",
+        "guest CPU did not reach ExitProcess with guest side effects (mode remains simulated)",
+        "installer CRT / Win32 / NSIS / Electron surface incomplete — not claiming launcher UI pass"
+      ],
+      "disclaimer": "launcher/installer smoke only; not full store UI or game download; no anti-cheat / ranked / 3A claim; mode=simulated must not become top-level PASS",
+      "notes": "真實公開商店／啟動器安裝 PE 經 StrawNT native 載入並嘗試 CPU 執行；副作用含 pe-exec-summary／marker／log／desktop"
+    }
+  ],
+  "missing_binaries": [],
+  "summary": {
+    "total_launchers": 4,
+    "pe_launchers": 3,
+    "launch_verified": 3,
+    "mode_real": 0,
+    "mode_simulated": 3,
+    "status_pass": 0,
+    "native_backend_only": true
+  },
+  "side_effects": {
+    "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt3-side-effects"
+  },
+  "pending": [
+    "steam: real store/installer PE loaded via StrawNT native",
+    "steam: guest CPU did not reach ExitProcess with guest side effects (mode remains simulated)",
+    "steam: installer CRT / Win32 / NSIS / Electron surface incomplete — not claiming launcher UI pass",
+    "itch: real store/installer PE loaded via StrawNT native",
+    "itch: guest CPU did not reach ExitProcess with guest side effects (mode remains simulated)",
+    "itch: installer CRT / Win32 / NSIS / Electron surface incomplete — not claiming launcher UI pass",
+    "battlenet: real store/installer PE loaded via StrawNT native",
+    "battlenet: guest CPU did not reach ExitProcess with guest side effects (mode remains simulated)",
+    "battlenet: installer CRT / Win32 / NSIS / Electron surface incomplete — not claiming launcher UI pass",
+    "epic-msi: MSI redistributable acquired; full Epic client PE not launched in this stage",
+    "Not claiming full Windows compatibility or anti-cheat / ranked pass",
+    "mode=simulated on individual launchers must never become top-level PASS"
+  ],
+  "known_limitations": [
+    "store/installer PE smoke: native load + CPU attempt; full installer UI/CRT often incomplete",
+    "top-level PASS requires >=2 mode=real launches with guest/host side effects",
+    "no anti-cheat ranked verification",
+    "no 3A / full Windows compatibility claim"
+  ],
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
+    "no Wine/Proton substrate; execution_backend=native",
+    "no WinBox naming",
+    "no full Windows compatibility claim",
+    "no anti-cheat ranked pass claim",
+    "no 3A completion claim",
+    "mode=simulated never counts as top-level PASS"
+  ],
+  "evidence_paths": [
+    "tests/strawnt/output/nt3-launchers.json",
+    "tests/strawnt/output/nt3-side-effects",
+    "tests/strawnt/nt3-real-launchers.sh"
+  ]
+}

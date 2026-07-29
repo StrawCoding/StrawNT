@@ -485,36 +485,39 @@ fn launch_via_native(
         return Err(1);
     }
 
-    // Always persist exec summary when side-effect dir is set (pe6 golden evidence).
-    if let Some(ref se) = exec.side_effects {
-        if let Some(dir) = std::env::var_os("STRAWNT_PE_SIDE_EFFECT_DIR").or_else(|| std::env::var_os("STRAWWU_PE_SIDE_EFFECT_DIR")) {
-            let summary = serde_json::json!({
-                "mode": exec.mode,
-                "cpu_executed": exec.cpu_executed,
-                "stdout": se.stdout_utf8,
-                "host_files": se.host_files_written,
-                "exit_code": se.exit_code,
-                "instructions_retired": se.instructions_retired,
-                "halt": exec.halt_reason,
-                "apis": se.apis_invoked,
-                "gui": se.gui,
-                "load": exec.load_result.as_ref().map(|l| serde_json::json!({
-                    "mapped_base": l.mapped_base,
-                    "entry_point_va": l.entry_point_va,
-                    "total_imports": l.total_imports,
-                    "resolved_imports": l.resolved_imports,
-                    "unresolved_imports": l.unresolved_imports,
-                })),
-                "backend": "native",
-                "app_id": app_id,
-                "binary": req.binary_path.display().to_string(),
-            });
-            let path = std::path::PathBuf::from(dir).join("pe-exec-summary.json");
-            let _ = std::fs::write(
-                &path,
-                serde_json::to_string_pretty(&summary).unwrap_or_default(),
-            );
-        }
+    // Always persist exec summary when side-effect dir is set (nt3 / pe6 evidence).
+    // Write even when guest side_effects are absent so load/mode failures remain observable.
+    if let Some(dir) = std::env::var_os("STRAWNT_PE_SIDE_EFFECT_DIR")
+        .or_else(|| std::env::var_os("STRAWWU_PE_SIDE_EFFECT_DIR"))
+    {
+        let se = exec.side_effects.as_ref();
+        let summary = serde_json::json!({
+            "mode": exec.mode,
+            "cpu_executed": exec.cpu_executed,
+            "stdout": se.map(|s| s.stdout_utf8.clone()).unwrap_or_default(),
+            "host_files": se.map(|s| s.host_files_written.clone()).unwrap_or_default(),
+            "exit_code": se.and_then(|s| s.exit_code),
+            "instructions_retired": se.map(|s| s.instructions_retired).unwrap_or(0),
+            "halt": exec.halt_reason,
+            "apis": se.map(|s| s.apis_invoked.clone()).unwrap_or_default(),
+            "gui": se.and_then(|s| s.gui.clone()),
+            "load": exec.load_result.as_ref().map(|l| serde_json::json!({
+                "mapped_base": l.mapped_base,
+                "entry_point_va": l.entry_point_va,
+                "total_imports": l.total_imports,
+                "resolved_imports": l.resolved_imports,
+                "unresolved_imports": l.unresolved_imports,
+            })),
+            "error": exec.error,
+            "backend": "native",
+            "app_id": app_id,
+            "binary": req.binary_path.display().to_string(),
+        });
+        let path = std::path::PathBuf::from(dir).join("pe-exec-summary.json");
+        let _ = std::fs::write(
+            &path,
+            serde_json::to_string_pretty(&summary).unwrap_or_default(),
+        );
     }
 
     let mode = exec.mode.as_str();
