@@ -1,0 +1,72 @@
+{
+  "schema": "strawwu-portable-pe0-remove-wine/v1",
+  "stage": "pe0-remove-wine",
+  "status": "PASS",
+  "version": "0.7.1.18",
+  "generated_at": "2026-07-29T05:14:57Z",
+  "binary": {
+    "path": "components/target/release/strawwu",
+    "version_output": "strawwu 0.7.1-preview.18",
+    "status_output": [
+      "strawwu: status — runtime idle, 0 session(s), 0 app(s) registered",
+      "strawwu: execution_backend=native (strawwu-nt)",
+      "strawwu: default backend=native"
+    ]
+  },
+  "checks": [
+    {
+      "name": "wine_backend_rs_absent",
+      "status": "PASS",
+      "detail": "components/strawwu-launcher/src/wine_backend.rs absent"
+    },
+    {
+      "name": "product_path_no_wine_launch",
+      "status": "PASS",
+      "detail": "rg matched nothing"
+    },
+    {
+      "name": "strawwu_status_native",
+      "status": "PASS",
+      "detail": "strawwu: status — runtime idle, 0 session(s), 0 app(s) registered\nstrawwu: execution_backend=native (strawwu-nt)\nstrawwu: default backend=native"
+    },
+    {
+      "name": "help_default_native",
+      "status": "PASS",
+      "detail": "help mentions Default backend=native; no wine"
+    },
+    {
+      "name": "install_sh_no_wine_provision",
+      "status": "PASS",
+      "detail": "ensure_wine / STRAWWU_BACKEND=wine / apt wine removed; STRAWWU_BACKEND default native present"
+    },
+    {
+      "name": "readme_native_default",
+      "status": "PASS",
+      "detail": "README documents native default; no Wine install guidance"
+    },
+    {
+      "name": "launcher_unit_tests",
+      "status": "PASS",
+      "detail": "47 tests ok"
+    }
+  ],
+  "evidence": [
+    "tests/portable/output/pe0-remove-wine.json",
+    "install.sh",
+    "README.md",
+    "components/strawwu-launcher/src/main.rs",
+    "components/strawwu-launcher/src/lib.rs",
+    "components/strawwu-launcher/src/loader.rs"
+  ],
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
+    "no Wine/Proton as execution substrate",
+    "no WinBox naming",
+    "no full Windows compatibility claim"
+  ],
+  "git": {
+    "branch": "main",
+    "head_at_evidence": "5d20153aa1d039af7fad93ae450a7c88babebaec",
+    "note": "commit+push follows evidence generation"
+  }
+}

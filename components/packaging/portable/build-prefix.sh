@@ -113,7 +113,7 @@ manifest = {
     "notes": [
         "Self-contained CLI prefix; does not require system strawwu-* deb packages.",
         "Host glibc / libgcc remain the ABI baseline.",
-        "Real PE via Wine by default; not a full Windows OS claim; anti-cheat may fail.",
+        "Default execution_backend=native (strawwu-nt); not a full Windows OS claim; anti-cheat may fail.",
     ],
 }
 path = os.path.join(prefix, "share", "strawwu", "portable-prefix.json")

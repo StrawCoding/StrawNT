@@ -13,35 +13,33 @@ curl -fsSL https://raw.githubusercontent.com/StrawCoding/StrawWU-portable/main/i
 
 安裝時會：
 1. 下載最新 Release 產物
-2. **自動安裝 Wine**（若系統還沒有）
-3. 啟用 **雙擊 .exe / .msi → 真實安裝／啟動**
+2. 啟用 **雙擊 .exe / .msi → 安裝／啟動**（`execution_backend=native`）
 
 ```bash
 strawwu --version
-strawwu status          # 應顯示 wine: OK
+strawwu status          # 應顯示 backend=native
 strawwu integrate       # 換桌面後再開一次
 ```
 
-### 點擊就能安裝與啟動（真實執行）
+### 點擊就能安裝與啟動
 
 1. 檔案管理員 **雙擊** `.exe` / `.msi`
-2. StrawWU 經 **Wine** 真正執行安裝精靈／程式
+2. StrawWU 經自研 **strawwu-nt**（`execution_backend=native`）處理安裝／啟動
 3. 寫入應用選單捷徑，之後可一鍵再開
 
 ```bash
-strawwu open setup.exe          # 安裝程式 → Wine 執行 + 捷徑
-strawwu open game.exe           # 一般程式 → Wine 啟動 + 捷徑
+strawwu open setup.exe          # 安裝程式 → native + 捷徑
+strawwu open game.exe           # 一般程式 → native + 捷徑
 strawwu install setup.exe       # 同上（安裝模式）
-strawwu run app.exe             # 預設 backend=wine
-strawwu run app.exe --backend native   # 僅模擬（測試用）
+strawwu run app.exe             # 預設 backend=native
 ```
 
-預設裝到 `~/.local/share/strawwu-core`，`WINEPREFIX` 在同樹的 `var/lib/strawwu/wineprefix`。
+預設裝到 `~/.local/share/strawwu-core`。
 
 ## 誠實邊界
 
-- **真實 PE 執行**預設走 **Wine**（成熟上游），不是自研模擬器裝樣子
-- 仍**不保證**所有 Windows 軟體都可跑（反作弊／核心驅動／部分遊戲可能失敗）
+- 預設執行路徑為自研 **strawwu-nt**／`execution_backend=native`（**不**使用 Wine／Proton）
+- **不保證**所有 Windows 軟體都可跑（反作弊／核心驅動／部分遊戲可能失敗）
 - Flatpak 對 PE／session 為 **PARTIAL**
 - **不是** StrawWU ISO／桌面安裝器
 

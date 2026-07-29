@@ -1,6 +1,6 @@
 {
   "schema": "strawwu-portable-artifacts/v1",
-  "version": "0.7.1.17",
+  "version": "0.7.1.18",
   "generated_at": "2026-07-29T05:02:08Z",
   "artifacts": [
     {
@@ -23,7 +23,7 @@
   "sha256sums": "tests/portable/output/SHA256SUMS",
   "notes": [
     "Portable Core redistribution artifacts for GitHub Releases.",
-    "Default PE backend=wine (real execution); install.sh installs Wine when possible.",
+    "Default PE backend=native (strawwu-nt); Wine/Proton removed from product path.",
     "Click-to-open: strawwu integrate + double-click .exe/.msi",
     "Not a full Windows OS claim; anti-cheat may fail."
   ]

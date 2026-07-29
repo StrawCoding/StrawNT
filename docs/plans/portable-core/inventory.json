@@ -150,7 +150,7 @@
     "flatpak": "components/packaging/portable/flatpak"
   },
   "exclusions": [
-    "Wine/Proton forbidden as sole OS identity (portable uses Wine as real PE backend)",
+    "Wine/Proton forbidden as execution substrate (execution_backend=native only)",
     "WinBox/winbox naming",
     "ISO/os-image/Plymouth/Calamares/kernel/desktop session",
     "full Windows compatibility claims"

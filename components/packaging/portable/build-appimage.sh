@@ -191,7 +191,7 @@ manifest = {
     "bundled_libs": libs,
     "notes": [
         "Portable Core AppImage / AppDir bundle; host glibc remains ABI baseline.",
-        "Real PE via Wine by default; not a full Windows OS claim; anti-cheat may fail.",
+        "Default execution_backend=native (strawwu-nt); not a full Windows OS claim; anti-cheat may fail.",
         "No WinBox naming.",
     ],
 }
