@@ -1,0 +1,110 @@
+{
+  "schema": "strawwu-portable-pe-console/v1",
+  "stage": "pe2-win32-console-mvp",
+  "status": "PASS",
+  "version": "0.7.1.20",
+  "backend": "native",
+  "execution_backend": "native",
+  "mode": "real",
+  "generated_at": "2026-07-29T05:45:15Z",
+  "fixture": {
+    "path": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/fixtures/pe2-console-mvp.exe",
+    "sha256": "0604ba82ac4ba93a547c63fe6f1e5fed92f9a6219f9b25ac3d512de71f2f6b43",
+    "kind": "win32-console-mvp-amd64",
+    "markers": [
+      "STRAWWU_PE_CONSOLE_OK",
+      "STRAWWU_PE_CONSOLE_CRT"
+    ]
+  },
+  "api_paths": {
+    "file": [
+      "CreateFileA",
+      "WriteFile",
+      "ReadFile",
+      "CloseHandle"
+    ],
+    "process": [
+      "GetCurrentProcessId",
+      "GetCommandLineA",
+      "GetProcessHeap",
+      "ExitProcess"
+    ],
+    "crt": [
+      "malloc",
+      "free",
+      "puts",
+      "HeapAlloc",
+      "HeapFree"
+    ],
+    "not_stub_only": true
+  },
+  "side_effects": {
+    "stdout_file": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe2-side-effects/pe-stdout.txt",
+    "stdout": "STRAWWU_PE_CONSOLE_OK\nSTRAWWU_PE_CONSOLE_CRT",
+    "marker_file": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe2-side-effects/pe2-marker.txt",
+    "marker_file_body": "STRAWWU_PE_CONSOLE_OK",
+    "dir": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/pe2-side-effects"
+  },
+  "launcher": {
+    "command": "strawwu run <fixture> --backend native",
+    "output": [
+      "strawwu: launched /mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/fixtures/pe2-console-mvp.exe (format=PE, pid=1000, backend=native, app_id=pe2-console-mvp, mode=real, gui-smoke=SKIP subsystem=non-gui)",
+      "STRAWWU_PE_CONSOLE_OK",
+      "STRAWWU_PE_CONSOLE_CRT"
+    ],
+    "require_real_exec": true
+  },
+  "checks": [
+    {
+      "name": "mode_real",
+      "status": "PASS"
+    },
+    {
+      "name": "backend_native",
+      "status": "PASS"
+    },
+    {
+      "name": "stdout_console_marker",
+      "status": "PASS"
+    },
+    {
+      "name": "stdout_crt_marker",
+      "status": "PASS"
+    },
+    {
+      "name": "host_file_side_effect",
+      "status": "PASS"
+    },
+    {
+      "name": "cpu_api_dispatch_test",
+      "status": "PASS"
+    },
+    {
+      "name": "runtime_exec_test",
+      "status": "PASS"
+    },
+    {
+      "name": "no_wine_substrate",
+      "status": "PASS"
+    }
+  ],
+  "evidence": [
+    "tests/portable/output/pe-console.json",
+    "tests/portable/fixtures/pe2-console-mvp.exe",
+    "components/strawwu-nt/src/cpu.rs",
+    "components/strawwu-nt/src/pe.rs",
+    "components/strawwu-nt/src/win32_stubs.rs"
+  ],
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
+    "no Wine/Proton substrate; execution_backend=native",
+    "no WinBox naming",
+    "no full Windows compatibility claim",
+    "mode=simulated is not accepted as success",
+    "not stub-only: real CPU dispatch of file/process/CRT APIs"
+  ],
+  "git": {
+    "branch": "main",
+    "commit": "feb797589"
+  }
+}

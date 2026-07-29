@@ -67,3 +67,8 @@ components/packaging/portable/flatpak/dist/
 tests/portable/output/pe1-side-effects/home/
 tests/portable/output/pe1-side-effects/app-registry.json
 tests/portable/output/pe1-side-effects/app-registry.json.lock
+
+# pe2 smoke ephemeral registry/home under side-effects (keep pe-stdout.txt / pe2-marker.txt)
+tests/portable/output/pe2-side-effects/home/
+tests/portable/output/pe2-side-effects/app-registry.json
+tests/portable/output/pe2-side-effects/app-registry.json.lock

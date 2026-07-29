@@ -1,26 +1,38 @@
 //! Minimal x86-64 CPU loop for strawwu-nt native PE execution.
 //!
-//! Supports the opcode subset used by the pe1 console fixture (RIP-relative
-//! LEA/CALL, MOV imm, SUB/ADD rsp, XOR, and absolute CALL via RAX). Win32
-//! stubs in the fixed `STUB_BASE` range produce host-observable side effects.
+//! Supports the opcode subset used by pe1/pe2 console fixtures (RIP-relative
+//! LEA/CALL, MOV imm/reg/stack, SUB/ADD rsp, XOR, and absolute CALL via RAX).
+//! Win32 / CRT stubs in the fixed `STUB_BASE` range produce host-observable
+//! side effects (file / process / heap / stdout) — not registry-only stubs.
 
 use std::collections::HashMap;
 use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 
-use crate::ntdll::{FileAccessMode, NtKernel, NtStatus};
+use crate::ntdll::{FileAccessMode, FileHandle, MemoryProtection, NtKernel, NtStatus};
 
-/// Fixed stub page used by the pe1 fixture and PeLoader import map.
+/// Fixed stub page used by console fixtures and PeLoader import map.
 pub const STUB_BASE: u64 = 0x7FFE_0000_0000;
 pub const STUB_GET_STD_HANDLE: u64 = STUB_BASE;
 pub const STUB_WRITE_FILE: u64 = STUB_BASE + 8;
 pub const STUB_EXIT_PROCESS: u64 = STUB_BASE + 16;
 pub const STUB_CREATE_FILE_A: u64 = STUB_BASE + 24;
 pub const STUB_CLOSE_HANDLE: u64 = STUB_BASE + 32;
+pub const STUB_READ_FILE: u64 = STUB_BASE + 40;
+pub const STUB_GET_CURRENT_PROCESS_ID: u64 = STUB_BASE + 48;
+pub const STUB_GET_COMMAND_LINE_A: u64 = STUB_BASE + 56;
+pub const STUB_GET_PROCESS_HEAP: u64 = STUB_BASE + 64;
+pub const STUB_HEAP_ALLOC: u64 = STUB_BASE + 72;
+pub const STUB_HEAP_FREE: u64 = STUB_BASE + 80;
+pub const STUB_MALLOC: u64 = STUB_BASE + 88;
+pub const STUB_FREE: u64 = STUB_BASE + 96;
+pub const STUB_PUTS: u64 = STUB_BASE + 104;
 
 pub const STD_OUTPUT_HANDLE: i32 = -11;
 pub const STD_OUTPUT_MAGIC: u64 = 0x0000_0000_0000_00F5;
+pub const PROCESS_HEAP_MAGIC: u64 = 0x0000_0000_0000_0EA7;
+pub const DEFAULT_GUEST_PID: u32 = 1000;
 
 const MAX_STEPS: u64 = 100_000;
 
@@ -41,6 +53,11 @@ pub struct ExecSideEffects {
     pub vfs_files_written: Vec<String>,
     pub exit_code: Option<u32>,
     pub instructions_retired: u64,
+    /// Win32/CRT APIs actually dispatched by the CPU loop (not registry-only).
+    pub apis_invoked: Vec<String>,
+    pub heap_allocations: u64,
+    pub guest_pid: Option<u32>,
+    pub command_line: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -81,6 +98,8 @@ pub struct Cpu {
     /// Maps guest file handles created via CreateFileA to VFS handle ids.
     open_files: HashMap<u64, u64>,
     next_guest_handle: u64,
+    cmdline_va: u64,
+    guest_pid: u32,
 }
 
 impl Cpu {
@@ -91,6 +110,15 @@ impl Cpu {
         stubs.insert(STUB_EXIT_PROCESS, "ExitProcess".into());
         stubs.insert(STUB_CREATE_FILE_A, "CreateFileA".into());
         stubs.insert(STUB_CLOSE_HANDLE, "CloseHandle".into());
+        stubs.insert(STUB_READ_FILE, "ReadFile".into());
+        stubs.insert(STUB_GET_CURRENT_PROCESS_ID, "GetCurrentProcessId".into());
+        stubs.insert(STUB_GET_COMMAND_LINE_A, "GetCommandLineA".into());
+        stubs.insert(STUB_GET_PROCESS_HEAP, "GetProcessHeap".into());
+        stubs.insert(STUB_HEAP_ALLOC, "HeapAlloc".into());
+        stubs.insert(STUB_HEAP_FREE, "HeapFree".into());
+        stubs.insert(STUB_MALLOC, "malloc".into());
+        stubs.insert(STUB_FREE, "free".into());
+        stubs.insert(STUB_PUTS, "puts".into());
 
         let mut gpr = Gpr::default();
         gpr.rsp = stack_top;
@@ -103,6 +131,8 @@ impl Cpu {
             halted: None,
             open_files: HashMap::new(),
             next_guest_handle: 0x2000,
+            cmdline_va: 0,
+            guest_pid: DEFAULT_GUEST_PID,
         }
     }
 
@@ -111,8 +141,40 @@ impl Cpu {
         self
     }
 
+    pub fn with_command_line(mut self, va: u64, text: &str) -> Self {
+        self.cmdline_va = va;
+        self.side_effects.command_line = Some(text.to_string());
+        self
+    }
+
+    pub fn with_guest_pid(mut self, pid: u32) -> Self {
+        self.guest_pid = pid;
+        self
+    }
+
     pub fn register_stub(&mut self, addr: u64, name: &str) {
         self.stubs.insert(addr, name.to_string());
+    }
+
+    fn note_api(&mut self, name: &str) {
+        self.side_effects.apis_invoked.push(name.to_string());
+    }
+
+    fn emit_stdout(&mut self, data: &[u8]) {
+        self.side_effects.stdout.extend_from_slice(data);
+        self.side_effects.stdout_utf8 =
+            String::from_utf8_lossy(&self.side_effects.stdout).into_owned();
+        if let Some(dir) = &self.host_side_effect_dir {
+            let path = dir.join("pe-stdout.txt");
+            if let Some(parent) = path.parent() {
+                let _ = std::fs::create_dir_all(parent);
+            }
+            let _ = std::fs::write(&path, &self.side_effects.stdout);
+            let p = path.display().to_string();
+            if !self.side_effects.host_files_written.contains(&p) {
+                self.side_effects.host_files_written.push(p);
+            }
+        }
     }
 
     pub fn run(&mut self, kernel: &mut NtKernel) -> CpuRunResult {
@@ -220,10 +282,18 @@ impl Cpu {
                 self.rip = ip + 2;
                 return Ok(());
             }
+            if modrm == 0xD2 {
+                self.gpr.rdx = 0;
+                self.rip = ip + 2;
+                return Ok(());
+            }
             return Err(CpuHaltReason::IllegalInstruction);
         }
 
         // mov rcx, rax — 48 89 C1
+        // mov rdx, rax — 48 89 C2
+        // mov r8, rax  — 49 89 C0
+        // mov [rsp+disp8], rax — 48 89 44 24 disp
         if rex_w && op == 0x89 {
             let modrm = kernel
                 .memory
@@ -233,6 +303,73 @@ impl Cpu {
                 self.gpr.rcx = self.gpr.rax;
                 self.rip = ip + 2;
                 return Ok(());
+            }
+            if modrm == 0xC2 {
+                self.gpr.rdx = self.gpr.rax;
+                self.rip = ip + 2;
+                return Ok(());
+            }
+            // REX.W + REX.B already handled via rex_w; 49 89 C0 is REX.WB=01001b → b0=0x49
+            if modrm == 0xC0 && rex_b {
+                self.gpr.r8 = self.gpr.rax;
+                self.rip = ip + 2;
+                return Ok(());
+            }
+            let sib = kernel
+                .memory
+                .read_u8(ip + 2)
+                .map_err(|_| CpuHaltReason::MemoryFault)?;
+            if modrm == 0x44 && sib == 0x24 {
+                let disp = kernel
+                    .memory
+                    .read_u8(ip + 3)
+                    .map_err(|_| CpuHaltReason::MemoryFault)? as i8 as i64;
+                let addr = (self.gpr.rsp as i64 + disp) as u64;
+                kernel
+                    .memory
+                    .write_u64(addr, self.gpr.rax)
+                    .map_err(|_| CpuHaltReason::MemoryFault)?;
+                self.rip = ip + 4;
+                return Ok(());
+            }
+            return Err(CpuHaltReason::IllegalInstruction);
+        }
+
+        // mov rax/rcx, [rsp+disp8] — 48 8B 44/4C 24 disp
+        if rex_w && op == 0x8B {
+            let modrm = kernel
+                .memory
+                .read_u8(ip + 1)
+                .map_err(|_| CpuHaltReason::MemoryFault)?;
+            let sib = kernel
+                .memory
+                .read_u8(ip + 2)
+                .map_err(|_| CpuHaltReason::MemoryFault)?;
+            if sib == 0x24 {
+                let disp = kernel
+                    .memory
+                    .read_u8(ip + 3)
+                    .map_err(|_| CpuHaltReason::MemoryFault)? as i8 as i64;
+                let addr = (self.gpr.rsp as i64 + disp) as u64;
+                let val = kernel
+                    .memory
+                    .read_u64(addr)
+                    .map_err(|_| CpuHaltReason::MemoryFault)?;
+                if modrm == 0x44 {
+                    self.gpr.rax = val;
+                    self.rip = ip + 4;
+                    return Ok(());
+                }
+                if modrm == 0x4C {
+                    self.gpr.rcx = val;
+                    self.rip = ip + 4;
+                    return Ok(());
+                }
+                if modrm == 0x54 {
+                    self.gpr.rdx = val;
+                    self.rip = ip + 4;
+                    return Ok(());
+                }
             }
             return Err(CpuHaltReason::IllegalInstruction);
         }
@@ -344,6 +481,7 @@ impl Cpu {
     }
 
     fn dispatch_stub(&mut self, kernel: &mut NtKernel, name: &str) -> Result<(), CpuHaltReason> {
+        self.note_api(name);
         match name {
             "GetStdHandle" => {
                 let nstd = self.gpr.rcx as i32;
@@ -365,29 +503,11 @@ impl Cpu {
                     .map_err(|_| CpuHaltReason::MemoryFault)?;
 
                 if handle == STD_OUTPUT_MAGIC {
-                    self.side_effects.stdout.extend_from_slice(&data);
-                    self.side_effects.stdout_utf8 =
-                        String::from_utf8_lossy(&self.side_effects.stdout).into_owned();
-                    if let Some(dir) = &self.host_side_effect_dir {
-                        let path = dir.join("pe-stdout.txt");
-                        if let Some(parent) = path.parent() {
-                            let _ = std::fs::create_dir_all(parent);
-                        }
-                        let _ = std::fs::write(&path, &self.side_effects.stdout);
-                        let p = path.display().to_string();
-                        if !self.side_effects.host_files_written.contains(&p) {
-                            self.side_effects.host_files_written.push(p);
-                        }
-                    }
+                    self.emit_stdout(&data);
                 } else if let Some(vfs_h) = self.open_files.get(&handle).copied() {
-                    let _ = kernel
-                        .filesystem
-                        .write_file(crate::ntdll::FileHandle(vfs_h), &data);
+                    let _ = kernel.filesystem.write_file(FileHandle(vfs_h), &data);
                     if let Some(dir) = &self.host_side_effect_dir {
-                        if let Some(vf) = kernel
-                            .filesystem
-                            .handle_path(crate::ntdll::FileHandle(vfs_h))
-                        {
+                        if let Some(vf) = kernel.filesystem.handle_path(FileHandle(vfs_h)) {
                             let host_name = vf
                                 .rsplit('\\')
                                 .next()
@@ -395,10 +515,13 @@ impl Cpu {
                                 .to_string();
                             let path = dir.join(host_name);
                             let _ = std::fs::write(&path, &data);
-                            self.side_effects
-                                .host_files_written
-                                .push(path.display().to_string());
-                            self.side_effects.vfs_files_written.push(vf);
+                            let ps = path.display().to_string();
+                            if !self.side_effects.host_files_written.contains(&ps) {
+                                self.side_effects.host_files_written.push(ps);
+                            }
+                            if !self.side_effects.vfs_files_written.contains(&vf) {
+                                self.side_effects.vfs_files_written.push(vf);
+                            }
                         }
                     }
                 }
@@ -407,6 +530,29 @@ impl Cpu {
                     let _ = kernel.memory.write_u32(written_ptr, len as u32);
                 }
                 self.gpr.rax = 1; // BOOL TRUE
+                Ok(())
+            }
+            "ReadFile" => {
+                let handle = self.gpr.rcx;
+                let buf_ptr = self.gpr.rdx;
+                let len = self.gpr.r8 as usize;
+                let read_ptr = self.gpr.r9;
+                if let Some(vfs_h) = self.open_files.get(&handle).copied() {
+                    let data = kernel
+                        .filesystem
+                        .read_file(FileHandle(vfs_h), len)
+                        .map_err(|_| CpuHaltReason::MemoryFault)?;
+                    kernel
+                        .memory
+                        .write_bytes(buf_ptr, &data)
+                        .map_err(|_| CpuHaltReason::MemoryFault)?;
+                    if read_ptr != 0 {
+                        let _ = kernel.memory.write_u32(read_ptr, data.len() as u32);
+                    }
+                    self.gpr.rax = 1;
+                } else {
+                    self.gpr.rax = 0;
+                }
                 Ok(())
             }
             "CreateFileA" => {
@@ -431,11 +577,68 @@ impl Cpu {
             "CloseHandle" => {
                 let handle = self.gpr.rcx;
                 if let Some(vfs_h) = self.open_files.remove(&handle) {
-                    let _ = kernel
-                        .filesystem
-                        .close_handle(crate::ntdll::FileHandle(vfs_h));
+                    let _ = kernel.filesystem.close_handle(FileHandle(vfs_h));
                 }
                 self.gpr.rax = 1;
+                Ok(())
+            }
+            "GetCurrentProcessId" => {
+                self.side_effects.guest_pid = Some(self.guest_pid);
+                self.gpr.rax = self.guest_pid as u64;
+                Ok(())
+            }
+            "GetCommandLineA" => {
+                self.gpr.rax = self.cmdline_va;
+                Ok(())
+            }
+            "GetProcessHeap" => {
+                self.gpr.rax = PROCESS_HEAP_MAGIC;
+                Ok(())
+            }
+            "HeapAlloc" => {
+                let size = self.gpr.r8.max(1);
+                let ptr = kernel
+                    .memory
+                    .allocate(size, MemoryProtection::ReadWrite)
+                    .map_err(|_| CpuHaltReason::MemoryFault)?;
+                self.side_effects.heap_allocations += 1;
+                self.gpr.rax = ptr;
+                Ok(())
+            }
+            "HeapFree" => {
+                let ptr = self.gpr.r8;
+                if ptr != 0 {
+                    let _ = kernel.memory.free(ptr);
+                }
+                self.gpr.rax = 1;
+                Ok(())
+            }
+            "malloc" => {
+                let size = self.gpr.rcx.max(1);
+                let ptr = kernel
+                    .memory
+                    .allocate(size, MemoryProtection::ReadWrite)
+                    .map_err(|_| CpuHaltReason::MemoryFault)?;
+                self.side_effects.heap_allocations += 1;
+                self.gpr.rax = ptr;
+                Ok(())
+            }
+            "free" => {
+                let ptr = self.gpr.rcx;
+                if ptr != 0 {
+                    let _ = kernel.memory.free(ptr);
+                }
+                self.gpr.rax = 0;
+                Ok(())
+            }
+            "puts" => {
+                let ptr = self.gpr.rcx;
+                let s = read_guest_cstring(kernel, ptr, 4096)
+                    .map_err(|_| CpuHaltReason::MemoryFault)?;
+                let mut data = s.into_bytes();
+                data.push(b'\n');
+                self.emit_stdout(&data);
+                self.gpr.rax = 0; // non-negative = success
                 Ok(())
             }
             "ExitProcess" => {
@@ -491,12 +694,22 @@ pub fn run_entry(
 ) -> Result<CpuRunResult, NtStatus> {
     let stack_base = kernel
         .memory
-        .allocate(0x1_0000, crate::ntdll::MemoryProtection::ReadWrite)?;
+        .allocate(0x1_0000, MemoryProtection::ReadWrite)?;
     let stack_top = stack_base + 0x1_0000 - 0x20;
     // Sentinel return address
     kernel.memory.write_u64(stack_top, 0)?;
 
-    let mut cpu = Cpu::new(entry, stack_top);
+    let cmdline = "pe2-console-mvp.exe\0";
+    let cmdline_va = kernel
+        .memory
+        .allocate(0x1000, MemoryProtection::ReadWrite)?;
+    kernel
+        .memory
+        .write_bytes(cmdline_va, cmdline.as_bytes())?;
+
+    let mut cpu = Cpu::new(entry, stack_top)
+        .with_guest_pid(DEFAULT_GUEST_PID)
+        .with_command_line(cmdline_va, "pe2-console-mvp.exe");
     if let Some(dir) = host_side_effect_dir {
         cpu = cpu.with_host_side_effect_dir(dir);
     }
@@ -506,9 +719,9 @@ pub fn run_entry(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ntdll::MemoryProtection;
-    use crate::pe::build_real_console_fixture_pe;
     use crate::loader::PeLoader;
+    use crate::ntdll::MemoryProtection;
+    use crate::pe::{build_real_console_fixture_pe, build_win32_console_mvp_pe};
 
     #[test]
     fn cpu_runs_fixture_with_stdout_side_effect() {
@@ -531,6 +744,54 @@ mod tests {
         assert!(host.is_file(), "missing {}", host.display());
         let body = std::fs::read_to_string(&host).unwrap();
         assert!(body.contains("STRAWWU_PE_REAL_OK"));
+    }
+
+    #[test]
+    fn cpu_runs_win32_console_mvp_file_process_crt() {
+        let pe = build_win32_console_mvp_pe();
+        let mut kernel = NtKernel::new();
+        let mut loader = PeLoader::new();
+        let load = loader.load(&pe, &mut kernel).unwrap();
+        let tmp = std::env::temp_dir().join("strawwu-pe2-cpu-test");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let _ = std::fs::create_dir_all(&tmp);
+        let result = run_entry(&mut kernel, load.entry_point_va, Some(tmp.clone())).unwrap();
+        assert_eq!(result.halt, CpuHaltReason::ExitProcess, "rip={:#x}", result.rip);
+        let se = &result.side_effects;
+        assert!(
+            se.stdout_utf8.contains("STRAWWU_PE_CONSOLE_OK"),
+            "stdout={}",
+            se.stdout_utf8
+        );
+        assert!(
+            se.stdout_utf8.contains("STRAWWU_PE_CONSOLE_CRT"),
+            "stdout missing CRT marker: {}",
+            se.stdout_utf8
+        );
+        assert_eq!(se.exit_code, Some(0));
+        assert!(se.heap_allocations >= 1);
+        assert_eq!(se.guest_pid, Some(DEFAULT_GUEST_PID));
+        for api in [
+            "GetCurrentProcessId",
+            "GetCommandLineA",
+            "CreateFileA",
+            "WriteFile",
+            "ReadFile",
+            "CloseHandle",
+            "malloc",
+            "puts",
+            "ExitProcess",
+        ] {
+            assert!(
+                se.apis_invoked.iter().any(|a| a == api),
+                "missing api {api} in {:?}",
+                se.apis_invoked
+            );
+        }
+        let host_file = tmp.join("pe2-marker.txt");
+        assert!(host_file.is_file(), "missing {}", host_file.display());
+        let body = std::fs::read_to_string(&host_file).unwrap();
+        assert!(body.contains("STRAWWU_PE_CONSOLE_OK"), "file={body}");
     }
 
     #[test]

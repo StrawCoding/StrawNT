@@ -7,6 +7,7 @@ StrawWU **Win 相容核心**（runtime／nt／launcher／graphics·audio／Hub�
 > **不**使用 Wine／Proton。不保證所有 Windows 軟體都可跑；反作弊／核心驅動可能失敗。
 > Flatpak 對 PE／SubsystemSession 為 **PARTIAL**。不是 ISO／桌面發行版。
 > pe1 起：最小 console PE fixture 經 native CPU 迴圈可產生可觀測副作用（`mode=real`）；更大範圍相容仍依 pe2+ 推進。
+> pe2：kernel32 檔案／行程 + msvcrt CRT 路徑足以跑小型 console `.exe`（非 stub-only）；證據 `tests/portable/output/pe-console.json`。
 
 ## 選擇哪一種包裝
 

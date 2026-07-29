@@ -247,7 +247,8 @@ pub fn execute_cooperative(
 mod tests {
     use super::*;
     use strawwu_nt::pe::{
-        build_pe_with_imports, build_real_console_fixture_pe, build_stub_pe, PeMachine, PeSubsystem,
+        build_pe_with_imports, build_real_console_fixture_pe, build_stub_pe,
+        build_win32_console_mvp_pe, PeMachine, PeSubsystem,
     };
 
     #[test]
@@ -282,6 +283,30 @@ mod tests {
         assert!(se.stdout_utf8.contains("STRAWWU_PE_REAL_OK"));
         assert_eq!(se.exit_code, Some(0));
         assert!(tmp.join("pe-stdout.txt").is_file());
+    }
+
+    #[test]
+    fn execute_win32_console_mvp_fixture() {
+        let mut orch = RuntimeOrchestrator::new();
+        let profile = AppProfile::default_win32("pe2-console-mvp");
+        let pe_data = build_win32_console_mvp_pe();
+        let tmp = std::env::temp_dir().join("strawwu-pe2-exec-test");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let _ = std::fs::create_dir_all(&tmp);
+
+        let result =
+            execute_pe_with_side_effect_dir(&mut orch, &profile, &pe_data, Some(tmp.clone()));
+        assert_eq!(result.state, ExecState::Running);
+        assert_eq!(result.mode, "real");
+        assert!(result.cpu_executed);
+        let se = result.side_effects.expect("side effects");
+        assert!(se.stdout_utf8.contains("STRAWWU_PE_CONSOLE_OK"));
+        assert!(se.stdout_utf8.contains("STRAWWU_PE_CONSOLE_CRT"));
+        assert!(se.heap_allocations >= 1);
+        assert!(tmp.join("pe2-marker.txt").is_file());
+        assert!(se.apis_invoked.iter().any(|a| a == "ReadFile"));
+        assert!(se.apis_invoked.iter().any(|a| a == "malloc"));
+        assert!(se.apis_invoked.iter().any(|a| a == "GetCurrentProcessId"));
     }
 
     #[test]

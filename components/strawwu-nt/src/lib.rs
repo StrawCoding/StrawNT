@@ -9,7 +9,10 @@ pub mod registry;
 pub mod loader;
 pub mod cpu;
 
-pub use pe::{PeFile, PeMachine, PeSubsystem, ImportEntry, build_real_console_fixture_pe};
+pub use pe::{
+    PeFile, PeMachine, PeSubsystem, ImportEntry, build_real_console_fixture_pe,
+    build_win32_console_mvp_pe,
+};
 pub use teb::{ThreadEnvironmentBlock, ProcessEnvironmentBlock, LoadedModule};
 pub use ntdll::{NtStatus, NtKernel, VirtualMemoryManager, VirtualFileSystem, FileHandle};
 pub use wow64::Wow64Context;

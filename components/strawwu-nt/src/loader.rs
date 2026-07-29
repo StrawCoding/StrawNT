@@ -103,6 +103,15 @@ impl PeLoader {
             ("ExitProcess", crate::cpu::STUB_EXIT_PROCESS),
             ("CreateFileA", crate::cpu::STUB_CREATE_FILE_A),
             ("CloseHandle", crate::cpu::STUB_CLOSE_HANDLE),
+            ("ReadFile", crate::cpu::STUB_READ_FILE),
+            ("GetCurrentProcessId", crate::cpu::STUB_GET_CURRENT_PROCESS_ID),
+            ("GetCommandLineA", crate::cpu::STUB_GET_COMMAND_LINE_A),
+            ("GetProcessHeap", crate::cpu::STUB_GET_PROCESS_HEAP),
+            ("HeapAlloc", crate::cpu::STUB_HEAP_ALLOC),
+            ("HeapFree", crate::cpu::STUB_HEAP_FREE),
+            ("malloc", crate::cpu::STUB_MALLOC),
+            ("free", crate::cpu::STUB_FREE),
+            ("puts", crate::cpu::STUB_PUTS),
         ];
 
         for import in &pe.imports {

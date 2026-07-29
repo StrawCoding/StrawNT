@@ -399,12 +399,14 @@ impl Win32StubRegistry {
             ("GetStdHandle", StubStatus::Implemented),
             ("GetCurrentProcessId", StubStatus::Implemented),
             ("GetCurrentThreadId", StubStatus::Implemented),
+            ("GetCommandLineA", StubStatus::Implemented),
+            ("GetCommandLineW", StubStatus::Stub),
             ("GetSystemInfo", StubStatus::Stub),
             ("VirtualAlloc", StubStatus::Stub),
             ("VirtualFree", StubStatus::Stub),
             ("CreateFileA", StubStatus::Implemented),
             ("CreateFileW", StubStatus::Stub),
-            ("ReadFile", StubStatus::Stub),
+            ("ReadFile", StubStatus::Implemented),
             ("WriteFile", StubStatus::Implemented),
             ("CloseHandle", StubStatus::Implemented),
             ("GetVersionExA", StubStatus::Stub),
@@ -412,13 +414,31 @@ impl Win32StubRegistry {
             ("ExitProcess", StubStatus::Implemented),
             ("CreateProcessA", StubStatus::Stub),
             ("CreateProcessW", StubStatus::Stub),
+            ("GetProcessHeap", StubStatus::Implemented),
             ("HeapCreate", StubStatus::Stub),
-            ("HeapAlloc", StubStatus::Stub),
-            ("HeapFree", StubStatus::Stub),
+            ("HeapAlloc", StubStatus::Implemented),
+            ("HeapFree", StubStatus::Implemented),
         ];
         for (name, status) in funcs {
             self.stubs.push(Win32Function {
                 dll: "kernel32.dll".into(),
+                name: name.into(),
+                status,
+            });
+        }
+        self.register_msvcrt_stubs();
+    }
+
+    fn register_msvcrt_stubs(&mut self) {
+        let funcs = [
+            ("malloc", StubStatus::Implemented),
+            ("free", StubStatus::Implemented),
+            ("puts", StubStatus::Implemented),
+            ("printf", StubStatus::Stub),
+        ];
+        for (name, status) in funcs {
+            self.stubs.push(Win32Function {
+                dll: "msvcrt.dll".into(),
                 name: name.into(),
                 status,
             });
