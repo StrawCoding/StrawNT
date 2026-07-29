@@ -1,0 +1,16 @@
+{
+  "backend": "wayland-mutter",
+  "closed": true,
+  "compositor": "mutter",
+  "display": "wayland",
+  "frame_count": 5,
+  "gdi_bitblt_count": 1,
+  "height": 480,
+  "hwnd": 65536,
+  "messages_dispatched": 3,
+  "schema": "strawwu-portable-pe-gui-compositor/v1",
+  "screenshot": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/cli-light2d/pe3-window.ppm",
+  "title": "Light2D Win Demo",
+  "visible": false,
+  "width": 640
+}

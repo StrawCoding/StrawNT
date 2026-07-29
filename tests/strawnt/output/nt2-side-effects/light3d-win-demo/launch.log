@@ -1,0 +1,5 @@
+strawnt native launch id=light3d-win-demo path=/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/nt2-light3d-demo.exe mode=real pid=1000 halt=Some("ExitProcess")
+stdout:
+STRAWNT_LIGHT3D_OK
+STRAWNT_LIGHT3D_CLOSED
+

@@ -102,3 +102,8 @@ tests/portable/fixtures/golden/
 # pe6 golden side-effects (JSON evidence pe-golden.json kept)
 tests/portable/output/pe6-side-effects/
 
+# nt2 CLI launch ephemeral registry/home (keep strawnt-run.log / present evidence)
+tests/strawnt/output/nt2-side-effects/cli-light2d/home/
+tests/strawnt/output/nt2-side-effects/cli-light2d/app-registry.json
+tests/strawnt/output/nt2-side-effects/cli-light2d/app-registry.json.lock
+

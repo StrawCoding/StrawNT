@@ -1,0 +1,3 @@
+  | strawnt: launched /mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/nt2-light2d-demo.exe (format=PE, pid=1000, backend=native, app_id=nt2-light2d-demo, mode=real, gui-smoke=PASS hwnd=65536 compositor=wayland-mutter visible=false closed=true frames=5 cpu-user32=1)
+  | STRAWNT_LIGHT2D_OK
+  | STRAWNT_LIGHT2D_CLOSED

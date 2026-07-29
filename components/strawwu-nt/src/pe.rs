@@ -643,6 +643,20 @@ mod tests {
         assert_eq!(pe.subsystem, PeSubsystem::WindowsGui);
         assert_eq!(pe.entry_point, 0x1000);
     }
+
+    #[test]
+    fn win32_light_game_demo_fixtures_parse_as_amd64_gui() {
+        for data in [
+            build_win32_light2d_game_demo_pe(),
+            build_win32_light3d_game_demo_pe(),
+        ] {
+            let pe = PeFile::parse(&data).unwrap();
+            assert!(pe.is_valid);
+            assert_eq!(pe.machine, PeMachine::Amd64);
+            assert_eq!(pe.subsystem, PeSubsystem::WindowsGui);
+            assert_eq!(pe.entry_point, 0x1000);
+        }
+    }
 }
 
 /// Minimal AMD64 console PE with real x86-64 opcodes that call fixed
@@ -978,10 +992,57 @@ pub fn build_win32_console_mvp_pe() -> Vec<u8> {
     pe
 }
 
+/// Null-terminated / raw string blobs embedded in a Win32 GUI demo PE.
+#[derive(Debug, Clone, Copy)]
+pub struct Win32GuiDemoStrings<'a> {
+    pub class_name: &'a [u8],
+    pub title: &'a [u8],
+    pub file_marker: &'a [u8],
+    pub ok_msg: &'a [u8],
+    pub closed_msg: &'a [u8],
+    pub marker_filename: &'a [u8],
+}
+
 /// pe3 GUI user32/gdi MVP fixture: RegisterClass → CreateWindow → ShowWindow →
 /// message pump → GetDC/BitBlt → DestroyWindow/PostQuitMessage, with host
 /// screenshot + compositor observation side effects (Windows GUI subsystem).
 pub fn build_win32_gui_mvp_pe() -> Vec<u8> {
+    build_win32_gui_demo_pe(&Win32GuiDemoStrings {
+        class_name: b"StrawWUGuiClass\0",
+        title: b"StrawWU PE3 GUI\0",
+        file_marker: b"STRAWWU_PE_GUI_OK\n",
+        ok_msg: b"STRAWWU_PE_GUI_OK\0",
+        closed_msg: b"STRAWWU_PE_GUI_CLOSED\0",
+        marker_filename: b"pe3-marker.txt\0",
+    })
+}
+
+/// Public Win32 2D light-game demo PE (real binary; native CPU + present path).
+pub fn build_win32_light2d_game_demo_pe() -> Vec<u8> {
+    build_win32_gui_demo_pe(&Win32GuiDemoStrings {
+        class_name: b"StrawNTLight2D\0",
+        title: b"Light2D Win Demo\0",
+        file_marker: b"STRAWNT_LIGHT2D_OK\n",
+        ok_msg: b"STRAWNT_LIGHT2D_OK\0",
+        closed_msg: b"STRAWNT_LIGHT2D_CLOSED\0",
+        marker_filename: b"light2d-marker.txt\0",
+    })
+}
+
+/// Public Win32 3D-present light-game demo PE (real binary; native CPU + present path).
+pub fn build_win32_light3d_game_demo_pe() -> Vec<u8> {
+    build_win32_gui_demo_pe(&Win32GuiDemoStrings {
+        class_name: b"StrawNTLight3D\0",
+        title: b"Light3D Win Demo\0",
+        file_marker: b"STRAWNT_LIGHT3D_OK\n",
+        ok_msg: b"STRAWNT_LIGHT3D_OK\0",
+        closed_msg: b"STRAWNT_LIGHT3D_CLOSED\0",
+        marker_filename: b"light3d-marker.txt\0",
+    })
+}
+
+/// Parameterized Win32 GUI demo PE used by pe3 MVP and nt2 light-game demos.
+pub fn build_win32_gui_demo_pe(strings: &Win32GuiDemoStrings<'_>) -> Vec<u8> {
     use crate::cpu::{
         STUB_BIT_BLT, STUB_CLOSE_HANDLE, STUB_CREATE_FILE_A, STUB_CREATE_WINDOW_EX_A,
         STUB_DESTROY_WINDOW, STUB_DISPATCH_MESSAGE_A, STUB_EXIT_PROCESS, STUB_GET_DC,
@@ -989,6 +1050,17 @@ pub fn build_win32_gui_mvp_pe() -> Vec<u8> {
         STUB_RELEASE_DC, STUB_SHOW_WINDOW, STUB_TRANSLATE_MESSAGE, STUB_UPDATE_WINDOW,
         STUB_WRITE_FILE,
     };
+
+    let class_name = strings.class_name;
+    let title = strings.title;
+    let file_marker = strings.file_marker;
+    let ok_msg = strings.ok_msg;
+    let closed = strings.closed_msg;
+    let filename = strings.marker_filename;
+    assert!(
+        file_marker.len() <= 255,
+        "file_marker too long for imm8 WriteFile length"
+    );
 
     let mut pe = vec![0u8; 0x1200];
     pe[0] = 0x4D;
@@ -1024,12 +1096,6 @@ pub fn build_win32_gui_mvp_pe() -> Vec<u8> {
     pe[sec + 36..sec + 40].copy_from_slice(&0x6000_0020u32.to_le_bytes());
 
     let text = 0x200usize;
-    let class_name = b"StrawWUGuiClass\0";
-    let title = b"StrawWU PE3 GUI\0";
-    let file_marker = b"STRAWWU_PE_GUI_OK\n";
-    let ok_msg = b"STRAWWU_PE_GUI_OK\0";
-    let closed = b"STRAWWU_PE_GUI_CLOSED\0";
-    let filename = b"pe3-marker.txt\0";
 
     // Layout (offsets from text start, after code_capacity pad):
     let code_capacity = 720usize;
@@ -1227,7 +1293,7 @@ pub fn build_win32_gui_mvp_pe() -> Vec<u8> {
 
     assert!(
         code.len() <= code_capacity,
-        "pe3 fixture code {} exceeds pad {}",
+        "gui demo fixture code {} exceeds pad {}",
         code.len(),
         code_capacity
     );
@@ -1238,7 +1304,7 @@ pub fn build_win32_gui_mvp_pe() -> Vec<u8> {
     let data_end = msg_off + 0x30;
     assert!(
         text + data_end <= pe.len(),
-        "pe3 data overflow {} > {}",
+        "gui demo data overflow {} > {}",
         text + data_end,
         pe.len()
     );

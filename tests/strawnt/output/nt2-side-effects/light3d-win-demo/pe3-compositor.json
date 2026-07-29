@@ -1,0 +1,19 @@
+{
+  "backend": "wayland-mutter",
+  "closed": true,
+  "compositor": "mutter",
+  "display": "wayland",
+  "frame_count": 5,
+  "gdi_bitblt_count": 1,
+  "height": 480,
+  "hwnd": 65536,
+  "messages_dispatched": 3,
+  "present_frames": 5,
+  "schema": "strawnt-pe-gui-present/v1",
+  "screenshot": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light3d-win-demo/pe3-window.ppm",
+  "title": "Light3D Win Demo",
+  "triangle_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light3d-win-demo/nt-triangle.ppm",
+  "triangle_pixels": 63038,
+  "visible": false,
+  "width": 640
+}

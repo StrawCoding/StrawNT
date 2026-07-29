@@ -1516,6 +1516,7 @@ mod tests {
     use crate::ntdll::MemoryProtection;
     use crate::pe::{
         build_real_console_fixture_pe, build_win32_console_mvp_pe, build_win32_gui_mvp_pe,
+        build_win32_light2d_game_demo_pe, build_win32_light3d_game_demo_pe,
     };
 
     #[test]
@@ -1658,6 +1659,46 @@ mod tests {
         assert!(body.contains("frame_count"));
         let marker = tmp.join("pe3-marker.txt");
         assert!(marker.is_file(), "missing {}", marker.display());
+    }
+
+    #[test]
+    fn cpu_runs_win32_light_game_demos() {
+        for (pe, ok, closed, marker_name) in [
+            (
+                build_win32_light2d_game_demo_pe(),
+                "STRAWNT_LIGHT2D_OK",
+                "STRAWNT_LIGHT2D_CLOSED",
+                "light2d-marker.txt",
+            ),
+            (
+                build_win32_light3d_game_demo_pe(),
+                "STRAWNT_LIGHT3D_OK",
+                "STRAWNT_LIGHT3D_CLOSED",
+                "light3d-marker.txt",
+            ),
+        ] {
+            let mut kernel = NtKernel::new();
+            let mut loader = PeLoader::new();
+            let load = loader.load(&pe, &mut kernel).unwrap();
+            let tmp = std::env::temp_dir().join(format!("strawnt-nt2-cpu-{ok}"));
+            let _ = std::fs::remove_dir_all(&tmp);
+            let _ = std::fs::create_dir_all(&tmp);
+            let result = run_entry(&mut kernel, load.entry_point_va, Some(tmp.clone())).unwrap();
+            assert_eq!(result.halt, CpuHaltReason::ExitProcess, "rip={:#x}", result.rip);
+            let se = &result.side_effects;
+            assert!(se.stdout_utf8.contains(ok), "stdout={}", se.stdout_utf8);
+            assert!(
+                se.stdout_utf8.contains(closed),
+                "stdout missing close: {}",
+                se.stdout_utf8
+            );
+            let gui = se.gui.as_ref().expect("gui side effects");
+            assert!(gui.triangle_pixels > 100);
+            assert!(gui.present_frames >= 1);
+            assert!(gui.compositor_frames >= 1);
+            assert!(tmp.join("pe3-window.ppm").is_file());
+            assert!(tmp.join(marker_name).is_file());
+        }
     }
 
     #[test]

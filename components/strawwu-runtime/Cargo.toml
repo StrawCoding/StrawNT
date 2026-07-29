@@ -22,4 +22,8 @@ path = "src/bin/golden_apps_verify.rs"
 name = "nt-graphics-verify"
 path = "src/bin/nt_graphics_verify.rs"
 
+[[bin]]
+name = "nt-light-games-verify"
+path = "src/bin/nt_light_games_verify.rs"
+
 [dev-dependencies]

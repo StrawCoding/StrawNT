@@ -1,0 +1,221 @@
+{
+  "apps": [
+    {
+      "backend": "native",
+      "binary": {
+        "bytes": 4608,
+        "machine": "Amd64",
+        "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/nt2-light2d-demo.exe",
+        "sha256": "b50e774db940f4dbbc42eeeedff65c95722f17d54f1285a363bf6a73891cb96c",
+        "source": "StrawNT public Win32 light-game demo PE fixture",
+        "subsystem": "WindowsGui"
+      },
+      "dimension": "2d",
+      "disclaimer": "launcher/present evidence only; not full gameplay; no 3A or anti-cheat claim",
+      "execution_backend": "native",
+      "id": "light2d-win-demo",
+      "kind": "lightweight_public_win_demo",
+      "launch_verified": true,
+      "mode": "real",
+      "name": "Public Win32 2D light-game demo",
+      "notes": "真實 Win32 light-game demo PE 經 StrawNT native 啟動並留下 present／截圖／marker／log 副作用",
+      "process": {
+        "cpu_executed": true,
+        "halt_reason": "ExitProcess",
+        "pid": 1000,
+        "session_id": "default"
+      },
+      "real_binary": true,
+      "scope": "launcher_present",
+      "side_effects": {
+        "compositor_frames": 5,
+        "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light2d-win-demo",
+        "log_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light2d-win-demo/launch.log",
+        "marker_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light2d-win-demo/light2d-marker.txt",
+        "present_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light2d-win-demo/nt-present.json",
+        "present_frames": 5,
+        "screenshot": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light2d-win-demo/pe3-window.ppm",
+        "stdout_marker": "STRAWNT_LIGHT2D_OK",
+        "title": "Light2D Win Demo",
+        "triangle_pixels": 63038
+      },
+      "status": "PASS"
+    },
+    {
+      "backend": "native",
+      "binary": {
+        "bytes": 4608,
+        "machine": "Amd64",
+        "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/nt2-light3d-demo.exe",
+        "sha256": "b3ec051015d52abfb37f9cb3549760f92e20918475b59dffb4c60fa0fd076d98",
+        "source": "StrawNT public Win32 light-game demo PE fixture",
+        "subsystem": "WindowsGui"
+      },
+      "dimension": "3d",
+      "disclaimer": "launcher/present evidence only; not full gameplay; no 3A or anti-cheat claim",
+      "execution_backend": "native",
+      "id": "light3d-win-demo",
+      "kind": "lightweight_public_win_demo",
+      "launch_verified": true,
+      "mode": "real",
+      "name": "Public Win32 3D-present light-game demo",
+      "notes": "真實 Win32 light-game demo PE 經 StrawNT native 啟動並留下 present／截圖／marker／log 副作用",
+      "process": {
+        "cpu_executed": true,
+        "halt_reason": "ExitProcess",
+        "pid": 1000,
+        "session_id": "default"
+      },
+      "real_binary": true,
+      "scope": "launcher_present",
+      "side_effects": {
+        "compositor_frames": 5,
+        "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light3d-win-demo",
+        "log_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light3d-win-demo/launch.log",
+        "marker_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light3d-win-demo/light3d-marker.txt",
+        "present_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light3d-win-demo/nt-present.json",
+        "present_frames": 5,
+        "screenshot": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light3d-win-demo/pe3-window.ppm",
+        "stdout_marker": "STRAWNT_LIGHT3D_OK",
+        "title": "Light3D Win Demo",
+        "triangle_pixels": 63038
+      },
+      "status": "PASS"
+    }
+  ],
+  "backend": "native",
+  "claims": {
+    "aaa_claimed": false,
+    "anti_cheat_claimed": false,
+    "anticheat_ranked_pass": false,
+    "full_windows_compat": false,
+    "native_pe_backend": true,
+    "real_binaries": true,
+    "simulated_ok": false,
+    "wine_proton_used": false
+  },
+  "component": "strawwu-nt+strawwu-runtime",
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
+    "no Wine/Proton substrate; execution_backend=native",
+    "no WinBox naming",
+    "no full Windows compatibility claim",
+    "no anti-cheat ranked pass claim",
+    "no 3A completion claim",
+    "mode=simulated never counts as PASS"
+  ],
+  "execution_backend": "native",
+  "failures": [],
+  "fixtures_dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures",
+  "generated_at": "2026-07-29T14:24:54Z",
+  "known_limitations": [
+    "public Win32 light-game demo PE launch + present evidence only",
+    "not full SuperTuxKart/OpenRA/3A gameplay coverage",
+    "no anti-cheat ranked verification"
+  ],
+  "product": "StrawNT",
+  "real_binaries": true,
+  "results": [
+    {
+      "backend": "native",
+      "binary": {
+        "bytes": 4608,
+        "machine": "Amd64",
+        "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/nt2-light2d-demo.exe",
+        "sha256": "b50e774db940f4dbbc42eeeedff65c95722f17d54f1285a363bf6a73891cb96c",
+        "source": "StrawNT public Win32 light-game demo PE fixture",
+        "subsystem": "WindowsGui"
+      },
+      "dimension": "2d",
+      "disclaimer": "launcher/present evidence only; not full gameplay; no 3A or anti-cheat claim",
+      "execution_backend": "native",
+      "id": "light2d-win-demo",
+      "kind": "lightweight_public_win_demo",
+      "launch_verified": true,
+      "mode": "real",
+      "name": "Public Win32 2D light-game demo",
+      "notes": "真實 Win32 light-game demo PE 經 StrawNT native 啟動並留下 present／截圖／marker／log 副作用",
+      "process": {
+        "cpu_executed": true,
+        "halt_reason": "ExitProcess",
+        "pid": 1000,
+        "session_id": "default"
+      },
+      "real_binary": true,
+      "scope": "launcher_present",
+      "side_effects": {
+        "compositor_frames": 5,
+        "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light2d-win-demo",
+        "log_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light2d-win-demo/launch.log",
+        "marker_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light2d-win-demo/light2d-marker.txt",
+        "present_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light2d-win-demo/nt-present.json",
+        "present_frames": 5,
+        "screenshot": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light2d-win-demo/pe3-window.ppm",
+        "stdout_marker": "STRAWNT_LIGHT2D_OK",
+        "title": "Light2D Win Demo",
+        "triangle_pixels": 63038
+      },
+      "status": "PASS"
+    },
+    {
+      "backend": "native",
+      "binary": {
+        "bytes": 4608,
+        "machine": "Amd64",
+        "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/nt2-light3d-demo.exe",
+        "sha256": "b3ec051015d52abfb37f9cb3549760f92e20918475b59dffb4c60fa0fd076d98",
+        "source": "StrawNT public Win32 light-game demo PE fixture",
+        "subsystem": "WindowsGui"
+      },
+      "dimension": "3d",
+      "disclaimer": "launcher/present evidence only; not full gameplay; no 3A or anti-cheat claim",
+      "execution_backend": "native",
+      "id": "light3d-win-demo",
+      "kind": "lightweight_public_win_demo",
+      "launch_verified": true,
+      "mode": "real",
+      "name": "Public Win32 3D-present light-game demo",
+      "notes": "真實 Win32 light-game demo PE 經 StrawNT native 啟動並留下 present／截圖／marker／log 副作用",
+      "process": {
+        "cpu_executed": true,
+        "halt_reason": "ExitProcess",
+        "pid": 1000,
+        "session_id": "default"
+      },
+      "real_binary": true,
+      "scope": "launcher_present",
+      "side_effects": {
+        "compositor_frames": 5,
+        "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light3d-win-demo",
+        "log_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light3d-win-demo/launch.log",
+        "marker_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light3d-win-demo/light3d-marker.txt",
+        "present_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light3d-win-demo/nt-present.json",
+        "present_frames": 5,
+        "screenshot": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/light3d-win-demo/pe3-window.ppm",
+        "stdout_marker": "STRAWNT_LIGHT3D_OK",
+        "title": "Light3D Win Demo",
+        "triangle_pixels": 63038
+      },
+      "status": "PASS"
+    }
+  ],
+  "schema": "strawnt-nt2-light-games/v1",
+  "side_effects": {
+    "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects"
+  },
+  "stage": "nt2-real-light-games",
+  "status": "PASS",
+  "summary": {
+    "native_backend_only": true,
+    "pass": 2,
+    "real_mode": 2,
+    "total": 2
+  },
+  "version": "0.7.1.35",
+  "cli_launch": {
+    "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt2-side-effects/cli-light2d/strawnt-run.log",
+    "backend": "native",
+    "mode": "real",
+    "binary": "tests/strawnt/fixtures/nt2-light2d-demo.exe"
+  }
+}
