@@ -1,0 +1,76 @@
+{
+  "schema": "strawwu-portable-cross-distro-matrix/v1",
+  "stage": "pc4-cross-distro-smoke",
+  "status": "PASS",
+  "version": "0.7.1.12",
+  "dist": "/mnt/data/code/project/StrawCoding/StrawWU-portable/components/packaging/portable/appimage/dist",
+  "generated_at": "2026-07-29T03:51:09Z",
+  "distros": [
+    {
+      "id": "ubuntu-24.04",
+      "image": "ubuntu:24.04",
+      "family": "debian",
+      "status": "PASS"
+    },
+    {
+      "id": "fedora-41",
+      "image": "fedora:41",
+      "family": "rpm",
+      "status": "PASS"
+    },
+    {
+      "id": "archlinux",
+      "image": "archlinux:latest",
+      "family": "arch",
+      "status": "PASS"
+    }
+  ],
+  "results": [
+    {
+      "id": "ubuntu-24.04",
+      "image": "ubuntu:24.04",
+      "family": "debian",
+      "status": "PASS",
+      "artifact_kind": "portable.tar.gz",
+      "version_output": "strawwu 0.4.0",
+      "status_output": "strawwu: status — runtime idle, 0 session(s), 0 app(s) registered",
+      "detail": "ok",
+      "checked_at": "2026-07-29T03:51:06Z"
+    },
+    {
+      "id": "fedora-41",
+      "image": "fedora:41",
+      "family": "rpm",
+      "status": "PASS",
+      "artifact_kind": "portable.tar.gz",
+      "version_output": "strawwu 0.4.0",
+      "status_output": "strawwu: status — runtime idle, 0 session(s), 0 app(s) registered",
+      "detail": "ok",
+      "checked_at": "2026-07-29T03:51:08Z"
+    },
+    {
+      "id": "archlinux",
+      "image": "archlinux:latest",
+      "family": "arch",
+      "status": "PASS",
+      "artifact_kind": "portable.tar.gz",
+      "version_output": "strawwu 0.4.0",
+      "status_output": "strawwu: status — runtime idle, 0 session(s), 0 app(s) registered",
+      "detail": "ok",
+      "checked_at": "2026-07-29T03:51:09Z"
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "pass": 3,
+    "fail": 0,
+    "skip": 0
+  },
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
+    "no Wine/Proton substrate",
+    "no WinBox naming",
+    "no full Windows compatibility claim",
+    "no physical Live USB / ISO hardware campaign"
+  ]
+}

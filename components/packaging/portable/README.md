@@ -53,11 +53,16 @@ test -f tests/portable/output/SHA256SUMS
 
 make test-portable-flatpak                     # Flatpak smoke → smoke-flatpak.json (PASS|PARTIAL)
 jq .status tests/portable/output/smoke-flatpak.json
+
+make test-portable-matrix                      # ≥3 distro containers → matrix.json
+jq .status tests/portable/output/matrix.json
+jq '.distros | length' tests/portable/output/matrix.json
 ```
 
 Full prefix `--version` / `status` without system `strawwu-*` debs is **pc1**.  
 AppImage／portable bundle + SHA256 + clean-container smoke is **pc2**.  
-Flatpak manifest + build；PE／session 需 host FS → 誠實 **PARTIAL** 是 **pc3**.
+Flatpak manifest + build；PE／session 需 host FS → 誠實 **PARTIAL** 是 **pc3**.  
+Cross-distro container matrix（Ubuntu LTS／Fedora／Arch；禁 ISO 實機）是 **pc4**.
 
 ## Explicit non-goals
 
