@@ -85,7 +85,8 @@ jq .status tests/portable/output/matrix.json
 
 ## 誠實非目標
 
-- 不宣稱完整 Windows 應用相容／反作弊排位通過／3A 全開
+- 不宣稱完整 Windows 應用相容／反作弊排位通過／官方 AC 簽章通過／3A 全開
+- 反作弊為探測矩陣（誠實 PARTIAL；grade A/B/C/F，Vanguard=F）；見 `tests/strawnt/output/nt4-anticheat.json`
 - 不使用 Wine／Proton 當底層
 - 不使用 `WinBox`／`winbox` 命名
 - 不提供／不依賴任何 OS ISO／桌面／kernel 產物

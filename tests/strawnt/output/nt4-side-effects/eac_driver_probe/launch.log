@@ -1,0 +1,4 @@
+strawnt anticheat probe id=eac_driver_probe type=EasyAntiCheat path=/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/anticheat/nt4-eac-probe.exe mode=real pid=1000 halt=Some("ExitProcess")
+stdout:
+STRAWNT_EAC_PROBE_OK
+

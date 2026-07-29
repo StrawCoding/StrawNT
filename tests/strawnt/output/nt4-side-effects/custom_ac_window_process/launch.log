@@ -1,0 +1,4 @@
+strawnt anticheat probe id=custom_ac_window_process type=CustomAC path=/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/anticheat/nt4-custom-ac-probe.exe mode=real pid=1000 halt=Some("ExitProcess")
+stdout:
+STRAWNT_CUSTOM_AC_PROBE_OK
+

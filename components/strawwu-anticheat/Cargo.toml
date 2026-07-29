@@ -2,7 +2,7 @@
 name = "strawwu-anticheat"
 version.workspace = true
 edition.workspace = true
-description = "StrawWU anti-cheat compatibility matrix — EAC/BattlEye/Vanguard probe stubs"
+description = "StrawNT anti-cheat compatibility matrix — EAC/BattlEye/Vanguard probe + honesty grades"
 license.workspace = true
 [dependencies]
 chrono = { version = "0.4", default-features = false, features = ["clock"] }

@@ -10,9 +10,11 @@ pub mod loader;
 pub mod cpu;
 
 pub use pe::{
-    PeFile, PeMachine, PeSubsystem, ImportEntry, Win32GuiDemoStrings,
-    build_real_console_fixture_pe, build_win32_console_mvp_pe, build_win32_gui_demo_pe,
-    build_win32_gui_mvp_pe, build_win32_light2d_game_demo_pe, build_win32_light3d_game_demo_pe,
+    AnticheatProbeStrings, PeFile, PeMachine, PeSubsystem, ImportEntry, Win32GuiDemoStrings,
+    build_real_console_fixture_pe, build_win32_anticheat_probe_pe, build_win32_battleye_probe_pe,
+    build_win32_console_mvp_pe, build_win32_custom_ac_probe_pe, build_win32_eac_probe_pe,
+    build_win32_gui_demo_pe, build_win32_gui_mvp_pe, build_win32_light2d_game_demo_pe,
+    build_win32_light3d_game_demo_pe,
 };
 pub use installer::{
     build_msi_package, build_pe4_installer_fixtures, build_sfx_installer, is_native_installer_blob,

@@ -693,6 +693,9 @@ test-portable-gx-graphics:
 test-strawnt-nt1-graphics:
 	bash tests/strawnt/nt1-real-graphics.sh
 
+test-strawnt-nt4-anticheat:
+	bash tests/strawnt/nt4-anticheat-honest.sh
+
 test-portable-gx-audio-input:
 	bash tests/portable/smoke-gx-audio-input.sh
 

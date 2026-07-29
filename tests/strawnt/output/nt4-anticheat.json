@@ -1,0 +1,973 @@
+{
+  "backend": "native",
+  "cases": [
+    {
+      "anticheat_type": "EasyAntiCheat",
+      "backend": "native",
+      "bridge_policy_side_effect": true,
+      "disclaimer": "PARTIAL only — does not guarantee ranked play or official AC signature pass",
+      "execution_backend": "native",
+      "grade": "B",
+      "name": "eac_driver_probe",
+      "notes": "driver stub via strawwu_ipc; DLL integrity partial; bridge seccomp applied; StrawNT surface-probe PE ran mode=real with host side effects",
+      "pe": {
+        "bytes": 4096,
+        "cpu_executed": true,
+        "disclaimer": "surface probe only — NOT vendor EAC/BE/Vanguard; no ranked/signature claim",
+        "halt_reason": "ExitProcess",
+        "machine": "Amd64",
+        "mode": "real",
+        "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/anticheat/nt4-eac-probe.exe",
+        "pid": 1000,
+        "real_binary": true,
+        "session_id": "default",
+        "sha256": "600d70112a498762eb8d8f618a2ad6fc47027e947b68b05365be318aa2487644",
+        "side_effects": {
+          "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/eac_driver_probe",
+          "host_files": [
+            "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/eac_driver_probe/eac-probe-marker.txt",
+            "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/eac_driver_probe/pe-stdout.txt"
+          ],
+          "log_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/eac_driver_probe/launch.log",
+          "marker_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/eac_driver_probe/eac-probe-marker.txt",
+          "stdout_marker": "STRAWNT_EAC_PROBE_OK"
+        },
+        "source": "StrawNT anticheat surface-probe PE fixture (not vendor AC)",
+        "subsystem": "WindowsCui"
+      },
+      "pe_mode": "real",
+      "probe_pass": 11,
+      "probe_ratio": 0.846,
+      "probe_total": 13,
+      "probes": [
+        {
+          "category": "DriverSignature",
+          "passed": true,
+          "probe_name": "eac_driver_loaded",
+          "response": "stub driver present via strawwu_ipc"
+        },
+        {
+          "category": "KernelCallback",
+          "passed": true,
+          "probe_name": "eac_kernel_callback",
+          "response": "callback stub registered"
+        },
+        {
+          "category": "DllIntegrity",
+          "passed": false,
+          "probe_name": "eac_dll_integrity",
+          "response": "DLL hash mismatch expected — PARTIAL"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": true,
+          "probe_name": "hidden_window_check",
+          "response": "no suspicious hidden windows detected in enum"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": true,
+          "probe_name": "overlay_window_check",
+          "response": "overlay windows filtered from enumeration"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": false,
+          "probe_name": "tool_window_visibility",
+          "response": "debug tool window visible — PARTIAL"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "process_list_filter",
+          "response": "host-side processes hidden from guest enumeration"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "module_list_filter",
+          "response": "injected modules not visible in LDR list"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "thread_enumeration",
+          "response": "bridge threads excluded from NtQuerySystemInformation"
+        },
+        {
+          "category": "KernelCallback",
+          "passed": true,
+          "probe_name": "bridge_seccomp_profile",
+          "response": "strawwu-bridge PolicySet profile=anticheat applied without crash"
+        },
+        {
+          "category": "KernelModuleScan",
+          "passed": true,
+          "probe_name": "bridge_block_init_module",
+          "response": "init_module decision=Deny"
+        },
+        {
+          "category": "DebuggerDetection",
+          "passed": true,
+          "probe_name": "bridge_block_ptrace",
+          "response": "ptrace decision=Deny"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "bridge_allow_openat",
+          "response": "openat decision=Allow (must remain Allow)"
+        }
+      ],
+      "real_probe_pe": true,
+      "status": "PARTIAL",
+      "substantive_verified": true
+    },
+    {
+      "anticheat_type": "BattlEye",
+      "backend": "native",
+      "bridge_policy_side_effect": true,
+      "disclaimer": "PARTIAL only — does not guarantee ranked play or official AC signature pass",
+      "execution_backend": "native",
+      "grade": "B",
+      "name": "battleye_init",
+      "notes": "kernel scan intercepted; process not crash; bridge policy deny init_module; StrawNT surface-probe PE ran mode=real with host side effects",
+      "pe": {
+        "bytes": 4096,
+        "cpu_executed": true,
+        "disclaimer": "surface probe only — NOT vendor EAC/BE/Vanguard; no ranked/signature claim",
+        "halt_reason": "ExitProcess",
+        "machine": "Amd64",
+        "mode": "real",
+        "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/anticheat/nt4-battleye-probe.exe",
+        "pid": 1000,
+        "real_binary": true,
+        "session_id": "default",
+        "sha256": "c0affd03b13fd7df5b5f05f866c6c543c58af0398bd9ee72d230ec1e84c24984",
+        "side_effects": {
+          "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/battleye_init",
+          "host_files": [
+            "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/battleye_init/be-probe-marker.txt",
+            "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/battleye_init/pe-stdout.txt"
+          ],
+          "log_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/battleye_init/launch.log",
+          "marker_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/battleye_init/be-probe-marker.txt",
+          "stdout_marker": "STRAWNT_BE_PROBE_OK"
+        },
+        "source": "StrawNT anticheat surface-probe PE fixture (not vendor AC)",
+        "subsystem": "WindowsCui"
+      },
+      "pe_mode": "real",
+      "probe_pass": 12,
+      "probe_ratio": 0.923,
+      "probe_total": 13,
+      "probes": [
+        {
+          "category": "KernelModuleScan",
+          "passed": true,
+          "probe_name": "be_kernel_scan",
+          "response": "scan intercepted by bridge"
+        },
+        {
+          "category": "DllIntegrity",
+          "passed": true,
+          "probe_name": "be_dll_check",
+          "response": "DLL integrity stub pass"
+        },
+        {
+          "category": "DebuggerDetection",
+          "passed": true,
+          "probe_name": "be_debugger_check",
+          "response": "NtQueryInformationProcess returns no debugger"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": true,
+          "probe_name": "hidden_window_check",
+          "response": "no suspicious hidden windows detected in enum"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": true,
+          "probe_name": "overlay_window_check",
+          "response": "overlay windows filtered from enumeration"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": false,
+          "probe_name": "tool_window_visibility",
+          "response": "debug tool window visible — PARTIAL"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "process_list_filter",
+          "response": "host-side processes hidden from guest enumeration"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "module_list_filter",
+          "response": "injected modules not visible in LDR list"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "thread_enumeration",
+          "response": "bridge threads excluded from NtQuerySystemInformation"
+        },
+        {
+          "category": "KernelCallback",
+          "passed": true,
+          "probe_name": "bridge_seccomp_profile",
+          "response": "strawwu-bridge PolicySet profile=anticheat applied without crash"
+        },
+        {
+          "category": "KernelModuleScan",
+          "passed": true,
+          "probe_name": "bridge_block_init_module",
+          "response": "init_module decision=Deny"
+        },
+        {
+          "category": "DebuggerDetection",
+          "passed": true,
+          "probe_name": "bridge_block_ptrace",
+          "response": "ptrace decision=Deny"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "bridge_allow_openat",
+          "response": "openat decision=Allow (must remain Allow)"
+        }
+      ],
+      "real_probe_pe": true,
+      "status": "PARTIAL",
+      "substantive_verified": true
+    },
+    {
+      "anticheat_type": "Vanguard",
+      "backend": "microvm",
+      "bridge_policy_side_effect": true,
+      "disclaimer": "PARTIAL only — does not guarantee ranked play or official AC signature pass",
+      "execution_backend": "microvm",
+      "grade": "F",
+      "name": "vanguard_tpm_probe",
+      "notes": "TPM stub partial; kernel driver not loaded — policy deny; grade F honest; no vendor Vanguard PE claimed — kernel/TPM remain grade F by policy",
+      "pe": null,
+      "pe_mode": "n/a",
+      "probe_pass": 10,
+      "probe_ratio": 0.769,
+      "probe_total": 13,
+      "probes": [
+        {
+          "category": "TpmCheck",
+          "passed": false,
+          "probe_name": "vanguard_tpm_probe",
+          "response": "TPM stub — PARTIAL, no real TPM attestation"
+        },
+        {
+          "category": "DriverSignature",
+          "passed": false,
+          "probe_name": "vanguard_kernel_driver",
+          "response": "kernel-mode driver not loaded — policy deny"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "vanguard_process_scan",
+          "response": "process list filtered"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": true,
+          "probe_name": "hidden_window_check",
+          "response": "no suspicious hidden windows detected in enum"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": true,
+          "probe_name": "overlay_window_check",
+          "response": "overlay windows filtered from enumeration"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": false,
+          "probe_name": "tool_window_visibility",
+          "response": "debug tool window visible — PARTIAL"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "process_list_filter",
+          "response": "host-side processes hidden from guest enumeration"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "module_list_filter",
+          "response": "injected modules not visible in LDR list"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "thread_enumeration",
+          "response": "bridge threads excluded from NtQuerySystemInformation"
+        },
+        {
+          "category": "KernelCallback",
+          "passed": true,
+          "probe_name": "bridge_seccomp_profile",
+          "response": "strawwu-bridge PolicySet profile=anticheat applied without crash"
+        },
+        {
+          "category": "KernelModuleScan",
+          "passed": true,
+          "probe_name": "bridge_block_init_module",
+          "response": "init_module decision=Deny"
+        },
+        {
+          "category": "DebuggerDetection",
+          "passed": true,
+          "probe_name": "bridge_block_ptrace",
+          "response": "ptrace decision=Deny"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "bridge_allow_openat",
+          "response": "openat decision=Allow (must remain Allow)"
+        }
+      ],
+      "real_probe_pe": false,
+      "status": "PARTIAL",
+      "substantive_verified": true
+    },
+    {
+      "anticheat_type": "CustomAC",
+      "backend": "native",
+      "bridge_policy_side_effect": true,
+      "disclaimer": "PARTIAL only — does not guarantee ranked play or official AC signature pass",
+      "execution_backend": "native",
+      "grade": "B",
+      "name": "custom_ac_window_process",
+      "notes": "custom window/process/debugger stubs; game syscall profile; no ranked claim; StrawNT surface-probe PE ran mode=real with host side effects",
+      "pe": {
+        "bytes": 4096,
+        "cpu_executed": true,
+        "disclaimer": "surface probe only — NOT vendor EAC/BE/Vanguard; no ranked/signature claim",
+        "halt_reason": "ExitProcess",
+        "machine": "Amd64",
+        "mode": "real",
+        "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/anticheat/nt4-custom-ac-probe.exe",
+        "pid": 1000,
+        "real_binary": true,
+        "session_id": "default",
+        "sha256": "03d2b8dee0c347a9b49cb168f6b20121bd5854211dc47f48b0753445af4dc763",
+        "side_effects": {
+          "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/custom_ac_window_process",
+          "host_files": [
+            "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/custom_ac_window_process/custom-ac-probe-marker.txt",
+            "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/custom_ac_window_process/pe-stdout.txt"
+          ],
+          "log_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/custom_ac_window_process/launch.log",
+          "marker_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/custom_ac_window_process/custom-ac-probe-marker.txt",
+          "stdout_marker": "STRAWNT_CUSTOM_AC_PROBE_OK"
+        },
+        "source": "StrawNT anticheat surface-probe PE fixture (not vendor AC)",
+        "subsystem": "WindowsCui"
+      },
+      "pe_mode": "real",
+      "probe_pass": 10,
+      "probe_ratio": 0.909,
+      "probe_total": 11,
+      "probes": [
+        {
+          "category": "WindowEnumeration",
+          "passed": true,
+          "probe_name": "hidden_window_check",
+          "response": "no suspicious hidden windows detected in enum"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": true,
+          "probe_name": "overlay_window_check",
+          "response": "overlay windows filtered from enumeration"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": false,
+          "probe_name": "tool_window_visibility",
+          "response": "debug tool window visible — PARTIAL"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "process_list_filter",
+          "response": "host-side processes hidden from guest enumeration"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "module_list_filter",
+          "response": "injected modules not visible in LDR list"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "thread_enumeration",
+          "response": "bridge threads excluded from NtQuerySystemInformation"
+        },
+        {
+          "category": "DebuggerDetection",
+          "passed": true,
+          "probe_name": "custom_debugger_check",
+          "response": "NtQueryInformationProcess stub: no debugger attached"
+        },
+        {
+          "category": "KernelCallback",
+          "passed": true,
+          "probe_name": "bridge_seccomp_profile",
+          "response": "strawwu-bridge PolicySet profile=game applied without crash"
+        },
+        {
+          "category": "KernelModuleScan",
+          "passed": true,
+          "probe_name": "bridge_block_init_module",
+          "response": "init_module decision=Allow"
+        },
+        {
+          "category": "DebuggerDetection",
+          "passed": true,
+          "probe_name": "bridge_block_ptrace",
+          "response": "ptrace decision=Deny"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "bridge_allow_openat",
+          "response": "openat decision=Allow (must remain Allow)"
+        }
+      ],
+      "real_probe_pe": true,
+      "status": "PARTIAL",
+      "substantive_verified": true
+    }
+  ],
+  "claims": {
+    "aaa_claimed": false,
+    "anti_cheat_claimed": false,
+    "anticheat_ranked_pass": false,
+    "full_windows_compat": false,
+    "native_pe_backend": true,
+    "official_ac_signature_pass": false,
+    "ranked_pass_claimed": false,
+    "real_binaries": true,
+    "simulated_ok": false,
+    "wine_proton_used": false
+  },
+  "component": "strawwu-anticheat+strawwu-nt+strawwu-runtime",
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
+    "no Wine/Proton substrate; execution_backend=native",
+    "no WinBox naming",
+    "no full Windows compatibility claim",
+    "no anti-cheat ranked pass claim",
+    "no official AC signature pass claim",
+    "no 3A completion claim",
+    "mode=simulated never elevated to top-level PASS"
+  ],
+  "execution_backend": "native",
+  "failures": [],
+  "fixtures_dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/anticheat",
+  "generated_at": "2026-07-29T14:59:46Z",
+  "known_limitations": [
+    "StrawNT surface-probe PEs + ProbeEngine + bridge PolicySet — NOT vendor EAC/BattlEye/Vanguard binaries",
+    "goal is run-without-crash + honest A/B/C/F grades (anti-cheat cap ≤B)",
+    "never claims ranked play or official AC signature pass",
+    "Vanguard kernel/TPM remain grade F by policy",
+    "top-level PASS forbidden for anticheat honesty matrix"
+  ],
+  "product": "StrawNT",
+  "real_binaries": true,
+  "results": [
+    {
+      "anticheat_type": "EasyAntiCheat",
+      "backend": "native",
+      "bridge_policy_side_effect": true,
+      "disclaimer": "PARTIAL only — does not guarantee ranked play or official AC signature pass",
+      "execution_backend": "native",
+      "grade": "B",
+      "name": "eac_driver_probe",
+      "notes": "driver stub via strawwu_ipc; DLL integrity partial; bridge seccomp applied; StrawNT surface-probe PE ran mode=real with host side effects",
+      "pe": {
+        "bytes": 4096,
+        "cpu_executed": true,
+        "disclaimer": "surface probe only — NOT vendor EAC/BE/Vanguard; no ranked/signature claim",
+        "halt_reason": "ExitProcess",
+        "machine": "Amd64",
+        "mode": "real",
+        "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/anticheat/nt4-eac-probe.exe",
+        "pid": 1000,
+        "real_binary": true,
+        "session_id": "default",
+        "sha256": "600d70112a498762eb8d8f618a2ad6fc47027e947b68b05365be318aa2487644",
+        "side_effects": {
+          "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/eac_driver_probe",
+          "host_files": [
+            "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/eac_driver_probe/eac-probe-marker.txt",
+            "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/eac_driver_probe/pe-stdout.txt"
+          ],
+          "log_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/eac_driver_probe/launch.log",
+          "marker_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/eac_driver_probe/eac-probe-marker.txt",
+          "stdout_marker": "STRAWNT_EAC_PROBE_OK"
+        },
+        "source": "StrawNT anticheat surface-probe PE fixture (not vendor AC)",
+        "subsystem": "WindowsCui"
+      },
+      "pe_mode": "real",
+      "probe_pass": 11,
+      "probe_ratio": 0.846,
+      "probe_total": 13,
+      "probes": [
+        {
+          "category": "DriverSignature",
+          "passed": true,
+          "probe_name": "eac_driver_loaded",
+          "response": "stub driver present via strawwu_ipc"
+        },
+        {
+          "category": "KernelCallback",
+          "passed": true,
+          "probe_name": "eac_kernel_callback",
+          "response": "callback stub registered"
+        },
+        {
+          "category": "DllIntegrity",
+          "passed": false,
+          "probe_name": "eac_dll_integrity",
+          "response": "DLL hash mismatch expected — PARTIAL"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": true,
+          "probe_name": "hidden_window_check",
+          "response": "no suspicious hidden windows detected in enum"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": true,
+          "probe_name": "overlay_window_check",
+          "response": "overlay windows filtered from enumeration"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": false,
+          "probe_name": "tool_window_visibility",
+          "response": "debug tool window visible — PARTIAL"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "process_list_filter",
+          "response": "host-side processes hidden from guest enumeration"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "module_list_filter",
+          "response": "injected modules not visible in LDR list"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "thread_enumeration",
+          "response": "bridge threads excluded from NtQuerySystemInformation"
+        },
+        {
+          "category": "KernelCallback",
+          "passed": true,
+          "probe_name": "bridge_seccomp_profile",
+          "response": "strawwu-bridge PolicySet profile=anticheat applied without crash"
+        },
+        {
+          "category": "KernelModuleScan",
+          "passed": true,
+          "probe_name": "bridge_block_init_module",
+          "response": "init_module decision=Deny"
+        },
+        {
+          "category": "DebuggerDetection",
+          "passed": true,
+          "probe_name": "bridge_block_ptrace",
+          "response": "ptrace decision=Deny"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "bridge_allow_openat",
+          "response": "openat decision=Allow (must remain Allow)"
+        }
+      ],
+      "real_probe_pe": true,
+      "status": "PARTIAL",
+      "substantive_verified": true
+    },
+    {
+      "anticheat_type": "BattlEye",
+      "backend": "native",
+      "bridge_policy_side_effect": true,
+      "disclaimer": "PARTIAL only — does not guarantee ranked play or official AC signature pass",
+      "execution_backend": "native",
+      "grade": "B",
+      "name": "battleye_init",
+      "notes": "kernel scan intercepted; process not crash; bridge policy deny init_module; StrawNT surface-probe PE ran mode=real with host side effects",
+      "pe": {
+        "bytes": 4096,
+        "cpu_executed": true,
+        "disclaimer": "surface probe only — NOT vendor EAC/BE/Vanguard; no ranked/signature claim",
+        "halt_reason": "ExitProcess",
+        "machine": "Amd64",
+        "mode": "real",
+        "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/anticheat/nt4-battleye-probe.exe",
+        "pid": 1000,
+        "real_binary": true,
+        "session_id": "default",
+        "sha256": "c0affd03b13fd7df5b5f05f866c6c543c58af0398bd9ee72d230ec1e84c24984",
+        "side_effects": {
+          "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/battleye_init",
+          "host_files": [
+            "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/battleye_init/be-probe-marker.txt",
+            "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/battleye_init/pe-stdout.txt"
+          ],
+          "log_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/battleye_init/launch.log",
+          "marker_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/battleye_init/be-probe-marker.txt",
+          "stdout_marker": "STRAWNT_BE_PROBE_OK"
+        },
+        "source": "StrawNT anticheat surface-probe PE fixture (not vendor AC)",
+        "subsystem": "WindowsCui"
+      },
+      "pe_mode": "real",
+      "probe_pass": 12,
+      "probe_ratio": 0.923,
+      "probe_total": 13,
+      "probes": [
+        {
+          "category": "KernelModuleScan",
+          "passed": true,
+          "probe_name": "be_kernel_scan",
+          "response": "scan intercepted by bridge"
+        },
+        {
+          "category": "DllIntegrity",
+          "passed": true,
+          "probe_name": "be_dll_check",
+          "response": "DLL integrity stub pass"
+        },
+        {
+          "category": "DebuggerDetection",
+          "passed": true,
+          "probe_name": "be_debugger_check",
+          "response": "NtQueryInformationProcess returns no debugger"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": true,
+          "probe_name": "hidden_window_check",
+          "response": "no suspicious hidden windows detected in enum"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": true,
+          "probe_name": "overlay_window_check",
+          "response": "overlay windows filtered from enumeration"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": false,
+          "probe_name": "tool_window_visibility",
+          "response": "debug tool window visible — PARTIAL"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "process_list_filter",
+          "response": "host-side processes hidden from guest enumeration"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "module_list_filter",
+          "response": "injected modules not visible in LDR list"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "thread_enumeration",
+          "response": "bridge threads excluded from NtQuerySystemInformation"
+        },
+        {
+          "category": "KernelCallback",
+          "passed": true,
+          "probe_name": "bridge_seccomp_profile",
+          "response": "strawwu-bridge PolicySet profile=anticheat applied without crash"
+        },
+        {
+          "category": "KernelModuleScan",
+          "passed": true,
+          "probe_name": "bridge_block_init_module",
+          "response": "init_module decision=Deny"
+        },
+        {
+          "category": "DebuggerDetection",
+          "passed": true,
+          "probe_name": "bridge_block_ptrace",
+          "response": "ptrace decision=Deny"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "bridge_allow_openat",
+          "response": "openat decision=Allow (must remain Allow)"
+        }
+      ],
+      "real_probe_pe": true,
+      "status": "PARTIAL",
+      "substantive_verified": true
+    },
+    {
+      "anticheat_type": "Vanguard",
+      "backend": "microvm",
+      "bridge_policy_side_effect": true,
+      "disclaimer": "PARTIAL only — does not guarantee ranked play or official AC signature pass",
+      "execution_backend": "microvm",
+      "grade": "F",
+      "name": "vanguard_tpm_probe",
+      "notes": "TPM stub partial; kernel driver not loaded — policy deny; grade F honest; no vendor Vanguard PE claimed — kernel/TPM remain grade F by policy",
+      "pe": null,
+      "pe_mode": "n/a",
+      "probe_pass": 10,
+      "probe_ratio": 0.769,
+      "probe_total": 13,
+      "probes": [
+        {
+          "category": "TpmCheck",
+          "passed": false,
+          "probe_name": "vanguard_tpm_probe",
+          "response": "TPM stub — PARTIAL, no real TPM attestation"
+        },
+        {
+          "category": "DriverSignature",
+          "passed": false,
+          "probe_name": "vanguard_kernel_driver",
+          "response": "kernel-mode driver not loaded — policy deny"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "vanguard_process_scan",
+          "response": "process list filtered"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": true,
+          "probe_name": "hidden_window_check",
+          "response": "no suspicious hidden windows detected in enum"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": true,
+          "probe_name": "overlay_window_check",
+          "response": "overlay windows filtered from enumeration"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": false,
+          "probe_name": "tool_window_visibility",
+          "response": "debug tool window visible — PARTIAL"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "process_list_filter",
+          "response": "host-side processes hidden from guest enumeration"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "module_list_filter",
+          "response": "injected modules not visible in LDR list"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "thread_enumeration",
+          "response": "bridge threads excluded from NtQuerySystemInformation"
+        },
+        {
+          "category": "KernelCallback",
+          "passed": true,
+          "probe_name": "bridge_seccomp_profile",
+          "response": "strawwu-bridge PolicySet profile=anticheat applied without crash"
+        },
+        {
+          "category": "KernelModuleScan",
+          "passed": true,
+          "probe_name": "bridge_block_init_module",
+          "response": "init_module decision=Deny"
+        },
+        {
+          "category": "DebuggerDetection",
+          "passed": true,
+          "probe_name": "bridge_block_ptrace",
+          "response": "ptrace decision=Deny"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "bridge_allow_openat",
+          "response": "openat decision=Allow (must remain Allow)"
+        }
+      ],
+      "real_probe_pe": false,
+      "status": "PARTIAL",
+      "substantive_verified": true
+    },
+    {
+      "anticheat_type": "CustomAC",
+      "backend": "native",
+      "bridge_policy_side_effect": true,
+      "disclaimer": "PARTIAL only — does not guarantee ranked play or official AC signature pass",
+      "execution_backend": "native",
+      "grade": "B",
+      "name": "custom_ac_window_process",
+      "notes": "custom window/process/debugger stubs; game syscall profile; no ranked claim; StrawNT surface-probe PE ran mode=real with host side effects",
+      "pe": {
+        "bytes": 4096,
+        "cpu_executed": true,
+        "disclaimer": "surface probe only — NOT vendor EAC/BE/Vanguard; no ranked/signature claim",
+        "halt_reason": "ExitProcess",
+        "machine": "Amd64",
+        "mode": "real",
+        "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/anticheat/nt4-custom-ac-probe.exe",
+        "pid": 1000,
+        "real_binary": true,
+        "session_id": "default",
+        "sha256": "03d2b8dee0c347a9b49cb168f6b20121bd5854211dc47f48b0753445af4dc763",
+        "side_effects": {
+          "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/custom_ac_window_process",
+          "host_files": [
+            "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/custom_ac_window_process/custom-ac-probe-marker.txt",
+            "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/custom_ac_window_process/pe-stdout.txt"
+          ],
+          "log_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/custom_ac_window_process/launch.log",
+          "marker_file": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects/custom_ac_window_process/custom-ac-probe-marker.txt",
+          "stdout_marker": "STRAWNT_CUSTOM_AC_PROBE_OK"
+        },
+        "source": "StrawNT anticheat surface-probe PE fixture (not vendor AC)",
+        "subsystem": "WindowsCui"
+      },
+      "pe_mode": "real",
+      "probe_pass": 10,
+      "probe_ratio": 0.909,
+      "probe_total": 11,
+      "probes": [
+        {
+          "category": "WindowEnumeration",
+          "passed": true,
+          "probe_name": "hidden_window_check",
+          "response": "no suspicious hidden windows detected in enum"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": true,
+          "probe_name": "overlay_window_check",
+          "response": "overlay windows filtered from enumeration"
+        },
+        {
+          "category": "WindowEnumeration",
+          "passed": false,
+          "probe_name": "tool_window_visibility",
+          "response": "debug tool window visible — PARTIAL"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "process_list_filter",
+          "response": "host-side processes hidden from guest enumeration"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "module_list_filter",
+          "response": "injected modules not visible in LDR list"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "thread_enumeration",
+          "response": "bridge threads excluded from NtQuerySystemInformation"
+        },
+        {
+          "category": "DebuggerDetection",
+          "passed": true,
+          "probe_name": "custom_debugger_check",
+          "response": "NtQueryInformationProcess stub: no debugger attached"
+        },
+        {
+          "category": "KernelCallback",
+          "passed": true,
+          "probe_name": "bridge_seccomp_profile",
+          "response": "strawwu-bridge PolicySet profile=game applied without crash"
+        },
+        {
+          "category": "KernelModuleScan",
+          "passed": true,
+          "probe_name": "bridge_block_init_module",
+          "response": "init_module decision=Allow"
+        },
+        {
+          "category": "DebuggerDetection",
+          "passed": true,
+          "probe_name": "bridge_block_ptrace",
+          "response": "ptrace decision=Deny"
+        },
+        {
+          "category": "ProcessScan",
+          "passed": true,
+          "probe_name": "bridge_allow_openat",
+          "response": "openat decision=Allow (must remain Allow)"
+        }
+      ],
+      "real_probe_pe": true,
+      "status": "PARTIAL",
+      "substantive_verified": true
+    }
+  ],
+  "schema": "strawnt-nt4-anticheat/v1",
+  "side_effects": {
+    "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt4-side-effects"
+  },
+  "source": {
+    "crate": "strawwu-anticheat",
+    "raw_schema": "strawwu-anticheat-substantive/v1",
+    "verification_stage": "nt4-anticheat-honest",
+    "verify_bin": "nt-anticheat-verify"
+  },
+  "stage": "nt4-anticheat-honest",
+  "status": "PARTIAL",
+  "summary": {
+    "bridge_policy_side_effects": 4,
+    "grades_present": [
+      "B",
+      "F"
+    ],
+    "hub_a_forbidden": true,
+    "overall_from_engine": "PARTIAL",
+    "partial_or_fail_only": true,
+    "real_probe_pe_count": 3,
+    "total_cases": 4,
+    "vanguard_grade_f": true
+  },
+  "version": "0.7.1.37"
+}

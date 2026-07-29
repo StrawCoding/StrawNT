@@ -1,0 +1,4 @@
+strawnt anticheat probe id=battleye_init type=BattlEye path=/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/fixtures/anticheat/nt4-battleye-probe.exe mode=real pid=1000 halt=Some("ExitProcess")
+stdout:
+STRAWNT_BE_PROBE_OK
+

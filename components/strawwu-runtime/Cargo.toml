@@ -13,6 +13,7 @@ strawwu-bridge = { path = "../strawwu-bridge" }
 strawwu-nt = { path = "../strawwu-nt" }
 strawwu-graphics = { path = "../strawwu-graphics" }
 strawwu-audio = { path = "../strawwu-audio" }
+strawwu-anticheat = { path = "../strawwu-anticheat" }
 
 [[bin]]
 name = "golden-apps-verify"
@@ -25,5 +26,9 @@ path = "src/bin/nt_graphics_verify.rs"
 [[bin]]
 name = "nt-light-games-verify"
 path = "src/bin/nt_light_games_verify.rs"
+
+[[bin]]
+name = "nt-anticheat-verify"
+path = "src/bin/nt_anticheat_verify.rs"
 
 [dev-dependencies]

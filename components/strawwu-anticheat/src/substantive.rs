@@ -86,7 +86,7 @@ fn status_for_ratio(ratio: f64) -> CompatStatus {
     }
 }
 
-fn build_case(name: &str, ac_type: AnticheatType, notes: &str) -> SubstantiveCase {
+fn build_case(name: &str, ac_type: AnticheatType, notes: &str, stage: &str) -> SubstantiveCase {
     let results = run_substantive_probes(ac_type);
     let pass = results.iter().filter(|r| r.passed).count();
     let total = results.len();
@@ -118,7 +118,7 @@ fn build_case(name: &str, ac_type: AnticheatType, notes: &str) -> SubstantiveCas
         evidence: SubstantiveEvidence {
             verified_at: Utc::now().format("%Y-%m-%dT%H:%M:%SZ").to_string(),
             verification_method: "ProbeEngine + strawwu-bridge PolicySet (native)".into(),
-            verification_stage: "gx4-anticheat-matrix".into(),
+            verification_stage: stage.into(),
             probe_pass: pass,
             probe_total: total,
             probes: results.iter().map(probe_to_evidence).collect(),
@@ -132,26 +132,37 @@ fn build_case(name: &str, ac_type: AnticheatType, notes: &str) -> SubstantiveCas
 }
 
 pub fn generate_substantive_report(project_version: &str) -> SubstantiveReport {
+    generate_substantive_report_for_stage(project_version, "gx4-anticheat-matrix")
+}
+
+pub fn generate_substantive_report_for_stage(
+    project_version: &str,
+    stage: &str,
+) -> SubstantiveReport {
     let cases = vec![
         build_case(
             "eac_driver_probe",
             AnticheatType::EasyAntiCheat,
             "driver stub via strawwu_ipc; DLL integrity partial; bridge seccomp applied",
+            stage,
         ),
         build_case(
             "battleye_init",
             AnticheatType::BattlEye,
             "kernel scan intercepted; process not crash; bridge policy deny init_module",
+            stage,
         ),
         build_case(
             "vanguard_tpm_probe",
             AnticheatType::Vanguard,
             "TPM stub partial; kernel driver not loaded — policy deny; grade F honest",
+            stage,
         ),
         build_case(
             "custom_ac_window_process",
             AnticheatType::CustomAc,
             "custom window/process/debugger stubs; game syscall profile; no ranked claim",
+            stage,
         ),
     ];
 
@@ -235,5 +246,22 @@ mod tests {
         assert!(json.contains("eac_driver_probe"));
         assert!(json.contains("custom_ac_window_process"));
         assert!(json.contains("gx4-anticheat-matrix"));
+    }
+
+    #[test]
+    fn nt4_stage_name_propagates() {
+        let report = generate_substantive_report_for_stage("0.7.1.37", "nt4-anticheat-honest");
+        assert_eq!(report.overall, "PARTIAL");
+        for case in &report.cases {
+            assert_eq!(case.evidence.verification_stage, "nt4-anticheat-honest");
+            assert_ne!(case.status, "PASS");
+            assert_ne!(case.grade, "A");
+        }
+        let vg = report
+            .cases
+            .iter()
+            .find(|c| c.name == "vanguard_tpm_probe")
+            .unwrap();
+        assert_eq!(vg.grade, "F");
     }
 }

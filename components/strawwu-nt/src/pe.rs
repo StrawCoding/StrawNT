@@ -657,6 +657,21 @@ mod tests {
             assert_eq!(pe.entry_point, 0x1000);
         }
     }
+
+    #[test]
+    fn win32_anticheat_probe_fixtures_parse_as_amd64_cui() {
+        for data in [
+            build_win32_eac_probe_pe(),
+            build_win32_battleye_probe_pe(),
+            build_win32_custom_ac_probe_pe(),
+        ] {
+            let pe = PeFile::parse(&data).unwrap();
+            assert!(pe.is_valid);
+            assert_eq!(pe.machine, PeMachine::Amd64);
+            assert_eq!(pe.subsystem, PeSubsystem::WindowsCui);
+            assert_eq!(pe.entry_point, 0x1000);
+        }
+    }
 }
 
 /// Minimal AMD64 console PE with real x86-64 opcodes that call fixed
@@ -1039,6 +1054,187 @@ pub fn build_win32_light3d_game_demo_pe() -> Vec<u8> {
         closed_msg: b"STRAWNT_LIGHT3D_CLOSED\0",
         marker_filename: b"light3d-marker.txt\0",
     })
+}
+
+/// Strings for StrawNT anticheat surface-probe PE fixtures.
+///
+/// These are **not** vendor EAC/BattlEye/Vanguard binaries — they are StrawNT
+/// native PE probes exercising process/file surfaces that AC suites commonly
+/// touch, for honest run-without-crash grading only.
+#[derive(Debug, Clone, Copy)]
+pub struct AnticheatProbeStrings<'a> {
+    pub file_marker: &'a [u8],
+    pub marker_filename: &'a [u8],
+}
+
+/// EasyAntiCheat-surface probe PE (process id + marker file + stdout).
+pub fn build_win32_eac_probe_pe() -> Vec<u8> {
+    build_win32_anticheat_probe_pe(&AnticheatProbeStrings {
+        file_marker: b"STRAWNT_EAC_PROBE_OK\n",
+        marker_filename: b"eac-probe-marker.txt\0",
+    })
+}
+
+/// BattlEye-surface probe PE (process id + marker file + stdout).
+pub fn build_win32_battleye_probe_pe() -> Vec<u8> {
+    build_win32_anticheat_probe_pe(&AnticheatProbeStrings {
+        file_marker: b"STRAWNT_BE_PROBE_OK\n",
+        marker_filename: b"be-probe-marker.txt\0",
+    })
+}
+
+/// Custom AC surface probe PE (process id + marker file + stdout).
+pub fn build_win32_custom_ac_probe_pe() -> Vec<u8> {
+    build_win32_anticheat_probe_pe(&AnticheatProbeStrings {
+        file_marker: b"STRAWNT_CUSTOM_AC_PROBE_OK\n",
+        marker_filename: b"custom-ac-probe-marker.txt\0",
+    })
+}
+
+/// Parameterized AMD64 console PE used as anticheat surface probes.
+///
+/// Exercises GetCurrentProcessId / CreateFileA / WriteFile / CloseHandle /
+/// GetStdHandle / ExitProcess — host-observable side effects, no Wine.
+pub fn build_win32_anticheat_probe_pe(strings: &AnticheatProbeStrings<'_>) -> Vec<u8> {
+    use crate::cpu::{
+        STUB_CLOSE_HANDLE, STUB_CREATE_FILE_A, STUB_EXIT_PROCESS, STUB_GET_CURRENT_PROCESS_ID,
+        STUB_GET_STD_HANDLE, STUB_WRITE_FILE,
+    };
+
+    let marker = strings.file_marker;
+    let filename = strings.marker_filename;
+    assert!(
+        marker.len() <= 255,
+        "anticheat probe marker too long for imm8 WriteFile length"
+    );
+
+    let mut pe = vec![0u8; 0x1000];
+    pe[0] = 0x4D;
+    pe[1] = 0x5A;
+    pe[0x3C..0x40].copy_from_slice(&0x50u32.to_le_bytes());
+
+    let pe_off = 0x50usize;
+    pe[pe_off..pe_off + 4].copy_from_slice(&PE_SIGNATURE);
+
+    let coff = pe_off + 4;
+    pe[coff..coff + 2].copy_from_slice(&(PeMachine::Amd64 as u16).to_le_bytes());
+    pe[coff + 2..coff + 4].copy_from_slice(&1u16.to_le_bytes());
+    pe[coff + 16..coff + 18].copy_from_slice(&240u16.to_le_bytes());
+    pe[coff + 18..coff + 20].copy_from_slice(&0x0022u16.to_le_bytes());
+
+    let opt = coff + 20;
+    pe[opt..opt + 2].copy_from_slice(&0x020Bu16.to_le_bytes());
+    pe[opt + 16..opt + 20].copy_from_slice(&0x1000u32.to_le_bytes());
+    pe[opt + 24..opt + 32].copy_from_slice(&0x0000_0001_4000_0000u64.to_le_bytes());
+    pe[opt + 32..opt + 36].copy_from_slice(&0x1000u32.to_le_bytes());
+    pe[opt + 36..opt + 40].copy_from_slice(&0x200u32.to_le_bytes());
+    pe[opt + 56..opt + 60].copy_from_slice(&0x4000u32.to_le_bytes());
+    pe[opt + 60..opt + 64].copy_from_slice(&0x200u32.to_le_bytes());
+    pe[opt + 68..opt + 70].copy_from_slice(&(PeSubsystem::WindowsCui as u16).to_le_bytes());
+    pe[opt + 108..opt + 112].copy_from_slice(&16u32.to_le_bytes());
+
+    let sec = opt + 240;
+    pe[sec..sec + 5].copy_from_slice(b".text");
+    pe[sec + 8..sec + 12].copy_from_slice(&0x1000u32.to_le_bytes());
+    pe[sec + 12..sec + 16].copy_from_slice(&0x1000u32.to_le_bytes());
+    pe[sec + 16..sec + 20].copy_from_slice(&0x800u32.to_le_bytes());
+    pe[sec + 20..sec + 24].copy_from_slice(&0x200u32.to_le_bytes());
+    pe[sec + 36..sec + 40].copy_from_slice(&0x6000_0020u32.to_le_bytes());
+
+    let text = 0x200usize;
+    let code_capacity = 256usize;
+    let marker_off = code_capacity;
+    let file_off = marker_off + marker.len();
+    let written_off = file_off + filename.len();
+
+    let mut code: Vec<u8> = Vec::with_capacity(code_capacity);
+    let emit = |code: &mut Vec<u8>, bytes: &[u8]| code.extend_from_slice(bytes);
+    let emit_u64 = |code: &mut Vec<u8>, v: u64| {
+        code.push(0x48);
+        code.push(0xB8);
+        code.extend_from_slice(&v.to_le_bytes());
+    };
+    let emit_call_rax = |code: &mut Vec<u8>| emit(code, &[0xFF, 0xD0]);
+    let emit_lea = |code: &mut Vec<u8>, rex_reg: u8, modrm_reg: u8, target_off: usize| {
+        code.push(rex_reg);
+        code.push(0x8D);
+        code.push(modrm_reg);
+        let disp = (target_off as i32) - ((code.len() as i32) + 4);
+        code.extend_from_slice(&disp.to_le_bytes());
+    };
+
+    // sub rsp, 0x48
+    emit(&mut code, &[0x48, 0x83, 0xEC, 0x48]);
+
+    // GetCurrentProcessId() — process-scan surface AC suites commonly touch
+    emit_u64(&mut code, STUB_GET_CURRENT_PROCESS_ID);
+    emit_call_rax(&mut code);
+
+    // CreateFileA(marker_filename)
+    emit_lea(&mut code, 0x48, 0x0D, file_off);
+    emit_u64(&mut code, STUB_CREATE_FILE_A);
+    emit_call_rax(&mut code);
+    emit(&mut code, &[0x48, 0x89, 0x44, 0x24, 0x28]); // mov [rsp+0x28], rax
+
+    // WriteFile(fh, marker, len, &written, NULL)
+    emit(&mut code, &[0x48, 0x89, 0xC1]);
+    emit_lea(&mut code, 0x48, 0x15, marker_off);
+    emit(
+        &mut code,
+        &[0x41, 0xB8, marker.len() as u8, 0x00, 0x00, 0x00],
+    );
+    emit_lea(&mut code, 0x4C, 0x0D, written_off);
+    emit(
+        &mut code,
+        &[0x48, 0xC7, 0x44, 0x24, 0x20, 0x00, 0x00, 0x00, 0x00],
+    );
+    emit_u64(&mut code, STUB_WRITE_FILE);
+    emit_call_rax(&mut code);
+
+    // CloseHandle(fh)
+    emit(&mut code, &[0x48, 0x8B, 0x4C, 0x24, 0x28]);
+    emit_u64(&mut code, STUB_CLOSE_HANDLE);
+    emit_call_rax(&mut code);
+
+    // GetStdHandle(-11); WriteFile(stdout, marker, ...)
+    emit(&mut code, &[0xB9, 0xF5, 0xFF, 0xFF, 0xFF]);
+    emit_u64(&mut code, STUB_GET_STD_HANDLE);
+    emit_call_rax(&mut code);
+    emit(&mut code, &[0x48, 0x89, 0xC1]);
+    emit_lea(&mut code, 0x48, 0x15, marker_off);
+    emit(
+        &mut code,
+        &[0x41, 0xB8, marker.len() as u8, 0x00, 0x00, 0x00],
+    );
+    emit_lea(&mut code, 0x4C, 0x0D, written_off);
+    emit(
+        &mut code,
+        &[0x48, 0xC7, 0x44, 0x24, 0x20, 0x00, 0x00, 0x00, 0x00],
+    );
+    emit_u64(&mut code, STUB_WRITE_FILE);
+    emit_call_rax(&mut code);
+
+    // ExitProcess(0)
+    emit(&mut code, &[0x31, 0xC9]);
+    emit_u64(&mut code, STUB_EXIT_PROCESS);
+    emit_call_rax(&mut code);
+
+    assert!(
+        code.len() <= code_capacity,
+        "anticheat probe code {} exceeds pad {}",
+        code.len(),
+        code_capacity
+    );
+    while code.len() < code_capacity {
+        code.push(0x90);
+    }
+
+    pe[text..text + code.len()].copy_from_slice(&code);
+    pe[text + marker_off..text + marker_off + marker.len()].copy_from_slice(marker);
+    pe[text + file_off..text + file_off + filename.len()].copy_from_slice(filename);
+    pe[text + written_off..text + written_off + 4].copy_from_slice(&0u32.to_le_bytes());
+
+    pe
 }
 
 /// Parameterized Win32 GUI demo PE used by pe3 MVP and nt2 light-game demos.
