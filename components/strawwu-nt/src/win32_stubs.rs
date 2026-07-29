@@ -389,8 +389,8 @@ impl Win32StubRegistry {
 
     fn register_kernel32_stubs(&mut self) {
         let funcs = [
-            ("GetModuleHandleA", StubStatus::Stub),
-            ("GetModuleHandleW", StubStatus::Stub),
+            ("GetModuleHandleA", StubStatus::Implemented),
+            ("GetModuleHandleW", StubStatus::Implemented),
             ("GetProcAddress", StubStatus::Stub),
             ("LoadLibraryA", StubStatus::Stub),
             ("LoadLibraryW", StubStatus::Stub),

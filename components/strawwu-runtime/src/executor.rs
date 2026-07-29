@@ -5,7 +5,7 @@ use strawwu_nt::cpu::{CpuHaltReason, ExecSideEffects};
 use strawwu_nt::ipc::PipeNamespace;
 use strawwu_nt::loader::{LoadResult, PeLoader};
 use strawwu_nt::ntdll::NtKernel;
-use strawwu_nt::run_entry;
+use strawwu_nt::run_entry_with_imports_and_base;
 use strawwu_nt::teb::{ProcessEnvironmentBlock, ThreadEnvironmentBlock};
 
 use crate::orchestrator::RuntimeOrchestrator;
@@ -175,10 +175,14 @@ pub fn execute_pe_with_side_effect_dir(
     );
 
     if entry_has_code(&ctx.kernel, load_result.entry_point_va) {
-        match run_entry(
+        let imports = ctx.loader.import_resolutions.clone();
+        let image_base = load_result.mapped_base;
+        match run_entry_with_imports_and_base(
             &mut ctx.kernel,
             load_result.entry_point_va,
             side_effect_dir,
+            &imports,
+            image_base,
         ) {
             Ok(cpu) => {
                 let gui_real = cpu

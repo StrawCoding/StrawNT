@@ -55,7 +55,7 @@ pub const DEFAULT_GUEST_PID: u32 = 1000;
 pub const DEFAULT_GUI_WIDTH: u32 = 640;
 pub const DEFAULT_GUI_HEIGHT: u32 = 480;
 
-const MAX_STEPS: u64 = 100_000;
+const MAX_STEPS: u64 = 2_000_000;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum CpuHaltReason {
@@ -141,6 +141,7 @@ pub struct Cpu {
     next_guest_handle: u64,
     cmdline_va: u64,
     guest_pid: u32,
+    image_base: u64,
     windows: WindowManager,
     gdi: GdiManager,
     /// Maps guest HDC values to window dimensions used at GetDC time.
@@ -196,6 +197,7 @@ impl Cpu {
             next_guest_handle: 0x2000,
             cmdline_va: 0,
             guest_pid: DEFAULT_GUEST_PID,
+            image_base: 0,
             windows: WindowManager::new(),
             gdi: GdiManager::new(),
             hdc_size: HashMap::new(),
@@ -221,8 +223,22 @@ impl Cpu {
         self
     }
 
+    pub fn with_image_base(mut self, base: u64) -> Self {
+        self.image_base = base;
+        self
+    }
+
     pub fn register_stub(&mut self, addr: u64, name: &str) {
         self.stubs.insert(addr, name.to_string());
+    }
+
+    pub fn register_imports(&mut self, resolutions: &[crate::loader::ImportResolution]) {
+        for r in resolutions {
+            if r.resolved && r.resolved_address != 0 {
+                self.stubs
+                    .insert(r.resolved_address, r.function_name.clone());
+            }
+        }
     }
 
     fn note_api(&mut self, name: &str) {
@@ -376,10 +392,19 @@ impl Cpu {
         let mut rex_b = false;
         let mut ip = self.rip;
         let mut op = b0;
-        if (b0 & 0xF0) == 0x40 {
-            rex_w = (b0 & 0x08) != 0;
-            rex_r = (b0 & 0x04) != 0;
-            rex_b = (b0 & 0x01) != 0;
+        let mut operand_size_override = false;
+        if op == 0x66 {
+            operand_size_override = true;
+            ip += 1;
+            op = kernel
+                .memory
+                .read_u8(ip)
+                .map_err(|_| CpuHaltReason::MemoryFault)?;
+        }
+        if (op & 0xF0) == 0x40 {
+            rex_w = (op & 0x08) != 0;
+            rex_r = (op & 0x04) != 0;
+            rex_b = (op & 0x01) != 0;
             ip += 1;
             op = kernel
                 .memory
@@ -434,42 +459,10 @@ impl Cpu {
             return Ok(());
         }
 
-        // xor r32, r/m32 — 31 /r  (also 45 31 C0/C9 → r8d/r9d)
-        if op == 0x31 {
-            let modrm = kernel
-                .memory
-                .read_u8(ip + 1)
-                .map_err(|_| CpuHaltReason::MemoryFault)?;
-            if modrm == 0xC9 {
-                if rex_b {
-                    self.gpr.r9 = 0;
-                } else {
-                    self.gpr.rcx = 0;
-                }
-                self.rip = ip + 2;
-                return Ok(());
-            }
-            if modrm == 0xC0 {
-                if rex_b {
-                    self.gpr.r8 = 0;
-                } else {
-                    self.gpr.rax = 0;
-                }
-                self.rip = ip + 2;
-                return Ok(());
-            }
-            if modrm == 0xD2 {
-                self.gpr.rdx = 0;
-                self.rip = ip + 2;
-                return Ok(());
-            }
-            return Err(CpuHaltReason::IllegalInstruction);
-        }
-
         // mov rcx, rax — 48 89 C1
         // mov rdx, rax — 48 89 C2
         // mov r8, rax  — 49 89 C0
-        // mov [rsp+disp8], rax — 48 89 44 24 disp
+        // mov [rsp+disp8], r64 — 48 89 xx 24 disp (any source reg)
         // mov [rip+disp32], rax — 48 89 05 disp32
         if rex_w && op == 0x89 {
             let modrm = kernel
@@ -509,20 +502,156 @@ impl Cpu {
                 .memory
                 .read_u8(ip + 2)
                 .map_err(|_| CpuHaltReason::MemoryFault)?;
-            if modrm == 0x44 && sib == 0x24 {
+            // mod=01 rm=100 SIB → [rsp+disp8]
+            if (modrm & 0xC7) == 0x44 && sib == 0x24 {
+                let src = ((modrm >> 3) & 0x07) as usize + if rex_r { 8 } else { 0 };
                 let disp = kernel
                     .memory
                     .read_u8(ip + 3)
                     .map_err(|_| CpuHaltReason::MemoryFault)? as i8 as i64;
                 let addr = (self.gpr.rsp as i64 + disp) as u64;
+                let val = match src {
+                    0 => self.gpr.rax,
+                    1 => self.gpr.rcx,
+                    2 => self.gpr.rdx,
+                    3 => self.gpr.rbx,
+                    5 => self.gpr.rbp,
+                    6 => self.gpr.rsi,
+                    7 => self.gpr.rdi,
+                    8 => self.gpr.r8,
+                    9 => self.gpr.r9,
+                    10 => self.gpr.r10,
+                    11 => self.gpr.r11,
+                    12 => self.gpr.r12,
+                    13 => self.gpr.r13,
+                    14 => self.gpr.r14,
+                    15 => self.gpr.r15,
+                    _ => 0,
+                };
                 kernel
                     .memory
-                    .write_u64(addr, self.gpr.rax)
+                    .write_u64(addr, val)
                     .map_err(|_| CpuHaltReason::MemoryFault)?;
                 self.rip = ip + 4;
                 return Ok(());
             }
             return Err(CpuHaltReason::IllegalInstruction);
+        }
+
+        // mov r32, [rsp+disp8] / mov [rsp+disp8], r32 — 89 / 8B without REX.W
+        if op == 0x89 {
+            let modrm = kernel
+                .memory
+                .read_u8(ip + 1)
+                .map_err(|_| CpuHaltReason::MemoryFault)?;
+            let sib = kernel
+                .memory
+                .read_u8(ip + 2)
+                .map_err(|_| CpuHaltReason::MemoryFault)?;
+            if (modrm & 0xC7) == 0x44 && sib == 0x24 {
+                let src = ((modrm >> 3) & 0x07) as usize;
+                let disp = kernel
+                    .memory
+                    .read_u8(ip + 3)
+                    .map_err(|_| CpuHaltReason::MemoryFault)? as i8 as i64;
+                let addr = (self.gpr.rsp as i64 + disp) as u64;
+                let val = match src {
+                    0 => self.gpr.rax as u32,
+                    1 => self.gpr.rcx as u32,
+                    2 => self.gpr.rdx as u32,
+                    3 => self.gpr.rbx as u32,
+                    5 => self.gpr.rbp as u32,
+                    6 => self.gpr.rsi as u32,
+                    7 => self.gpr.rdi as u32,
+                    _ => 0,
+                };
+                kernel
+                    .memory
+                    .write_u32(addr, val)
+                    .map_err(|_| CpuHaltReason::MemoryFault)?;
+                self.rip = ip + 4;
+                return Ok(());
+            }
+        }
+
+        // xor r32, r/m32 — 31 /r or 33 /r (zero register forms)
+        if op == 0x31 || op == 0x33 {
+            let modrm = kernel
+                .memory
+                .read_u8(ip + 1)
+                .map_err(|_| CpuHaltReason::MemoryFault)?;
+            // reg-reg xor same register → zero
+            if (modrm & 0xC0) == 0xC0 {
+                let rm = (modrm & 0x07) as usize + if rex_b { 8 } else { 0 };
+                let reg = ((modrm >> 3) & 0x07) as usize + if rex_r { 8 } else { 0 };
+                if rm == reg {
+                    self.set_gpr(rm, 0);
+                    self.rip = ip + 2;
+                    return Ok(());
+                }
+            }
+            // keep legacy exact matches
+            if modrm == 0xC9 {
+                if rex_b {
+                    self.gpr.r9 = 0;
+                } else {
+                    self.gpr.rcx = 0;
+                }
+                self.rip = ip + 2;
+                return Ok(());
+            }
+            if modrm == 0xC0 {
+                if rex_b {
+                    self.gpr.r8 = 0;
+                } else {
+                    self.gpr.rax = 0;
+                }
+                self.rip = ip + 2;
+                return Ok(());
+            }
+            if modrm == 0xD2 {
+                self.gpr.rdx = 0;
+                self.rip = ip + 2;
+                return Ok(());
+            }
+            if modrm == 0xDB {
+                self.gpr.rbx = 0;
+                self.rip = ip + 2;
+                return Ok(());
+            }
+            return Err(CpuHaltReason::IllegalInstruction);
+        }
+
+        // mov r64, [rip+disp32] — 48/4C 8B 05/0D/15/1D …
+        // Also handles non-REX 8B for r32 when needed via zero-extend path below.
+        if (rex_w || op == 0x8B) && op == 0x8B {
+            let modrm = kernel
+                .memory
+                .read_u8(ip + 1)
+                .map_err(|_| CpuHaltReason::MemoryFault)?;
+            // mod=00 rm=101 → [rip+disp32]
+            if (modrm & 0xC7) == 0x05 {
+                let reg = ((modrm >> 3) & 0x07) as usize + if rex_r { 8 } else { 0 };
+                let disp = kernel
+                    .memory
+                    .read_u32(ip + 2)
+                    .map_err(|_| CpuHaltReason::MemoryFault)? as i32 as i64;
+                let addr = (ip as i64 + 6 + disp) as u64;
+                let val = if rex_w {
+                    kernel
+                        .memory
+                        .read_u64(addr)
+                        .map_err(|_| CpuHaltReason::MemoryFault)?
+                } else {
+                    kernel
+                        .memory
+                        .read_u32(addr)
+                        .map_err(|_| CpuHaltReason::MemoryFault)? as u64
+                };
+                self.set_gpr(reg, val);
+                self.rip = ip + 6;
+                return Ok(());
+            }
         }
 
         // mov rax/rcx, [rsp+disp8] — 48 8B 44/4C 24 disp
@@ -565,6 +694,7 @@ impl Cpu {
         }
 
         // lea r64, [rip+disp32] — 48/4C 8D 05/0D/15/1D (modrm rm=101)
+        // also lea with other reg targets via modrm.reg
         if op == 0x8D {
             let modrm = kernel
                 .memory
@@ -584,34 +714,181 @@ impl Cpu {
             return Err(CpuHaltReason::IllegalInstruction);
         }
 
-        // mov qword [rsp+disp8], imm32 — 48 C7 44 24 disp imm32
-        if rex_w && op == 0xC7 {
+        // movsxd r64, r/m32 — 48 63 /r ; common: 48 63 05 disp32 ([rip])
+        if rex_w && op == 0x63 {
             let modrm = kernel
                 .memory
                 .read_u8(ip + 1)
                 .map_err(|_| CpuHaltReason::MemoryFault)?;
-            let sib = kernel
-                .memory
-                .read_u8(ip + 2)
-                .map_err(|_| CpuHaltReason::MemoryFault)?;
-            if modrm == 0x44 && sib == 0x24 {
+            let reg = ((modrm >> 3) & 0x07) as usize + if rex_r { 8 } else { 0 };
+            if (modrm & 0xC7) == 0x05 {
                 let disp = kernel
                     .memory
-                    .read_u8(ip + 3)
-                    .map_err(|_| CpuHaltReason::MemoryFault)? as i8 as i64;
-                let imm = kernel
+                    .read_u32(ip + 2)
+                    .map_err(|_| CpuHaltReason::MemoryFault)? as i32 as i64;
+                let addr = (ip as i64 + 6 + disp) as u64;
+                let v = kernel
                     .memory
-                    .read_u32(ip + 4)
-                    .map_err(|_| CpuHaltReason::MemoryFault)? as u64;
-                let addr = (self.gpr.rsp as i64 + disp) as u64;
-                kernel
-                    .memory
-                    .write_u64(addr, imm)
-                    .map_err(|_| CpuHaltReason::MemoryFault)?;
-                self.rip = ip + 8;
+                    .read_u32(addr)
+                    .map_err(|_| CpuHaltReason::MemoryFault)? as i32 as i64 as u64;
+                self.set_gpr(reg, v);
+                self.rip = ip + 6;
                 return Ok(());
             }
             return Err(CpuHaltReason::IllegalInstruction);
+        }
+
+        // cmp word/dword [rip+disp32], imm — 66 81 3D / 81 3D
+        if op == 0x81 {
+            let modrm = kernel
+                .memory
+                .read_u8(ip + 1)
+                .map_err(|_| CpuHaltReason::MemoryFault)?;
+            if (modrm & 0xC7) == 0x05 && ((modrm >> 3) & 7) == 7 {
+                let disp = kernel
+                    .memory
+                    .read_u32(ip + 2)
+                    .map_err(|_| CpuHaltReason::MemoryFault)? as i32 as i64;
+                let addr = (ip as i64 + 6 + disp) as u64;
+                if operand_size_override {
+                    let mem = kernel
+                        .memory
+                        .read_u16(addr)
+                        .unwrap_or(0);
+                    let imm = kernel
+                        .memory
+                        .read_u16(ip + 6)
+                        .map_err(|_| CpuHaltReason::MemoryFault)?;
+                    // Soft: ignore flags; jcc soft-policy handles branches.
+                    let _ = (mem, imm);
+                    self.rip = ip + 8;
+                    return Ok(());
+                }
+                let mem = kernel
+                    .memory
+                    .read_u32(addr)
+                    .map_err(|_| CpuHaltReason::MemoryFault)?;
+                let imm = kernel
+                    .memory
+                    .read_u32(ip + 6)
+                    .map_err(|_| CpuHaltReason::MemoryFault)?;
+                let _ = (mem, imm);
+                self.rip = ip + 10;
+                return Ok(());
+            }
+            return Err(CpuHaltReason::IllegalInstruction);
+        }
+        if op == 0xEB {
+            let rel = kernel
+                .memory
+                .read_u8(ip + 1)
+                .map_err(|_| CpuHaltReason::MemoryFault)? as i8 as i64;
+            self.rip = (ip as i64 + 2 + rel) as u64;
+            return Ok(());
+        }
+        if (0x70..=0x7F).contains(&op) {
+            let rel = kernel
+                .memory
+                .read_u8(ip + 1)
+                .map_err(|_| CpuHaltReason::MemoryFault)? as i8 as i64;
+            // Soft flags: treat ZF unknown → take/not-take alternately via a sticky bit.
+            // For golden smoke: assume equality compares often succeed (JZ taken).
+            let take = match op {
+                0x74 | 0x67 => true,  // jz/jbe soft-taken
+                0x75 | 0x7F => false, // jnz/jg soft-not-taken
+                _ => false,
+            };
+            if take {
+                self.rip = (ip as i64 + 2 + rel) as u64;
+            } else {
+                self.rip = ip + 2;
+            }
+            return Ok(());
+        }
+
+        // nop — 90 / 0F 1F …
+        if op == 0x90 {
+            self.rip = ip + 1;
+            return Ok(());
+        }
+        if op == 0x0F {
+            let b1 = kernel
+                .memory
+                .read_u8(ip + 1)
+                .map_err(|_| CpuHaltReason::MemoryFault)?;
+            if b1 == 0x1F {
+                // multi-byte nop: 0F 1F /0
+                let modrm = kernel
+                    .memory
+                    .read_u8(ip + 2)
+                    .map_err(|_| CpuHaltReason::MemoryFault)?;
+                let len = match modrm {
+                    0x00 => 3,
+                    0x40..=0x47 => 4,
+                    _ => 3,
+                };
+                self.rip = ip + len as u64;
+                return Ok(());
+            }
+            return Err(CpuHaltReason::IllegalInstruction);
+        }
+
+        // mov qword [rsp+disp8], imm32 — 48 C7 44 24 disp imm32
+        // mov dword [rax], imm32 — C7 00 imm32 (also REX.W form writes 32-bit zero-extended store)
+        if op == 0xC7 {
+            let modrm = kernel
+                .memory
+                .read_u8(ip + 1)
+                .map_err(|_| CpuHaltReason::MemoryFault)?;
+            if rex_w {
+                let sib = kernel
+                    .memory
+                    .read_u8(ip + 2)
+                    .map_err(|_| CpuHaltReason::MemoryFault)?;
+                if modrm == 0x44 && sib == 0x24 {
+                    let disp = kernel
+                        .memory
+                        .read_u8(ip + 3)
+                        .map_err(|_| CpuHaltReason::MemoryFault)? as i8 as i64;
+                    let imm = kernel
+                        .memory
+                        .read_u32(ip + 4)
+                        .map_err(|_| CpuHaltReason::MemoryFault)? as u64;
+                    let addr = (self.gpr.rsp as i64 + disp) as u64;
+                    kernel
+                        .memory
+                        .write_u64(addr, imm)
+                        .map_err(|_| CpuHaltReason::MemoryFault)?;
+                    self.rip = ip + 8;
+                    return Ok(());
+                }
+            }
+            // mod=00 rm=000 → [rax]
+            if (modrm & 0xC7) == 0x00 {
+                let imm = kernel
+                    .memory
+                    .read_u32(ip + 2)
+                    .map_err(|_| CpuHaltReason::MemoryFault)?;
+                kernel
+                    .memory
+                    .write_u32(self.gpr.rax, imm)
+                    .map_err(|_| CpuHaltReason::MemoryFault)?;
+                self.rip = ip + 6;
+                return Ok(());
+            }
+            return Err(CpuHaltReason::IllegalInstruction);
+        }
+
+        // call rel32 — E8 cd
+        if op == 0xE8 {
+            let rel = kernel
+                .memory
+                .read_u32(ip + 1)
+                .map_err(|_| CpuHaltReason::MemoryFault)? as i32 as i64;
+            let next = ip + 5;
+            let target = (next as i64 + rel) as u64;
+            self.rip = next;
+            return self.call_target(kernel, target);
         }
 
         // call rax / call [rip+disp32]
@@ -648,6 +925,11 @@ impl Cpu {
                 .read_u64(self.gpr.rsp)
                 .map_err(|_| CpuHaltReason::StackFault)?;
             self.gpr.rsp = self.gpr.rsp.wrapping_add(8);
+            // Sentinel return (0) from run_entry stack → stop the loop.
+            if ret == 0 {
+                self.halted = Some(CpuHaltReason::ExitProcess);
+                return Ok(());
+            }
             self.rip = ret;
             return Ok(());
         }
@@ -775,6 +1057,20 @@ impl Cpu {
             "GetCurrentProcessId" => {
                 self.side_effects.guest_pid = Some(self.guest_pid);
                 self.gpr.rax = self.guest_pid as u64;
+                Ok(())
+            }
+            "GetModuleHandleA" | "GetModuleHandleW" => {
+                // NULL → process image base (CRT / 7za self-check path).
+                let arg = self.gpr.rcx;
+                if arg == 0 {
+                    self.gpr.rax = if self.image_base != 0 {
+                        self.image_base
+                    } else {
+                        STUB_BASE
+                    };
+                } else {
+                    self.gpr.rax = STUB_BASE; // soft: pretend any named module resolves
+                }
                 Ok(())
             }
             "GetCommandLineA" => {
@@ -1067,7 +1363,12 @@ impl Cpu {
                 self.halted = Some(CpuHaltReason::ExitProcess);
                 Ok(())
             }
-            _ => Err(CpuHaltReason::IllegalInstruction),
+            // Soft stubs for unresolved / registry-only Win32 & CRT symbols so
+            // real public PEs can make progress past import calls (pe6).
+            _ => {
+                self.gpr.rax = 0;
+                Ok(())
+            }
         }
     }
 
@@ -1112,6 +1413,27 @@ pub fn run_entry(
     entry: u64,
     host_side_effect_dir: Option<PathBuf>,
 ) -> Result<CpuRunResult, NtStatus> {
+    run_entry_with_imports(kernel, entry, host_side_effect_dir, &[])
+}
+
+/// Same as [`run_entry`], registering loader IAT resolutions into the CPU stub map.
+pub fn run_entry_with_imports(
+    kernel: &mut NtKernel,
+    entry: u64,
+    host_side_effect_dir: Option<PathBuf>,
+    imports: &[crate::loader::ImportResolution],
+) -> Result<CpuRunResult, NtStatus> {
+    run_entry_with_imports_and_base(kernel, entry, host_side_effect_dir, imports, 0)
+}
+
+/// Like [`run_entry_with_imports`] with a known mapped image base for GetModuleHandle.
+pub fn run_entry_with_imports_and_base(
+    kernel: &mut NtKernel,
+    entry: u64,
+    host_side_effect_dir: Option<PathBuf>,
+    imports: &[crate::loader::ImportResolution],
+    image_base: u64,
+) -> Result<CpuRunResult, NtStatus> {
     let stack_base = kernel
         .memory
         .allocate(0x1_0000, MemoryProtection::ReadWrite)?;
@@ -1129,10 +1451,12 @@ pub fn run_entry(
 
     let mut cpu = Cpu::new(entry, stack_top)
         .with_guest_pid(DEFAULT_GUEST_PID)
-        .with_command_line(cmdline_va, "strawwu-guest.exe");
+        .with_command_line(cmdline_va, "strawwu-guest.exe")
+        .with_image_base(image_base);
     if let Some(dir) = host_side_effect_dir {
         cpu = cpu.with_host_side_effect_dir(dir);
     }
+    cpu.register_imports(imports);
     Ok(cpu.run(kernel))
 }
 

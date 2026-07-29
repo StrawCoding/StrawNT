@@ -23,6 +23,7 @@ pub use ntdll::{NtStatus, NtKernel, VirtualMemoryManager, VirtualFileSystem, Fil
 pub use wow64::Wow64Context;
 pub use loader::PeLoader;
 pub use cpu::{
-    run_entry, CpuHaltReason, CpuRunResult, ExecSideEffects, GuiSideEffects, STUB_BASE,
-    STUB_EXIT_PROCESS, STUB_GET_STD_HANDLE, STUB_WRITE_FILE,
+    run_entry, run_entry_with_imports, run_entry_with_imports_and_base, CpuHaltReason, CpuRunResult,
+    ExecSideEffects, GuiSideEffects, STUB_BASE, STUB_EXIT_PROCESS, STUB_GET_STD_HANDLE,
+    STUB_WRITE_FILE,
 };

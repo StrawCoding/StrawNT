@@ -1,0 +1,201 @@
+{
+  "schema": "strawwu-portable-pe-golden/v1",
+  "stage": "pe6-golden-smoke",
+  "status": "PARTIAL",
+  "version": "0.7.1.24",
+  "backend": "native",
+  "execution_backend": "native",
+  "mode": "mixed",
+  "generated_at": "2026-07-29T07:12:10Z",
+  "apps": [
+    {
+      "id": "7za",
+      "name": "7za.exe",
+      "path": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/fixtures/golden/7za.exe",
+      "sha256": "574bb90d17732f3cc4145fd4ba12d8f29b9d63400881c0e6fe3110c88b0485de",
+      "source": "https://www.7-zip.org/a/7z2501-extra.7z (x64/7za.exe)",
+      "status": "PARTIAL",
+      "launcher_rc": 0,
+      "launcher_output": [
+        "strawwu: launched /mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/fixtures/golden/7za.exe (format=PE, pid=1000, backend=native, app_id=7za, mode=simulated, gui-smoke=SKIP subsystem=non-gui)"
+      ],
+      "exec": {
+        "backend": "native",
+        "mode": "simulated",
+        "cpu_executed": true,
+        "instructions_retired": 7,
+        "halt": "IllegalInstruction",
+        "apis_invoked_sample": [],
+        "apis_invoked_count": 0,
+        "stdout": "",
+        "host_files": [],
+        "load": {
+          "entry_point_va": 68720433824,
+          "mapped_base": 68719476736,
+          "resolved_imports": 145,
+          "total_imports": 145,
+          "unresolved_imports": []
+        }
+      },
+      "pending": [
+        "full CRT / Win32 surface incomplete for this public PE",
+        "CLI stdout / functional archive or applet side effects not yet observed"
+      ]
+    },
+    {
+      "id": "busybox64u",
+      "name": "busybox64u.exe",
+      "path": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/fixtures/golden/busybox64u.exe",
+      "sha256": "6e263d154d8548d1eb936f65d1d8312c80df31c45974e48d6335e4dcc0f4f34c",
+      "source": "https://frippery.org/files/busybox/busybox64u.exe",
+      "status": "PARTIAL",
+      "launcher_rc": 0,
+      "launcher_output": [
+        "strawwu: launched /mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/fixtures/golden/busybox64u.exe (format=PE, pid=1000, backend=native, app_id=busybox64u, mode=simulated, gui-smoke=SKIP subsystem=non-gui)"
+      ],
+      "exec": {
+        "backend": "native",
+        "mode": "simulated",
+        "cpu_executed": true,
+        "instructions_retired": 2,
+        "halt": "MemoryFault",
+        "apis_invoked_sample": [],
+        "apis_invoked_count": 0,
+        "stdout": "",
+        "host_files": [],
+        "load": {
+          "entry_point_va": 68719506848,
+          "mapped_base": 68719476736,
+          "resolved_imports": 329,
+          "total_imports": 329,
+          "unresolved_imports": []
+        }
+      },
+      "pending": [
+        "full CRT / Win32 surface incomplete for this public PE",
+        "CLI stdout / functional archive or applet side effects not yet observed"
+      ]
+    }
+  ],
+  "results": [
+    {
+      "id": "7za",
+      "name": "7za.exe",
+      "path": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/fixtures/golden/7za.exe",
+      "sha256": "574bb90d17732f3cc4145fd4ba12d8f29b9d63400881c0e6fe3110c88b0485de",
+      "source": "https://www.7-zip.org/a/7z2501-extra.7z (x64/7za.exe)",
+      "status": "PARTIAL",
+      "launcher_rc": 0,
+      "launcher_output": [
+        "strawwu: launched /mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/fixtures/golden/7za.exe (format=PE, pid=1000, backend=native, app_id=7za, mode=simulated, gui-smoke=SKIP subsystem=non-gui)"
+      ],
+      "exec": {
+        "backend": "native",
+        "mode": "simulated",
+        "cpu_executed": true,
+        "instructions_retired": 7,
+        "halt": "IllegalInstruction",
+        "apis_invoked_sample": [],
+        "apis_invoked_count": 0,
+        "stdout": "",
+        "host_files": [],
+        "load": {
+          "entry_point_va": 68720433824,
+          "mapped_base": 68719476736,
+          "resolved_imports": 145,
+          "total_imports": 145,
+          "unresolved_imports": []
+        }
+      },
+      "pending": [
+        "full CRT / Win32 surface incomplete for this public PE",
+        "CLI stdout / functional archive or applet side effects not yet observed"
+      ]
+    },
+    {
+      "id": "busybox64u",
+      "name": "busybox64u.exe",
+      "path": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/fixtures/golden/busybox64u.exe",
+      "sha256": "6e263d154d8548d1eb936f65d1d8312c80df31c45974e48d6335e4dcc0f4f34c",
+      "source": "https://frippery.org/files/busybox/busybox64u.exe",
+      "status": "PARTIAL",
+      "launcher_rc": 0,
+      "launcher_output": [
+        "strawwu: launched /mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/fixtures/golden/busybox64u.exe (format=PE, pid=1000, backend=native, app_id=busybox64u, mode=simulated, gui-smoke=SKIP subsystem=non-gui)"
+      ],
+      "exec": {
+        "backend": "native",
+        "mode": "simulated",
+        "cpu_executed": true,
+        "instructions_retired": 2,
+        "halt": "MemoryFault",
+        "apis_invoked_sample": [],
+        "apis_invoked_count": 0,
+        "stdout": "",
+        "host_files": [],
+        "load": {
+          "entry_point_va": 68719506848,
+          "mapped_base": 68719476736,
+          "resolved_imports": 329,
+          "total_imports": 329,
+          "unresolved_imports": []
+        }
+      },
+      "pending": [
+        "full CRT / Win32 surface incomplete for this public PE",
+        "CLI stdout / functional archive or applet side effects not yet observed"
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "name": "apps_count_ge_2",
+      "status": "PASS"
+    },
+    {
+      "name": "all_backend_native",
+      "status": "PASS"
+    },
+    {
+      "name": "pe_loaded_imports",
+      "status": "PASS"
+    },
+    {
+      "name": "cpu_executed",
+      "status": "PASS"
+    },
+    {
+      "name": "no_wine_substrate",
+      "status": "PASS"
+    },
+    {
+      "name": "iat_patch_foundation",
+      "status": "PASS"
+    }
+  ],
+  "pending": [
+    "7za: full CRT / Win32 surface incomplete for this public PE",
+    "7za: CLI stdout / functional archive or applet side effects not yet observed",
+    "busybox64u: full CRT / Win32 surface incomplete for this public PE",
+    "busybox64u: CLI stdout / functional archive or applet side effects not yet observed",
+    "Not claiming full Windows compatibility or anti-cheat pass",
+    "Notepad++ portable-class GUI apps still out of golden PASS scope"
+  ],
+  "evidence": [
+    "tests/portable/output/pe-golden.json",
+    "tests/portable/smoke-pe-golden.sh",
+    "tests/portable/output/pe6-side-effects/",
+    "components/strawwu-nt/src/loader.rs",
+    "components/strawwu-nt/src/cpu.rs"
+  ],
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
+    "no Wine/Proton substrate; execution_backend=native",
+    "no WinBox naming",
+    "no full Windows compatibility / anti-cheat claim"
+  ],
+  "git": {
+    "branch": "main",
+    "commit": "753b96302"
+  }
+}

@@ -95,3 +95,10 @@ tests/portable/output/pe5-side-effects/pe2-marker.txt
 tests/portable/output/pe5-side-effects/*.log
 tests/portable/output/pe5-side-effects/*.txt
 tests/portable/fixtures/pe4-msi-setup.msi
+
+# pe6 golden public PE cache (downloaded by smoke-pe-golden.sh; verified by sha256)
+tests/portable/fixtures/golden/
+
+# pe6 golden side-effects (JSON evidence pe-golden.json kept)
+tests/portable/output/pe6-side-effects/
+

@@ -73,6 +73,10 @@ pub struct PeSection {
 pub struct ImportEntry {
     pub dll_name: String,
     pub functions: Vec<String>,
+    /// Import Lookup Table (OriginalFirstThunk) RVA; 0 if bound/absent.
+    pub original_first_thunk_rva: u32,
+    /// Import Address Table (FirstThunk) RVA — patched by the loader.
+    pub first_thunk_rva: u32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -234,8 +238,13 @@ impl PeFile {
             let ilt_rva = u32::from_le_bytes(
                 data[desc_offset..desc_offset + 4].try_into().unwrap_or([0; 4]),
             );
+            let first_thunk_rva = u32::from_le_bytes(
+                data[desc_offset + 16..desc_offset + 20]
+                    .try_into()
+                    .unwrap_or([0; 4]),
+            );
 
-            if name_rva == 0 && ilt_rva == 0 {
+            if name_rva == 0 && ilt_rva == 0 && first_thunk_rva == 0 {
                 break;
             }
 
@@ -245,14 +254,21 @@ impl PeFile {
                 String::new()
             };
 
-            let functions = if let Some(ilt_off) = Self::rva_to_file_offset(ilt_rva, sections) {
+            // Prefer OriginalFirstThunk; fall back to FirstThunk (bound imports).
+            let lookup_rva = if ilt_rva != 0 { ilt_rva } else { first_thunk_rva };
+            let functions = if let Some(ilt_off) = Self::rva_to_file_offset(lookup_rva, sections) {
                 Self::parse_ilt(data, ilt_off, is_pe32_plus, sections)
             } else {
                 Vec::new()
             };
 
             if !dll_name.is_empty() {
-                imports.push(ImportEntry { dll_name, functions });
+                imports.push(ImportEntry {
+                    dll_name,
+                    functions,
+                    original_first_thunk_rva: ilt_rva,
+                    first_thunk_rva,
+                });
             }
 
             desc_offset += 20;
@@ -458,6 +474,8 @@ pub fn build_pe_with_imports(machine: PeMachine, subsystem: PeSubsystem, dll_imp
         string_pool_offset += name_bytes.len() + 1;
 
         // Write ILT entries for each function
+        let iat_start = ilt_offset; // we'll duplicate ILT into IAT after filling ILT
+        let mut func_entries: Vec<u64> = Vec::new();
         for func_name in *funcs {
             // Hint/Name entry: 2-byte hint (0) + name string
             let hint_name_rva = idata_rva_base + (string_pool_offset - idata_base) as u32;
@@ -474,11 +492,26 @@ pub fn build_pe_with_imports(machine: PeMachine, subsystem: PeSubsystem, dll_imp
             } else {
                 pe[ilt_offset..ilt_offset + 4].copy_from_slice(&hint_name_rva.to_le_bytes());
             }
+            func_entries.push(hint_name_rva as u64);
             ilt_offset += entry_size;
         }
 
         // Null terminator for ILT
         ilt_offset += entry_size;
+
+        // Duplicate into IAT (FirstThunk) so loader can patch a distinct table.
+        let iat_rva = idata_rva_base + (ilt_offset - idata_base) as u32;
+        pe[desc_off + 16..desc_off + 20].copy_from_slice(&iat_rva.to_le_bytes());
+        for ent in &func_entries {
+            if is_64 {
+                pe[ilt_offset..ilt_offset + 8].copy_from_slice(&ent.to_le_bytes());
+            } else {
+                pe[ilt_offset..ilt_offset + 4].copy_from_slice(&(*ent as u32).to_le_bytes());
+            }
+            ilt_offset += entry_size;
+        }
+        ilt_offset += entry_size; // IAT null terminator
+        let _ = iat_start;
     }
 
     // Null terminator descriptor (already zeros)
