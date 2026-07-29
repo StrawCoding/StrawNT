@@ -4,7 +4,8 @@
 	test-phase0 test-phase2 kernel-build validate-calamares-preflight validate-partition-probe \
 	test-install-e2e test-install-firstboot-e2e test-installed-boot test-target-flathub test-wincompat test-wincompat-os test-wincompat-registry test-wincompat-gui test-wincompat-e2e test-hw-live-usb test-hw-matrix test-user-docs test-handbook test-mvp-closeout test-release-manifest test-apt-repo test-ci-baseline test-ci-nightly test-perf-baseline test-perf-legal-gate test-strawwu-shell test-hub test-hub-settings test-apps-page test-flathub-hub test-l10n-ime test-firstboot test-finished-meta test-context-menu test-registry-hooks test-deep-uninstall test-initramfs-hooks test-target-identity test-greeter-session test-wave0-baseline test-wave-all-pass test-purge-baseline test-flatpak test-nosnap test-initrd-overlays test-initrd-core test-initrd-bottom test-init-tools test-bug-reporter test-calamares-settings test-app-registry test-security-baseline test-observability test-legal-trademark test-desktop-stack test-live-install-ux test-update-notifier test-target-setup test-meta-audit purge-ubuntu-telemetry \
 	install-flatpak-setup install-bug-reporter install-calamares-settings install-update-notifier install-target-setup install-firstboot install-wincompat nosnap-harden build-debs bump-version check-version-bump generate-release-manifest release-sign publish-debs publish-fork-debs \
-	portable-prefix test-portable-prefix portable-appimage test-portable-appimage
+	portable-prefix test-portable-prefix portable-appimage test-portable-appimage \
+	portable-flatpak test-portable-flatpak
 
 REPO_ROOT := $(abspath .)
 SCRIPTS   := os-image/scripts
@@ -133,6 +134,8 @@ help:
 	@echo "  test-portable-prefix          Smoke prefix → tests/portable/output/smoke-prefix.json"
 	@echo "  portable-appimage             Build AppImage / portable bundle (Portable Core pc2)"
 	@echo "  test-portable-appimage        Clean-container smoke → smoke-appimage.json + SHA256SUMS"
+	@echo "  portable-flatpak              Build Flatpak org.strawwu.Core (Portable Core pc3)"
+	@echo "  test-portable-flatpak         Flatpak smoke → smoke-flatpak.json (PASS|PARTIAL)"
 
 preflight:
 	bash tests/preflight/test-ubuntu-clone.sh
@@ -660,6 +663,12 @@ portable-appimage:
 
 test-portable-appimage:
 	bash tests/portable/smoke-appimage.sh
+
+portable-flatpak:
+	bash components/packaging/portable/build-flatpak.sh
+
+test-portable-flatpak:
+	bash tests/portable/smoke-flatpak.sh
 
 build-os-debs:
 	bash $(SCRIPTS)/build-os-debs.sh

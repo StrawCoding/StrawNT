@@ -24,7 +24,7 @@ Crate → artifact mapping lives in:
 
 Required core keys: `runtime`, `nt`, `launcher`, `cli`, `graphics`, `audio`, `hub`.
 
-## Build (pc1 / pc2)
+## Build (pc1 / pc2 / pc3)
 
 ```bash
 make portable-prefix
@@ -32,6 +32,9 @@ make portable-prefix
 
 make portable-appimage
 # or: bash components/packaging/portable/build-appimage.sh
+
+make portable-flatpak
+# or: bash components/packaging/portable/build-flatpak.sh
 ```
 
 Optional Hub bundling: `STRAWWU_PORTABLE_WITH_HUB=1 make portable-prefix`.
@@ -47,13 +50,18 @@ jq .status tests/portable/output/smoke-prefix.json
 make test-portable-appimage                    # clean-container smoke → smoke-appimage.json
 jq .status tests/portable/output/smoke-appimage.json
 test -f tests/portable/output/SHA256SUMS
+
+make test-portable-flatpak                     # Flatpak smoke → smoke-flatpak.json (PASS|PARTIAL)
+jq .status tests/portable/output/smoke-flatpak.json
 ```
 
 Full prefix `--version` / `status` without system `strawwu-*` debs is **pc1**.  
-AppImage／portable bundle + SHA256 + clean-container smoke is **pc2**.
+AppImage／portable bundle + SHA256 + clean-container smoke is **pc2**.  
+Flatpak manifest + build；PE／session 需 host FS → 誠實 **PARTIAL** 是 **pc3**.
 
 ## Explicit non-goals
 
 - ISO / os-image / Plymouth / Calamares / kernel / desktop session changes
 - Replacing the StrawWU Live USB / installed-distro track
 - Declaring complete Windows application compatibility
+- Declaring full Flatpak sandbox compatibility for PE / SubsystemSession

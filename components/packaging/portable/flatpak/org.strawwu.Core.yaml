@@ -1,0 +1,96 @@
+# StrawWU Portable Core — Flatpak manifest (pc3)
+# App-id: org.strawwu.Core
+#
+# HONEST PARTIAL: Flatpak sandbox cannot fully host PE load + SubsystemSession
+# without host filesystem / device visibility. finish-args below document the
+# required holes; do NOT treat this as full sandbox isolation or full Windows
+# compatibility. No Wine/Proton substrate; no WinBox naming.
+#
+# Build (from repo root):
+#   make portable-flatpak
+#   # or: bash components/packaging/portable/build-flatpak.sh
+#
+# Sources under "staged/" are prepared by build-flatpak.sh from the portable prefix.
+
+app-id: org.strawwu.Core
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+command: strawwu
+finish-args:
+  # Network: optional Hub / remote registry lookups (CLI core does not require it).
+  - --share=network
+  - --share=ipc
+  # Display / audio bridges (graphics·audio crates may need these when used).
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --socket=pulseaudio
+  - --device=dri
+  # PARTIAL — PE / SubsystemSession need host-visible paths for app binaries,
+  # shared C:\-style state, and registry. Narrower portals are not sufficient
+  # for arbitrary PE launch; host (or explicit path) filesystem is required.
+  - --filesystem=home
+  - --filesystem=xdg-download
+  - --filesystem=host
+  # Portals (still insufficient alone for PE; listed for honesty).
+  - --talk-name=org.freedesktop.portal.Desktop
+  - --talk-name=org.freedesktop.portal.Documents
+  - --talk-name=org.freedesktop.portal.FileChooser
+modules:
+  - name: strawwu-core
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 bin/strawwu /app/bin/strawwu
+      - |
+        if [ -x bin/strawwu-env ]; then
+          install -Dm755 bin/strawwu-env /app/bin/strawwu-env
+        fi
+      - |
+        mkdir -p /app/lib/strawwu
+        if [ -d lib ]; then
+          find lib -maxdepth 1 -type f \( -name '*.so' -o -name '*.so.*' \) \
+            -exec cp -a {} /app/lib/strawwu/ \;
+        fi
+      - |
+        mkdir -p /app/lib
+        if [ -d /app/lib/strawwu ] && ls /app/lib/strawwu/* >/dev/null 2>&1; then
+          for so in /app/lib/strawwu/*; do
+            ln -sfn "strawwu/$(basename "$so")" "/app/lib/$(basename "$so")"
+          done
+        fi
+      - |
+        if command -v patchelf >/dev/null 2>&1; then
+          patchelf --set-rpath '$ORIGIN/../lib/strawwu:$ORIGIN/../lib' /app/bin/strawwu || true
+        fi
+      - |
+        mkdir -p /app/share/strawwu /app/share/doc/strawwu-portable \
+                 /app/var/lib/strawwu /app/share/applications \
+                 /app/share/icons/hicolor/256x256/apps \
+                 /app/share/metainfo
+        if [ -d share/strawwu ]; then
+          cp -a share/strawwu/. /app/share/strawwu/
+        fi
+        if [ -d share/doc/strawwu-portable ]; then
+          cp -a share/doc/strawwu-portable/. /app/share/doc/strawwu-portable/
+        fi
+        if [ -d var/lib/strawwu ]; then
+          cp -a var/lib/strawwu/. /app/var/lib/strawwu/
+        else
+          printf '%s\n' '{"schema_version":"1.0","apps":[]}' \
+            > /app/var/lib/strawwu/app-registry.json
+        fi
+        if [ -f share/applications/org.strawwu.Core.desktop ]; then
+          install -Dm644 share/applications/org.strawwu.Core.desktop \
+            /app/share/applications/org.strawwu.Core.desktop
+        fi
+        if [ -f share/icons/hicolor/256x256/apps/org.strawwu.Core.png ]; then
+          install -Dm644 share/icons/hicolor/256x256/apps/org.strawwu.Core.png \
+            /app/share/icons/hicolor/256x256/apps/org.strawwu.Core.png
+        fi
+        if [ -f share/metainfo/org.strawwu.Core.metainfo.xml ]; then
+          install -Dm644 share/metainfo/org.strawwu.Core.metainfo.xml \
+            /app/share/metainfo/org.strawwu.Core.metainfo.xml
+        fi
+    sources:
+      - type: dir
+        path: staged

@@ -1,18 +1,24 @@
 {
   "track": "A+3",
-  "stage": "pc2-appimage",
+  "stage": "pc3-flatpak",
   "description": "Portable Core crate→artifact inventory for self-contained prefix / AppImage / Flatpak. Not a full Windows compatibility claim.",
   "prefix_env": "STRAWWU_PREFIX",
   "build": {
     "prefix_script": "components/packaging/portable/build-prefix.sh",
     "appimage_script": "components/packaging/portable/build-appimage.sh",
+    "flatpak_script": "components/packaging/portable/build-flatpak.sh",
     "make_target": "portable-prefix",
     "make_appimage": "portable-appimage",
+    "make_flatpak": "portable-flatpak",
     "smoke": "tests/portable/smoke-prefix.sh",
     "smoke_appimage": "tests/portable/smoke-appimage.sh",
+    "smoke_flatpak": "tests/portable/smoke-flatpak.sh",
     "evidence": "tests/portable/output/smoke-prefix.json",
     "evidence_appimage": "tests/portable/output/smoke-appimage.json",
-    "sha256sums": "tests/portable/output/SHA256SUMS"
+    "evidence_flatpak": "tests/portable/output/smoke-flatpak.json",
+    "sha256sums": "tests/portable/output/SHA256SUMS",
+    "flatpak_manifest": "components/packaging/portable/flatpak/org.strawwu.Core.yaml",
+    "flatpak_sandbox_notes": "components/packaging/portable/flatpak/SANDBOX-NOTES.md"
   },
   "components": {
     "runtime": {

@@ -52,3 +52,10 @@ components/packaging/portable/prefix/share/doc/
 # Portable Core AppImage / bundle artifacts (rebuild via make portable-appimage)
 components/packaging/portable/appimage/dist/
 components/packaging/portable/appimage/.tools/
+
+# Portable Core Flatpak build artifacts (rebuild via make portable-flatpak)
+components/packaging/portable/flatpak/staged/
+components/packaging/portable/flatpak/.build/
+components/packaging/portable/flatpak/.flatpak-builder/
+components/packaging/portable/flatpak/repo/
+components/packaging/portable/flatpak/dist/

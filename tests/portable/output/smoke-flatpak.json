@@ -1,0 +1,54 @@
+{
+  "schema": "strawwu-portable-smoke-flatpak/v1",
+  "stage": "pc3-flatpak",
+  "status": "PARTIAL",
+  "version": "0.7.1.11",
+  "flatpak_dir": "/mnt/data/code/project/StrawCoding/StrawWU-portable/components/packaging/portable/flatpak",
+  "generated_at": "2026-07-29T03:30:18Z",
+  "checks": {
+    "manifest": {
+      "status": "PASS",
+      "path": "/mnt/data/code/project/StrawCoding/StrawWU-portable/components/packaging/portable/flatpak/org.strawwu.Core.yaml",
+      "app_id": "org.strawwu.Core"
+    },
+    "sandbox_notes": {
+      "status": "PASS",
+      "path": "/mnt/data/code/project/StrawCoding/StrawWU-portable/components/packaging/portable/flatpak/SANDBOX-NOTES.md",
+      "documents_partial": true
+    },
+    "bundle": {
+      "status": "PASS",
+      "path": "/mnt/data/code/project/StrawCoding/StrawWU-portable/components/packaging/portable/flatpak/dist/org.strawwu.Core-0.7.1.11.flatpak"
+    },
+    "version": {
+      "status": "PASS",
+      "output": "strawwu 0.4.0"
+    },
+    "status_cmd": {
+      "status": "PASS",
+      "output": "strawwu: status — runtime idle, 0 session(s), 0 app(s) registered"
+    },
+    "pe_session_sandbox": {
+      "status": "PARTIAL",
+      "message": "PE load / SubsystemSession require --filesystem=host (and related finish-args); Flatpak packaging is not full sandbox isolation",
+      "required_finish_args": [
+        "--filesystem=host",
+        "--filesystem=home",
+        "--device=dri"
+      ]
+    },
+    "honesty": {
+      "status": "PASS",
+      "full_sandbox_compatible": false,
+      "full_windows_compatible": false,
+      "partial_reason": "host filesystem required for PE/SubsystemSession"
+    }
+  },
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
+    "no Wine/Proton substrate",
+    "no WinBox naming",
+    "no full Windows compatibility claim",
+    "no fake full Flatpak sandbox compatibility for PE/session"
+  ]
+}
