@@ -16,7 +16,17 @@ StrawWU **Win 相容核心**（runtime／nt／launcher／graphics·audio／Hub�
 
 ISO／Live USB／桌面策展屬另一軌道，**不在此範圍**。
 
-## 快速開始（prefix）
+## 一鍵安裝（終端使用者）
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/StrawCoding/StrawWU-portable/main/install.sh | bash
+strawwu --version
+strawwu status
+```
+
+自訂：`bash -s -- --prefix "$HOME/.local/strawwu"` 或 `--version 0.7.1.15`。
+
+## 快速開始（prefix／開發建置）
 
 ```bash
 make portable-prefix

@@ -2,13 +2,13 @@
   "schema": "strawwu-portable-smoke-prefix/v1",
   "stage": "pc1-self-contained-prefix",
   "status": "PASS",
-  "version": "0.7.1.9",
+  "version": "0.7.1.15",
   "prefix": "/mnt/data/code/project/StrawCoding/StrawWU-portable/components/packaging/portable/prefix",
-  "generated_at": "2026-07-29T02:36:37Z",
+  "generated_at": "2026-07-29T04:31:13Z",
   "checks": {
     "version": {
       "status": "PASS",
-      "output": "strawwu 0.4.0"
+      "output": "strawwu 0.7.1-preview.15"
     },
     "status_cmd": {
       "status": "PASS",

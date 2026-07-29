@@ -1,10 +1,9 @@
 [package]
 name = "strawwu-nt"
-version = "0.4.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
 description = "StrawWU Windows NT compatibility layer — TEB/PEB, PE loader, Win32 API stubs"
-license = "MIT"
-
+license.workspace = true
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

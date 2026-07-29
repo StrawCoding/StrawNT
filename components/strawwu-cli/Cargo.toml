@@ -1,10 +1,9 @@
 [package]
 name = "strawwu-cli"
-version = "0.4.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
 description = "StrawWU CLI helpers — devices list and rootfs integration"
-license = "MIT"
-
+license.workspace = true
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

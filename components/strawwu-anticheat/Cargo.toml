@@ -1,10 +1,9 @@
 [package]
 name = "strawwu-anticheat"
-version = "0.4.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
 description = "StrawWU anti-cheat compatibility matrix — EAC/BattlEye/Vanguard probe stubs"
-license = "MIT"
-
+license.workspace = true
 [dependencies]
 chrono = { version = "0.4", default-features = false, features = ["clock"] }
 serde = { version = "1", features = ["derive"] }

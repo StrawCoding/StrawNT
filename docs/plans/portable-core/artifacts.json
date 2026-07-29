@@ -1,42 +1,28 @@
 {
   "schema": "strawwu-portable-artifacts/v1",
-  "track": "A+3",
-  "stage": "pc5-closeout",
-  "version": "0.7.1.13",
-  "generated_at": "2026-07-29T04:02:02Z",
-  "notes": "Built artifacts retain stage build tags in filenames; closeout VERSION may be newer. Not a full Windows compatibility claim. Flatpak is PARTIAL.",
+  "version": "0.7.1.15",
+  "generated_at": "2026-07-29T04:31:08Z",
   "artifacts": [
     {
-      "name": "StrawWU-Core-0.7.1.10-x86_64.AppImage",
-      "kind": "appimage",
-      "path": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.10-x86_64.AppImage",
-      "sha256": "bb335c40af6bf707dee14a5e901850f11e7beac50be8832efd9559b0bb301aec",
+      "name": "StrawWU-Core-0.7.1.15-x86_64.AppImage",
+      "kind": "AppImage",
+      "path": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.15-x86_64.AppImage",
+      "sha256": "5f507e9a3b068ff27d5f9982f8be2e3a80dc10d3c6f3b3dddcfda09c5373ca16",
       "size_bytes": 1337848,
-      "built_version_tag": "StrawWU-Core-0.7.1.10-x86_64.AppImage"
+      "built_version_tag": "StrawWU-Core-0.7.1.15-x86_64.AppImage"
     },
     {
-      "name": "StrawWU-Core-0.7.1.10-x86_64.portable.tar.gz",
+      "name": "StrawWU-Core-0.7.1.15-x86_64.portable.tar.gz",
       "kind": "portable.tar.gz",
-      "path": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.10-x86_64.portable.tar.gz",
-      "sha256": "4c8928e186187b6261878d69e9c5d75ceb04f44b05053b1ac4fc07eed6c5b421",
-      "size_bytes": 423046,
-      "built_version_tag": "StrawWU-Core-0.7.1.10-x86_64.portable.tar.gz"
-    },
-    {
-      "name": "org.strawwu.Core-0.7.1.11.flatpak",
-      "kind": "flatpak",
-      "path": "components/packaging/portable/flatpak/dist/org.strawwu.Core-0.7.1.11.flatpak",
-      "sha256": "cbc111c7b4dfb53be8e7fd788bed20acc6ae2f223381b3cbf94fabb1b6110a6f",
-      "size_bytes": 353728,
-      "built_version_tag": "org.strawwu.Core-0.7.1.11.flatpak"
+      "path": "components/packaging/portable/appimage/dist/StrawWU-Core-0.7.1.15-x86_64.portable.tar.gz",
+      "sha256": "97449934219dcd521a67cbc91e506defb953e93983bcd76ff602517912aae21a",
+      "size_bytes": 422969,
+      "built_version_tag": "StrawWU-Core-0.7.1.15-x86_64.portable.tar.gz"
     }
   ],
-  "sha256sums_path": "tests/portable/output/SHA256SUMS",
-  "evidence": {
-    "smoke_prefix": "tests/portable/output/smoke-prefix.json",
-    "smoke_appimage": "tests/portable/output/smoke-appimage.json",
-    "smoke_flatpak": "tests/portable/output/smoke-flatpak.json",
-    "matrix": "tests/portable/output/matrix.json",
-    "closeout": "tests/portable/output/closeout.json"
-  }
+  "sha256sums": "tests/portable/output/SHA256SUMS",
+  "notes": [
+    "Portable Core redistribution artifacts for GitHub Releases.",
+    "Not a full Windows compatibility claim."
+  ]
 }

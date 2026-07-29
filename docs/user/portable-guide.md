@@ -12,7 +12,18 @@
 - Flatpak 對 PE／SubsystemSession：**PARTIAL**（需 host filesystem）
 - **不取代** Live USB／安裝版 ISO 軌道
 
-## 三種形態
+## 一鍵安裝（推薦）
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/StrawCoding/StrawWU-portable/main/install.sh | bash
+strawwu --version
+strawwu status
+```
+
+腳本從 GitHub Releases 下載 `portable.tar.gz`，裝到
+`~/.local/share/strawwu-core`，並把 `strawwu` 連到 `~/.local/bin`。
+
+## 三種形態（手動／建置）
 
 1. **自含 prefix** — `make portable-prefix`，執行 `$STRAWWU_PREFIX/bin/strawwu`
 2. **AppImage／portable.tar.gz** — `make portable-appimage`（跨發行版優先）
