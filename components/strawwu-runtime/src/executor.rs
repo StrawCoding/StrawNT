@@ -341,8 +341,12 @@ mod tests {
         assert!(gui.hwnd.unwrap_or(0) > 0);
         assert!(gui.closed);
         assert!(gui.compositor_frames >= 1);
+        assert!(gui.triangle_pixels > 100, "triangle_pixels={}", gui.triangle_pixels);
+        assert!(gui.present_frames >= 1);
         assert!(tmp.join("pe3-window.ppm").is_file());
         assert!(tmp.join("pe3-compositor.json").is_file());
+        assert!(tmp.join("nt-triangle.ppm").is_file());
+        assert!(tmp.join("nt-present.json").is_file());
         assert!(tmp.join("pe3-marker.txt").is_file());
         assert!(se.apis_invoked.iter().any(|a| a == "CreateWindowExA"));
         assert!(se.apis_invoked.iter().any(|a| a == "BitBlt"));

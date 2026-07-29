@@ -18,4 +18,8 @@ strawwu-audio = { path = "../strawwu-audio" }
 name = "golden-apps-verify"
 path = "src/bin/golden_apps_verify.rs"
 
+[[bin]]
+name = "nt-graphics-verify"
+path = "src/bin/nt_graphics_verify.rs"
+
 [dev-dependencies]

@@ -1,0 +1,18 @@
+{
+  "d3d11_translation_target": "vulkan",
+  "display_backend": "wayland",
+  "draw_calls": 1,
+  "dxgi_frames": 5,
+  "height": 480,
+  "present_frames": 8,
+  "schema": "strawwu-portable-gx-present/v1",
+  "screenshot": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt1-side-effects/gx-pipeline/gx-triangle.ppm",
+  "triangle_pixels": 63038,
+  "triangles_drawn": 1,
+  "vk_frames": 5,
+  "vk_icd": "strawwu-vk-icd",
+  "vsync": "on",
+  "wgl_backend": "egl",
+  "wgl_frames": 3,
+  "width": 640
+}

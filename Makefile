@@ -7,7 +7,7 @@
 	portable-prefix test-portable-prefix portable-appimage test-portable-appimage \
 	portable-flatpak test-portable-flatpak test-portable-matrix test-portable-closeout \
 	test-portable-pe-closeout test-portable-gx-graphics test-portable-gx-audio-input \
-	test-portable-gx-closeout
+	test-portable-gx-closeout test-strawnt-nt1-graphics
 
 REPO_ROOT := $(abspath .)
 SCRIPTS   := os-image/scripts
@@ -689,6 +689,9 @@ test-portable-pe-closeout:
 
 test-portable-gx-graphics:
 	bash tests/portable/smoke-gx-graphics.sh
+
+test-strawnt-nt1-graphics:
+	bash tests/strawnt/nt1-real-graphics.sh
 
 test-portable-gx-audio-input:
 	bash tests/portable/smoke-gx-audio-input.sh

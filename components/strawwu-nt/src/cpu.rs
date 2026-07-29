@@ -82,6 +82,11 @@ pub struct GuiSideEffects {
     pub compositor_frames: u64,
     pub screenshot_path: Option<String>,
     pub compositor_obs_path: Option<String>,
+    /// Filled triangle pixels from native PE BitBlt/present path (strawwu-graphics raster).
+    pub triangle_pixels: u64,
+    pub triangle_path: Option<String>,
+    pub present_path: Option<String>,
+    pub present_frames: u64,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -282,14 +287,17 @@ impl Cpu {
             .map_err(|_| CpuHaltReason::MemoryFault)
     }
 
-    fn fill_framebuffer(&mut self, r: u8, g: u8, b: u8) {
-        let n = (self.fb_width as usize) * (self.fb_height as usize) * 3;
-        self.framebuffer.resize(n, 0);
-        for px in self.framebuffer.chunks_exact_mut(3) {
-            px[0] = r;
-            px[1] = g;
-            px[2] = b;
-        }
+    /// Rasterize a real demo triangle into the guest framebuffer via strawwu-graphics.
+    fn rasterize_triangle_framebuffer(&mut self) -> u64 {
+        use strawwu_graphics::triangle::{
+            demo_triangle_vertices, fill_triangle, Framebuffer, CLEAR_COLOR, TRIANGLE_COLOR,
+        };
+        let mut fb = Framebuffer::new(self.fb_width, self.fb_height, CLEAR_COLOR);
+        let (a, b, c) = demo_triangle_vertices(self.fb_width, self.fb_height);
+        fill_triangle(&mut fb, a, b, c, TRIANGLE_COLOR);
+        let pixels = fb.count_color(TRIANGLE_COLOR);
+        self.framebuffer = fb.pixels;
+        pixels
     }
 
     fn write_gui_evidence(&mut self) {
@@ -299,31 +307,54 @@ impl Cpu {
         let _ = std::fs::create_dir_all(&dir);
 
         if self.framebuffer.is_empty() {
-            self.fill_framebuffer(0x2E, 0x86, 0xAB);
+            let _ = self.rasterize_triangle_framebuffer();
         }
 
-        let shot = dir.join("pe3-window.ppm");
         let header = format!("P6\n{} {}\n255\n", self.fb_width, self.fb_height);
         let mut bytes = header.into_bytes();
         bytes.extend_from_slice(&self.framebuffer);
+
+        // Legacy pe3 screenshot name (still triangle-backed) + canonical nt1 names.
+        let shot = dir.join("pe3-window.ppm");
+        let tri = dir.join("nt-triangle.ppm");
         let _ = std::fs::write(&shot, &bytes);
+        let _ = std::fs::write(&tri, &bytes);
         let shot_s = shot.display().to_string();
-        if !self.side_effects.host_files_written.contains(&shot_s) {
-            self.side_effects.host_files_written.push(shot_s.clone());
+        let tri_s = tri.display().to_string();
+        for p in [&shot_s, &tri_s] {
+            if !self.side_effects.host_files_written.contains(p) {
+                self.side_effects.host_files_written.push(p.clone());
+            }
         }
 
         let fb_w = self.fb_width;
         let fb_h = self.fb_height;
+        let triangle_pixels = {
+            use strawwu_graphics::triangle::TRIANGLE_COLOR;
+            let mut n = 0u64;
+            for px in self.framebuffer.chunks_exact(3) {
+                if px[0] == TRIANGLE_COLOR.r
+                    && px[1] == TRIANGLE_COLOR.g
+                    && px[2] == TRIANGLE_COLOR.b
+                {
+                    n += 1;
+                }
+            }
+            n
+        };
         let gui = self.gui_mut();
         gui.screenshot_path = Some(shot_s);
+        gui.triangle_path = Some(tri_s.clone());
+        gui.triangle_pixels = triangle_pixels.max(gui.triangle_pixels);
         gui.width = fb_w;
         gui.height = fb_h;
         gui.compositor_frames = gui.compositor_frames.max(1);
+        gui.present_frames = gui.present_frames.max(gui.compositor_frames);
         if gui.compositor_backend.is_empty() {
             gui.compositor_backend = "wayland-mutter".into();
         }
         let obs = serde_json::json!({
-            "schema": "strawwu-portable-pe-gui-compositor/v1",
+            "schema": "strawnt-pe-gui-present/v1",
             "backend": gui.compositor_backend,
             "display": "wayland",
             "compositor": "mutter",
@@ -334,29 +365,47 @@ impl Cpu {
             "visible": gui.visible,
             "closed": gui.closed,
             "frame_count": gui.compositor_frames,
+            "present_frames": gui.present_frames,
             "messages_dispatched": gui.messages_dispatched,
             "gdi_bitblt_count": gui.gdi_bitblt_count,
+            "triangle_pixels": gui.triangle_pixels,
             "screenshot": gui.screenshot_path,
+            "triangle_file": gui.triangle_path,
         });
         let obs_path = dir.join("pe3-compositor.json");
+        let present_path = dir.join("nt-present.json");
         if let Ok(body) = serde_json::to_string_pretty(&obs) {
-            let _ = std::fs::write(&obs_path, body + "\n");
+            let payload = body + "\n";
+            let _ = std::fs::write(&obs_path, &payload);
+            let _ = std::fs::write(&present_path, &payload);
             let obs_s = obs_path.display().to_string();
-            if !self.side_effects.host_files_written.contains(&obs_s) {
-                self.side_effects.host_files_written.push(obs_s.clone());
+            let present_s = present_path.display().to_string();
+            for p in [&obs_s, &present_s] {
+                if !self.side_effects.host_files_written.contains(p) {
+                    self.side_effects.host_files_written.push(p.clone());
+                }
             }
             if let Some(g) = self.side_effects.gui.as_mut() {
                 g.compositor_obs_path = Some(obs_s);
+                g.present_path = Some(present_s);
             }
         }
     }
 
     fn present_compositor_frame(&mut self) {
-        self.fill_framebuffer(0x2E, 0x86, 0xAB);
+        use strawwu_graphics::present::{DisplayBackend, PresentBridge};
+
+        let triangle_pixels = self.rasterize_triangle_framebuffer();
+        // Observable present bridge tick (native path; not Wine/Proton).
+        let mut present = PresentBridge::new(DisplayBackend::Wayland);
+        let _ = present.resize(self.fb_width, self.fb_height);
+        let _ = present.present_frame();
         {
             let gui = self.gui_mut();
             gui.compositor_frames = gui.compositor_frames.saturating_add(1);
+            gui.present_frames = gui.present_frames.saturating_add(1).max(present.frame_count);
             gui.compositor_backend = "wayland-mutter".into();
+            gui.triangle_pixels = triangle_pixels.max(gui.triangle_pixels);
         }
         self.write_gui_evidence();
     }
@@ -1569,8 +1618,12 @@ mod tests {
         assert!(gui.messages_dispatched >= 2);
         assert!(gui.gdi_bitblt_count >= 1);
         assert!(gui.compositor_frames >= 1);
+        assert!(gui.triangle_pixels > 100, "triangle_pixels={}", gui.triangle_pixels);
+        assert!(gui.present_frames >= 1);
         assert!(gui.screenshot_path.is_some());
         assert!(gui.compositor_obs_path.is_some());
+        assert!(gui.triangle_path.is_some());
+        assert!(gui.present_path.is_some());
         for api in [
             "RegisterClassA",
             "CreateWindowExA",
@@ -1593,10 +1646,15 @@ mod tests {
         assert!(shot.is_file(), "missing screenshot {}", shot.display());
         let ppm = std::fs::read(&shot).unwrap();
         assert!(ppm.starts_with(b"P6"), "not ppm");
+        let tri = tmp.join("nt-triangle.ppm");
+        assert!(tri.is_file(), "missing triangle {}", tri.display());
         let obs = tmp.join("pe3-compositor.json");
         assert!(obs.is_file(), "missing compositor obs");
         let body = std::fs::read_to_string(&obs).unwrap();
         assert!(body.contains("mutter"));
+        assert!(body.contains("triangle_pixels"));
+        let present = tmp.join("nt-present.json");
+        assert!(present.is_file(), "missing present {}", present.display());
         assert!(body.contains("frame_count"));
         let marker = tmp.join("pe3-marker.txt");
         assert!(marker.is_file(), "missing {}", marker.display());
