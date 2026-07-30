@@ -13,6 +13,8 @@ REPO="${STRAWNT_REPO:-${STRAWWU_REPO:-StrawCoding/StrawNT}}"
 PREFIX="${STRAWNT_PREFIX:-${STRAWWU_PREFIX:-${HOME}/.local/share/strawnt}}"
 BIN_DIR="${STRAWNT_BIN_DIR:-${STRAWWU_BIN_DIR:-${HOME}/.local/bin}}"
 REQUESTED_VERSION="${STRAWNT_VERSION:-${STRAWWU_VERSION:-}}"
+# Local portable.tar.gz / AppImage bypasses GitHub download (CI / nt6 clean-env).
+LOCAL_ASSET="${STRAWNT_LOCAL_ASSET:-}"
 ARCH="$(uname -m)"
 TMPDIR_ROOT="${TMPDIR:-/tmp}"
 WORK=""
@@ -28,11 +30,13 @@ Options:
   --prefix DIR     Install root (default: ~/.local/share/strawnt)
   --bin-dir DIR    Symlink directory (default: ~/.local/bin)
   --version VER    Release tag/version (default: latest GitHub release)
+  --local FILE     Install from local portable.tar.gz / AppImage
   --help           Show this help
 
 Examples:
   curl -fsSL https://raw.githubusercontent.com/StrawCoding/StrawNT/main/install.sh | bash
   curl -fsSL ... | bash -s -- --prefix "$HOME/.local/strawnt"
+  STRAWNT_LOCAL_ASSET=./StrawNT-*.portable.tar.gz bash install.sh
 EOF
 }
 
@@ -41,6 +45,7 @@ while [[ $# -gt 0 ]]; do
     --prefix) PREFIX="$2"; shift 2 ;;
     --bin-dir) BIN_DIR="$2"; shift 2 ;;
     --version) REQUESTED_VERSION="$2"; shift 2 ;;
+    --local) LOCAL_ASSET="$2"; shift 2 ;;
     --help|-h) usage; exit 0 ;;
     *) die "unknown option: $1 (try --help)" ;;
   esac
@@ -103,29 +108,44 @@ cleanup() {
 }
 trap cleanup EXIT
 
-resolve_release
-log "repo=${REPO} release=${RELEASE_TAG} asset=${ASSET_NAME}"
-log "prefix=${PREFIX}"
-log "bin-dir=${BIN_DIR}"
-
 WORK="$(mktemp -d "${TMPDIR_ROOT}/strawnt-install.XXXXXX")"
-ASSET_PATH="${WORK}/${ASSET_NAME}"
-log "downloading ${ASSET_URL}"
-curl -fL --progress-bar -o "${ASSET_PATH}" "${ASSET_URL}" \
-  || die "download failed"
+ASSET_PATH=""
+ASSET_NAME=""
+RELEASE_TAG=""
 
-if [[ -n "${SUMS_URL}" ]]; then
-  log "verifying SHA256"
-  curl -fsSL -o "${WORK}/SHA256SUMS" "${SUMS_URL}" || die "SHA256SUMS download failed"
-  (
-    cd "${WORK}"
-    # Only check the asset we downloaded (SUMS may list multiple files).
-    awk -v f="${ASSET_NAME}" '$2 == f { print }' SHA256SUMS > SHA256SUMS.check
-    [[ -s SHA256SUMS.check ]] || die "SHA256SUMS has no entry for ${ASSET_NAME}"
-    sha256sum -c SHA256SUMS.check
-  ) || die "checksum mismatch"
+if [[ -n "${LOCAL_ASSET}" ]]; then
+  [[ -f "${LOCAL_ASSET}" ]] || die "local asset not found: ${LOCAL_ASSET}"
+  ASSET_NAME="$(basename "${LOCAL_ASSET}")"
+  ASSET_PATH="${WORK}/${ASSET_NAME}"
+  cp -a "${LOCAL_ASSET}" "${ASSET_PATH}"
+  RELEASE_TAG="local:${ASSET_NAME}"
+  log "repo=local release=${RELEASE_TAG} asset=${ASSET_NAME}"
+  log "prefix=${PREFIX}"
+  log "bin-dir=${BIN_DIR}"
+  log "using local asset ${LOCAL_ASSET}"
 else
-  log "WARNING: no SHA256SUMS in release — skipping checksum"
+  resolve_release
+  log "repo=${REPO} release=${RELEASE_TAG} asset=${ASSET_NAME}"
+  log "prefix=${PREFIX}"
+  log "bin-dir=${BIN_DIR}"
+  ASSET_PATH="${WORK}/${ASSET_NAME}"
+  log "downloading ${ASSET_URL}"
+  curl -fL --progress-bar -o "${ASSET_PATH}" "${ASSET_URL}" \
+    || die "download failed"
+
+  if [[ -n "${SUMS_URL}" ]]; then
+    log "verifying SHA256"
+    curl -fsSL -o "${WORK}/SHA256SUMS" "${SUMS_URL}" || die "SHA256SUMS download failed"
+    (
+      cd "${WORK}"
+      # Only check the asset we downloaded (SUMS may list multiple files).
+      awk -v f="${ASSET_NAME}" '$2 == f { print }' SHA256SUMS > SHA256SUMS.check
+      [[ -s SHA256SUMS.check ]] || die "SHA256SUMS has no entry for ${ASSET_NAME}"
+      sha256sum -c SHA256SUMS.check
+    ) || die "checksum mismatch"
+  else
+    log "WARNING: no SHA256SUMS in release — skipping checksum"
+  fi
 fi
 
 STAGE="${WORK}/stage"
@@ -198,6 +218,61 @@ ln -sfn "${WRAPPER}" "${BIN_DIR}/strawnt"
 # Compat alias (deprecated) — main path is strawnt.
 ln -sfn "${WRAPPER}" "${BIN_DIR}/strawwu"
 
+# Ensure BIN_DIR is on PATH for this shell and future login shells.
+ensure_bin_on_path() {
+  case ":${PATH}:" in
+    *":${BIN_DIR}:"*) ;;
+    *) export PATH="${BIN_DIR}:${PATH}" ;;
+  esac
+  local marker="# StrawNT PATH"
+  for rc in "${HOME}/.profile" "${HOME}/.bashrc"; do
+    [[ -f "${rc}" ]] || continue
+    if ! grep -qF "${marker}" "${rc}" 2>/dev/null; then
+      if ! grep -qF "${BIN_DIR}" "${rc}" 2>/dev/null; then
+        printf '\n%s\n%s\n' "${marker}" "export PATH=\"${BIN_DIR}:\$PATH\"" >> "${rc}"
+        log "added ${BIN_DIR} to PATH via ${rc}"
+      fi
+    fi
+  done
+  # Always create a sourceable env snippet.
+  mkdir -p "${HOME}/.config/strawnt"
+  cat > "${HOME}/.config/strawnt/env.sh" <<EOF
+# Sourced by install / docs — puts StrawNT CLI on PATH.
+export PATH="${BIN_DIR}:\$PATH"
+export STRAWNT_PREFIX="${PREFIX}"
+EOF
+}
+ensure_bin_on_path
+
+# Pre-clear legacy StrawWU / temp-path open handlers that steal MIME defaults.
+APPS_DIR="${HOME}/.local/share/applications"
+MIME_DIR="${HOME}/.local/share/mime/packages"
+mkdir -p "${APPS_DIR}" "${MIME_DIR}"
+for stale in strawwu-open.desktop strawwu.desktop; do
+  if [[ -f "${APPS_DIR}/${stale}" ]]; then
+    rm -f "${APPS_DIR}/${stale}"
+    log "removed stale desktop handler: ${APPS_DIR}/${stale}"
+  fi
+done
+# Broken TryExec pointing at deleted /tmp/... leftovers.
+if [[ -d "${APPS_DIR}" ]]; then
+  while IFS= read -r -d '' desk; do
+    try="$(awk -F= '/^TryExec=/{print $2; exit}' "${desk}" 2>/dev/null || true)"
+    if [[ -n "${try}" && "${try}" == /* && ! -e "${try}" ]]; then
+      base="$(basename "${desk}")"
+      case "${base}" in
+        strawwu*|strawnt-open.desktop|*.desktop)
+          if grep -qiE 'strawwu|X-StrawWU|open %f|x-ms-dos-executable|x-msi' "${desk}"; then
+            rm -f "${desk}"
+            log "removed broken TryExec handler: ${desk} (was ${try})"
+          fi
+          ;;
+      esac
+    fi
+  done < <(find "${APPS_DIR}" -maxdepth 1 -type f -name '*.desktop' -print0 2>/dev/null || true)
+fi
+rm -f "${MIME_DIR}/strawwu-win32.xml" 2>/dev/null || true
+
 # Click-to-open: MIME handler so double-clicking .exe/.msi installs & launches.
 export PATH="${BIN_DIR}:${PATH}"
 export STRAWNT_PREFIX="${PREFIX}"
@@ -248,9 +323,11 @@ Try:
   strawnt status
   strawnt open setup.exe     # native PE path + app-menu shortcut
   # Or double-click any .exe / .msi in your file manager
+  # App menu: StrawNT (runs status); MIME handler is hidden (NoDisplay)
 
-If 'strawnt' is not found, add to PATH:
+If 'strawnt' is not found, add to PATH (or open a new login shell):
   export PATH="${BIN_DIR}:\$PATH"
+  # or: source ~/.config/strawnt/env.sh
 
 Note: .exe/.msi execution uses StrawNT native PE (execution_backend=native).
 Not every Windows app will run; anti-cheat / kernel drivers may still fail.

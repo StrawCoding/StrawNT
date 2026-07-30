@@ -136,11 +136,16 @@ EOF
 [Desktop Entry]
 Type=Application
 Name=StrawNT
-Comment=StrawNT native PE runtime — click .exe to install & launch
-Exec=strawnt
+GenericName=Windows App Runtime
+Comment=StrawNT native PE / NT ABI runtime
+Exec=strawnt status
+TryExec=strawnt
 Icon=strawnt
-Categories=System;
+Categories=System;Utility;
 Terminal=true
+NoDisplay=false
+X-StrawNT-Kind=menu-launcher
+X-StrawNT-Backend=native
 EOF
     cp -a "${APPDIR}/strawnt.desktop" "${APPDIR}/usr/share/applications/strawnt.desktop"
 
@@ -152,7 +157,7 @@ EOF
         cat > "${APPDIR}/usr/share/applications/strawnt-open.desktop" <<'EOF'
 [Desktop Entry]
 Type=Application
-Name=StrawNT
+Name=StrawNT (Open)
 Comment=Install or run Windows .exe/.msi with StrawNT native PE
 Exec=strawnt open %f
 TryExec=strawnt
@@ -160,11 +165,15 @@ Icon=strawnt
 Terminal=false
 Categories=System;Utility;
 MimeType=application/x-ms-dos-executable;application/x-msdownload;application/vnd.microsoft.portable-executable;application/x-msi;
-NoDisplay=false
+NoDisplay=true
 StartupNotify=true
 X-StrawNT-Kind=open-handler
+X-StrawNT-Backend=native
 EOF
     fi
+    # Never ship legacy StrawWU handlers inside AppDir.
+    rm -f "${APPDIR}/usr/share/applications/strawwu-open.desktop" \
+          "${APPDIR}/usr/share/applications/strawwu.desktop"
 
     cat > "${APPDIR}/AppRun" <<'EOF'
 #!/usr/bin/env bash

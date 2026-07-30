@@ -113,3 +113,9 @@ tests/strawnt/fixtures/launchers/
 
 # nt3 side-effects (JSON evidence nt3-launchers.json kept)
 tests/strawnt/output/nt3-side-effects/
+
+# nt6 openable ephemeral install tree (keep open.log / desktops / evidence JSON)
+tests/strawnt/output/nt6-side-effects/clean-home/
+tests/strawnt/output/nt6-side-effects/apps/
+tests/strawnt/output/nt6-side-effects/app-registry.json
+tests/strawnt/output/nt6-side-effects/app-registry.json.lock

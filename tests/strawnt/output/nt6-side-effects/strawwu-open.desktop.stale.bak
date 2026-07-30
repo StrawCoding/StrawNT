@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=StrawWU
+GenericName=Windows App Launcher
+Comment=Install or run Windows .exe/.msi with StrawWU Portable Core
+Exec="/tmp/tmp.hqa8qM1Rum/bin/strawwu" open %f
+TryExec=/tmp/tmp.hqa8qM1Rum/bin/strawwu
+Icon=strawwu
+Terminal=false
+Categories=System;Utility;
+MimeType=application/x-ms-dos-executable;application/x-msdownload;application/vnd.microsoft.portable-executable;application/x-msi;application/x-ms-shortcut;
+NoDisplay=false
+StartupNotify=true
+X-StrawWU-Kind=open-handler

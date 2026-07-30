@@ -1,0 +1,4 @@
+strawnt: desktop launcher → /mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/applications/pe2-console-mvp.desktop
+strawnt: launched /mnt/data/code/project/StrawCoding/StrawNT/tests/portable/fixtures/pe2-console-mvp.exe (format=PE, pid=1000, backend=native, app_id=pe2-console-mvp, mode=real, gui-smoke=SKIP subsystem=non-gui)
+STRAWWU_PE_CONSOLE_OK
+STRAWWU_PE_CONSOLE_CRT

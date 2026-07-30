@@ -12,20 +12,23 @@ curl -fsSL https://raw.githubusercontent.com/StrawCoding/StrawNT/main/install.sh
 ```
 
 安裝時會：
-1. 下載最新 Release 產物
-2. 啟用 **雙擊 .exe / .msi → 安裝／啟動**（`execution_backend=native`）
+1. 下載最新 Release 產物（或 `install.sh --local` 本機產物）
+2. 把 `strawnt` 掛到 `~/.local/bin`（並寫入 `~/.config/strawnt/env.sh`）
+3. 清除舊 StrawWU／壞掉的暫存路徑 MIME handler
+4. 寫入應用選單入口（`strawnt.desktop` → `status`）與雙擊 handler（`strawnt-open.desktop`）
 
 ```bash
 strawnt --version
 strawnt status          # 應顯示 backend=native
-strawnt integrate       # 換桌面後再開一次
+strawnt integrate       # 換桌面／清 stale handler 後再開一次
 ```
 
 ### 點擊就能安裝與啟動
 
-1. 檔案管理員 **雙擊** `.exe` / `.msi`
-2. StrawNT 經自研 **native PE**（`execution_backend=native`）處理安裝／啟動
-3. 寫入應用選單捷徑，之後可一鍵再開
+1. 應用選單開 **StrawNT**（執行 `status`；不需檔案參數）
+2. 檔案管理員 **雙擊** `.exe` / `.msi`（MIME → `strawnt open`）
+3. StrawNT 經自研 **native PE**（`execution_backend=native`）處理安裝／啟動
+4. 寫入應用選單捷徑，之後可一鍵再開
 
 ```bash
 strawnt open setup.exe          # 安裝程式 → native + 捷徑

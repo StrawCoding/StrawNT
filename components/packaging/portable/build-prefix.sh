@@ -174,11 +174,28 @@ Click-to-open:
 Independent product — not an OS/ISO/desktop distribution.
 EOF
 
-# Template desktop handler (install.sh / \`strawnt integrate\` writes the live copy).
-cat > "${PREFIX}/share/applications/strawnt-open.desktop" <<'EOF'
+# Template desktop entries (install.sh / `strawnt integrate` writes the live copies).
+cat > "${PREFIX}/share/applications/strawnt.desktop" <<'EOF'
 [Desktop Entry]
 Type=Application
 Name=StrawNT
+GenericName=Windows App Runtime
+Comment=StrawNT native PE / NT ABI runtime
+Exec=strawnt status
+TryExec=strawnt
+Icon=strawnt
+Terminal=true
+Categories=System;Utility;
+NoDisplay=false
+StartupNotify=true
+X-StrawNT-Kind=menu-launcher
+X-StrawNT-Backend=native
+EOF
+
+cat > "${PREFIX}/share/applications/strawnt-open.desktop" <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=StrawNT (Open)
 GenericName=Windows App Launcher
 Comment=Install or run Windows .exe/.msi with StrawNT native PE
 Exec=strawnt open %f
@@ -187,10 +204,15 @@ Icon=strawnt
 Terminal=false
 Categories=System;Utility;
 MimeType=application/x-ms-dos-executable;application/x-msdownload;application/vnd.microsoft.portable-executable;application/x-msi;application/x-ms-shortcut;
-NoDisplay=false
+NoDisplay=true
 StartupNotify=true
 X-StrawNT-Kind=open-handler
+X-StrawNT-Backend=native
 EOF
+
+# Never ship legacy StrawWU open handlers in the prefix.
+rm -f "${PREFIX}/share/applications/strawwu-open.desktop" \
+      "${PREFIX}/share/applications/strawwu.desktop"
 
 # Wrapper that sets local registry when invoked from prefix.
 cat > "${PREFIX}/bin/strawnt-env" <<EOF

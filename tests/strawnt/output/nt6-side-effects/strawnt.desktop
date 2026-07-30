@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=StrawNT
+GenericName=Windows App Runtime
+Comment=StrawNT native PE / NT ABI runtime
+Exec="/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/bin/strawnt" status
+TryExec=/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/bin/strawnt
+Icon=strawnt
+Terminal=true
+Categories=System;Utility;
+NoDisplay=false
+StartupNotify=true
+X-StrawNT-Kind=menu-launcher
+X-StrawNT-Backend=native

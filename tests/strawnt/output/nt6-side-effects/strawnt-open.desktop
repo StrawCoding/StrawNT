@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Application
+Name=StrawNT (Open)
+GenericName=Windows App Launcher
+Comment=Install or run Windows .exe/.msi via StrawNT native PE
+Exec="/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/bin/strawnt" open %f
+TryExec=/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/bin/strawnt
+Icon=strawnt
+Terminal=false
+Categories=System;Utility;
+MimeType=application/x-ms-dos-executable;application/x-msdownload;application/vnd.microsoft.portable-executable;application/x-msi;application/x-ms-shortcut;
+NoDisplay=true
+StartupNotify=true
+X-StrawNT-Kind=open-handler
+X-StrawNT-Backend=native

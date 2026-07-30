@@ -246,11 +246,13 @@ fn main() {
                 }
             }
         }
-        Command::Integrate => match desktop::install_desktop_integration() {
-            Ok(path) => {
+        Command::Integrate => match desktop::install_desktop_integration_full() {
+            Ok(info) => {
                 println!(
-                    "strawnt: desktop integration installed\n  handler: {}\n  backend: native (strawnt-native)\n  tip: double-click .exe / .msi to install & launch",
-                    path.display()
+                    "strawnt: desktop integration installed\n  menu: {}\n  handler: {}\n  cleared_stale: {}\n  backend: native (strawnt-native)\n  tip: app menu → StrawNT; double-click .exe / .msi to install & launch",
+                    info.menu_entry.display(),
+                    info.open_handler.display(),
+                    info.cleared_stale.len()
                 );
                 open::notify(
                     "StrawNT",

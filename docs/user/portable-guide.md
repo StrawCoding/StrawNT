@@ -24,14 +24,16 @@ strawnt status
 
 腳本從 GitHub Releases 下載 `portable.tar.gz`，裝到
 `~/.local/share/strawnt`，把 `strawnt` 連到 `~/.local/bin`，
-並執行 `strawnt integrate` 啟用 **雙擊 .exe/.msi → 安裝與啟動**。
+清除舊 StrawWU／暫存路徑 handler，並執行 `strawnt integrate`：
+應用選單有可啟動的 **StrawNT**；雙擊 `.exe`/`.msi` → 安裝與啟動。
 
 ```bash
-strawnt integrate              # 重裝／換桌面後再開
+strawnt integrate              # 重裝／換桌面後再開（會清 stale handler）
 strawnt open setup.exe         # 或直接雙擊檔案
 ```
 
 安裝／開啟後會在 `~/.local/share/applications/` 寫入捷徑，可從應用選單再開。
+Openable 證據：`tests/strawnt/output/nt6-openable.json`。
 
 ## 三種形態（手動／建置）
 

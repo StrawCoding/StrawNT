@@ -1,0 +1,95 @@
+{
+  "schema": "strawnt-nt6-openable/v1",
+  "stage": "nt6-openable-app",
+  "product": "StrawNT",
+  "status": "PASS",
+  "version": "0.7.1.39",
+  "mode": "real",
+  "backend": "native",
+  "execution_backend": "native",
+  "generated_at": "2026-07-30T01:48:55Z",
+  "cli_available": true,
+  "desktop_exec_exists": true,
+  "stale_handler_cleared": true,
+  "install": {
+    "method": "install.sh --local",
+    "asset": "/mnt/data/code/project/StrawCoding/StrawNT/components/packaging/portable/appimage/dist/StrawNT-0.7.1.39-x86_64.portable.tar.gz",
+    "asset_sha256": "50b2bfa29596fcfb4b9971917e7dd68df5ea2244836e9fd4a9931b748a37a625"
+  },
+  "cli": {
+    "which": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/bin/strawnt",
+    "version": "strawnt 0.7.1-preview.39"
+  },
+  "desktop": {
+    "menu_entry": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/applications/strawnt.desktop",
+    "open_handler": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/applications/strawnt-open.desktop",
+    "try_exec_resolved": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/bin/strawnt"
+  },
+  "open": {
+    "fixture": "tests/portable/fixtures/pe2-console-mvp.exe",
+    "log": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/open.log",
+    "output_excerpt": "strawnt: desktop launcher → /mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/applications/pe2-console-mvp.desktop\nstrawnt: launched /mnt/data/code/project/StrawCoding/StrawNT/tests/portable/fixtures/pe2-console-mvp.exe (format=PE, pid=1000, backend=native, app_id=pe2-console-mvp, mode=real, gui-smoke=SKIP subsystem=non-gui)\nSTRAWWU_PE_CONSOLE_OK\nSTRAWWU_PE_CONSOLE_CRT"
+  },
+  "side_effects": {
+    "dir": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects",
+    "open_log": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/open.log",
+    "primary": "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/pe-exec-summary.json"
+  },
+  "artifacts": [
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/app-registry.json",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.config/mimeapps.list",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.config/strawnt/env.sh",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/applications/mimeinfo.cache",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/applications/pe2-console-mvp.desktop",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/applications/strawnt-open.desktop",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/applications/strawnt.desktop",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/mime/application/vnd.microsoft.portable-executable.xml",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/mime/application/x-msi.xml",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/mime/globs",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/mime/globs2",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/mime/magic",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/mime/mime.cache",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/mime/packages/strawnt-win32.xml",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/mime/treemagic",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/mime/types",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/mime/version",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/strawnt/bin/strawnt",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/strawnt/bin/strawnt-env",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/strawnt/bin/strawnt-portable",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/strawnt/bin/strawnt-portable",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/strawnt/bin/strawnt-portable",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/strawnt/bin/strawwu",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/strawnt/share/applications/strawnt-open.desktop",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/strawnt/share/applications/strawnt.desktop",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/strawnt/share/doc/strawnt/README.txt",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/strawnt/share/icons/hicolor/256x256/apps/strawnt.png",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/strawnt/share/strawnt/portable-appimage.json",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/strawnt/share/strawnt/portable-prefix.json",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/strawnt/share/strawnt/wincompat/baseline.yaml",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/strawnt/var/lib/strawnt/app-registry.json",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/install.sh.log",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/open.log",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/pe-exec-summary.json",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/pe-stdout.txt",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/pe2-marker.txt",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/strawnt-open.desktop",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/strawnt.desktop",
+    "/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/strawwu-open.desktop.stale.bak"
+  ],
+  "claims": {
+    "cli_available": true,
+    "desktop_exec_exists": true,
+    "stale_handler_cleared": true,
+    "full_windows_compat": false,
+    "anticheat_ranked_pass": false,
+    "wine_proton_used": false,
+    "simulated_ok": false
+  },
+  "exclusions_honored": [
+    "no ISO/os-image/Plymouth/Calamares/kernel/desktop / StrawWU OS changes",
+    "no Wine/Proton substrate; execution_backend=native",
+    "no WinBox naming",
+    "no full Windows compatibility / ranked anti-cheat claim",
+    "no simulated top-level PASS"
+  ]
+}

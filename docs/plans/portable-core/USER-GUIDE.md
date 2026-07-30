@@ -93,6 +93,7 @@ jq .status tests/portable/output/matrix.json
 | nt3 啟動器 | `nt3-launchers.json` | **PARTIAL**（僅驗啟動） |
 | nt4 反作弊 | `nt4-anticheat.json` | **PARTIAL**（探測矩陣；禁排位宣稱） |
 | nt5 closeout | `nt5-closeout.json` | 本輪 closeout |
+| nt6 openable | `nt6-openable.json` | PASS（CLI／選單／清 stale／真實 open） |
 
 Closeout 報告：`docs/plans/portable-core/nt5-closeout-report.md`（HTML：`html/nt5-closeout-report.html`）。
 

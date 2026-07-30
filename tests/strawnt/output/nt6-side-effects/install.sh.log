@@ -1,0 +1,42 @@
+[strawnt-install] repo=local release=local:StrawNT-0.7.1.39-x86_64.portable.tar.gz asset=StrawNT-0.7.1.39-x86_64.portable.tar.gz
+[strawnt-install] prefix=/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/strawnt
+[strawnt-install] bin-dir=/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/bin
+[strawnt-install] using local asset /mnt/data/code/project/StrawCoding/StrawNT/components/packaging/portable/appimage/dist/StrawNT-0.7.1.39-x86_64.portable.tar.gz
+[strawnt-install] installing into /mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/strawnt
+[strawnt-install] removed stale desktop handler: /mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/applications/strawwu-open.desktop
+strawnt: desktop integration installed
+  menu: /mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/applications/strawnt.desktop
+  handler: /mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/applications/strawnt-open.desktop
+  cleared_stale: 0
+  backend: native (strawnt-native)
+  tip: app menu → StrawNT; double-click .exe / .msi to install & launch
+[strawnt-install] desktop click-to-open enabled (.exe / .msi → native PE)
+
+StrawNT installed.
+
+  release : local:StrawNT-0.7.1.39-x86_64.portable.tar.gz
+  prefix  : /mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/share/strawnt
+  command : /mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/bin/strawnt
+  version : strawnt 0.7.1-preview.39
+  status  : exit 0
+  click   : integrate exit 0
+  backend : native (StrawNT PE)
+
+strawnt: status — runtime idle, 0 session(s), 0 app(s) registered
+strawnt: execution_backend=native (strawnt-native)
+strawnt: default backend=native
+
+Try:
+  strawnt --version
+  strawnt status
+  strawnt open setup.exe     # native PE path + app-menu shortcut
+  # Or double-click any .exe / .msi in your file manager
+  # App menu: StrawNT (runs status); MIME handler is hidden (NoDisplay)
+
+If 'strawnt' is not found, add to PATH (or open a new login shell):
+  export PATH="/mnt/data/code/project/StrawCoding/StrawNT/tests/strawnt/output/nt6-side-effects/clean-home/.local/bin:$PATH"
+  # or: source ~/.config/strawnt/env.sh
+
+Note: .exe/.msi execution uses StrawNT native PE (execution_backend=native).
+Not every Windows app will run; anti-cheat / kernel drivers may still fail.
+StrawNT is an independent product — not an OS / ISO / desktop distribution.
