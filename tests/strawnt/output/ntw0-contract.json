@@ -5,7 +5,7 @@
   "product": "StrawNT",
   "version": "0.7.1.48",
   "generated_at": "2026-08-07T16:37:20Z",
-  "git_head": "7602e3747707abe21dd049c6c91eed3498ce5963",
+  "git_head": "6122e316b5cea8d4dcab7817269e215c0bf032f3",
   "backend": "wine",
   "execution_backend": "wine",
   "engine": "proton-ge",
