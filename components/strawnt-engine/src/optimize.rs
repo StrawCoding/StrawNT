@@ -474,10 +474,13 @@ fn probe_dxvk_vulkan(repo: &Path) -> Value {
 }
 
 fn idle_sec() -> u64 {
-    std::env::var("STRAWNT_NTW3_IDLE_SEC")
+    // Authoritative plan (NTW3 Task 7): RSS after 60s idle minimum.
+    // Env override may raise the window; values below 60 are rejected for honesty.
+    let requested = std::env::var("STRAWNT_NTW3_IDLE_SEC")
         .ok()
         .and_then(|s| s.parse().ok())
-        .unwrap_or(15)
+        .unwrap_or(60u64);
+    requested.max(60)
 }
 
 /// Run one full NTW3 metric suite for a profile.

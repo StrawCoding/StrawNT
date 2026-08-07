@@ -35,7 +35,7 @@
         "prefix_create_ms": { "type": ["number", "null"] },
         "prefix_create_clone_ms": { "type": ["number", "null"] },
         "prefix_create_mode": { "type": "string" },
-        "rss_idle_sec": { "type": "number" }
+        "rss_idle_sec": { "type": "number", "minimum": 60 }
       }
     },
     "deltas": {

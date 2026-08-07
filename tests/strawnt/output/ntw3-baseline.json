@@ -3,9 +3,9 @@
   "stage": "ntw3-optimize",
   "status": "PASS",
   "product": "StrawNT",
-  "version": "0.7.1.54",
-  "generated_at": "2026-08-07T17:55:31Z",
-  "git_head": "4d2cbe709e2b67066227c4e9cb52c46e2e667c5f",
+  "version": "0.7.1.55",
+  "generated_at": "2026-08-07T18:10:10Z",
+  "git_head": "fd57b6dfab78f72b404c6db82fc83f947fc6caa4",
   "profile": "baseline",
   "execution_backend": "wine",
   "backend": "wine",
@@ -16,19 +16,19 @@
   "powered_by_wine": true,
   "simulated": false,
   "metrics": {
-    "cold_start_ms": 1130.909315,
+    "cold_start_ms": 1262.413137,
     "prefix_create_clone_ms": null,
     "prefix_create_mode": "wineboot",
-    "prefix_create_ms": 15893.190382,
-    "rss_after_idle_kb": 90380,
-    "rss_idle_sec": 10,
+    "prefix_create_ms": 23826.773774,
+    "rss_after_idle_kb": 90404,
+    "rss_idle_sec": 60,
     "rss_pids": [
-      1398512,
-      1398517,
-      1398520,
-      1398530,
-      1398536,
-      1398615
+      1418589,
+      1418594,
+      1418597,
+      1418607,
+      1418613,
+      1418620
     ]
   },
   "bench": {
@@ -41,13 +41,13 @@
       "simulated": false
     },
     "cold_start": {
-      "cold_start_ms": 1130.909315,
+      "cold_start_ms": 1262.413137,
       "exit_code": 0,
-      "marker": "STRAWNT_NTW3_baseline_1398042",
+      "marker": "STRAWNT_NTW3_baseline_1417873",
       "status": "PASS",
       "stderr_tail": "",
       "stdout_has_marker": true,
-      "stdout_tail": "e:winediag:loader_init wine-staging 11.0 is a testing version containing experimental patches.\n00e0:fixme:winediag:loader_init Please mention your exact version when filing bug reports on winehq.org.\n",
+      "stdout_tail": "e:winediag:loader_init wine-staging 11.0 is a testing version containing experimental patches.\n00e4:fixme:winediag:loader_init Please mention your exact version when filing bug reports on winehq.org.\n",
       "used_xvfb": true,
       "wine_bin": "/mnt/data/code/project/StrawCoding/StrawNT/third_party/proton-ge/dist/files/bin/wine"
     },
@@ -74,21 +74,21 @@
         "vulkaninfo_present": false
       }
     },
-    "home": "/tmp/strawnt-ntw3-base.ly0PTY/home",
+    "home": "/tmp/strawnt-ntw3-base.YDQlc0/home",
     "metrics": {
-      "cold_start_ms": 1130.909315,
+      "cold_start_ms": 1262.413137,
       "prefix_create_clone_ms": null,
       "prefix_create_mode": "wineboot",
-      "prefix_create_ms": 15893.190382,
-      "rss_after_idle_kb": 90380,
-      "rss_idle_sec": 10,
+      "prefix_create_ms": 23826.773774,
+      "rss_after_idle_kb": 90404,
+      "rss_idle_sec": 60,
       "rss_pids": [
-        1398512,
-        1398517,
-        1398520,
-        1398530,
-        1398536,
-        1398615
+        1418589,
+        1418594,
+        1418597,
+        1418607,
+        1418613,
+        1418620
       ]
     },
     "notes": [
@@ -102,7 +102,7 @@
     "pin": "GE-Proton11-3",
     "powered_by": "Wine",
     "powered_by_wine": true,
-    "prefix": "/tmp/strawnt-ntw3-base.ly0PTY/home/prefixes/ntw3-baseline-1398042",
+    "prefix": "/tmp/strawnt-ntw3-base.YDQlc0/home/prefixes/ntw3-baseline-1417873",
     "prefix_create": {
       "mode": "wineboot",
       "status": "PASS",
@@ -114,7 +114,7 @@
           "wineboot",
           "-u"
         ],
-        "duration_sec": 15.893004991,
+        "duration_sec": 23.826372981,
         "exit_code": 0,
         "pin": "GE-Proton11-3",
         "status": "PASS",
@@ -127,16 +127,16 @@
     "product": "StrawNT",
     "profile": "baseline",
     "rss": {
-      "idle_sec": 10,
+      "idle_sec": 60,
       "pids": [
-        1398512,
-        1398517,
-        1398520,
-        1398530,
-        1398536,
-        1398615
+        1418589,
+        1418594,
+        1418597,
+        1418607,
+        1418613,
+        1418620
       ],
-      "rss_kb": 90380,
+      "rss_kb": 90404,
       "status": "PASS"
     },
     "schema": "strawnt-ntw3-bench/v1",

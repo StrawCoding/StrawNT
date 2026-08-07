@@ -12,7 +12,12 @@ WORK="$(mktemp -d "${TMPDIR:-/tmp}/strawnt-ntw3-opt.XXXXXX")"
 export STRAWNT_HOME="${WORK}/home"
 export STRAWNT_ROOT="${REPO_ROOT}"
 export STRAWNT_FORCE_XVFB=1
-export STRAWNT_NTW3_IDLE_SEC="${STRAWNT_NTW3_IDLE_SEC:-15}"
+# Authoritative plan (NTW3 Task 7): RSS after 60s idle minimum.
+export STRAWNT_NTW3_IDLE_SEC="${STRAWNT_NTW3_IDLE_SEC:-60}"
+if [[ "${STRAWNT_NTW3_IDLE_SEC}" -lt 60 ]]; then
+  echo "STRAWNT_NTW3_IDLE_SEC=${STRAWNT_NTW3_IDLE_SEC} < 60; clamping to 60" >&2
+  export STRAWNT_NTW3_IDLE_SEC=60
+fi
 mkdir -p "${OUT_DIR}" "${STRAWNT_HOME}"
 
 cleanup() {
@@ -181,5 +186,6 @@ PY
 
 jq -e '.status == "PASS"' "${OUT_JSON}" >/dev/null
 jq -e '(.metrics != null) or (.deltas != null) or (.claims.measurable == true)' "${OUT_JSON}" >/dev/null
-echo "ntw3-optimize deltas:"
+jq -e '(.metrics.rss_idle_sec // 0) >= 60 and (.baseline_metrics.rss_idle_sec // 0) >= 60' "${OUT_JSON}" >/dev/null
+echo "ntw3-optimize deltas (idle=${STRAWNT_NTW3_IDLE_SEC}s):"
 jq '.deltas | with_entries(.value |= {before, after, delta, delta_pct, improved})' "${OUT_JSON}"

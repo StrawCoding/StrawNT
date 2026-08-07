@@ -10,8 +10,13 @@ WORK="$(mktemp -d "${TMPDIR:-/tmp}/strawnt-ntw3-base.XXXXXX")"
 export STRAWNT_HOME="${WORK}/home"
 export STRAWNT_ROOT="${REPO_ROOT}"
 export STRAWNT_FORCE_XVFB=1
-# Plan mentions 60s; allow override. Default 15 for practical CI; label in JSON.
-export STRAWNT_NTW3_IDLE_SEC="${STRAWNT_NTW3_IDLE_SEC:-15}"
+# Authoritative plan (NTW3 Task 7): RSS after 60s idle minimum.
+# Override may raise the window; values below 60 are clamped upward.
+export STRAWNT_NTW3_IDLE_SEC="${STRAWNT_NTW3_IDLE_SEC:-60}"
+if [[ "${STRAWNT_NTW3_IDLE_SEC}" -lt 60 ]]; then
+  echo "STRAWNT_NTW3_IDLE_SEC=${STRAWNT_NTW3_IDLE_SEC} < 60; clamping to 60" >&2
+  export STRAWNT_NTW3_IDLE_SEC=60
+fi
 mkdir -p "${OUT_DIR}" "${STRAWNT_HOME}"
 
 cleanup() {
@@ -86,5 +91,6 @@ jq -n \
 
 echo "Wrote ${OUT_JSON}"
 jq -e '.metrics.cold_start_ms != null and .metrics.prefix_create_ms != null' "${OUT_JSON}" >/dev/null
+jq -e '.metrics.rss_after_idle_kb != null and (.metrics.rss_idle_sec // 0) >= 60' "${OUT_JSON}" >/dev/null
 jq -e '.claims.measurable == true' "${OUT_JSON}" >/dev/null
-echo "ntw3-baseline: $(jq -r .status "${OUT_JSON}")"
+echo "ntw3-baseline: $(jq -r .status "${OUT_JSON}") idle=${STRAWNT_NTW3_IDLE_SEC}s"
