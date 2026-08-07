@@ -53,9 +53,26 @@ pub enum Command {
         json: bool,
         home: Option<PathBuf>,
     },
+    /// NTW4: Win32 IPC interop (same/cross prefix).
+    Interop(InteropSubcommand),
     Config(ConfigSubcommand),
     Version,
     Help,
+}
+
+#[derive(Debug, Clone)]
+pub enum InteropSubcommand {
+    Status { json: bool },
+    Smoke {
+        json: bool,
+        home: Option<PathBuf>,
+    },
+    Grant {
+        token: String,
+        channel: String,
+        prefixes: Vec<String>,
+        json: bool,
+    },
 }
 
 #[derive(Debug, Clone)]
@@ -166,10 +183,79 @@ pub fn parse_args(args: &[String]) -> Result<Command, String> {
         "recipes" => parse_recipes(&args[1..]),
         "matrix" => parse_matrix(&args[1..]),
         "bench" => parse_bench(&args[1..]),
+        "interop" => parse_interop(&args[1..]),
         "config" => parse_config(&args[1..]),
         "--version" | "version" => Ok(Command::Version),
         "--help" | "help" => Ok(Command::Help),
         _ => Err(format!("unknown command: {}", args[0])),
+    }
+}
+
+fn parse_interop(args: &[String]) -> Result<Command, String> {
+    if args.is_empty() {
+        return Err("interop requires subcommand: status|smoke|grant".into());
+    }
+    match args[0].as_str() {
+        "status" => {
+            let (json, _home, rest) = parse_home_json(&args[1..])?;
+            if !rest.is_empty() {
+                return Err(format!("unexpected interop status args: {}", rest.join(" ")));
+            }
+            Ok(Command::Interop(InteropSubcommand::Status { json }))
+        }
+        "smoke" => {
+            let (json, home, rest) = parse_home_json(&args[1..])?;
+            if !rest.is_empty() {
+                return Err(format!("unexpected interop smoke args: {}", rest.join(" ")));
+            }
+            Ok(Command::Interop(InteropSubcommand::Smoke { json, home }))
+        }
+        "grant" => {
+            let (json, _home, rest) = parse_home_json(&args[1..])?;
+            let mut token = None;
+            let mut channel = None;
+            let mut prefixes = Vec::new();
+            let mut i = 0;
+            while i < rest.len() {
+                if let Some(p) = rest[i].strip_prefix("__prefix__:") {
+                    prefixes.push(p.to_string());
+                    i += 1;
+                    continue;
+                }
+                match rest[i].as_str() {
+                    "--token" => {
+                        i += 1;
+                        token = Some(
+                            rest.get(i)
+                                .cloned()
+                                .ok_or_else(|| "--token requires a value".to_string())?,
+                        );
+                    }
+                    "--channel" => {
+                        i += 1;
+                        channel = Some(
+                            rest.get(i)
+                                .cloned()
+                                .ok_or_else(|| "--channel requires a value".to_string())?,
+                        );
+                    }
+                    other => return Err(format!("unexpected interop grant arg: {other}")),
+                }
+                i += 1;
+            }
+            let token = token.ok_or_else(|| "interop grant requires --token".to_string())?;
+            let channel = channel.ok_or_else(|| "interop grant requires --channel".to_string())?;
+            if prefixes.len() < 2 {
+                return Err("interop grant requires at least two --prefix values".into());
+            }
+            Ok(Command::Interop(InteropSubcommand::Grant {
+                token,
+                channel,
+                prefixes,
+                json,
+            }))
+        }
+        other => Err(format!("unknown interop subcommand: {other}")),
     }
 }
 
@@ -831,6 +917,32 @@ mod tests {
         match cmd2 {
             Command::Bench { profile, .. } => assert_eq!(profile, "optimized"),
             _ => panic!("expected bench optimized"),
+        }
+    }
+
+    #[test]
+    fn parse_interop() {
+        let cmd = parse_args(&args("interop smoke --json")).unwrap();
+        assert!(matches!(
+            cmd,
+            Command::Interop(InteropSubcommand::Smoke { json: true, .. })
+        ));
+        let cmd2 = parse_args(&args(
+            "interop grant --token t --channel c --prefix a --prefix b --json",
+        ))
+        .unwrap();
+        match cmd2 {
+            Command::Interop(InteropSubcommand::Grant {
+                token,
+                channel,
+                prefixes,
+                json: true,
+            }) => {
+                assert_eq!(token, "t");
+                assert_eq!(channel, "c");
+                assert_eq!(prefixes, vec!["a", "b"]);
+            }
+            _ => panic!("expected interop grant"),
         }
     }
 

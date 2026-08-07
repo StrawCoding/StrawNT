@@ -1,0 +1,19 @@
+[package]
+name = "strawnt-interop"
+version.workspace = true
+edition.workspace = true
+description = "StrawNT Win32 IPC interop bus: host broker + same/cross-prefix smoke (NTW4)"
+license.workspace = true
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+strawnt-engine = { path = "../strawnt-engine" }
+
+[[bin]]
+name = "strawnt-interopd"
+path = "src/bin/strawnt-interopd.rs"
+
+[dev-dependencies]
+tempfile = "3"

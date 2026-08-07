@@ -7,6 +7,7 @@
 	portable-prefix test-portable-prefix portable-appimage test-portable-appimage \
 	portable-flatpak test-portable-flatpak test-portable-matrix test-portable-closeout \
 	test-strawnt-ntw0-contract test-strawnt-ntw1-engine test-strawnt-ntw2-shell \
+	test-strawnt-ntw3-optimize test-strawnt-ntw4-interop \
 	test-legacy-portable-pe-closeout test-legacy-portable-gx-graphics \
 	test-legacy-portable-gx-audio-input test-legacy-portable-gx-anticheat \
 	test-legacy-portable-gx-closeout test-legacy-strawnt-nt1-graphics \
@@ -148,6 +149,8 @@ help:
 	@echo "  test-strawnt-ntw0-contract    Wine pivot contract/legal evidence → ntw0-contract.json"
 	@echo "  test-strawnt-ntw1-engine      Proton-GE vendor + engine smoke → ntw1-engine.json"
 	@echo "  test-strawnt-ntw2-shell       Shell/prefix/recipes/MIME + Electron Hub wine/GE → ntw2-shell.json"
+	@echo "  test-strawnt-ntw3-optimize    Wine/GE optimize deltas → ntw3-optimize.json"
+	@echo "  test-strawnt-ntw4-interop     Win32 IPC same+cross prefix → ntw4-interop.json"
 	@echo ""
 	@echo "Legacy/archive native-era verifies (NTW0 soft-reset — NOT product Wine-ban gates):"
 	@echo "  test-legacy-portable-pe-closeout"
@@ -705,6 +708,12 @@ test-strawnt-ntw1-engine:
 
 test-strawnt-ntw2-shell:
 	bash tests/strawnt/ntw2-shell.sh
+
+test-strawnt-ntw3-optimize:
+	bash tests/strawnt/ntw3-optimize.sh
+
+test-strawnt-ntw4-interop:
+	bash tests/strawnt/ntw4-interop.sh
 
 # ---------------------------------------------------------------------------
 # LEGACY/ARCHIVE (NTW0 soft-reset) — native-era evidence only.

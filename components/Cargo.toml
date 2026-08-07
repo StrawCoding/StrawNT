@@ -12,9 +12,10 @@ members = [
     "strawwu-device-proxy",
     "strawwu-app-registry",
     "strawnt-engine",
+    "strawnt-interop",
 ]
 
 [workspace.package]
-version = "0.7.1-preview.56"
+version = "0.7.1-preview.57"
 edition = "2021"
 license = "MIT"

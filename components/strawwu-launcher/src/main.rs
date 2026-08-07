@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 use std::process;
 
 use strawwu_launcher::cli::{
-    self, Command, EngineSubcommand, MatrixSubcommand, OpenMode, PrefixSubcommand,
+    self, Command, EngineSubcommand, InteropSubcommand, MatrixSubcommand, OpenMode, PrefixSubcommand,
     RecipesSubcommand,
 };
 use strawwu_launcher::desktop;
@@ -614,6 +614,110 @@ fn main() {
                 }
             }
         }
+        Command::Interop(sub) => match sub {
+            InteropSubcommand::Status { json } => {
+                let root = require_repo_root("interop");
+                let spec = root.join("docs/specs/interop-win32-ipc.md");
+                let fixtures_ok = match strawnt_interop::smoke::ensure_fixtures(&root) {
+                    Ok((ac, game)) => ac.is_file() && game.is_file(),
+                    Err(_) => false,
+                };
+                let pin = strawnt_engine::load_pin(&root).ok();
+                let v = serde_json::json!({
+                    "command": "interop status",
+                    "product": "StrawNT",
+                    "stage": "ntw4-win32-ipc",
+                    "execution_backend": "wine",
+                    "backend": "wine",
+                    "engine": "proton-ge",
+                    "pin": pin.as_ref().map(|p| p.tag.clone()),
+                    "powered_by_wine": true,
+                    "spec_present": spec.is_file(),
+                    "fixtures_built": fixtures_ok,
+                    "default_broker_port": strawnt_interop::broker::DEFAULT_PORT,
+                    "claims": {
+                        "ranked_pass_claimed": false,
+                        "full_windows_claimed": false
+                    },
+                    "status": if spec.is_file() { "PASS" } else { "FAIL" },
+                    "notes": [
+                        "same_prefix=named pipes; cross_prefix=host broker + capability grant",
+                        "powered by Wine — not a ranked anti-cheat claim"
+                    ]
+                });
+                emit_json_or_human(json, &v);
+                if v.get("status").and_then(|s| s.as_str()) != Some("PASS") {
+                    process::exit(1);
+                }
+            }
+            InteropSubcommand::Smoke { json, home } => {
+                let _root = require_repo_root("interop");
+                match strawnt_interop::run_interop_smoke(home.as_deref()) {
+                    Ok(mut v) => {
+                        if let Ok(ver) = std::fs::read_to_string(
+                            strawnt_engine::find_repo_root()
+                                .map(|r| r.join("VERSION"))
+                                .unwrap_or_default(),
+                        ) {
+                            v.as_object_mut().map(|o| {
+                                o.insert(
+                                    "version".into(),
+                                    serde_json::Value::String(ver.trim().to_string()),
+                                )
+                            });
+                        }
+                        if let Ok(head) = std::process::Command::new("git")
+                            .args(["rev-parse", "HEAD"])
+                            .output()
+                        {
+                            if head.status.success() {
+                                let h = String::from_utf8_lossy(&head.stdout).trim().to_string();
+                                v.as_object_mut().map(|o| {
+                                    o.insert("git_head".into(), serde_json::Value::String(h))
+                                });
+                            }
+                        }
+                        let ts = chrono_like_utc();
+                        v.as_object_mut().map(|o| {
+                            o.insert("generated_at".into(), serde_json::Value::String(ts))
+                        });
+                        emit_json_or_human(json, &v);
+                        let st = v.get("status").and_then(|s| s.as_str()).unwrap_or("FAIL");
+                        if st != "PASS" {
+                            process::exit(1);
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("strawnt interop smoke failed: {e}");
+                        process::exit(1);
+                    }
+                }
+            }
+            InteropSubcommand::Grant {
+                token,
+                channel,
+                prefixes,
+                json,
+            } => {
+                let grant = strawnt_interop::Grant {
+                    token,
+                    channel,
+                    prefixes,
+                };
+                let v = serde_json::json!({
+                    "command": "interop grant",
+                    "status": "PASS",
+                    "grant": grant,
+                    "notes": [
+                        "Ephemeral grant record for App Manager / interopd control plane",
+                        "Live cross-prefix AUTH still requires broker-loaded grant",
+                        "ranked_pass_claimed=false"
+                    ],
+                    "claims": { "ranked_pass_claimed": false }
+                });
+                emit_json_or_human(json, &v);
+            }
+        },
         Command::Config(_) => {
             println!("strawnt: config (stub)");
         }
@@ -636,6 +740,24 @@ fn emit_json_or_human(json: bool, v: &serde_json::Value) {
     } else {
         println!("{}", serde_json::to_string_pretty(v).unwrap_or_default());
     }
+}
+
+fn chrono_like_utc() -> String {
+    use std::time::{SystemTime, UNIX_EPOCH};
+    let secs = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0);
+    // Prefer `date -u` when available for RFC3339-ish stamp.
+    if let Ok(out) = process::Command::new("date")
+        .args(["-u", "+%Y-%m-%dT%H:%M:%SZ"])
+        .output()
+    {
+        if out.status.success() {
+            return String::from_utf8_lossy(&out.stdout).trim().to_string();
+        }
+    }
+    format!("{secs}")
 }
 
 /// NTW0+: product default is **wine** (Proton-GE). Legacy native via STRAWNT_LEGACY_NATIVE=1.
@@ -951,6 +1073,9 @@ COMMANDS:
         Honest PASS/PARTIAL/FAIL/UNKNOWN matrix; seed line.exe+steam.exe (NTW2)
     bench [--profile baseline|optimized] [--home DIR] [--json]
         NTW3 measurable Wine/GE bench (cold start / RSS / prefix create)
+    interop status|smoke|grant [--home DIR] [--json]
+        NTW4 Win32 IPC: same_prefix pipes + cross_prefix host broker
+        (not a ranked / vendor anti-cheat PASS)
     version
     help
 

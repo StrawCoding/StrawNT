@@ -1,0 +1,81 @@
+{
+  "backend": "wine",
+  "claims": {
+    "cross_prefix": true,
+    "full_windows_claimed": false,
+    "powered_by_wine": true,
+    "ranked_pass_claimed": false,
+    "same_prefix": true,
+    "simulated": false,
+    "vendor_anticheat_certified": false
+  },
+  "cross_prefix": true,
+  "cross_prefix_result": {
+    "ac": {
+      "exit_code": 0,
+      "stderr_tail": "",
+      "stdout_tail": "fsync: up and running.\nac_stub: broker received 'STRAWNT_NTW4_CROSS'\r\nac_stub PASS broker STRAWNT_NTW4_CROSS\r\n"
+    },
+    "ac_prefix_id": "pfx-ac",
+    "broker_port": 37083,
+    "channel": "ntw4-cross",
+    "game": {
+      "exit_code": 0,
+      "stderr_tail": "",
+      "stdout_tail": "fsync: up and running.\ngame_stub PASS broker send STRAWNT_NTW4_CROSS\r\n"
+    },
+    "game_prefix_id": "pfx-game",
+    "payload": "STRAWNT_NTW4_CROSS",
+    "status": "PASS",
+    "transport": "host_broker_tcp"
+  },
+  "engine": "proton-ge",
+  "engine_pin": "GE-Proton11-3",
+  "execution_backend": "wine",
+  "fixtures": {
+    "ac": "/mnt/data/code/project/StrawCoding/StrawNT/components/strawnt-interop/fixtures/build/strawnt_ac_stub.exe",
+    "game": "/mnt/data/code/project/StrawCoding/StrawNT/components/strawnt-interop/fixtures/build/strawnt_game_stub.exe"
+  },
+  "generated_at": "2026-08-07T18:29:04Z",
+  "git_head": "709d56b71e633504e1e5d8cda9201dccf8f9f59f",
+  "home": "/tmp/strawnt-ntw4.6MgXSb/home",
+  "notes": [
+    "NTW4 Win32 IPC: same_prefix named pipe + cross_prefix host broker",
+    "Scene: anti-cheat App \u2194 game message exchange (fixtures only)",
+    "powered by Wine \u2014 not a ranked / vendor anti-cheat PASS",
+    "cross-prefix default deny; smoke used explicit capability grant"
+  ],
+  "pin": "GE-Proton11-3",
+  "powered_by": "Wine",
+  "powered_by_wine": true,
+  "product": "StrawNT",
+  "same_prefix": true,
+  "same_prefix_result": {
+    "ac": {
+      "exit_code": 0,
+      "stderr_tail": "",
+      "stdout_tail": "fsync: up and running.\nac_stub: pipe listening \\\\.\\pipe\\strawnt-ntw4-same\r\nac_stub: received 'STRAWNT_NTW4_SAME'\r\nac_stub PASS pipe STRAWNT_NTW4_SAME\r\n"
+    },
+    "game": {
+      "exit_code": 0,
+      "stderr_tail": "",
+      "stdout_tail": "game_stub PASS pipe send STRAWNT_NTW4_SAME\r\n"
+    },
+    "payload": "STRAWNT_NTW4_SAME",
+    "pipe": "strawnt-ntw4-same",
+    "status": "PASS",
+    "transport": "named_pipe"
+  },
+  "schema": "strawnt-ntw4-interop/v1",
+  "simulated": false,
+  "stage": "ntw4-win32-ipc",
+  "status": "PASS",
+  "version": "0.7.1.57",
+  "artifacts": {
+    "spec": "docs/specs/interop-win32-ipc.md",
+    "harness": "tests/strawnt/ntw4-interop.sh",
+    "crate": "components/strawnt-interop",
+    "daemon": "strawnt-interopd",
+    "fixtures": "components/strawnt-interop/fixtures"
+  }
+}
