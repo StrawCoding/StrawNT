@@ -3,9 +3,9 @@
   "stage": "ntw2-shell-electron",
   "status": "PASS",
   "product": "StrawNT",
-  "version": "0.7.1.52",
-  "generated_at": "2026-08-07T17:39:14Z",
-  "git_head": "2c8be15041f3712ce5bb5567237ed8c2b264bfa6",
+  "version": "0.7.1.53",
+  "generated_at": "2026-08-07T17:40:35Z",
+  "git_head": "11f4b6648111d2ba635ee912fbb66e9bc4390738",
   "hub": "electron",
   "backend": "wine",
   "execution_backend": "wine",
@@ -46,7 +46,7 @@
         "visible_ui": "UNKNOWN"
       },
       "status": "PARTIAL",
-      "updated_at": 1786124408,
+      "updated_at": 1786124480,
       "wine_flavor": "proton-ge"
     },
     "steam": {
@@ -80,7 +80,7 @@
         "visible_ui": "UNKNOWN"
       },
       "status": "PARTIAL",
-      "updated_at": 1786124408,
+      "updated_at": 1786124480,
       "wine_flavor": "proton-ge"
     }
   },
@@ -115,7 +115,7 @@
         "visible_ui": "UNKNOWN"
       },
       "status": "PARTIAL",
-      "updated_at": 1786124408,
+      "updated_at": 1786124480,
       "wine_flavor": "proton-ge"
     },
     "steam": {
@@ -149,7 +149,7 @@
         "visible_ui": "UNKNOWN"
       },
       "status": "PARTIAL",
-      "updated_at": 1786124408,
+      "updated_at": 1786124480,
       "wine_flavor": "proton-ge"
     }
   },
