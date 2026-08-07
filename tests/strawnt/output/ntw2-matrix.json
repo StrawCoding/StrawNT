@@ -1,0 +1,72 @@
+{
+  "entries": {
+    "line.exe": {
+      "app": "line",
+      "app_key": "line.exe",
+      "backend": "wine",
+      "engine": "proton-ge",
+      "engine_pin": "GE-Proton11-3",
+      "exe": "line.exe",
+      "execution_backend": "wine",
+      "honesty": {
+        "all_features_claimed": false,
+        "full_windows_claimed": false,
+        "ranked_anticheat_claimed": false
+      },
+      "name": "line.exe",
+      "notes": "NTW2 shell seed: install/launch UI scope; IgnoreCodeSign/crypt32 path; not full LINE verification; no ranked claim",
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "prefix": "line",
+      "recipes_recommended": [
+        "crypt32-signature",
+        "vcrun",
+        "corefonts"
+      ],
+      "scopes": {
+        "install": "PARTIAL",
+        "launch": "PARTIAL",
+        "login": "UNKNOWN",
+        "visible_ui": "UNKNOWN"
+      },
+      "status": "PARTIAL",
+      "updated_at": 1786124408,
+      "wine_flavor": "proton-ge"
+    },
+    "steam.exe": {
+      "app": "steam",
+      "app_key": "steam.exe",
+      "backend": "wine",
+      "engine": "proton-ge",
+      "engine_pin": "GE-Proton11-3",
+      "exe": "steam.exe",
+      "execution_backend": "wine",
+      "honesty": {
+        "all_games_playable_claimed": false,
+        "full_windows_claimed": false,
+        "ranked_anticheat_claimed": false
+      },
+      "name": "steam.exe",
+      "notes": "NTW2 shell seed: launcher start/login UI only; not all-games-play claim",
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "prefix": "steam",
+      "recipes_recommended": [
+        "vcrun",
+        "corefonts",
+        "dxvk"
+      ],
+      "scopes": {
+        "all_games": "UNKNOWN",
+        "install": "PARTIAL",
+        "launch": "PARTIAL",
+        "login": "UNKNOWN",
+        "visible_ui": "UNKNOWN"
+      },
+      "status": "PARTIAL",
+      "updated_at": 1786124408,
+      "wine_flavor": "proton-ge"
+    }
+  },
+  "version": 1
+}

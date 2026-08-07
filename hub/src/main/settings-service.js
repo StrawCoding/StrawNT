@@ -4,8 +4,11 @@ const { execFile, spawn } = require('child_process');
 const { promisify } = require('util');
 const {
   HUB_ROOT,
+  REPO_ROOT,
   resolveLegalDoc,
   resolveCompatMatrix,
+  resolveStrawntCli,
+  resolveStrawntMatrix,
   readVersion,
   readOsPrettyName,
 } = require('../common/settings-paths');
@@ -22,6 +25,49 @@ function loadManifest() {
 }
 
 function readCompatMatrix() {
+  // Prefer StrawNT wine/GE matrix when present (NTW2).
+  const strawntMatrix = resolveStrawntMatrix();
+  if (strawntMatrix) {
+    try {
+      const data = JSON.parse(fs.readFileSync(strawntMatrix, 'utf8'));
+      const entries = data.entries || {};
+      const cases = Object.values(entries).map((e) => ({
+        name: e.name || e.app_key,
+        grade: e.status === 'PASS' ? 'A' : e.status === 'PARTIAL' ? 'C' : e.status === 'FAIL' ? 'F' : 'U',
+        status: e.status || 'UNKNOWN',
+        backend: e.execution_backend || e.backend || 'wine',
+        engine: e.engine || 'proton-ge',
+        powered_by: e.powered_by || 'Wine',
+      }));
+      return {
+        available: true,
+        path: strawntMatrix,
+        source: 'strawnt-matrix',
+        summary: {
+          overall: cases.some((c) => c.status === 'FAIL')
+            ? 'FAIL'
+            : cases.some((c) => c.status === 'PARTIAL' || c.status === 'UNKNOWN')
+              ? 'PARTIAL'
+              : cases.length
+                ? 'PASS'
+                : 'UNKNOWN',
+        },
+        project_version: data.version,
+        anticheat_matrix: { cases },
+        golden: {
+          line: entries['line.exe'] || null,
+          steam: entries['steam.exe'] || null,
+        },
+        sub_stages: data.sub_stages || [],
+        execution_backend: 'wine',
+        engine: 'proton-ge',
+        powered_by_wine: true,
+      };
+    } catch {
+      // fall through to legacy
+    }
+  }
+
   const matrixPath = resolveCompatMatrix();
   if (!matrixPath) {
     return {
@@ -29,6 +75,9 @@ function readCompatMatrix() {
       path: null,
       summary: { overall: 'UNKNOWN' },
       anticheat_matrix: { cases: [] },
+      execution_backend: 'wine',
+      engine: 'proton-ge',
+      powered_by_wine: true,
     };
   }
   try {
@@ -36,10 +85,14 @@ function readCompatMatrix() {
     return {
       available: true,
       path: matrixPath,
+      source: 'legacy-wincompat',
       summary: data.summary || { overall: 'UNKNOWN' },
       project_version: data.project_version,
       anticheat_matrix: data.anticheat_matrix || { cases: [] },
       sub_stages: data.sub_stages || [],
+      execution_backend: 'wine',
+      engine: 'proton-ge',
+      powered_by_wine: true,
     };
   } catch {
     return {
@@ -47,6 +100,39 @@ function readCompatMatrix() {
       path: matrixPath,
       summary: { overall: 'ERROR' },
       anticheat_matrix: { cases: [] },
+      execution_backend: 'wine',
+      engine: 'proton-ge',
+      powered_by_wine: true,
+    };
+  }
+}
+
+async function runStrawntDoctor() {
+  const cli = resolveStrawntCli();
+  try {
+    const { stdout } = await execFileAsync(cli, ['doctor', '--json'], {
+      timeout: 15000,
+      encoding: 'utf8',
+      env: { ...process.env, STRAWNT_ROOT: REPO_ROOT },
+    });
+    const data = JSON.parse(stdout);
+    return { available: true, mock: false, data, cli };
+  } catch (err) {
+    return {
+      available: false,
+      mock: true,
+      cli,
+      error: err.code || err.message,
+      data: {
+        product: 'StrawNT',
+        execution_backend: 'wine',
+        backend: 'wine',
+        engine: 'proton-ge',
+        powered_by: 'Wine',
+        powered_by_wine: true,
+        status: 'UNKNOWN',
+        wine: { found: false },
+      },
     };
   }
 }
@@ -61,7 +147,7 @@ async function runStrawwuStatus() {
   } catch (err) {
     return {
       available: false,
-      output: 'strawwu status — runtime idle, 0 sessions active (mock)',
+      output: 'strawnt: execution_backend=wine (proton-ge); powered by Wine',
       mock: true,
       error: err.code || err.message,
     };
@@ -71,11 +157,20 @@ async function runStrawwuStatus() {
 async function getAboutInfo() {
   const manifest = loadManifest();
   const legal = manifest.legal || {};
+  const doctor = await runStrawntDoctor();
   return {
     version: readVersion(),
     osName: readOsPrettyName(),
-    productName: 'StrawWU',
+    productName: 'StrawNT',
+    hub: 'electron',
     role: manifest.role,
+    execution_backend: 'wine',
+    backend: 'wine',
+    engine: doctor.data?.engine || 'proton-ge',
+    engine_pin: doctor.data?.pin || doctor.data?.engine_pin || null,
+    powered_by: 'Wine',
+    powered_by_wine: true,
+    engineStatus: doctor,
     legal: {
       privacy: resolveLegalDoc('privacy.html'),
       eula: resolveLegalDoc('eula.html'),
@@ -87,19 +182,36 @@ async function getAboutInfo() {
 }
 
 async function getWinCompatInfo() {
-  const [status, matrix] = await Promise.all([runStrawwuStatus(), readCompatMatrix()]);
+  const [status, matrix, doctor] = await Promise.all([
+    runStrawwuStatus(),
+    Promise.resolve(readCompatMatrix()),
+    runStrawntDoctor(),
+  ]);
   const cases = matrix.anticheat_matrix?.cases || [];
   const grades = cases.map((c) => ({
     name: c.name,
     grade: c.grade,
     status: c.status,
-    backend: c.backend,
+    backend: c.backend || 'wine',
+    engine: c.engine || doctor.data?.engine || 'proton-ge',
   }));
   return {
+    hub: 'electron',
+    execution_backend: 'wine',
+    backend: 'wine',
+    engine: doctor.data?.engine || 'proton-ge',
+    engine_pin: doctor.data?.pin || doctor.data?.engine_pin || null,
+    powered_by: 'Wine',
+    powered_by_wine: true,
     sessionStatus: status,
+    engineStatus: doctor,
     compatMatrix: matrix,
     grades,
     overallGrade: matrix.summary?.overall || 'PARTIAL',
+    golden: matrix.golden || {
+      line: null,
+      steam: null,
+    },
   };
 }
 
@@ -148,25 +260,13 @@ async function launchBugReporter(useGtk = true) {
   });
 }
 
-async function openDesktopShortcut(desktopFile) {
-  const candidates = [
-    `/usr/share/applications/${desktopFile}`,
-    `/usr/local/share/applications/${desktopFile}`,
-  ];
-  const found = candidates.find((p) => fs.existsSync(p));
-  if (!found) {
-    throw new Error(`Desktop file not found: ${desktopFile}`);
-  }
-  return openPath(found);
-}
-
 module.exports = {
-  loadManifest,
   getAboutInfo,
   getWinCompatInfo,
   getSystemShortcuts,
   openLegalDoc,
   launchBugReporter,
-  openDesktopShortcut,
+  openPath,
   readCompatMatrix,
+  runStrawntDoctor,
 };

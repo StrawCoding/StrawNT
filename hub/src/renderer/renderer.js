@@ -261,10 +261,27 @@ function gradeClass(grade) {
 function renderWinCompat(data) {
   if (!data) return;
   const status = data.sessionStatus || {};
+  const engine = data.engineStatus?.data || {};
   $wincompatStatus.innerHTML = `
     <div class="info-row">
       <span class="info-label">${t('wincompat.session')}</span>
       <span class="info-value">${escapeHtml(status.output || t('wincompat.unavailable'))}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Hub</span>
+      <span class="info-value">${escapeHtml(data.hub || 'electron')}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Backend</span>
+      <span class="info-value">${escapeHtml(data.execution_backend || data.backend || 'wine')}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Engine</span>
+      <span class="info-value">${escapeHtml((data.engine || 'proton-ge') + (data.engine_pin ? '@' + data.engine_pin : ''))}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Powered by</span>
+      <span class="info-value">${escapeHtml(data.powered_by || engine.powered_by || 'Wine')}</span>
     </div>
     <div class="info-row">
       <span class="info-label">${t('wincompat.overall')}</span>
@@ -288,7 +305,8 @@ function renderWinCompat(data) {
         </div>
         <div class="grade-meta">
           <span>${escapeHtml(g.status)}</span>
-          <span>${escapeHtml(g.backend)}</span>
+          <span>${escapeHtml(g.backend || 'wine')}</span>
+          <span>${escapeHtml(g.engine || 'proton-ge')}</span>
         </div>
       </div>
     `,

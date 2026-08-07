@@ -2,7 +2,7 @@
 name = "strawnt-engine"
 version.workspace = true
 edition.workspace = true
-description = "StrawNT Proton-GE / Wine engine pin, doctor, and runner MVP"
+description = "StrawNT Proton-GE / Wine engine: pin, doctor, runner, prefix, recipes, matrix"
 license.workspace = true
 
 [dependencies]

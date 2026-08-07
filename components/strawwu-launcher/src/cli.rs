@@ -41,9 +41,61 @@ pub enum Command {
     Engine(EngineSubcommand),
     /// NTW1: engine doctor (pin + wine presence + honesty).
     Doctor { json: bool },
+    /// NTW2: Wine prefix create / list.
+    Prefix(PrefixSubcommand),
+    /// NTW2: winetricks / repair recipes.
+    Recipes(RecipesSubcommand),
+    /// NTW2: honest compat matrix.
+    Matrix(MatrixSubcommand),
     Config(ConfigSubcommand),
     Version,
     Help,
+}
+
+#[derive(Debug, Clone)]
+pub enum PrefixSubcommand {
+    Create {
+        name: String,
+        arch: String,
+        force: bool,
+        json: bool,
+        home: Option<PathBuf>,
+    },
+    List {
+        json: bool,
+        home: Option<PathBuf>,
+    },
+}
+
+#[derive(Debug, Clone)]
+pub enum RecipesSubcommand {
+    List { json: bool },
+    Plan { id: String, json: bool },
+    Apply {
+        id: String,
+        prefix: String,
+        json: bool,
+        home: Option<PathBuf>,
+    },
+}
+
+#[derive(Debug, Clone)]
+pub enum MatrixSubcommand {
+    List { json: bool, home: Option<PathBuf> },
+    Get {
+        app_key: String,
+        json: bool,
+        home: Option<PathBuf>,
+    },
+    Set {
+        name: String,
+        status: String,
+        notes: String,
+        prefix: Option<String>,
+        json: bool,
+        home: Option<PathBuf>,
+    },
+    Seed { json: bool, home: Option<PathBuf> },
 }
 
 #[derive(Debug, Clone)]
@@ -104,6 +156,9 @@ pub fn parse_args(args: &[String]) -> Result<Command, String> {
         "status" => Ok(Command::Status),
         "engine" => parse_engine(&args[1..]),
         "doctor" => parse_doctor(&args[1..]),
+        "prefix" => parse_prefix(&args[1..]),
+        "recipes" => parse_recipes(&args[1..]),
+        "matrix" => parse_matrix(&args[1..]),
         "config" => parse_config(&args[1..]),
         "--version" | "version" => Ok(Command::Version),
         "--help" | "help" => Ok(Command::Help),
@@ -138,6 +193,229 @@ fn parse_doctor(args: &[String]) -> Result<Command, String> {
         }
     }
     Ok(Command::Doctor { json })
+}
+
+fn take_flag_value(args: &[String], i: &mut usize, flag: &str) -> Result<Option<String>, String> {
+    if args.get(*i).map(|s| s.as_str()) == Some(flag) {
+        *i += 1;
+        let v = args
+            .get(*i)
+            .cloned()
+            .ok_or_else(|| format!("{flag} requires a value"))?;
+        *i += 1;
+        Ok(Some(v))
+    } else {
+        Ok(None)
+    }
+}
+
+fn parse_home_json(args: &[String]) -> Result<(bool, Option<PathBuf>, Vec<String>), String> {
+    let mut json = false;
+    let mut home = None;
+    let mut rest = Vec::new();
+    let mut i = 0;
+    while i < args.len() {
+        if args[i] == "--json" {
+            json = true;
+            i += 1;
+            continue;
+        }
+        if let Some(v) = take_flag_value(args, &mut i, "--home")? {
+            home = Some(PathBuf::from(v));
+            continue;
+        }
+        if let Some(v) = take_flag_value(args, &mut i, "-p")? {
+            rest.push(format!("__prefix__:{v}"));
+            continue;
+        }
+        if let Some(v) = take_flag_value(args, &mut i, "--prefix")? {
+            rest.push(format!("__prefix__:{v}"));
+            continue;
+        }
+        rest.push(args[i].clone());
+        i += 1;
+    }
+    Ok((json, home, rest))
+}
+
+fn parse_prefix(args: &[String]) -> Result<Command, String> {
+    if args.is_empty() {
+        return Err("prefix requires subcommand: create|list".into());
+    }
+    match args[0].as_str() {
+        "list" => {
+            let (json, home, rest) = parse_home_json(&args[1..])?;
+            if !rest.is_empty() {
+                return Err(format!("unexpected prefix list args: {}", rest.join(" ")));
+            }
+            Ok(Command::Prefix(PrefixSubcommand::List { json, home }))
+        }
+        "create" => {
+            let (json, home, rest) = parse_home_json(&args[1..])?;
+            let mut name = None;
+            let mut arch = "win64".to_string();
+            let mut force = false;
+            let mut i = 0;
+            while i < rest.len() {
+                match rest[i].as_str() {
+                    "--force" => force = true,
+                    "--arch" => {
+                        i += 1;
+                        arch = rest
+                            .get(i)
+                            .cloned()
+                            .ok_or_else(|| "--arch requires a value".to_string())?;
+                    }
+                    other if !other.starts_with('-') && name.is_none() => {
+                        name = Some(other.to_string());
+                    }
+                    other => return Err(format!("unexpected prefix create arg: {other}")),
+                }
+                i += 1;
+            }
+            let name = name.ok_or_else(|| "prefix create requires a name".to_string())?;
+            Ok(Command::Prefix(PrefixSubcommand::Create {
+                name,
+                arch,
+                force,
+                json,
+                home,
+            }))
+        }
+        other => Err(format!("unknown prefix subcommand: {other}")),
+    }
+}
+
+fn parse_recipes(args: &[String]) -> Result<Command, String> {
+    if args.is_empty() {
+        return Err("recipes requires subcommand: list|plan|apply".into());
+    }
+    match args[0].as_str() {
+        "list" => {
+            let (json, _home, rest) = parse_home_json(&args[1..])?;
+            if !rest.is_empty() {
+                return Err(format!("unexpected recipes list args: {}", rest.join(" ")));
+            }
+            Ok(Command::Recipes(RecipesSubcommand::List { json }))
+        }
+        "plan" => {
+            let (json, _home, rest) = parse_home_json(&args[1..])?;
+            let id = rest
+                .first()
+                .cloned()
+                .ok_or_else(|| "recipes plan requires a recipe id".to_string())?;
+            Ok(Command::Recipes(RecipesSubcommand::Plan { id, json }))
+        }
+        "apply" => {
+            let (json, home, rest) = parse_home_json(&args[1..])?;
+            let mut id = None;
+            let mut prefix = None;
+            for item in rest {
+                if let Some(p) = item.strip_prefix("__prefix__:") {
+                    prefix = Some(p.to_string());
+                } else if id.is_none() {
+                    id = Some(item);
+                } else {
+                    return Err(format!("unexpected recipes apply arg: {item}"));
+                }
+            }
+            let id = id.ok_or_else(|| "recipes apply requires a recipe id".to_string())?;
+            let prefix =
+                prefix.ok_or_else(|| "recipes apply requires --prefix <name>".to_string())?;
+            Ok(Command::Recipes(RecipesSubcommand::Apply {
+                id,
+                prefix,
+                json,
+                home,
+            }))
+        }
+        other => Err(format!("unknown recipes subcommand: {other}")),
+    }
+}
+
+fn parse_matrix(args: &[String]) -> Result<Command, String> {
+    if args.is_empty() {
+        return Err("matrix requires subcommand: list|get|set|seed".into());
+    }
+    match args[0].as_str() {
+        "list" => {
+            let (json, home, rest) = parse_home_json(&args[1..])?;
+            if !rest.is_empty() {
+                return Err(format!("unexpected matrix list args: {}", rest.join(" ")));
+            }
+            Ok(Command::Matrix(MatrixSubcommand::List { json, home }))
+        }
+        "get" => {
+            let (json, home, rest) = parse_home_json(&args[1..])?;
+            let app_key = rest
+                .first()
+                .cloned()
+                .ok_or_else(|| "matrix get requires an app key".to_string())?;
+            Ok(Command::Matrix(MatrixSubcommand::Get {
+                app_key,
+                json,
+                home,
+            }))
+        }
+        "set" => {
+            let (json, home, rest) = parse_home_json(&args[1..])?;
+            let mut name = None;
+            let mut status = None;
+            let mut notes = String::new();
+            let mut prefix = None;
+            let mut i = 0;
+            while i < rest.len() {
+                if let Some(p) = rest[i].strip_prefix("__prefix__:") {
+                    prefix = Some(p.to_string());
+                    i += 1;
+                    continue;
+                }
+                match rest[i].as_str() {
+                    "--notes" => {
+                        i += 1;
+                        notes = rest
+                            .get(i)
+                            .cloned()
+                            .ok_or_else(|| "--notes requires a value".to_string())?;
+                    }
+                    "--status" => {
+                        i += 1;
+                        status = Some(
+                            rest.get(i)
+                                .cloned()
+                                .ok_or_else(|| "--status requires a value".to_string())?,
+                        );
+                    }
+                    other if !other.starts_with('-') && name.is_none() => {
+                        name = Some(other.to_string());
+                    }
+                    other if !other.starts_with('-') && status.is_none() => {
+                        status = Some(other.to_string());
+                    }
+                    other => return Err(format!("unexpected matrix set arg: {other}")),
+                }
+                i += 1;
+            }
+            let name = name.ok_or_else(|| "matrix set requires a name".to_string())?;
+            let status = status.ok_or_else(|| "matrix set requires a status".to_string())?;
+            Ok(Command::Matrix(MatrixSubcommand::Set {
+                name,
+                status,
+                notes,
+                prefix,
+                json,
+                home,
+            }))
+        }
+        "seed" => {
+            let (json, home, rest) = parse_home_json(&args[1..])?;
+            if !rest.is_empty() {
+                return Err(format!("unexpected matrix seed args: {}", rest.join(" ")));
+            }
+            Ok(Command::Matrix(MatrixSubcommand::Seed { json, home }))
+        }
+        other => Err(format!("unknown matrix subcommand: {other}")),
+    }
 }
 
 fn parse_open(args: &[String]) -> Result<Command, String> {
@@ -451,6 +729,57 @@ mod tests {
         assert!(matches!(cmd, Command::Doctor { json: false }));
         let cmd2 = parse_args(&args("doctor --json")).unwrap();
         assert!(matches!(cmd2, Command::Doctor { json: true }));
+    }
+
+    #[test]
+    fn parse_prefix_create_list() {
+        let cmd = parse_args(&args("prefix create demo --json")).unwrap();
+        match cmd {
+            Command::Prefix(PrefixSubcommand::Create {
+                name,
+                json: true,
+                ..
+            }) => assert_eq!(name, "demo"),
+            _ => panic!("expected prefix create"),
+        }
+        let cmd2 = parse_args(&args("prefix list --json --home /tmp/x")).unwrap();
+        match cmd2 {
+            Command::Prefix(PrefixSubcommand::List {
+                json: true,
+                home: Some(h),
+            }) => assert_eq!(h, PathBuf::from("/tmp/x")),
+            _ => panic!("expected prefix list"),
+        }
+    }
+
+    #[test]
+    fn parse_recipes_and_matrix() {
+        let cmd = parse_args(&args("recipes list --json")).unwrap();
+        assert!(matches!(
+            cmd,
+            Command::Recipes(RecipesSubcommand::List { json: true })
+        ));
+        let cmd2 = parse_args(&args(
+            "recipes apply fontsmooth --prefix demo --json",
+        ))
+        .unwrap();
+        match cmd2 {
+            Command::Recipes(RecipesSubcommand::Apply {
+                id,
+                prefix,
+                json: true,
+                ..
+            }) => {
+                assert_eq!(id, "fontsmooth");
+                assert_eq!(prefix, "demo");
+            }
+            _ => panic!("expected recipes apply"),
+        }
+        let cmd3 = parse_args(&args("matrix seed --json")).unwrap();
+        assert!(matches!(
+            cmd3,
+            Command::Matrix(MatrixSubcommand::Seed { json: true, .. })
+        ));
     }
 
     #[test]

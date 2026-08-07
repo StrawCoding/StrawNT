@@ -55,7 +55,10 @@ describe('Hub settings center (W4-D3)', () => {
   it('settings-service should load about info with legal paths', async () => {
     const service = require(path.join(HUB_ROOT, 'src/main/settings-service.js'));
     const about = await service.getAboutInfo();
-    assert.equal(about.productName, 'StrawWU');
+    assert.equal(about.productName, 'StrawNT');
+    assert.equal(about.hub, 'electron');
+    assert.equal(about.execution_backend, 'wine');
+    assert.equal(about.powered_by, 'Wine');
     assert.ok(about.version);
     assert.ok(about.legal.privacy);
     assert.ok(about.legal.eula);
@@ -67,9 +70,19 @@ describe('Hub settings center (W4-D3)', () => {
     const service = require(path.join(HUB_ROOT, 'src/main/settings-service.js'));
     const info = await service.getWinCompatInfo();
     assert.ok(info.sessionStatus);
+    assert.equal(info.hub, 'electron');
+    assert.equal(info.execution_backend, 'wine');
+    assert.equal(info.powered_by_wine, true);
+    assert.ok(info.engineStatus);
     assert.ok(info.compatMatrix.available);
     assert.ok(Array.isArray(info.grades));
     assert.ok(info.grades.length >= 1);
+  });
+
+  it('settings-paths should resolve strawnt CLI helper', () => {
+    const paths = require(path.join(HUB_ROOT, 'src/common/settings-paths.js'));
+    assert.equal(typeof paths.resolveStrawntCli, 'function');
+    assert.ok(paths.resolveStrawntCli());
   });
 
   it('settings-service should expose system shortcuts', () => {

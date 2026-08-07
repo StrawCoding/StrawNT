@@ -6,7 +6,7 @@
 	install-flatpak-setup install-bug-reporter install-calamares-settings install-update-notifier install-target-setup install-firstboot install-wincompat nosnap-harden build-debs bump-version check-version-bump generate-release-manifest release-sign publish-debs publish-fork-debs \
 	portable-prefix test-portable-prefix portable-appimage test-portable-appimage \
 	portable-flatpak test-portable-flatpak test-portable-matrix test-portable-closeout \
-	test-strawnt-ntw0-contract test-strawnt-ntw1-engine \
+	test-strawnt-ntw0-contract test-strawnt-ntw1-engine test-strawnt-ntw2-shell \
 	test-legacy-portable-pe-closeout test-legacy-portable-gx-graphics \
 	test-legacy-portable-gx-audio-input test-legacy-portable-gx-anticheat \
 	test-legacy-portable-gx-closeout test-legacy-strawnt-nt1-graphics \
@@ -147,6 +147,7 @@ help:
 	@echo "  test-portable-closeout        Portable Core closeout → closeout.json (pc5)"
 	@echo "  test-strawnt-ntw0-contract    Wine pivot contract/legal evidence → ntw0-contract.json"
 	@echo "  test-strawnt-ntw1-engine      Proton-GE vendor + engine smoke → ntw1-engine.json"
+	@echo "  test-strawnt-ntw2-shell       Shell/prefix/recipes/MIME + Electron Hub wine/GE → ntw2-shell.json"
 	@echo ""
 	@echo "Legacy/archive native-era verifies (NTW0 soft-reset — NOT product Wine-ban gates):"
 	@echo "  test-legacy-portable-pe-closeout"
@@ -701,6 +702,9 @@ test-strawnt-ntw0-contract:
 
 test-strawnt-ntw1-engine:
 	bash tests/strawnt/ntw1-engine.sh
+
+test-strawnt-ntw2-shell:
+	bash tests/strawnt/ntw2-shell.sh
 
 # ---------------------------------------------------------------------------
 # LEGACY/ARCHIVE (NTW0 soft-reset) — native-era evidence only.

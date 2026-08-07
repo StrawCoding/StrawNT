@@ -1,0 +1,185 @@
+{
+  "schema": "strawnt-ntw2-shell/v1",
+  "stage": "ntw2-shell-electron",
+  "status": "PASS",
+  "product": "StrawNT",
+  "version": "0.7.1.52",
+  "generated_at": "2026-08-07T17:39:14Z",
+  "git_head": "2c8be15041f3712ce5bb5567237ed8c2b264bfa6",
+  "hub": "electron",
+  "backend": "wine",
+  "execution_backend": "wine",
+  "engine": "proton-ge",
+  "pin": "GE-Proton11-3",
+  "engine_pin": "GE-Proton11-3",
+  "powered_by": "Wine",
+  "powered_by_wine": true,
+  "simulated": false,
+  "matrix": {
+    "line": {
+      "app": "line",
+      "app_key": "line.exe",
+      "backend": "wine",
+      "engine": "proton-ge",
+      "engine_pin": "GE-Proton11-3",
+      "exe": "line.exe",
+      "execution_backend": "wine",
+      "honesty": {
+        "all_features_claimed": false,
+        "full_windows_claimed": false,
+        "ranked_anticheat_claimed": false
+      },
+      "name": "line.exe",
+      "notes": "NTW2 shell seed: install/launch UI scope; IgnoreCodeSign/crypt32 path; not full LINE verification; no ranked claim",
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "prefix": "line",
+      "recipes_recommended": [
+        "crypt32-signature",
+        "vcrun",
+        "corefonts"
+      ],
+      "scopes": {
+        "install": "PARTIAL",
+        "launch": "PARTIAL",
+        "login": "UNKNOWN",
+        "visible_ui": "UNKNOWN"
+      },
+      "status": "PARTIAL",
+      "updated_at": 1786124408,
+      "wine_flavor": "proton-ge"
+    },
+    "steam": {
+      "app": "steam",
+      "app_key": "steam.exe",
+      "backend": "wine",
+      "engine": "proton-ge",
+      "engine_pin": "GE-Proton11-3",
+      "exe": "steam.exe",
+      "execution_backend": "wine",
+      "honesty": {
+        "all_games_playable_claimed": false,
+        "full_windows_claimed": false,
+        "ranked_anticheat_claimed": false
+      },
+      "name": "steam.exe",
+      "notes": "NTW2 shell seed: launcher start/login UI only; not all-games-play claim",
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "prefix": "steam",
+      "recipes_recommended": [
+        "vcrun",
+        "corefonts",
+        "dxvk"
+      ],
+      "scopes": {
+        "all_games": "UNKNOWN",
+        "install": "PARTIAL",
+        "launch": "PARTIAL",
+        "login": "UNKNOWN",
+        "visible_ui": "UNKNOWN"
+      },
+      "status": "PARTIAL",
+      "updated_at": 1786124408,
+      "wine_flavor": "proton-ge"
+    }
+  },
+  "apps": {
+    "line": {
+      "app": "line",
+      "app_key": "line.exe",
+      "backend": "wine",
+      "engine": "proton-ge",
+      "engine_pin": "GE-Proton11-3",
+      "exe": "line.exe",
+      "execution_backend": "wine",
+      "honesty": {
+        "all_features_claimed": false,
+        "full_windows_claimed": false,
+        "ranked_anticheat_claimed": false
+      },
+      "name": "line.exe",
+      "notes": "NTW2 shell seed: install/launch UI scope; IgnoreCodeSign/crypt32 path; not full LINE verification; no ranked claim",
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "prefix": "line",
+      "recipes_recommended": [
+        "crypt32-signature",
+        "vcrun",
+        "corefonts"
+      ],
+      "scopes": {
+        "install": "PARTIAL",
+        "launch": "PARTIAL",
+        "login": "UNKNOWN",
+        "visible_ui": "UNKNOWN"
+      },
+      "status": "PARTIAL",
+      "updated_at": 1786124408,
+      "wine_flavor": "proton-ge"
+    },
+    "steam": {
+      "app": "steam",
+      "app_key": "steam.exe",
+      "backend": "wine",
+      "engine": "proton-ge",
+      "engine_pin": "GE-Proton11-3",
+      "exe": "steam.exe",
+      "execution_backend": "wine",
+      "honesty": {
+        "all_games_playable_claimed": false,
+        "full_windows_claimed": false,
+        "ranked_anticheat_claimed": false
+      },
+      "name": "steam.exe",
+      "notes": "NTW2 shell seed: launcher start/login UI only; not all-games-play claim",
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "prefix": "steam",
+      "recipes_recommended": [
+        "vcrun",
+        "corefonts",
+        "dxvk"
+      ],
+      "scopes": {
+        "all_games": "UNKNOWN",
+        "install": "PARTIAL",
+        "launch": "PARTIAL",
+        "login": "UNKNOWN",
+        "visible_ui": "UNKNOWN"
+      },
+      "status": "PARTIAL",
+      "updated_at": 1786124408,
+      "wine_flavor": "proton-ge"
+    }
+  },
+  "claims": {
+    "hub": "electron",
+    "line_matrix": true,
+    "steam_matrix": true,
+    "backend": "wine",
+    "engine": "proton-ge",
+    "powered_by_wine": true,
+    "full_windows_claimed": false,
+    "all_games_playable_claimed": false,
+    "ranked_anticheat_claimed": false,
+    "simulated": false
+  },
+  "shell": {
+    "prefix_create": true,
+    "recipes_catalog": true,
+    "mime": true,
+    "hub_wine_ge_bound": true,
+    "fontsmooth": "PASS",
+    "hub_unit_tests": "PASS"
+  },
+  "artifacts": {
+    "matrix_export": "tests/strawnt/output/ntw2-matrix.json",
+    "engine_crate": "components/strawnt-engine/",
+    "hub": "hub/",
+    "desktop": "components/strawwu-launcher/src/desktop.rs"
+  },
+  "failures": [
+    ""
+  ]
+}

@@ -9,9 +9,14 @@ const DEV_LEGAL = path.join(REPO_ROOT, 'os-image/config/branding/usr/share/straw
 
 const INSTALLED_COMPAT = '/usr/share/strawwu/compat-matrix.json';
 const DEV_COMPAT = path.join(REPO_ROOT, 'components/tests/wincompat/output/compat-matrix.json');
+const DEV_STRAWNT_MATRIX = path.join(REPO_ROOT, 'tests/strawnt/output/ntw2-matrix.json');
+const INSTALLED_STRAWNT_MATRIX = '/usr/share/strawnt/matrix.json';
 
 const VERSION_FILE = path.join(REPO_ROOT, 'VERSION');
 const OS_RELEASE = '/etc/os-release';
+
+const DEV_STRAWNT_CLI = path.join(REPO_ROOT, 'components/target/debug/strawnt');
+const INSTALLED_STRAWNT_CLI = '/usr/bin/strawnt';
 
 const INSTALLED_APP_REGISTRY = '/var/lib/strawwu/app-registry.json';
 const DEV_APP_REGISTRY = path.join(
@@ -82,6 +87,29 @@ function resolveCompatMatrix() {
   return firstExisting(INSTALLED_COMPAT, DEV_COMPAT);
 }
 
+function resolveStrawntMatrix() {
+  if (process.env.STRAWNT_MATRIX && fs.existsSync(process.env.STRAWNT_MATRIX)) {
+    return process.env.STRAWNT_MATRIX;
+  }
+  // Prefer XDG data home matrix if present.
+  const xdg = process.env.XDG_DATA_HOME
+    || path.join(process.env.HOME || '', '.local/share');
+  const userMatrix = path.join(xdg, 'strawnt', 'matrix.json');
+  return firstExisting(
+    process.env.STRAWNT_HOME ? path.join(process.env.STRAWNT_HOME, 'matrix.json') : null,
+    userMatrix,
+    DEV_STRAWNT_MATRIX,
+    INSTALLED_STRAWNT_MATRIX,
+  );
+}
+
+function resolveStrawntCli() {
+  if (process.env.STRAWNT_CLI && fs.existsSync(process.env.STRAWNT_CLI)) {
+    return process.env.STRAWNT_CLI;
+  }
+  return firstExisting(DEV_STRAWNT_CLI, INSTALLED_STRAWNT_CLI) || 'strawnt';
+}
+
 function readVersion() {
   try {
     const pkg = JSON.parse(fs.readFileSync(path.join(HUB_ROOT, 'package.json'), 'utf8'));
@@ -97,11 +125,11 @@ function readVersion() {
 
 function readOsPrettyName() {
   if (!fs.existsSync(OS_RELEASE)) {
-    return 'StrawWU (development)';
+    return 'StrawNT (development)';
   }
   const text = fs.readFileSync(OS_RELEASE, 'utf8');
   const match = text.match(/^PRETTY_NAME="(.+)"$/m);
-  return match ? match[1] : 'StrawWU';
+  return match ? match[1] : 'StrawNT';
 }
 
 function resolveAppRegistry() {
@@ -220,6 +248,8 @@ module.exports = {
   resolveLegalDir,
   resolveLegalDoc,
   resolveCompatMatrix,
+  resolveStrawntMatrix,
+  resolveStrawntCli,
   resolveAppRegistry,
   resolveAppRegistryCli,
   resolveFlatpakCli,

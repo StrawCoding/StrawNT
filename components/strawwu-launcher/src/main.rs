@@ -1,7 +1,10 @@
 use std::path::{Path, PathBuf};
 use std::process;
 
-use strawwu_launcher::cli::{self, Command, EngineSubcommand, OpenMode};
+use strawwu_launcher::cli::{
+    self, Command, EngineSubcommand, MatrixSubcommand, OpenMode, PrefixSubcommand,
+    RecipesSubcommand,
+};
 use strawwu_launcher::desktop;
 use strawwu_launcher::detect::{detect_from_path, BinaryFormat};
 use strawwu_launcher::install_native;
@@ -439,9 +442,172 @@ fn main() {
                 }
             }
         }
+        Command::Prefix(sub) => match sub {
+            PrefixSubcommand::Create {
+                name,
+                arch,
+                force,
+                json,
+                home,
+            } => {
+                let root = require_repo_root("prefix");
+                match strawnt_engine::prefix::create_prefix(
+                    &root,
+                    &name,
+                    &arch,
+                    force,
+                    home.as_deref(),
+                ) {
+                    Ok(v) => {
+                        emit_json_or_human(json, &v);
+                        if v.get("status").and_then(|s| s.as_str()) == Some("FAIL") {
+                            process::exit(1);
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("strawnt prefix create failed: {e}");
+                        process::exit(1);
+                    }
+                }
+            }
+            PrefixSubcommand::List { json, home } => {
+                match strawnt_engine::prefix::list_prefixes(home.as_deref()) {
+                    Ok(v) => emit_json_or_human(json, &v),
+                    Err(e) => {
+                        eprintln!("strawnt prefix list failed: {e}");
+                        process::exit(1);
+                    }
+                }
+            }
+        },
+        Command::Recipes(sub) => match sub {
+            RecipesSubcommand::List { json } => {
+                let v = strawnt_engine::recipes::list_recipes();
+                emit_json_or_human(json, &v);
+            }
+            RecipesSubcommand::Plan { id, json } => {
+                match strawnt_engine::recipes::plan_recipe(&id) {
+                    Ok(v) => emit_json_or_human(json, &v),
+                    Err(e) => {
+                        eprintln!("strawnt recipes plan failed: {e}");
+                        process::exit(1);
+                    }
+                }
+            }
+            RecipesSubcommand::Apply {
+                id,
+                prefix,
+                json,
+                home,
+            } => {
+                let root = require_repo_root("recipes");
+                match strawnt_engine::recipes::apply_recipe(
+                    &root,
+                    &id,
+                    &prefix,
+                    home.as_deref(),
+                ) {
+                    Ok(v) => {
+                        emit_json_or_human(json, &v);
+                        let st = v.get("status").and_then(|s| s.as_str()).unwrap_or("FAIL");
+                        if st == "FAIL" {
+                            process::exit(1);
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("strawnt recipes apply failed: {e}");
+                        process::exit(1);
+                    }
+                }
+            }
+        },
+        Command::Matrix(sub) => match sub {
+            MatrixSubcommand::List { json, home } => {
+                match strawnt_engine::matrix::list_matrix(home.as_deref()) {
+                    Ok(v) => emit_json_or_human(json, &v),
+                    Err(e) => {
+                        eprintln!("strawnt matrix list failed: {e}");
+                        process::exit(1);
+                    }
+                }
+            }
+            MatrixSubcommand::Get {
+                app_key,
+                json,
+                home,
+            } => match strawnt_engine::matrix::get_entry(&app_key, home.as_deref()) {
+                Ok(v) => emit_json_or_human(json, &v),
+                Err(e) => {
+                    eprintln!("strawnt matrix get failed: {e}");
+                    process::exit(1);
+                }
+            },
+            MatrixSubcommand::Set {
+                name,
+                status,
+                notes,
+                prefix,
+                json,
+                home,
+            } => match strawnt_engine::matrix::set_entry(
+                &name,
+                &status,
+                &notes,
+                prefix.as_deref(),
+                None,
+                None,
+                home.as_deref(),
+            ) {
+                Ok(v) => emit_json_or_human(json, &v),
+                Err(e) => {
+                    eprintln!("strawnt matrix set failed: {e}");
+                    process::exit(1);
+                }
+            },
+            MatrixSubcommand::Seed { json, home } => {
+                let root = require_repo_root("matrix");
+                let pin = match strawnt_engine::load_pin(&root) {
+                    Ok(p) => p.tag,
+                    Err(e) => {
+                        eprintln!("strawnt matrix seed: {e}");
+                        process::exit(1);
+                    }
+                };
+                match strawnt_engine::matrix::seed_golden(home.as_deref(), &pin) {
+                    Ok(v) => {
+                        emit_json_or_human(json, &v);
+                        if v.get("status").and_then(|s| s.as_str()) != Some("PASS") {
+                            process::exit(1);
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("strawnt matrix seed failed: {e}");
+                        process::exit(1);
+                    }
+                }
+            }
+        },
         Command::Config(_) => {
             println!("strawnt: config (stub)");
         }
+    }
+}
+
+fn require_repo_root(ctx: &str) -> PathBuf {
+    match strawnt_engine::find_repo_root() {
+        Ok(r) => r,
+        Err(e) => {
+            eprintln!("strawnt {ctx}: {e}");
+            process::exit(1);
+        }
+    }
+}
+
+fn emit_json_or_human(json: bool, v: &serde_json::Value) {
+    if json {
+        println!("{}", serde_json::to_string_pretty(v).unwrap_or_default());
+    } else {
+        println!("{}", serde_json::to_string_pretty(v).unwrap_or_default());
     }
 }
 
@@ -749,6 +915,13 @@ COMMANDS:
         Smoke cmd.exe echo via vendored Proton-GE wine
     doctor [--json]
         Engine health: pin, wine binary, powered by Wine
+    prefix create <name> [--arch win64] [--force] [--home DIR] [--json]
+        Create Wine prefix under ~/.local/share/strawnt/prefixes (NTW2)
+    prefix list [--home DIR] [--json]
+    recipes list|plan <id>|apply <id> --prefix <name> [--home DIR] [--json]
+        Recipes: vcrun, corefonts, dxvk, fontsmooth, crypt32-signature (NTW2)
+    matrix list|get <key>|set <name> <status>|seed [--home DIR] [--json]
+        Honest PASS/PARTIAL/FAIL/UNKNOWN matrix; seed line.exe+steam.exe (NTW2)
     version
     help
 

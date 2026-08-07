@@ -1,7 +1,14 @@
-//! StrawNT engine — vendored Proton-GE / Wine substrate (NTW1).
+//! StrawNT engine — vendored Proton-GE / Wine substrate (NTW1+) + shell (NTW2).
 //!
 //! Honesty: `execution_backend=wine`, `engine=proton-ge@<pin>`, powered by Wine.
 //! Does not claim full Windows or ranked anti-cheat.
+//!
+//! NTW2: prefix / recipes / matrix (patterns absorbed from straw-wine).
+
+pub mod matrix;
+pub mod paths;
+pub mod prefix;
+pub mod recipes;
 
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -9,6 +16,13 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::time::{SystemTime, UNIX_EPOCH};
+
+pub fn unix_secs() -> u64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0)
+}
 
 #[derive(Debug, thiserror::Error)]
 pub enum EngineError {
