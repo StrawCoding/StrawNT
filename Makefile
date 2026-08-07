@@ -8,6 +8,8 @@
 	portable-flatpak test-portable-flatpak test-portable-matrix test-portable-closeout \
 	test-strawnt-ntw0-contract test-strawnt-ntw1-engine test-strawnt-ntw2-shell \
 	test-strawnt-ntw3-optimize test-strawnt-ntw4-interop \
+	test-strawnt-ntw5-appmgr test-strawnt-ntw6-sysapps \
+	release-packaging test-strawnt-ntw7-packaging \
 	test-legacy-portable-pe-closeout test-legacy-portable-gx-graphics \
 	test-legacy-portable-gx-audio-input test-legacy-portable-gx-anticheat \
 	test-legacy-portable-gx-closeout test-legacy-strawnt-nt1-graphics \
@@ -151,6 +153,10 @@ help:
 	@echo "  test-strawnt-ntw2-shell       Shell/prefix/recipes/MIME + Electron Hub wine/GE → ntw2-shell.json"
 	@echo "  test-strawnt-ntw3-optimize    Wine/GE optimize deltas → ntw3-optimize.json"
 	@echo "  test-strawnt-ntw4-interop     Win32 IPC same+cross prefix → ntw4-interop.json"
+	@echo "  test-strawnt-ntw5-appmgr      System App Manager smoke → ntw5-appmgr.json"
+	@echo "  test-strawnt-ntw6-sysapps     Dedicated system apps suite → ntw6-sysapps.json"
+	@echo "  release-packaging            Build deb/rpm + SHA256SUMS (NTW7)"
+	@echo "  test-strawnt-ntw7-packaging  Packaging smoke → ntw7-packaging.json"
 	@echo ""
 	@echo "Legacy/archive native-era verifies (NTW0 soft-reset — NOT product Wine-ban gates):"
 	@echo "  test-legacy-portable-pe-closeout"
@@ -714,6 +720,19 @@ test-strawnt-ntw3-optimize:
 
 test-strawnt-ntw4-interop:
 	bash tests/strawnt/ntw4-interop.sh
+
+test-strawnt-ntw5-appmgr:
+	bash tests/strawnt/ntw5-appmgr.sh
+
+test-strawnt-ntw6-sysapps:
+	bash tests/strawnt/ntw6-sysapps.sh
+
+release-packaging:
+	bash scripts/build-release.sh
+	bash scripts/sign-release.sh
+
+test-strawnt-ntw7-packaging:
+	bash tests/strawnt/ntw7-packaging.sh
 
 # ---------------------------------------------------------------------------
 # LEGACY/ARCHIVE (NTW0 soft-reset) — native-era evidence only.

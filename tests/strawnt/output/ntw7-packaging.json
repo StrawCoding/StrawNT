@@ -1,0 +1,124 @@
+{
+  "schema": "strawnt-ntw7-packaging/v1",
+  "status": "PASS",
+  "stage": "ntw7-packaging",
+  "product": "StrawNT",
+  "version": "0.7.1.63",
+  "git_head": "b224b2344",
+  "timestamp_utc": "2026-08-07T19:56:09Z",
+  "execution_backend": "wine",
+  "engine": "proton-ge",
+  "powered_by": "Wine",
+  "delivery": {
+    "gui_local": "PASS",
+    "desktop_mime": "PASS",
+    "deb": "PASS",
+    "rpm": "PASS",
+    "flatpak": "PARTIAL"
+  },
+  "artefacts": {
+    "deb": "strawnt_0.7.1+d63-1_amd64.deb",
+    "rpm": "strawnt-0.7.1.63-1.fc41.x86_64.rpm",
+    "sha256sums": "SHA256SUMS",
+    "sha256sums_dist": "dist/SHA256SUMS",
+    "sha256sums_tests": "tests/strawnt/output/SHA256SUMS",
+    "gpg": "signed",
+    "flatpak": "PARTIAL",
+    "packaging_dir": "packaging"
+  },
+  "distros": [
+    "ubuntu-24.04",
+    "debian-bookworm",
+    "fedora-41"
+  ],
+  "hub_entry": "packaging/hub/strawnt-hub-entry.json",
+  "checks": {
+    "packaging_contracts": {
+      "status": "PASS",
+      "detail": {
+        "gui_local": "packaging/desktop/strawnt-hub.desktop.in",
+        "desktop_mime": [
+          "packaging/desktop/strawnt-open.desktop.in",
+          "packaging/mime/strawnt-win32.xml"
+        ],
+        "hub_entry": "packaging/hub/strawnt-hub-entry.json",
+        "flatpak_manifest": "packaging/flatpak/org.strawcoding.strawnt.yml",
+        "execution_backend": "wine",
+        "powered_by": "Wine"
+      }
+    },
+    "build": {
+      "status": "PASS",
+      "detail": {
+        "deb": "/mnt/data/code/project/StrawCoding/StrawNT/dist/strawnt_0.7.1+d63-1_amd64.deb",
+        "rpm": "/mnt/data/code/project/StrawCoding/StrawNT/dist/strawnt-0.7.1.63-1.fc41.x86_64.rpm",
+        "flatpak": "PARTIAL",
+        "version": "0.7.1.63"
+      }
+    },
+    "sha256_sign": {
+      "status": "PASS",
+      "detail": {
+        "status": "PASS",
+        "gpg": "signed",
+        "gpg_key_hint": "apt@wastebase.xyz",
+        "files": [
+          "flatpak-status.json",
+          "strawnt-0.7.1.63-1.fc41.x86_64.rpm",
+          "strawnt_0.7.1+d63-1_amd64.deb"
+        ],
+        "sha256sums": "cd11bbe0ce370cb37b9a8ab4a139c6bf5a1fb04e666918ae2286d8a3a888a8c1  flatpak-status.json\nd2f32e96db8b31f36463a9177d8c31218827ad03ee22a717ae5574f41f661b86  strawnt-0.7.1.63-1.fc41.x86_64.rpm\n2d23bdf2fc7f3b4d195147b34ea0e88b3c5b0770040b39b700b96e0558ca1d9d  strawnt_0.7.1+d63-1_amd64.deb\n",
+        "execution_backend": "wine",
+        "engine": "proton-ge",
+        "powered_by": "Wine"
+      }
+    },
+    "host_smoke": {
+      "status": "PASS",
+      "detail": {
+        "doctor_backend": "wine",
+        "doctor_status": "PASS",
+        "version": "0.7.1.63",
+        "gui_local": "strawnt-hub --version OK",
+        "desktop_mime": "present",
+        "distro": "ubuntu-26.04"
+      }
+    },
+    "distro_ubuntu": {
+      "status": "PASS",
+      "detail": {
+        "distro": "ubuntu-24.04",
+        "artefact": "deb",
+        "execution_backend": "wine",
+        "powered_by": "Wine",
+        "status": "PASS"
+      }
+    },
+    "distro_debian": {
+      "status": "PASS",
+      "detail": {
+        "distro": "debian-bookworm",
+        "artefact": "deb",
+        "execution_backend": "wine",
+        "powered_by": "Wine",
+        "status": "PASS"
+      }
+    },
+    "distro_fedora": {
+      "status": "PASS",
+      "detail": {
+        "distro": "fedora-41",
+        "artefact": "rpm",
+        "execution_backend": "wine",
+        "powered_by": "Wine",
+        "status": "PASS"
+      }
+    }
+  },
+  "sha256sums": "cd11bbe0ce370cb37b9a8ab4a139c6bf5a1fb04e666918ae2286d8a3a888a8c1  flatpak-status.json\nd2f32e96db8b31f36463a9177d8c31218827ad03ee22a717ae5574f41f661b86  strawnt-0.7.1.63-1.fc41.x86_64.rpm\n2d23bdf2fc7f3b4d195147b34ea0e88b3c5b0770040b39b700b96e0558ca1d9d  strawnt_0.7.1+d63-1_amd64.deb\n",
+  "notes": [
+    "deb/rpm omit multi-GB Proton-GE dist; PIN + fetch scripts shipped; smoke bind-mounts GE",
+    "flatpak honest PARTIAL",
+    "not a full Windows / ranked anti-cheat claim"
+  ]
+}

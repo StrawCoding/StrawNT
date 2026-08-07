@@ -1,0 +1,17 @@
+[Desktop Entry]
+Type=Application
+Name=StrawNT
+GenericName=Windows App Runtime
+Comment=StrawNT Wine/Proton-GE runtime (powered by Wine · execution_backend=wine)
+Exec=@STRAWNT_BIN@ status
+TryExec=@STRAWNT_BIN@
+Icon=strawnt
+Terminal=true
+Categories=System;Utility;Emulator;
+Keywords=Wine;Windows;exe;msi;Proton;StrawNT;
+NoDisplay=false
+StartupNotify=true
+X-StrawNT-Kind=menu-launcher
+X-StrawNT-Backend=wine
+X-StrawNT-Engine=proton-ge
+X-StrawNT-PoweredBy=Wine

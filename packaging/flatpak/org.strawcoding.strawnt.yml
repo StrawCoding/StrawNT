@@ -1,0 +1,18 @@
+# INTENTIONAL PARTIAL: Flatpak + Wine/Proton-GE + arbitrary PE is not a full product path.
+# Primary release artefacts are .deb and .rpm (+ SHA256SUMS). See dist/flatpak-status.json.
+id: org.strawcoding.strawnt
+runtime: org.freedesktop.Platform
+runtime-version: "24.08"
+sdk: org.freedesktop.Sdk
+command: strawnt
+finish-args:
+  - --share=network
+  - --share=ipc
+  - --socket=x11
+  - --socket=wayland
+  - --device=dri
+  - --filesystem=home
+  - --filesystem=host
+modules: []
+# status: PARTIAL — do not advertise as full Flatpak release
+# reason: sandbox cannot fully host PE install paths + Wine prefix UX without host FS hole

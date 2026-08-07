@@ -1,0 +1,31 @@
+{
+  "product": "StrawNT",
+  "id": "org.strawcoding.strawnt",
+  "hub": {
+    "track": "wine",
+    "stack": "electron",
+    "entry": "hub/",
+    "desktop": "strawnt-hub.desktop",
+    "executable": "strawnt-hub"
+  },
+  "execution_backend": "wine",
+  "engine": "proton-ge",
+  "powered_by": "Wine",
+  "delivery": [
+    "gui_local",
+    "desktop_mime",
+    "deb",
+    "rpm",
+    "flatpak"
+  ],
+  "honesty": {
+    "full_windows": false,
+    "ranked_anticheat": false,
+    "flatpak": "PARTIAL"
+  },
+  "notes": [
+    "Flagship = GE-vendored StrawNT (policy C merge from StrawWine patterns)",
+    "Electron Hub is the locked primary GUI (not StrawWine Vue HTTP)",
+    "Flatpak remains honest PARTIAL due to PE/Wine sandbox limits"
+  ]
+}

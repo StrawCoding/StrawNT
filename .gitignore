@@ -28,6 +28,17 @@ os-image/debs/*/output/
 os-image/output/apt-repo/
 os-image/output/apt-fork-repo/
 
+# NTW7 product release artefacts (rebuild via scripts/build-release.sh)
+dist/*.deb
+dist/*.rpm
+dist/SHA256SUMS
+dist/SHA256SUMS.asc
+dist/sign-result.json
+dist/flatpak-status.json
+# Root SHA256SUMS is committed as Hermes evidence; rebuild updates it.
+# Keep SHA256SUMS tracked; ignore only local asc if unsigned
+SHA256SUMS.asc
+
 # preflight test outputs are regenerated every run (they even contain throwaway
 # GPG keypairs) — must never be committed.
 tests/apt-repo/output/
@@ -62,6 +73,9 @@ components/packaging/portable/flatpak/.build/
 components/packaging/portable/flatpak/.flatpak-builder/
 components/packaging/portable/flatpak/repo/
 components/packaging/portable/flatpak/dist/
+
+# NTW7 package build target (docker bookworm glibc; rebuild via build-release.sh)
+components/target-pkg/
 
 # pe1 smoke ephemeral registry/home under side-effects (keep pe-stdout.txt)
 tests/portable/output/pe1-side-effects/home/

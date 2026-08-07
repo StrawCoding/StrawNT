@@ -1,0 +1,17 @@
+[Desktop Entry]
+Type=Application
+Name=StrawNT (Open)
+GenericName=Windows App Launcher
+Comment=Install or run Windows .exe/.msi via StrawNT Wine/Proton-GE (powered by Wine)
+Exec=@STRAWNT_BIN@ open %f
+TryExec=@STRAWNT_BIN@
+Icon=strawnt
+Terminal=false
+Categories=System;Utility;Emulator;
+MimeType=application/x-ms-dos-executable;application/x-msdownload;application/vnd.microsoft.portable-executable;application/x-msi;application/x-ms-shortcut;
+NoDisplay=true
+StartupNotify=true
+X-StrawNT-Kind=open-handler
+X-StrawNT-Backend=wine
+X-StrawNT-Engine=proton-ge
+X-StrawNT-PoweredBy=Wine

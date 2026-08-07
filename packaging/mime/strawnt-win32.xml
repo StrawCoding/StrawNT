@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/vnd.microsoft.portable-executable">
+    <comment>Windows Portable Executable</comment>
+    <comment xml:lang="zh_TW">Windows 可攜執行檔</comment>
+    <glob pattern="*.exe"/>
+    <glob pattern="*.dll"/>
+  </mime-type>
+  <mime-type type="application/x-msi">
+    <comment>Windows Installer Package</comment>
+    <comment xml:lang="zh_TW">Windows 安裝套件</comment>
+    <glob pattern="*.msi"/>
+  </mime-type>
+</mime-info>

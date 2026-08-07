@@ -1,0 +1,34 @@
+Name: strawnt
+Version: @VERSION@
+Release: 1%{?dist}
+Summary: StrawNT — Windows apps on Linux via Wine/Proton-GE
+License: MIT AND LGPL-2.1-or-later
+URL: https://github.com/StrawCoding/StrawNT
+BuildArch: x86_64
+Requires: glibc
+Recommends: libvulkan1
+
+%description
+StrawNT product shell and CLI (execution_backend=wine, engine=proton-ge).
+Powered by Wine. Does not claim full Windows or ranked anti-cheat.
+Vendored Proton-GE is fetched/placed under STRAWNT_ROOT/third_party/proton-ge
+(git-lfs / scripts/fetch-proton-ge.sh). Flatpak remains honest PARTIAL.
+
+%install
+mkdir -p %{buildroot}
+cp -a @ROOTFS@/. %{buildroot}/
+
+%files
+/usr/bin/strawnt
+/usr/bin/strawnt-hub
+/usr/lib/strawnt
+/usr/share/applications/strawnt.desktop
+/usr/share/applications/strawnt-open.desktop
+/usr/share/applications/strawnt-hub.desktop
+/usr/share/mime/packages/strawnt-win32.xml
+/usr/share/metainfo/org.strawcoding.strawnt.metainfo.xml
+/usr/share/doc/strawnt
+
+%changelog
+* Sat Aug 08 2026 StrawCoding <dev@strawcoding.org> - @VERSION@-1
+- NTW7 packaging: deb/rpm + MIME + gui_local hub desktop (powered by Wine)

@@ -1,0 +1,17 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=StrawNT Hub
+GenericName=StrawNT Local GUI
+Comment=StrawNT Electron Hub — App Manager & system apps (powered by Wine · execution_backend=wine)
+Exec=@STRAWNT_HUB_BIN@
+TryExec=@STRAWNT_HUB_BIN@
+Icon=strawnt
+Terminal=false
+Categories=Settings;System;
+Keywords=strawnt;hub;gui;wine;proton;apps;
+StartupNotify=true
+X-StrawNT-Kind=gui-local
+X-StrawNT-Backend=wine
+X-StrawNT-Engine=proton-ge
+X-StrawNT-PoweredBy=Wine

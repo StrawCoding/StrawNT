@@ -180,16 +180,18 @@ cat > "${PREFIX}/share/applications/strawnt.desktop" <<'EOF'
 Type=Application
 Name=StrawNT
 GenericName=Windows App Runtime
-Comment=StrawNT native PE / NT ABI runtime
+Comment=StrawNT Wine/Proton-GE runtime (powered by Wine)
 Exec=strawnt status
 TryExec=strawnt
 Icon=strawnt
 Terminal=true
-Categories=System;Utility;
+Categories=System;Utility;Emulator;
 NoDisplay=false
 StartupNotify=true
 X-StrawNT-Kind=menu-launcher
-X-StrawNT-Backend=native
+X-StrawNT-Backend=wine
+X-StrawNT-Engine=proton-ge
+X-StrawNT-PoweredBy=Wine
 EOF
 
 cat > "${PREFIX}/share/applications/strawnt-open.desktop" <<'EOF'
@@ -197,17 +199,19 @@ cat > "${PREFIX}/share/applications/strawnt-open.desktop" <<'EOF'
 Type=Application
 Name=StrawNT (Open)
 GenericName=Windows App Launcher
-Comment=Install or run Windows .exe/.msi with StrawNT native PE
+Comment=Install or run Windows .exe/.msi via StrawNT Wine/Proton-GE (powered by Wine)
 Exec=strawnt open %f
 TryExec=strawnt
 Icon=strawnt
 Terminal=false
-Categories=System;Utility;
+Categories=System;Utility;Emulator;
 MimeType=application/x-ms-dos-executable;application/x-msdownload;application/vnd.microsoft.portable-executable;application/x-msi;application/x-ms-shortcut;
 NoDisplay=true
 StartupNotify=true
 X-StrawNT-Kind=open-handler
-X-StrawNT-Backend=native
+X-StrawNT-Backend=wine
+X-StrawNT-Engine=proton-ge
+X-StrawNT-PoweredBy=Wine
 EOF
 
 # Never ship legacy StrawWU open handlers in the prefix.
