@@ -772,6 +772,10 @@ pub fn compute_deltas(before: &Value, after: &Value) -> Value {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::sync::Mutex;
+
+    // Env mutation must be serialized across idle_sec tests.
+    static IDLE_ENV_LOCK: Mutex<()> = Mutex::new(());
 
     #[test]
     fn profile_parse() {
@@ -780,6 +784,24 @@ mod tests {
             OptProfile::parse("optimized").unwrap(),
             OptProfile::Optimized
         );
+    }
+
+    #[test]
+    fn idle_sec_defaults_and_clamps_to_plan_floor() {
+        let _guard = IDLE_ENV_LOCK.lock().unwrap();
+        std::env::remove_var("STRAWNT_NTW3_IDLE_SEC");
+        assert_eq!(idle_sec(), 60, "plan Task 7 floor is 60s");
+
+        std::env::set_var("STRAWNT_NTW3_IDLE_SEC", "10");
+        assert_eq!(idle_sec(), 60, "values below 60 must clamp upward");
+
+        std::env::set_var("STRAWNT_NTW3_IDLE_SEC", "59");
+        assert_eq!(idle_sec(), 60);
+
+        std::env::set_var("STRAWNT_NTW3_IDLE_SEC", "90");
+        assert_eq!(idle_sec(), 90, "values above floor are allowed");
+
+        std::env::remove_var("STRAWNT_NTW3_IDLE_SEC");
     }
 
     #[test]
