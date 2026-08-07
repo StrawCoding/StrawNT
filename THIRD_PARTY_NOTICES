@@ -1,24 +1,23 @@
 # THIRD_PARTY_NOTICES — StrawNT
 
-Skeleton (NTW0, 2026-08-07). Full per-component license texts and pins land with NTW1 (vendored Proton-GE via git-lfs).
+Product shell and StrawNT original code: MIT License — see `LICENSE`.
 
-## Product shell
+## Wine / Proton-GE substrate (NTW1)
 
-- StrawNT original code: MIT License — see `LICENSE`.
+StrawNT is **powered by Wine**. The flagship engine is vendored **Proton-GE** under `third_party/proton-ge/` (pin + git-lfs cache; extract via `scripts/fetch-proton-ge.sh`).
 
-## Planned third-party (wine substrate)
+| Component | Role | License | Location / pin |
+|-----------|------|---------|----------------|
+| Proton-GE | Primary engine upstream | Upstream COPYING + Wine LGPL family | `third_party/proton-ge/PIN` (`GE-Proton11-3`) |
+| Wine | Win32 compatibility substrate inside GE | LGPL-2.1+ (file-level varies) | `third_party/proton-ge/dist/` (extracted) |
+| DXVK / vkd3d-proton | D3D → Vulkan (bundled in GE) | zlib / LGPL / upstream | Inside GE `files/` |
 
-| Component | Role | License (expected) | Status |
-|-----------|------|--------------------|--------|
-| Wine | Win32 compatibility substrate | LGPL-2.1+ (file-level varies) | Notice required; tree vendored in NTW1 |
-| Proton-GE | Primary engine upstream pin | Upstream COPYING / component licenses | `ge_distribution=git-lfs`; **not** downloaded in NTW0 |
-| DXVK | D3D → Vulkan | zlib / upstream | With engine vendor |
-| vkd3d / vkd3d-proton | D3D12 → Vulkan | LGPL / upstream | With engine vendor |
-
-## Honesty
-
-StrawNT is **powered by Wine**. Do not redistribute without this notice pack and an LGPL source offer (see `docs/legal/WINE-LGPL.md`).
+See also: `docs/legal/WINE-LGPL.md`, `third_party/proton-ge/README.md`.
 
 ## Source offer
 
-Until `third_party/proton-ge/PIN` exists, source offer is: obtain corresponding upstream sources from the GE-Proton / Wine projects named in the future PIN file, plus any StrawNT modifications published in this repository under the same release tag.
+Corresponding upstream sources for the pinned GE-Proton release are available from the `release_url` / `tarball_url` recorded in `third_party/proton-ge/PIN`, plus any StrawNT modifications published in this repository under the same product release tag.
+
+## Honesty
+
+Do not redistribute without this notice pack and an LGPL source offer. Do not claim full Windows, ranked anti-cheat pass, or that all games are playable.

@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 use std::process;
 
-use strawwu_launcher::cli::{self, Command, OpenMode};
+use strawwu_launcher::cli::{self, Command, EngineSubcommand, OpenMode};
 use strawwu_launcher::desktop;
 use strawwu_launcher::detect::{detect_from_path, BinaryFormat};
 use strawwu_launcher::install_native;
@@ -14,6 +14,7 @@ use strawwu_runtime::executor::ExecState;
 use strawwu_runtime::orchestrator::RuntimeOrchestrator;
 use strawwu_runtime::profile::AppProfile;
 use strawwu_runtime::maybe_run_gui_smoke;
+use strawnt_engine::{self, print_doctor_human, print_status_human};
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -348,6 +349,96 @@ fn main() {
                 process::exit(1);
             }
         },
+        Command::Engine(EngineSubcommand::Status { json }) => {
+            let root = match strawnt_engine::find_repo_root() {
+                Ok(r) => r,
+                Err(e) => {
+                    eprintln!("strawnt engine: {e}");
+                    process::exit(1);
+                }
+            };
+            match strawnt_engine::engine_status(&root) {
+                Ok(s) => {
+                    if json {
+                        println!("{}", serde_json::to_string_pretty(&s).unwrap_or_default());
+                    } else {
+                        print_status_human(&s);
+                    }
+                    if s.status == "FAIL" {
+                        process::exit(1);
+                    }
+                }
+                Err(e) => {
+                    eprintln!("strawnt engine status failed: {e}");
+                    process::exit(1);
+                }
+            }
+        }
+        Command::Engine(EngineSubcommand::Hello { json }) => {
+            let root = match strawnt_engine::find_repo_root() {
+                Ok(r) => r,
+                Err(e) => {
+                    eprintln!("strawnt engine: {e}");
+                    process::exit(1);
+                }
+            };
+            let prefix = std::env::temp_dir().join(format!(
+                "strawnt-engine-hello-{}",
+                std::process::id()
+            ));
+            match strawnt_engine::run_hello_cmd(&root, &prefix) {
+                Ok(r) => {
+                    if json {
+                        println!("{}", serde_json::to_string_pretty(&r).unwrap_or_default());
+                    } else {
+                        println!(
+                            "strawnt engine hello: status={} backend={} pin={} exit={}",
+                            r.status, r.backend, r.pin, r.exit_code
+                        );
+                        if !r.stdout.trim().is_empty() {
+                            print!("{}", r.stdout);
+                            if !r.stdout.ends_with('\n') {
+                                println!();
+                            }
+                        }
+                    }
+                    let _ = std::fs::remove_dir_all(&prefix);
+                    if r.status != "PASS" {
+                        process::exit(1);
+                    }
+                }
+                Err(e) => {
+                    let _ = std::fs::remove_dir_all(&prefix);
+                    eprintln!("strawnt engine hello failed: {e}");
+                    process::exit(1);
+                }
+            }
+        }
+        Command::Doctor { json } => {
+            let root = match strawnt_engine::find_repo_root() {
+                Ok(r) => r,
+                Err(e) => {
+                    eprintln!("strawnt doctor: {e}");
+                    process::exit(1);
+                }
+            };
+            match strawnt_engine::doctor(&root) {
+                Ok(d) => {
+                    if json {
+                        println!("{}", serde_json::to_string_pretty(&d).unwrap_or_default());
+                    } else {
+                        print_doctor_human(&d);
+                    }
+                    if d.status == "FAIL" || !d.wine.found {
+                        process::exit(1);
+                    }
+                }
+                Err(e) => {
+                    eprintln!("strawnt doctor failed: {e}");
+                    process::exit(1);
+                }
+            }
+        }
         Command::Config(_) => {
             println!("strawnt: config (stub)");
         }
@@ -652,6 +743,12 @@ COMMANDS:
     profile inspect|export <app-id>
     repair <app-id>
     status
+    engine status [--json]
+        Vendored Proton-GE pin + wine path (NTW1)
+    engine hello [--json]
+        Smoke cmd.exe echo via vendored Proton-GE wine
+    doctor [--json]
+        Engine health: pin, wine binary, powered by Wine
     version
     help
 

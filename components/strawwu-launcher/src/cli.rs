@@ -37,9 +37,19 @@ pub enum Command {
         app_id: String,
     },
     Status,
+    /// NTW1: vendored Proton-GE engine status / smoke helpers.
+    Engine(EngineSubcommand),
+    /// NTW1: engine doctor (pin + wine presence + honesty).
+    Doctor { json: bool },
     Config(ConfigSubcommand),
     Version,
     Help,
+}
+
+#[derive(Debug, Clone)]
+pub enum EngineSubcommand {
+    Status { json: bool },
+    Hello { json: bool },
 }
 
 #[derive(Debug, Clone)]
@@ -92,11 +102,42 @@ pub fn parse_args(args: &[String]) -> Result<Command, String> {
             })
         }
         "status" => Ok(Command::Status),
+        "engine" => parse_engine(&args[1..]),
+        "doctor" => parse_doctor(&args[1..]),
         "config" => parse_config(&args[1..]),
         "--version" | "version" => Ok(Command::Version),
         "--help" | "help" => Ok(Command::Help),
         _ => Err(format!("unknown command: {}", args[0])),
     }
+}
+
+fn parse_engine(args: &[String]) -> Result<Command, String> {
+    let mut json = false;
+    let mut sub = None;
+    for a in args {
+        match a.as_str() {
+            "--json" => json = true,
+            "status" => sub = Some("status"),
+            "hello" => sub = Some("hello"),
+            other => return Err(format!("unknown engine argument: {other}")),
+        }
+    }
+    match sub {
+        Some("hello") => Ok(Command::Engine(EngineSubcommand::Hello { json })),
+        Some("status") | None => Ok(Command::Engine(EngineSubcommand::Status { json })),
+        _ => Err("engine requires subcommand: status|hello".into()),
+    }
+}
+
+fn parse_doctor(args: &[String]) -> Result<Command, String> {
+    let mut json = false;
+    for a in args {
+        match a.as_str() {
+            "--json" => json = true,
+            other => return Err(format!("unknown doctor argument: {other}")),
+        }
+    }
+    Ok(Command::Doctor { json })
 }
 
 fn parse_open(args: &[String]) -> Result<Command, String> {
@@ -388,6 +429,28 @@ mod tests {
     fn parse_status() {
         let cmd = parse_args(&args("status")).unwrap();
         assert!(matches!(cmd, Command::Status));
+    }
+
+    #[test]
+    fn parse_engine_status() {
+        let cmd = parse_args(&args("engine status")).unwrap();
+        assert!(matches!(
+            cmd,
+            Command::Engine(EngineSubcommand::Status { json: false })
+        ));
+        let cmd2 = parse_args(&args("engine status --json")).unwrap();
+        assert!(matches!(
+            cmd2,
+            Command::Engine(EngineSubcommand::Status { json: true })
+        ));
+    }
+
+    #[test]
+    fn parse_doctor() {
+        let cmd = parse_args(&args("doctor")).unwrap();
+        assert!(matches!(cmd, Command::Doctor { json: false }));
+        let cmd2 = parse_args(&args("doctor --json")).unwrap();
+        assert!(matches!(cmd2, Command::Doctor { json: true }));
     }
 
     #[test]

@@ -27,7 +27,7 @@ StrawNT 先前以自研 **native PE** 為產品預設，並以硬契約「禁 Wi
 1. README／USER-GUIDE／產品路徑 verify **不得**再要求 `wine_proton_used=false` 或 native-only 作為 PASS。
 2. native 路徑僅經 `STRAWNT_LEGACY_NATIVE=1`（unsupported）或 `tests/archive/native/`／歷史證據保留。
 3. LGPL：每個 release 必須附 `docs/legal/WINE-LGPL.md`、`THIRD_PARTY_NOTICES` 與 source offer。
-4. 引擎實際 vendor／runner 在 **NTW1**；本階 **禁止**下載完整 GE 大檔。
+4. 引擎實際 vendor／runner 在 **NTW1**（`third_party/proton-ge` + git-lfs）；NTW0 禁止下載完整 GE 大檔。
 5. 禁宣稱完整 Windows／排位／官方反作弊通過。
 
 ## Soft-reset rules

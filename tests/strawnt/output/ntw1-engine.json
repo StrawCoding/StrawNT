@@ -1,0 +1,43 @@
+{
+  "schema": "strawnt-ntw1-engine/v1",
+  "stage": "ntw1-vendor-engine",
+  "status": "PASS",
+  "product": "StrawNT",
+  "version": "0.7.1.49",
+  "generated_at": "2026-08-07T17:06:54Z",
+  "git_head": "f57162fa8a4e5448bb1309f072279b78b832d948",
+  "backend": "wine",
+  "execution_backend": "wine",
+  "engine": "proton-ge",
+  "pin": "GE-Proton11-3",
+  "engine_pin": "GE-Proton11-3",
+  "hello": "PASS",
+  "cmd": "PASS",
+  "claims": {
+    "pin": "GE-Proton11-3",
+    "engine": "proton-ge",
+    "backend": "wine",
+    "powered_by_wine": true,
+    "distribution": "git-lfs",
+    "full_windows_claimed": false,
+    "all_games_playable_claimed": false,
+    "ranked_anticheat_claimed": false
+  },
+  "artifacts": {
+    "pin": "third_party/proton-ge/PIN",
+    "readme": "third_party/proton-ge/README.md",
+    "fetch": "scripts/fetch-proton-ge.sh",
+    "verify": "scripts/verify-proton-ge.sh",
+    "engine_crate": "components/strawnt-engine/",
+    "wine_bin": "/mnt/data/code/project/StrawCoding/StrawNT/third_party/proton-ge/dist/files/bin/wine",
+    "hello_stdout": "tests/strawnt/output/ntw1-hello.txt"
+  },
+  "smoke": {
+    "hello_marker": "STRAWNT_HELLO_1786122421",
+    "hello_status": "PASS",
+    "cmd_status": "PASS",
+    "engine_status_json_ok": true,
+    "doctor_json_ok": true
+  },
+  "failures": []
+}

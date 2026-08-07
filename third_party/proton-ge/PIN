@@ -1,0 +1,16 @@
+# StrawNT Proton-GE engine pin (NTW1)
+# Format: key=value (no unquoted spaces). Do not claim all games playable.
+
+engine=proton-ge
+tag=GE-Proton11-3
+upstream=https://github.com/GloriousEggroll/proton-ge-custom
+release_url=https://github.com/GloriousEggroll/proton-ge-custom/releases/tag/GE-Proton11-3
+tarball_url=https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-3/GE-Proton11-3.tar.gz
+tarball_name=GE-Proton11-3.tar.gz
+sha512sum_url=https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-3/GE-Proton11-3.sha512sum
+sha512=528ae7831f909c0a4fff5d83889ac6dab3c9706746cd148f05f3064ac042763853d68277e2a815f18f16c17285d5d128864a03c563956c0dce30bafcd16aa77c
+pinned_date=2026-07-25
+host_arch=x86_64
+distribution=git-lfs
+dist_wine_relpath=files/bin/wine
+notes=vendored-GE-Proton;execution_backend=wine;powered-by-Wine;not-full-Windows

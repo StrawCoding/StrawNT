@@ -1,0 +1,4 @@
+# Git LFS — StrawNT Proton-GE vendor (NTW1)
+# Large GE release archives under third_party/proton-ge/cache/ are stored via LFS.
+third_party/proton-ge/cache/** filter=lfs diff=lfs merge=lfs -text
+third_party/proton-ge/cache/*.tar.gz filter=lfs diff=lfs merge=lfs -text

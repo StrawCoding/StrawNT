@@ -119,3 +119,13 @@ tests/strawnt/output/nt6-side-effects/clean-home/
 tests/strawnt/output/nt6-side-effects/apps/
 tests/strawnt/output/nt6-side-effects/app-registry.json
 tests/strawnt/output/nt6-side-effects/app-registry.json.lock
+
+# Proton-GE vendor (NTW1): extract tree regenerable; keep PIN/README/cache via LFS
+third_party/proton-ge/dist/
+.cache/proton-ge/
+tests/strawnt/output/ntw1-wineprefix/
+tests/strawnt/output/ntw1-rust-pfx/
+tests/strawnt/output/ntw1-hello.txt
+tests/strawnt/output/ntw1-hello.err
+
+tests/strawnt/output/ntw1-hello.json
