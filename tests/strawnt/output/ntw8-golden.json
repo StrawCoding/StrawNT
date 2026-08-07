@@ -6,13 +6,13 @@
   "mode": "real",
   "simulated": false,
   "version": "0.7.1.70",
-  "git_head": "591432e7b",
-  "git_head_full": "591432e7b2b72fdcb4b1706c38c7e37ea6badf69",
+  "git_head": "9cf0b34a6",
+  "git_head_full": "9cf0b34a6bac194178ca21239a8dca0c6350ffe3",
   "timestamp_utc": "2026-08-07T21:02:15Z",
   "provenance": {
     "version": "0.7.1.70",
-    "git_head": "591432e7b",
-    "git_head_full": "591432e7b2b72fdcb4b1706c38c7e37ea6badf69",
+    "git_head": "9cf0b34a6",
+    "git_head_full": "9cf0b34a6bac194178ca21239a8dca0c6350ffe3",
     "timestamp_utc": "2026-08-07T21:02:15Z",
     "engine_pin": "GE-Proton11-3",
     "mode": "real"
