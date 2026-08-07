@@ -1,17 +1,19 @@
-# 執行後端規格：native / container / microvm
+# 執行後端規格：wine / native(legacy) / container / microvm
 
-| 版本 | 0.4.0.0 |
+| 版本 | 0.7.1（NTW0 pivot） |
 |------|----------------------|
-| 日期 | 2026-07-02 |
-| 對齊 | `2026-06-29` 系統計畫 Phase 6、ADR-0002 Runtime Orchestration |
+| 日期 | 2026-08-07（原 2026-07-02；契約翻轉） |
+| 對齊 | Wine pivot ADR、`2026-06-29` Phase 6 歷史、ADR-0002 Runtime Orchestration |
+
+> **契約翻轉（2026-08-07／NTW0）：** 產品預設 `execution_backend=wine`／`engine=proton-ge`（**powered by Wine**）。舊「禁 Wine／Proton」與「native 為唯一預設」已**廢止**。見 `docs/decisions/2026-08-07-wine-pivot.md`。
 
 ## 目標
 
-Windows 應用由 **`strawwu-runtime`（Orchestrator）** 統一編排。預設在 **共享 SubsystemSession** 內執行（`execution_backend: native`），app 之間可互通、共享資料、runtime 層協作——**不使用 per-app sandbox 作為預設**。
+Windows 應用由 **`strawnt`／runtime 編排層** 統一啟動。產品預設經 **Wine／Proton-GE**（`execution_backend: wine`）在 prefix 內執行；app 之間可互通（同 prefix；跨 prefix IPC 見 NTW4）——**不使用 per-app sandbox 作為預設**。
 
-`container` / `microvm` 為**可選政策覆寫**（隔離不可信或極高風險 workload），由 runtime 內建，不是獨立 Docker 克隆 daemon。詳見 `runtime-cooperation.md`。
+`native`（自研 PE）僅 **legacy／research**（`STRAWNT_LEGACY_NATIVE=1`，unsupported）。`container` / `microvm` 為**可選政策覆寫**（隔離不可信或極高風險 workload），不是獨立 Docker 克隆 daemon。詳見 `runtime-cooperation.md`。
 
-**禁止** `WinBox` / `winbox` 命名（與 StrawWinBox 專案區隔）；禁止 merge StrawWinBox 原始碼。
+**禁止** `WinBox` / `winbox` 命名（與 StrawWinBox 專案區隔）；禁止 merge StrawWinBox 原始碼；禁止將 Wine 靜默改名為自研 PE。
 
 ## 架構（對齊原始計畫）
 
@@ -42,15 +44,16 @@ Windows 應用由 **`strawwu-runtime`（Orchestrator）** 統一編排。預設�
     └──────────────────┘
 ```
 
-### execution_backend 三種策略
+### execution_backend 策略
 
-| 後端 | 用途 | 協作 / 隔離 | v3.0 狀態 | 預設？ |
-|------|------|-------------|-----------|--------|
-| `native` | 日常 app、遊戲、啟動器+本體、需 IPC 的套件 | **共享 session，app 互通** | PASS — Orchestrator + ProcessGraph + SessionRegistry + Executor 全 37 tests | **是** |
-| `container` | 不可信 installer、使用者要求隔離 | 組內可互通；對其他 app 隔離 | PASS — namespace isolation + overlay + policy dispatch | 否（覆寫） |
-| `microvm` | 極高風險反作弊探測、不可信核心邏輯 | VM 內互通；對 host 隔離 | PASS — VFIO passthrough PoC + container lifecycle + DMA mapping | 否（覆寫） |
+| 後端 | 用途 | 協作 / 隔離 | 狀態 | 預設？ |
+|------|------|-------------|------|--------|
+| `wine` | 旗艦產品路徑（Proton-GE vendored；可選 system-wine 風味） | **同 prefix 互通**；跨 prefix 見 NTW4 | NTW1+ vendor／runner | **是** |
+| `native` | 歷史自研 PE／研究 | 共享 SubsystemSession | **legacy／archive** | 否（`STRAWNT_LEGACY_NATIVE=1`） |
+| `container` | 不可信 installer、使用者要求隔離 | 組內可互通；對其他 app 隔離 | 可選覆寫 | 否 |
+| `microvm` | 極高風險反作弊探測、不可信核心邏輯 | VM 內互通；對 host 隔離 | 可選覆寫 | 否 |
 
-Orchestrator **不實作** Win32 syscall 語意（屬 strawwu-nt）；**不繞過** NT 直接 ioctl bridge（除 ResourcePolicy）。
+旗艦路徑以 Wine／GE 為基板；legacy native Orchestrator 保留 git 歷史，不作產品預設。
 
 ## App Profile（schema 對齊 profile-v2）
 
@@ -59,7 +62,7 @@ Orchestrator **不實作** Win32 syscall 語意（屬 strawwu-nt）；**不繞�
   "schema_version": "0.2",
   "app_id": "notepad-plus",
   "runtime_kind": "win32",
-  "execution_backend": "native",
+  "execution_backend": "wine",
   "session_mode": "shared",
   "permissions": {
     "network": true,
@@ -80,14 +83,19 @@ Orchestrator **不實作** Win32 syscall 語意（屬 strawwu-nt）；**不繞�
 
 `syscall_profile` 枚舉：`daily` | `game` | `anticheat`（影響 bridge seccomp 與探測回應表）。
 
-## native 後端（預設，協作執行）
+## wine 後端（產品預設）
 
-- 所有 app 進入同一 **SubsystemSession**
+- 經 **Proton-GE**（vendored；大檔 git-lfs）或可選 system-wine 風味執行
+- Prefix 預設 `~/.local/share/strawnt/`；誠實標示 **powered by Wine**
+- 圖形／音訊經 DXVK／vkd3d／PipeWire 等（NTW1–NTW3）
+- 不得宣稱完整 Windows／排位／官方反作弊通過
+
+## native 後端（legacy／research）
+
+- 所有 app 進入同一 **SubsystemSession**（歷史設計）
 - 共享虛擬 `C:\` 基底、`HKLM`/`HKCR`、session 級 IPC 命名空間
-- strawwu-launcher 注入 PE、建立 TEB/PEB；runtime 維護 process graph
-- 子程序（啟動器 spawn 遊戲）預設繼承環境與 cooperation group
-- 圖形經 `strawwu-graphics`（Vulkan/OpenGL，見 `graphics-stack.md`）
-- bridge seccomp 依 profile 收緊，**不**切斷同 session 的合法 IPC
+- 僅經 `STRAWNT_LEGACY_NATIVE=1`（**unsupported**）；不作產品預設
+- 圖形經 `strawwu-graphics`（Vulkan/OpenGL，見 `graphics-stack.md`）歷史路徑
 
 ## container 後端（可選覆寫）
 
@@ -108,15 +116,16 @@ Orchestrator **不實作** Win32 syscall 語意（屬 strawwu-nt）；**不繞�
 ## CLI（統一 strawwu，禁止 strawwu-box）
 
 ```bash
-strawwu install setup.exe
-strawwu run app.exe                              # 預設 native + shared session
-strawwu run --bundle launcher.exe,game.exe       # cooperation group
-strawwu run --backend container untrusted.exe    # 明確隔離覆寫
-strawwu run --backend microvm --profile anticheat launcher.exe
-strawwu apps list
-strawwu profile inspect <app-id>
-strawwu profile export <app-id>
-strawwu repair <app-id>                          # 重設 app overlay（不影響其他 app）
+strawnt install setup.exe
+strawnt run app.exe                              # 預設 wine / proton-ge
+strawnt run --bundle launcher.exe,game.exe       # cooperation group（同 prefix）
+strawnt run --backend container untrusted.exe    # 明確隔離覆寫
+strawnt run --backend microvm --profile anticheat launcher.exe
+STRAWNT_LEGACY_NATIVE=1 strawnt run app.exe      # legacy native（unsupported）
+strawnt apps list
+strawnt profile inspect <app-id>
+strawnt profile export <app-id>
+strawnt repair <app-id>                          # 重設 app overlay（不影響其他 app）
 ```
 
 ## 與 Hub（Electron）整合
@@ -132,10 +141,12 @@ strawwu repair <app-id>                          # 重設 app overlay（不影�
 - 禁止使用 `WinBox` / `winbox` 作為產品或 API 名稱
 - 禁止 merge StrawWinBox 原始碼
 - 禁止獨立 `strawwu-sandboxd` + `strawwu-box` 平行於 runtime 的第二套 CLI
-- 禁止 Wine/Proton 作為底層執行引擎
+- 禁止將 Wine／Proton-GE **靜默改名**為自研 PE／完整 Windows（必須標 **powered by Wine**）
+- 禁止宣稱排位／官方反作弊簽章通過
 
-## 非目標（v3.0）
+## 非目標
 
-- 完整 Hyper-V 相容
+- 完整 Hyper-V 相容／完整 Windows OS
 - 100% 內核模式驅動簽章通過
 - 所有反作弊可排位對戰
+- 以 native PE 作為產品預設（已 soft-reset／legacy）

@@ -48,7 +48,8 @@ Portals alone are **not** enough for arbitrary PE launch.
 
 ## Explicit non-claims
 
-- Not a Wine/Proton substrate
+- Not a silent rebrand of Wine as self-made PE（must say **powered by Wine**）
 - No `WinBox` / `winbox` naming
 - Not full Windows compatibility
 - Not full Flatpak sandbox isolation for PE/session
+- Not ranked / official anti-cheat pass

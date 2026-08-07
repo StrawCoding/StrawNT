@@ -73,8 +73,10 @@ make -C components check                  # 快速 cargo check
 
 ## 設計原則
 
-- **預設不使用 sandbox** — app 在共享 SubsystemSession 內互通
-- **native 後端為預設** — container/microvm 僅作覆寫
-- **禁止 WinBox / strawwu-box** — 統一使用 `strawwu` CLI
-- **禁止 Wine/Proton** — 全部自行實作翻譯層
-- **誠實標 PASS/PARTIAL/FAIL** — 不宣稱完整 Windows 相容
+> **2026-08-07 Wine pivot（NTW0）：** 產品預設已改 `execution_backend=wine`／`engine=proton-ge`（**powered by Wine**）。舊「禁 Wine／Proton」與「native 為預設」硬契約已**廢止**；native PE 僅 legacy／research（`STRAWNT_LEGACY_NATIVE=1`、unsupported）。見 `docs/decisions/2026-08-07-wine-pivot.md`。
+
+- **預設不使用 sandbox** — prefix／session 內 app 可互通（同／跨 prefix IPC 見 NTW4）
+- **wine／proton-ge 為預設執行後端** — container/microvm 僅作覆寫；native 為 legacy
+- **禁止 WinBox / strawwu-box** — 統一使用 `strawnt` CLI（舊 `strawwu` 僅相容別名）
+- **誠實標示 powered by Wine** — 不得靜默改名為自研 PE／完整 Windows
+- **誠實標 PASS/PARTIAL/FAIL/UNKNOWN** — 不宣稱完整 Windows／排位／官方 AC 通過

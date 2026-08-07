@@ -28,6 +28,7 @@ require_file "README.md"
 require_file "docs/plans/portable-core/USER-GUIDE.md"
 require_file "tests/archive/native/README.md"
 require_file "archive/native-pe/README.md"
+require_file "docs/plans/kickoff/README.md"
 
 # Product docs must not hard-ban Wine (historical archive wording excepted)
 BAN_HITS="$(
@@ -40,6 +41,44 @@ BAN_HITS="$(
 )"
 if [[ -n "${BAN_HITS}" ]]; then
     failures+=("product docs still hard-ban Wine: ${BAN_HITS}")
+fi
+
+# Current component docs must not keep native-default + Wine ban as live product contract
+for f in components/README.md components/specs/execution-backends.md; do
+    if rg -n -i '禁止 Wine/Proton|禁止 Wine／Proton|禁止 Wine/Proton 作為底層' "${REPO_ROOT}/${f}" \
+        | rg -v -i 'archive|歷史|legacy|retired|廢止|lift|靜默改名|powered by' >/dev/null 2>&1; then
+        failures+=("${f} still hard-bans Wine as product contract")
+    fi
+    if rg -n 'native 後端為預設' "${REPO_ROOT}/${f}" >/dev/null 2>&1; then
+        failures+=("${f} still declares native as product default")
+    fi
+done
+
+if ! rg -qi 'execution_backend=wine|backend=wine|powered by Wine' \
+    "${REPO_ROOT}/components/README.md"; then
+    failures+=("components/README.md missing wine default honesty")
+fi
+
+if ! rg -qi 'execution_backend: wine|`wine`' \
+    "${REPO_ROOT}/components/specs/execution-backends.md"; then
+    failures+=("execution-backends.md missing wine default")
+fi
+
+# Kickoff / A3 historical hard contracts must be marked retired
+for f in docs/plans/kickoff/NT4-anticheat-honest.md docs/plans/portable-core/A3-cross-distro-core.md; do
+    if ! rg -qi '歷史|retired|廢止|legacy|lift' "${REPO_ROOT}/${f}"; then
+        failures+=("${f} native-era Wine ban not marked historical/retired")
+    fi
+done
+
+# Native-era pe verify must not fail product tree solely on Wine markers
+if rg -n 'write_fail "wine substrate markers found' \
+    "${REPO_ROOT}/tests/portable/smoke-pe-real-exec.sh" >/dev/null 2>&1; then
+    failures+=("smoke-pe-real-exec.sh still fails on wine substrate markers")
+fi
+if ! rg -qi 'LEGACY/ARCHIVE|lift_ban|skip wine-substrate' \
+    "${REPO_ROOT}/tests/portable/smoke-pe-real-exec.sh"; then
+    failures+=("smoke-pe-real-exec.sh missing NTW0 legacy/lift marker")
 fi
 
 for f in README.md docs/plans/portable-core/USER-GUIDE.md; do
@@ -100,6 +139,11 @@ doc = {
         "full_windows_claimed": False,
         "ranked_anticheat_claimed": False,
         "ge_tree_downloaded_in_ntw0": False,
+        "opencode_gaps_addressed": [
+            "components/README.md + execution-backends.md live contract flipped to wine",
+            "kickoff/A3 historical Wine ban marked retired",
+            "smoke-pe-real-exec wine marker product-tree fail removed; Makefile marks pe/gx legacy",
+        ],
     },
     "artifacts": {
         "adr_wine_pivot": "docs/decisions/2026-08-07-wine-pivot.md",
@@ -107,6 +151,7 @@ doc = {
         "legal_wine_lgpl": "docs/legal/WINE-LGPL.md",
         "third_party_notices": "THIRD_PARTY_NOTICES",
         "native_archive": "tests/archive/native/README.md",
+        "kickoff_index": "docs/plans/kickoff/README.md",
     },
     "failures": failures,
 }

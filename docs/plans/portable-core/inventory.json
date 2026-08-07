@@ -1,9 +1,12 @@
 {
-  "track": "A+3 + native-pe-real-exec + game-compat",
-  "stage": "gx5-closeout",
-  "description": "Portable Core crate→artifact inventory for self-contained prefix / AppImage / Flatpak, Native PE Real Exec (pe0–pe7), and Game Compat (gx0–gx5). Not a full Windows compatibility claim; anti-cheat matrix is honest PARTIAL (no ranked play claim).",
-  "prefix_env": "STRAWWU_PREFIX",
-  "execution_backend": "native",
+  "track": "A+3 + wine-pivot (NTW0) + legacy native-pe + game-compat",
+  "stage": "ntw0-contract-legal",
+  "description": "Portable Core crate→artifact inventory. Product default execution_backend=wine / proton-ge (powered by Wine) since 2026-08-07. Native PE (pe0–pe7) and Game Compat (gx0–gx5) evidence retained as legacy/archive. Not a full Windows compatibility claim; anti-cheat matrix is honest (no ranked play claim).",
+  "prefix_env": "STRAWNT_PREFIX",
+  "execution_backend": "wine",
+  "execution_backend_legacy": "native",
+  "engine": "proton-ge",
+  "wine_ban_policy": "lift_ban",
   "build": {
     "prefix_script": "components/packaging/portable/build-prefix.sh",
     "appimage_script": "components/packaging/portable/build-appimage.sh",
@@ -169,10 +172,11 @@
     "flatpak": "components/packaging/portable/flatpak"
   },
   "exclusions": [
-    "Wine/Proton forbidden as execution substrate (execution_backend=native only)",
+    "Silent rebrand of Wine as self-made PE (must label powered by Wine)",
     "WinBox/winbox naming",
     "ISO/os-image/Plymouth/Calamares/kernel/desktop session",
     "full Windows compatibility claims",
-    "anti-cheat ranked play / 排位可用 claims"
+    "anti-cheat ranked play / 排位可用 claims",
+    "NOTE(historical): pre-NTW0 'Wine/Proton forbidden / native only' hard contract — retired 2026-08-07"
   ]
 }

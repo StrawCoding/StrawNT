@@ -1,21 +1,17 @@
 # Runtime 協作與互通規格
 
-| 版本 | 0.4.0.0 |
+| 版本 | 0.7.1（NTW0 pivot） |
 |------|----------------------|
-| 日期 | 2026-07-02 |
-| 對齊 | `2026-06-29` 系統計畫 Runtime Orchestrator、ADR-0002 |
+| 日期 | 2026-08-07（原 2026-07-02） |
+| 對齊 | Wine pivot ADR、Runtime Orchestrator、ADR-0002 |
 
-## 核心決策（2026-07-02）
+> **契約翻轉（2026-08-07／NTW0）：** 產品預設 `execution_backend=wine`。以下「SubsystemSession／native」敘述保留為 legacy／research 互通模型；旗艦路徑為 Wine／GE prefix。見 `docs/decisions/2026-08-07-wine-pivot.md`。
+
+## 核心決策
 
 **不使用 per-app sandbox 作為預設模型。**
 
-Windows 應用預設在同一 **SubsystemSession**（共享 Win32/NT 相容環境）內執行，可：
-
-- 互相通訊（IPC）
-- 共享資料與虛擬檔案系統視圖
-- 在 runtime 層協作（啟動器 ↔ 遊戲 ↔ 輔助程序）
-
-`container` / `microvm` 僅作為**可選政策覆寫**（不可信 installer、極高風險反作弊探測），不是主架構。
+產品預設經 **Wine／Proton-GE** 在 prefix 內執行；同 prefix app 可互通。`native` SubsystemSession 模型保留為 **legacy**。`container` / `microvm` 僅作為**可選政策覆寫**，不是主架構。
 
 ## 分層（與 Ubuntu / runtime 的關係）
 
@@ -123,11 +119,12 @@ Ubuntu Linux（Host OS，唯一真實 kernel）
 
 | 後端 | 協作能力 | 使用時機 |
 |------|----------|----------|
-| `native`（預設） | **完整 session 互通** | 日常 app、遊戲、啟動器+本體、需 COM/IPC 的套件 |
+| `wine`（**產品預設**） | **同 prefix 互通**；跨 prefix 見 NTW4 | 旗艦路徑（Proton-GE／可選 system-wine） |
+| `native`（**legacy**） | **完整 session 互通** | 歷史自研 PE／研究（`STRAWNT_LEGACY_NATIVE=1`） |
 | `container` | 組內互通；與其他 app **預設隔離** | 不可信 installer、使用者明確隔離 |
 | `microvm` | VM 內互通；對 host **隔離** | Vanguard 級探測、極高風險 |
 
-**禁止**將 `container` 當作預設後端；遊戲與啟動器必須能在 `native` + `session-shared` 下協作。
+**禁止**將 `container` 當作預設後端；產品預設為 `wine`。同／跨 prefix IPC 與防作弊↔遊戲場景見 NTW4。
 
 ## 驗收場景（黃金回歸）
 
@@ -142,10 +139,10 @@ Ubuntu Linux（Host OS，唯一真實 kernel）
 - 禁止 per-app sandbox 作為預設或唯一模型
 - 禁止 `WinBox` / `strawwu-box` / `strawwu-sandboxd` 獨立產品線
 - 禁止 merge StrawWinBox 原始碼
-- 禁止 Wine/Proton 作為底層
+- 禁止將 Wine／Proton-GE 靜默改名為自研 PE（必須 **powered by Wine**）
 
 ## 相關規格
 
-- `execution-backends.md` — native/container/microvm 後端細節
+- `execution-backends.md` — wine／native(legacy)／container／microvm 後端細節
 - `graphics-stack.md` — 遊戲與 overlay 共用 GPU
 - `anticheat-compat.md` — 反作弊探測與後端覆寫

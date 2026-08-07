@@ -1,5 +1,7 @@
 # GX4-anticheat-matrix
 
+> **歷史／retired（2026-08-07 Wine pivot／NTW0）：** 本 kickoff 為 native-era 任務書。其中「禁 Wine／Proton／Do not … Wine」為**歷史硬契約**，已廢止。現行產品預設 wine／proton-ge（powered by Wine）。見 `docs/plans/kickoff/README.md`、`docs/decisions/2026-08-07-wine-pivot.md`。
+
 ## Goal
 See Hermes plan `/root/.hermes/plans/2026-07-29_strawwu-portable-game-compat.md` stage `GX4`.
 

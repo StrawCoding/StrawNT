@@ -161,7 +161,7 @@ doc = {
     "sandbox_notes": [
         "PE load and SubsystemSession need host filesystem (--filesystem=host).",
         "Default Flatpak isolation alone is insufficient for arbitrary PE paths.",
-        "Not a full Windows compatibility claim; no Wine/Proton; no WinBox naming.",
+        "Not a full Windows compatibility claim; powered by Wine when backend=wine; no WinBox naming.",
     ],
 }
 path = os.path.join(staged, "share", "strawwu", "portable-flatpak.json")

@@ -22,4 +22,4 @@ Artifacts land in `components/packaging/portable/appimage/dist/` (gitignored):
 Evidence: `tests/portable/output/smoke-appimage.json`, `tests/portable/output/SHA256SUMS`.
 
 Do not claim full Windows compatibility in AppImage metadata.
-No Wine/Proton substrate; no `WinBox` naming.
+**powered by Wine** · `execution_backend=wine` · no `WinBox` naming.

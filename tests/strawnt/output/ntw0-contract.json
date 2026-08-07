@@ -3,9 +3,9 @@
   "stage": "ntw0-contract-legal",
   "status": "PASS",
   "product": "StrawNT",
-  "version": "0.7.1.41",
-  "generated_at": "2026-08-07T15:29:49Z",
-  "git_head": "2c4b673664dda09ab1cff65a9006040ccbf51746",
+  "version": "0.7.1.42",
+  "generated_at": "2026-08-07T15:46:24Z",
+  "git_head": "323869ca321b26f53645d6d4df84358c1c7b9d53",
   "backend": "wine",
   "execution_backend": "wine",
   "engine": "proton-ge",
@@ -22,14 +22,20 @@
     "native_default_retired": true,
     "full_windows_claimed": false,
     "ranked_anticheat_claimed": false,
-    "ge_tree_downloaded_in_ntw0": false
+    "ge_tree_downloaded_in_ntw0": false,
+    "opencode_gaps_addressed": [
+      "components/README.md + execution-backends.md live contract flipped to wine",
+      "kickoff/A3 historical Wine ban marked retired",
+      "smoke-pe-real-exec wine marker product-tree fail removed; Makefile marks pe/gx legacy"
+    ]
   },
   "artifacts": {
     "adr_wine_pivot": "docs/decisions/2026-08-07-wine-pivot.md",
     "adr_strawwine_merge": "docs/decisions/2026-08-07-strawwine-merge.md",
     "legal_wine_lgpl": "docs/legal/WINE-LGPL.md",
     "third_party_notices": "THIRD_PARTY_NOTICES",
-    "native_archive": "tests/archive/native/README.md"
+    "native_archive": "tests/archive/native/README.md",
+    "kickoff_index": "docs/plans/kickoff/README.md"
   },
   "failures": []
 }

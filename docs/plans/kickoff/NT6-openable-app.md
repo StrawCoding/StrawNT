@@ -1,5 +1,7 @@
 # NT6-openable-app
 
+> **歷史／retired（2026-08-07 Wine pivot／NTW0）：** 本 kickoff 為 native-era 任務書。其中「禁 Wine／Proton／Do not … Wine」為**歷史硬契約**，已廢止。現行產品預設 wine／proton-ge（powered by Wine）。見 `docs/plans/kickoff/README.md`、`docs/decisions/2026-08-07-wine-pivot.md`。
+
 ## Goal
 使用者能開啟 StrawNT：一鍵 install 後 CLI 可用、應用選單可啟動、舊 StrawWU/暫存 handler 不擋雙擊、`strawnt open` 真實 fixture 有副作用。
 

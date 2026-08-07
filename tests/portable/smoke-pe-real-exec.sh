@@ -119,14 +119,10 @@ echo "${STDOUT_BODY}" | grep -q 'STRAWWU_PE_REAL_OK' \
 echo "${RUN_OUT}" | grep -q 'STRAWWU_PE_REAL_OK' \
     || write_fail "process output missing STRAWWU_PE_REAL_OK marker"
 
-# Refuse Wine substrate in product paths (pe0 already withdrew; keep regression guard).
-if command -v rg >/dev/null 2>&1; then
-    if rg -n -i 'ensure_wine|wine_backend|STRAWWU_BACKEND=wine|launch_via_wine' \
-        "${REPO_ROOT}/components" "${REPO_ROOT}/install.sh" "${REPO_ROOT}/README.md" \
-        >/tmp/pe1-wine-rg.txt 2>/dev/null; then
-        write_fail "wine substrate markers found in product tree"
-    fi
-fi
+# NTW0 soft-reset: wine ban lifted — product tree MAY contain wine/GE markers.
+# Do not fail legacy native evidence solely because Wine substrate is present.
+# (Historical pe0 withdrew wine; product default is now wine / proton-ge.)
+log "NTW0: skip wine-substrate product-tree ban (lift_ban; path_role=legacy_native)"
 
 COMMIT="$(git -C "${REPO_ROOT}" rev-parse --short HEAD 2>/dev/null || echo unknown)"
 
@@ -163,10 +159,10 @@ doc = {
     },
     "checks": [
         {"name": "mode_real", "status": "PASS"},
-        {"name": "backend_native", "status": "PASS"},
+        {"name": "backend_native_legacy", "status": "PASS"},
         {"name": "stdout_marker", "status": "PASS"},
         {"name": "host_side_effect_file", "status": "PASS"},
-        {"name": "no_wine_substrate", "status": "PASS"},
+        {"name": "wine_ban_lifted_ntw0", "status": "PASS"},
     ],
     "evidence": [
         "tests/portable/output/pe-real-exec.json",
@@ -174,9 +170,11 @@ doc = {
         "components/strawwu-nt/src/cpu.rs",
         "components/strawwu-runtime/src/executor.rs",
     ],
+    "path_role": "legacy_native",
+    "wine_ban_policy": "lift_ban",
     "exclusions_honored": [
         "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
-        "no Wine/Proton substrate; execution_backend=native",
+        "legacy_native path_role; wine ban lifted (NTW0) — product default is wine",
         "no WinBox naming",
         "no full Windows compatibility claim",
         "mode=simulated is not accepted as success",

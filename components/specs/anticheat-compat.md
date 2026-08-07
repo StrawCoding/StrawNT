@@ -10,11 +10,13 @@
 
 ## 執行策略與後端
 
+> **NTW0：** 產品預設 `execution_backend=wine`。下表「native」欄位為歷史／legacy 建議；旗艦路徑改經 Wine／GE prefix。禁宣稱排位／官方 AC 通過。
+
 | 反作弊類型 | 建議 execution_backend | 說明 |
 |------------|------------------------|------|
-| 無 / 輕量 | **`native`（預設）** | 日常 app、單機遊戲、啟動器+本體協作 |
-| EAC / BattlEye | **`native` 優先**；必要時 `container` + `syscall_profile: anticheat` | 驅動探測 stub；遊戲與 AC 需同 session 時不得強制隔離 |
-| Vanguard 等核心模式 | `microvm` 或 policy 拒絕 | TPM/核心載入模擬 |
+| 無 / 輕量 | **`wine`（產品預設）**；legacy `native` | 日常 app、單機遊戲、啟動器+本體 |
+| EAC / BattlEye | **`wine` 同 prefix**；必要時隔離覆寫 | 誠實矩陣；禁排位宣稱 |
+| Vanguard 等核心模式 | policy 拒絕或 UNKNOWN／FAIL | 禁宣稱通過 |
 
 ## 探測類別
 

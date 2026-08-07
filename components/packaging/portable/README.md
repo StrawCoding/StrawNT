@@ -1,12 +1,15 @@
 # StrawNT packaging
 
-Cross-distro, self-contained **native PE／NT ABI** core
-(runtime / nt / launcher / graphics·audio / Hub / CLI).
+Cross-distro, self-contained **Wine／Proton-GE** Windows app runtime
+(CLI / launcher / Hub / prefix／AppImage／Flatpak).
+
+> **2026-08-07 Wine pivot：** 產品預設 `execution_backend=wine`／`engine=proton-ge`
+>（**powered by Wine**）。舊「不使用 Wine／Proton」契約已廢止。
 
 This directory does **not** claim full Windows compatibility. It does **not**
-use Wine/Proton as a substrate, and it does **not** introduce `WinBox` /
-`winbox` naming or per-app sandbox defaults. StrawNT is an independent
-product — not an OS / ISO / desktop distribution.
+introduce `WinBox` / `winbox` naming or per-app sandbox defaults. StrawNT is an
+independent product — not an OS / ISO / desktop distribution. Legal:
+`docs/legal/WINE-LGPL.md`、`THIRD_PARTY_NOTICES`.
 
 ## Layout
 

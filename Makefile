@@ -7,7 +7,8 @@
 	portable-prefix test-portable-prefix portable-appimage test-portable-appimage \
 	portable-flatpak test-portable-flatpak test-portable-matrix test-portable-closeout \
 	test-portable-pe-closeout test-portable-gx-graphics test-portable-gx-audio-input \
-	test-portable-gx-closeout test-strawnt-nt1-graphics test-strawnt-nt5-closeout test-strawnt-nt6-openable
+	test-portable-gx-closeout test-strawnt-ntw0-contract test-strawnt-nt1-graphics \
+	test-strawnt-nt5-closeout test-strawnt-nt6-openable
 
 REPO_ROOT := $(abspath .)
 SCRIPTS   := os-image/scripts
@@ -140,11 +141,12 @@ help:
 	@echo "  test-portable-flatpak         Flatpak smoke → smoke-flatpak.json (PASS|PARTIAL)"
 	@echo "  test-portable-matrix          Cross-distro container matrix → matrix.json (pc4)"
 	@echo "  test-portable-closeout        Portable Core closeout → closeout.json (pc5)"
-	@echo "  test-portable-pe-closeout     Native PE closeout → pe-closeout.json (pe7)"
-	@echo "  test-portable-gx-graphics     DXGI/D3D11→VK + wgl present → gx-graphics.json (gx0)"
-	@echo "  test-portable-gx-audio-input  WASAPI→PipeWire/equiv + XInput → gx-audio-input.json (gx1)"
-	@echo "  test-portable-gx-closeout     Game Compat closeout → gx-closeout.json (gx5)"
-	@echo "  test-strawnt-nt5-closeout     StrawNT youwan closeout → nt5-closeout.json"
+	@echo "  test-portable-pe-closeout     [LEGACY/ARCHIVE] Native PE closeout → pe-closeout.json"
+	@echo "  test-portable-gx-graphics     [LEGACY/ARCHIVE] DXGI/D3D11→VK → gx-graphics.json"
+	@echo "  test-portable-gx-audio-input  [LEGACY/ARCHIVE] WASAPI/XInput → gx-audio-input.json"
+	@echo "  test-portable-gx-closeout     [LEGACY/ARCHIVE] Game Compat closeout → gx-closeout.json"
+	@echo "  test-strawnt-ntw0-contract    Wine pivot contract/legal evidence → ntw0-contract.json"
+	@echo "  test-strawnt-nt5-closeout     [LEGACY] StrawNT youwan closeout → nt5-closeout.json"
 	@echo "  test-strawnt-nt6-openable     StrawNT openable install/menu/open → nt6-openable.json"
 
 preflight:
@@ -687,27 +689,38 @@ test-portable-closeout:
 	bash tests/portable/closeout.sh
 
 test-portable-pe-closeout:
+	@echo "[LEGACY/ARCHIVE NTW0] native-era pe-closeout — not a product Wine-ban gate"
 	bash tests/portable/pe-closeout.sh
 
 test-portable-gx-graphics:
+	@echo "[LEGACY/ARCHIVE NTW0] native-era gx-graphics — not a product Wine-ban gate"
 	bash tests/portable/smoke-gx-graphics.sh
 
 test-strawnt-nt1-graphics:
+	@echo "[LEGACY/ARCHIVE NTW0] native-era nt1-graphics — not a product Wine-ban gate"
 	bash tests/strawnt/nt1-real-graphics.sh
 
 test-strawnt-nt4-anticheat:
+	@echo "[LEGACY/ARCHIVE NTW0] native-era nt4-anticheat — not a product Wine-ban gate"
 	bash tests/strawnt/nt4-anticheat-honest.sh
 
 test-portable-gx-audio-input:
+	@echo "[LEGACY/ARCHIVE NTW0] native-era gx-audio-input — not a product Wine-ban gate"
 	bash tests/portable/smoke-gx-audio-input.sh
 
 test-portable-gx-anticheat:
+	@echo "[LEGACY/ARCHIVE NTW0] native-era gx-anticheat — not a product Wine-ban gate"
 	bash tests/portable/smoke-gx-anticheat.sh
 
 test-portable-gx-closeout:
+	@echo "[LEGACY/ARCHIVE NTW0] native-era gx-closeout — not a product Wine-ban gate"
 	bash tests/portable/gx-closeout.sh
 
+test-strawnt-ntw0-contract:
+	bash tests/strawnt/ntw0-contract.sh
+
 test-strawnt-nt5-closeout:
+	@echo "[LEGACY/ARCHIVE NTW0] native-era nt5-closeout — not a product Wine-ban gate"
 	bash tests/strawnt/nt5-youwan-closeout.sh
 
 test-strawnt-nt6-openable:

@@ -141,13 +141,9 @@ jq -e '.frame_count >= 1 and .compositor == "mutter"' "${OBS}" >/dev/null \
     || write_fail "compositor observation incomplete"
 OBS_BODY="$(cat "${OBS}")"
 
-if command -v rg >/dev/null 2>&1; then
-    if rg -n -i 'ensure_wine|wine_backend|STRAWWU_BACKEND=wine|launch_via_wine' \
-        "${REPO_ROOT}/components" "${REPO_ROOT}/install.sh" "${REPO_ROOT}/README.md" \
-        >/tmp/pe3-wine-rg.txt 2>/dev/null; then
-        write_fail "wine substrate markers found in product tree"
-    fi
-fi
+# NTW0 soft-reset: wine ban lifted — product tree MAY contain wine/GE markers.
+# Do not fail legacy native evidence solely because Wine substrate is present.
+log "NTW0: skip wine-substrate product-tree ban (lift_ban; path_role=legacy_native)"
 
 COMMIT="$(git -C "${REPO_ROOT}" rev-parse --short HEAD 2>/dev/null || echo unknown)"
 

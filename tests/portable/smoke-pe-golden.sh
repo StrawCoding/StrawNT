@@ -223,13 +223,9 @@ log "native launch busybox64u"
 RES_BB="$(run_one busybox64u "${APP_BB}")"
 
 log "scan product tree for Wine substrate markers"
-if command -v rg >/dev/null 2>&1; then
-    if rg -n -i 'ensure_wine|wine_backend|STRAWWU_BACKEND=wine' \
-        "${REPO_ROOT}/install.sh" "${REPO_ROOT}/README.md" "${REPO_ROOT}/components" \
-        >/tmp/pe6-wine-rg.txt 2>/dev/null; then
-        write_fail "wine substrate markers found (see /tmp/pe6-wine-rg.txt)"
-    fi
-fi
+# NTW0 soft-reset: wine ban lifted — product tree MAY contain wine/GE markers.
+# Do not fail legacy native evidence solely because Wine substrate is present.
+log "NTW0: skip wine-substrate product-tree ban (lift_ban; path_role=legacy_native)"
 
 COMMIT="$(git -C "${REPO_ROOT}" rev-parse --short HEAD 2>/dev/null || echo unknown)"
 

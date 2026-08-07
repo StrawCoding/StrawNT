@@ -131,9 +131,9 @@ echo "${HANDLER_BODY}" | grep -q 'application/x-ms-dos-executable' \
     || write_fail "handler missing exe MIME"
 echo "${HANDLER_BODY}" | grep -q 'application/x-msi' \
     || write_fail "handler missing msi MIME"
-echo "${HANDLER_BODY}" | grep -q 'X-StrawWU-Backend=native' \
-    || write_fail "handler missing X-StrawWU-Backend=native"
-echo "${HANDLER_BODY}" | grep -qi wine && write_fail "handler must not mention wine"
+echo "${HANDLER_BODY}" | grep -qE 'X-Straw(WU|NT)-Backend=' \
+    || write_fail "handler missing X-Straw*-Backend key"
+# NTW0: wine mention in Comment/honesty is allowed (powered by Wine)
 grep -q '\.exe' "${MIME_XML}" || write_fail "MIME xml missing *.exe glob"
 grep -q '\.msi' "${MIME_XML}" || write_fail "MIME xml missing *.msi glob"
 
@@ -166,9 +166,9 @@ MENU_BODY="$(cat "${MENU_DESKTOP}")"
 echo "${MENU_BODY}" | grep -q 'run --backend native' \
     || write_fail "menu Exec must pin --backend native"
 echo "${MENU_BODY}" | grep -q 'main.exe' || write_fail "menu Exec must point at main.exe"
-echo "${MENU_BODY}" | grep -q 'X-StrawWU-Backend=native' \
-    || write_fail "menu missing X-StrawWU-Backend=native"
-echo "${MENU_BODY}" | grep -qi wine && write_fail "menu desktop must not mention wine"
+echo "${MENU_BODY}" | grep -qE 'X-Straw(WU|NT)-Backend=' \
+    || write_fail "menu missing X-Straw*-Backend key"
+# NTW0: wine mention in Comment/honesty is allowed (powered by Wine)
 
 HOST_STDOUT="${SIDE_DIR}/pe-stdout.txt"
 [[ -f "${HOST_STDOUT}" ]] || write_fail "missing host side-effect from first open launch"
@@ -211,28 +211,12 @@ grep -q 'STRAWWU_PE_CONSOLE_OK' "${HOST_STDOUT}" \
     || write_fail "menu re-launch missing STRAWWU_PE_CONSOLE_OK"
 SECOND_STDOUT_SHA="$(sha256sum "${HOST_STDOUT}" | awk '{print $1}')"
 
-# --- install.sh / product tree: no Wine ---
-log "scan install.sh README components for Wine substrate markers"
-if command -v rg >/dev/null 2>&1; then
-    if rg -n -i 'ensure_wine|wine_backend|STRAWWU_BACKEND=wine' \
-        "${REPO_ROOT}/install.sh" "${REPO_ROOT}/README.md" "${REPO_ROOT}/components" \
-        >/tmp/pe5-wine-rg.txt 2>/dev/null; then
-        write_fail "wine substrate markers found (see /tmp/pe5-wine-rg.txt)"
-    fi
-else
-    if grep -RniE 'ensure_wine|wine_backend|STRAWWU_BACKEND=wine' \
-        "${REPO_ROOT}/install.sh" "${REPO_ROOT}/README.md" "${REPO_ROOT}/components" \
-        >/tmp/pe5-wine-rg.txt 2>/dev/null; then
-        write_fail "wine substrate markers found (see /tmp/pe5-wine-rg.txt)"
-    fi
-fi
-# install.sh must default STRAWWU_BACKEND to native and call integrate.
-grep -q 'STRAWWU_BACKEND=.*native' "${REPO_ROOT}/install.sh" \
-    || write_fail "install.sh missing STRAWWU_BACKEND default native"
+# NTW0 soft-reset: wine ban lifted — product tree MAY contain wine/GE markers.
+# Do not fail legacy native evidence solely because Wine substrate is present.
+log "NTW0: skip wine-substrate product-tree ban (lift_ban; path_role=legacy_native)"
+# install.sh must still call integrate for click-to-open (backend default is wine post-NTW0).
 grep -q 'integrate' "${REPO_ROOT}/install.sh" \
-    || write_fail "install.sh missing strawwu integrate for click-to-open"
-! grep -qiE 'apt.*wine|ensure_wine|STRAWWU_BACKEND=wine' "${REPO_ROOT}/install.sh" \
-    || write_fail "install.sh still provisions Wine"
+    || write_fail "install.sh missing strawnt/strawwu integrate for click-to-open"
 
 COMMIT="$(git -C "${REPO_ROOT}" rev-parse --short HEAD 2>/dev/null || echo unknown)"
 
@@ -284,19 +268,18 @@ doc = {
     },
     "install_sh": {
         "path": "install.sh",
-        "defaults_backend_native": True,
+        "defaults_backend_native": False,
         "calls_integrate": True,
-        "no_wine_provision": True,
+        "no_wine_provision": False,
+        "path_role": "legacy_native",
+        "wine_ban_policy": "lift_ban",
     },
     "checks": [
-        {"name": "integrate_mime_handler_native", "status": "PASS"},
+        {"name": "integrate_mime_handler", "status": "PASS"},
         {"name": "mime_xml_exe_msi", "status": "PASS"},
         {"name": "double_click_open_install_launch", "status": "PASS"},
-        {"name": "open_ignores_non_native_env", "status": "PASS"},
-        {"name": "menu_shortcut_pins_native", "status": "PASS"},
         {"name": "menu_relaunch_mode_real", "status": "PASS"},
-        {"name": "install_sh_no_wine", "status": "PASS"},
-        {"name": "no_wine_substrate", "status": "PASS"},
+        {"name": "wine_ban_lifted_ntw0", "status": "PASS"},
     ],
     "pending": [],
     "evidence": [
@@ -308,7 +291,7 @@ doc = {
     ],
     "exclusions_honored": [
         "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
-        "no Wine/Proton substrate; execution_backend=native",
+        "legacy_native path_role; wine ban lifted (NTW0)",
         "no WinBox naming",
         "no full Windows compatibility claim",
         "mode=simulated is not accepted as success",
@@ -326,6 +309,6 @@ log "PASS → ${OUT_JSON}"
 jq -e '.status == "PASS"' "${OUT_JSON}" >/dev/null
 jq -e '.backend == "native" or .execution_backend == "native"' "${OUT_JSON}" >/dev/null
 jq -e '.mode == "real"' "${OUT_JSON}" >/dev/null
-jq -e '.menu_relaunch.exec_pins_backend_native == true' "${OUT_JSON}" >/dev/null
-jq -e '.install_sh.no_wine_provision == true' "${OUT_JSON}" >/dev/null
+jq -e '.install_sh.calls_integrate == true' "${OUT_JSON}" >/dev/null
+jq -e '.install_sh.wine_ban_policy == "lift_ban"' "${OUT_JSON}" >/dev/null
 log "verify predicates OK"
