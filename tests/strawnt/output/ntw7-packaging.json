@@ -4,7 +4,7 @@
   "stage": "ntw7-packaging",
   "product": "StrawNT",
   "version": "0.7.1.65",
-  "git_head": "6536c0e5a",
+  "git_head": "7d29d1a53",
   "timestamp_utc": "2026-08-07T20:12:22Z",
   "execution_backend": "wine",
   "engine": "proton-ge",
