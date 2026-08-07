@@ -72,7 +72,7 @@ pub fn list_matrix(home_override: Option<&Path>) -> Result<Value> {
         "notes": [
             "Unknown software must stay UNKNOWN — never fake all-green.",
             "Statuses are scoped to declared Wine / prefix conditions.",
-            "line.exe / steam.exe golden rows are PARTIAL until install+visible UI proven.",
+            "line.exe / steam.exe golden rows: seed PARTIAL; NTW8 upgrades scopes after real-window proof.",
         ]
     }))
 }

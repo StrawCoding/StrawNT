@@ -1,0 +1,32 @@
+schema: strawwu-wincompat-baseline/v1
+cli: /usr/bin/strawwu
+log_path: /var/log/strawwu/wincompat.log
+state_dir: /var/lib/strawwu/wincompat
+registry_path: /var/lib/strawwu/app-registry.json
+execution_backend_default: native
+desktop_dir_default: ~/.local/share/applications
+gui_smoke:
+  enabled: true
+  compositor: mutter
+  display_backend_default: wayland
+  log_event: gui_smoke
+commands:
+  - status
+  - version
+  - help
+  - run
+  - install
+  - apps
+registry_integration:
+  run_registers: true
+  install_registers: pending
+  apps_list_source: app-registry
+e2e_flow:
+  wave: W6-W6
+  steps:
+    - install
+    - icon
+    - launch
+    - remove
+  smoke_script: tests/e2e/wincompat-smoke.sh
+  preflight: tests/preflight/test-wincompat-e2e.sh

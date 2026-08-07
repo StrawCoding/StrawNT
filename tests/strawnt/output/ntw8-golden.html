@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<title>StrawNT NTW8 Golden Closeout — 0.7.1.66</title>
+<style>
+:root {
+  --bg: #0f1419; --surface: #1a2332; --text: #e8eef4; --muted: #8b9cb3;
+  --accent: #14b8a6; --border: #2d3a4d; --pass: #34d399; --partial: #fbbf24; --fail: #f87171;
+}
+* { box-sizing: border-box; }
+body { font-family: "IBM Plex Sans", "Noto Sans TC", system-ui, sans-serif;
+  background: linear-gradient(160deg, #0f1419 0%, #15202b 50%, #0f1419 100%);
+  color: var(--text); margin: 0; padding: 2rem 1rem 4rem; line-height: 1.6; }
+.wrap { max-width: 58rem; margin: 0 auto; }
+header { border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+.brand { color: var(--accent); font-size: 1.75rem; font-weight: 700; letter-spacing: 0.02em; }
+.meta { color: var(--muted); font-size: 0.92rem; }
+h1 { font-size: 1.35rem; margin: 0.4rem 0; font-weight: 600; }
+h2 { color: var(--accent); font-size: 1.1rem; margin-top: 2rem;
+  border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+th, td { border: 1px solid var(--border); padding: 0.45rem 0.55rem; text-align: left; }
+th { background: var(--surface); color: var(--accent); }
+.badge { display: inline-block; padding: 0.1rem 0.45rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+.badge.pass { background: rgba(52,211,153,0.15); color: var(--pass); }
+.badge.partial { background: rgba(251,191,36,0.15); color: var(--partial); }
+.badge.fail { background: rgba(248,113,113,0.15); color: var(--fail); }
+.badge.unknown { background: rgba(139,156,179,0.15); color: var(--muted); }
+.shots { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+.shots figure { margin: 0; background: var(--surface); border: 1px solid var(--border); padding: 0.5rem; }
+.shots img { width: 100%; height: auto; display: block; background: #000; }
+.shots figcaption { color: var(--muted); font-size: 0.8rem; margin-top: 0.35rem; }
+code { background: #0d1117; border: 1px solid var(--border); padding: 0.05rem 0.3rem; border-radius: 3px; font-size: 0.85em; }
+ul { padding-left: 1.25rem; }
+.pill { display: inline-block; margin-right: 0.5rem; color: var(--muted); }
+.status-hero { font-size: 1.5rem; font-weight: 700; color: var(--pass); }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand">StrawNT</div>
+  <h1>NTW8 Golden Closeout — line.exe + steam.exe</h1>
+  <p class="meta">
+    <span class="pill">version 0.7.1.66</span>
+    <span class="pill">engine proton-ge@GE-Proton11-3</span>
+    <span class="pill">backend=wine</span>
+    <span class="pill">powered by Wine</span>
+    <span class="pill">2026-08-07T20:53:14Z</span>
+    <span class="pill">git 80416f6a2</span>
+  </p>
+  <p class="status-hero">status: PASS · mode: real</p>
+</header>
+
+<h2>Strict matrix</h2>
+<table>
+<thead>
+<tr><th>App</th><th>Status</th><th>install</th><th>launch</th><th>visible_ui</th><th>login</th><th>window</th></tr>
+</thead>
+<tbody>
+<tr><td>line.exe</td><td><span class='badge partial'>PARTIAL</span></td><td><span class='badge pass'>PASS</span></td><td><span class='badge pass'>PASS</span></td><td><span class='badge pass'>PASS</span></td><td><span class='badge unknown'>UNKNOWN</span></td><td><code>0xe00001 &quot;Banner&quot;: (&quot;steam_proton&quot; &quot;steam_proton&quot;)</code></td></tr>
+<tr><td>steam.exe</td><td><span class='badge partial'>PARTIAL</span></td><td><span class='badge pass'>PASS</span></td><td><span class='badge pass'>PASS</span></td><td><span class='badge pass'>PASS</span></td><td><span class='badge unknown'>UNKNOWN</span></td><td><code>0xe00001 &quot;Steam 安裝&quot;: (&quot;steam_proton&quot; &quot;steam_proton&quot</code></td></tr>
+
+</tbody>
+</table>
+
+<h2>Real window evidence</h2>
+<div class="shots">
+  <figure>
+    <img src="ntw8/shots/line.png" alt="LINE window capture"/>
+    <figcaption>line.exe / LineLauncher —      0xe00001 &quot;Banner&quot;: (&quot;steam_proton&quot; &quot;steam_proton&quot;)  306x306+487+247  +487+247</figcaption>
+  </figure>
+  <figure>
+    <img src="ntw8/shots/steam.png" alt="Steam window capture"/>
+    <figcaption>steam.exe / SteamSetup —      0xe00001 &quot;Steam 安裝&quot;: (&quot;steam_proton&quot; &quot;steam_proton&quot;)  497x444+391+187  +391+187</figcaption>
+  </figure>
+</div>
+
+<h2>Honesty</h2>
+<ul>
+  <li>App rows remain <strong>PARTIAL</strong>: login / all_games UNKNOWN — not claimed.</li>
+  <li><code>ranked_pass_claimed=false</code> — no ranked / official anti-cheat claim.</li>
+  <li>Top-level PASS means declared-scope evidence is complete — not full Windows.</li>
+  <li>mode=<code>real</code> (Xvfb + xwininfo + PNG) — not simulated.</li>
+</ul>
+
+<h2>Prior stages</h2>
+<ul>
+<li>ntw0-contract-legal: <span class="badge pass">PASS</span></li><li>ntw1-vendor-engine: <span class="badge pass">PASS</span></li><li>ntw2-shell-electron: <span class="badge pass">PASS</span></li><li>ntw3-optimize: <span class="badge pass">PASS</span></li><li>ntw4-win32-ipc: <span class="badge pass">PASS</span></li><li>ntw5-app-manager: <span class="badge pass">PASS</span></li><li>ntw6-sysapps: <span class="badge pass">PASS</span></li><li>ntw7-packaging: <span class="badge pass">PASS</span></li>
+</ul>
+
+<p class="meta">Evidence JSON: <code>tests/strawnt/output/ntw8-golden.json</code></p>
+</div>
+</body>
+</html>

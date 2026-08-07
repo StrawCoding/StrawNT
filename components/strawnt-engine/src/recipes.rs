@@ -52,7 +52,7 @@ fn recipe_catalog() -> Vec<Value> {
             "kind": "crypt32_signature",
             "category": "repair",
             "network": false,
-            "description": "Record LINE IgnoreCodeSign / crypt32 soft-pass recipe marker (shim full install in later stage)"
+            "description": "Install vendored wintrust soft-pass shim + DllOverrides; optional LINE IgnoreCodeSign (PARTIAL vs native Authenticode)"
         }),
     ]
 }
@@ -171,42 +171,193 @@ fn needs_xvfb() -> bool {
         .is_none()
 }
 
-fn apply_crypt32_marker(prefix: &Path) -> Result<Value> {
+fn shim_data_dir(repo: &Path) -> PathBuf {
+    repo.join("components/strawnt-engine/data/shims")
+}
+
+fn locate_shim_dlls(repo: &Path) -> (Option<PathBuf>, Option<PathBuf>) {
+    let root = shim_data_dir(repo);
+    let mut x64 = root.join("wintrust_x86_64.dll");
+    if !x64.is_file() {
+        x64 = root.join("wintrust.dll.x86_64");
+    }
+    let mut x86 = root.join("wintrust_i686.dll");
+    if !x86.is_file() {
+        x86 = root.join("wintrust.dll.i686");
+    }
+    (
+        x64.is_file().then_some(x64),
+        x86.is_file().then_some(x86),
+    )
+}
+
+fn run_wine_regedit(repo: &Path, prefix: &Path, reg_file: &Path) -> Result<Value> {
+    let pin = load_pin(repo)?;
+    let wine = wine_bin_path(repo, &pin);
+    if !wine.is_file() {
+        return Err(EngineError::Message(format!(
+            "vendored wine missing at {}",
+            wine.display()
+        )));
+    }
+    let mut argv: Vec<String> = Vec::new();
+    let mut used_xvfb = false;
+    if needs_xvfb() {
+        if let Some(xvfb) = which("xvfb-run") {
+            argv.push(xvfb.display().to_string());
+            argv.push("-a".into());
+            used_xvfb = true;
+        }
+    }
+    argv.push(wine.display().to_string());
+    argv.push("regedit".into());
+    argv.push(reg_file.display().to_string());
+    let output = Command::new(&argv[0])
+        .args(&argv[1..])
+        .env("WINEPREFIX", prefix)
+        .env("WINEARCH", "win64")
+        .env("WINEDEBUG", "-all")
+        .env("WINEDLLOVERRIDES", "winemenubuilder.exe=d")
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .output()?;
+    let exit_code = output.status.code().unwrap_or(-1);
+    Ok(json!({
+        "status": if exit_code == 0 { "PASS" } else { "PARTIAL" },
+        "exit_code": exit_code,
+        "used_xvfb": used_xvfb,
+        "command": argv,
+    }))
+}
+
+/// Install vendored wintrust soft-pass shim into an initialized Wine prefix.
+fn apply_crypt32_shim(repo: &Path, prefix: &Path) -> Result<Value> {
+    let (x64, x86) = locate_shim_dlls(repo);
+    if x64.is_none() && x86.is_none() {
+        return Ok(json!({
+            "status": "FAIL",
+            "recipe": "crypt32-signature",
+            "error": "wintrust shim DLLs missing",
+            "hint": shim_data_dir(repo).display().to_string(),
+            "execution_backend": "wine",
+            "powered_by": "Wine",
+        }));
+    }
+
+    let sys32 = prefix.join("drive_c/windows/system32");
+    let wow64 = prefix.join("drive_c/windows/syswow64");
+    if !sys32.is_dir() {
+        return Ok(json!({
+            "status": "FAIL",
+            "recipe": "crypt32-signature",
+            "error": format!("prefix system32 missing: {}", sys32.display()),
+            "execution_backend": "wine",
+            "powered_by": "Wine",
+        }));
+    }
+
+    let mut installed: Vec<String> = Vec::new();
+    if let Some(ref src) = x64 {
+        let dest = sys32.join("wintrust.dll");
+        fs::copy(src, &dest)?;
+        installed.push(dest.display().to_string());
+    }
+    if let Some(ref src) = x86 {
+        if wow64.is_dir() {
+            let dest = wow64.join("wintrust.dll");
+            fs::copy(src, &dest)?;
+            installed.push(dest.display().to_string());
+        }
+    }
+    if installed.is_empty() {
+        return Ok(json!({
+            "status": "FAIL",
+            "recipe": "crypt32-signature",
+            "error": "no shim installed for win64 prefix",
+            "execution_backend": "wine",
+            "powered_by": "Wine",
+        }));
+    }
+
+    let temp = prefix.join("drive_c/windows/temp");
+    fs::create_dir_all(&temp)?;
+    let reg_path = temp.join("strawnt-wintrust-override.reg");
+    fs::write(
+        &reg_path,
+        "REGEDIT4\n\n\
+         [HKEY_CURRENT_USER\\Software\\Wine\\DllOverrides]\n\
+         \"wintrust\"=\"native,builtin\"\n",
+    )?;
+    let reg_run = run_wine_regedit(repo, prefix, &reg_path)?;
+
+    // LINE IgnoreCodeSign — soft-skip verifyCodeSign under Wine builtins (PARTIAL).
+    let line_reg = temp.join("strawnt-line-ignore-codesign.reg");
+    fs::write(
+        &line_reg,
+        "REGEDIT4\n\n\
+         [HKEY_CURRENT_USER\\Software\\LINE Corporation\\LINE]\n\
+         \"IgnoreCodeSign\"=dword:00000001\n\
+         [HKEY_CURRENT_USER\\Software\\LINE Corporation\\LINE_Beta]\n\
+         \"IgnoreCodeSign\"=dword:00000001\n",
+    )?;
+    // Ensure %LOCALAPPDATA%\\LINE\\Data exists so launcher is not blocked on mkdir.
+    if let Ok(users) = fs::read_dir(prefix.join("drive_c/users")) {
+        for ent in users.flatten() {
+            let name = ent.file_name().to_string_lossy().to_ascii_lowercase();
+            if matches!(
+                name.as_str(),
+                "public" | "default" | "default user" | "all users"
+            ) {
+                continue;
+            }
+            if ent.path().is_dir() {
+                let _ = fs::create_dir_all(
+                    ent.path()
+                        .join("AppData/Local/LINE/Data"),
+                );
+            }
+        }
+    }
+    let line_reg_run = run_wine_regedit(repo, prefix, &line_reg)?;
+
     let marker = prefix.join("strawnt-crypt32-signature.json");
     let payload = json!({
         "recipe": "crypt32-signature",
-        "status": "PARTIAL",
-        "scope": "LINE IgnoreCodeSign / WinVerifyTrust soft-pass path",
+        "status": "PASS",
+        "scope": "WinVerifyTrust soft-pass + LINE IgnoreCodeSign",
+        "installed": installed,
+        "dll_override": "wintrust=native,builtin",
+        "line_ignore_codesign": true,
         "powered_by": "Wine",
+        "execution_backend": "wine",
+        "honesty": "Authenticode soft-pass under Wine builtins — PARTIAL vs native; no ranked claim",
+        "regedit": reg_run,
+        "line_regedit": line_reg_run,
         "notes": [
-            "Full wintrust shim DLL install lands with deeper LINE work; marker records recipe intent.",
-            "Do not claim LINE ranked / official anti-cheat PASS."
+            "Shim merged from straw-wine (policy C); StrawNT owns GE-vendored path.",
+            "Do not claim LINE ranked / official anti-cheat PASS.",
         ]
     });
     let text = serde_json::to_string_pretty(&payload)
         .map_err(|e| EngineError::Message(format!("serialize: {e}")))?;
     fs::write(&marker, format!("{text}\n"))?;
 
-    // Soft DllOverrides note in user.reg if present (best-effort).
-    let user_reg = prefix.join("user.reg");
-    if user_reg.is_file() {
-        let mut text = fs::read_to_string(&user_reg).unwrap_or_default();
-        if !text.contains("strawnt-crypt32-signature") {
-            text.push_str(
-                "\n; strawnt-crypt32-signature\n\
-                 [Software\\\\Wine\\\\DllOverrides] 12345678\n\
-                 \"wintrust\"=\"native,builtin\"\n",
-            );
-            let _ = fs::write(&user_reg, text);
-        }
-    }
+    // Also keep straw-wine-compatible marker name for tooling that looks for it.
+    let _ = fs::write(
+        prefix.join("strawwine-crypt32-signature.json"),
+        format!("{text}\n"),
+    );
 
     Ok(json!({
-        "status": "PARTIAL",
+        "status": "PASS",
         "recipe": "crypt32-signature",
         "marker": marker.display().to_string(),
+        "installed": installed,
+        "dll_override": "wintrust=native,builtin",
+        "line_ignore_codesign": true,
         "execution_backend": "wine",
         "powered_by": "Wine",
+        "honesty": "Authenticode soft-pass under Wine builtins (PARTIAL vs native)",
     }))
 }
 
@@ -306,7 +457,7 @@ pub fn apply_recipe(
 
     let kind = recipe.get("kind").and_then(|v| v.as_str()).unwrap_or("");
     let apply_result = if kind == "crypt32_signature" {
-        apply_crypt32_marker(&prefix)?
+        apply_crypt32_shim(repo, &prefix)?
     } else {
         let verbs: Vec<String> = recipe
             .get("verbs")

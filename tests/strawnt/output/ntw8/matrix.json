@@ -1,0 +1,33 @@
+{
+  "entries": {
+    "line.exe": {
+      "app_key": "line.exe",
+      "backend": "wine",
+      "engine": "proton-ge",
+      "execution_backend": "wine",
+      "name": "line.exe",
+      "notes": "NTW8 golden: NSIS stage + crypt32 shim + real LineLauncher window; login UNKNOWN; no ranked claim",
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "prefix": "line",
+      "status": "PARTIAL",
+      "updated_at": 1786136049,
+      "wine_flavor": "proton-ge"
+    },
+    "steam.exe": {
+      "app_key": "steam.exe",
+      "backend": "wine",
+      "engine": "proton-ge",
+      "execution_backend": "wine",
+      "name": "steam.exe",
+      "notes": "NTW8 golden: SteamSetup under GE Wine with real window; login/all_games UNKNOWN; no ranked claim",
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "prefix": "steam",
+      "status": "PARTIAL",
+      "updated_at": 1786136049,
+      "wine_flavor": "proton-ge"
+    }
+  },
+  "version": 1
+}

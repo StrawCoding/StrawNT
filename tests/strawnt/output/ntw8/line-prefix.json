@@ -1,0 +1,51 @@
+{
+  "arch": "win64",
+  "backend": "wine",
+  "create_mode": "template_clone",
+  "created": true,
+  "detail": {
+    "clone": {
+      "arch": "win64",
+      "created": true,
+      "duration_ms": 688.494814,
+      "mode": "template_clone",
+      "name": "line",
+      "path": "/tmp/strawnt-ntw8.6n7Qxx/home/prefixes/line",
+      "status": "PASS",
+      "template": "/tmp/strawnt-ntw8.6n7Qxx/home/templates/win64"
+    },
+    "ensure_template": {
+      "arch": "win64",
+      "created": true,
+      "path": "/tmp/strawnt-ntw8.6n7Qxx/home/templates/win64",
+      "status": "PASS",
+      "wineboot": {
+        "command": [
+          "/usr/bin/xvfb-run",
+          "-a",
+          "/mnt/data/code/project/StrawCoding/StrawNT/third_party/proton-ge/dist/files/bin/wine",
+          "wineboot",
+          "-u"
+        ],
+        "duration_sec": 19.566991872,
+        "exit_code": 0,
+        "pin": "GE-Proton11-3",
+        "status": "PASS",
+        "stderr_tail": "",
+        "stdout_tail": "fsync: up and running.\n",
+        "used_xvfb": true,
+        "wine_bin": "/mnt/data/code/project/StrawCoding/StrawNT/third_party/proton-ge/dist/files/bin/wine"
+      }
+    },
+    "mode": "template_clone"
+  },
+  "engine": "proton-ge",
+  "execution_backend": "wine",
+  "home": "/tmp/strawnt-ntw8.6n7Qxx/home",
+  "name": "line",
+  "path": "/tmp/strawnt-ntw8.6n7Qxx/home/prefixes/line",
+  "pin": "GE-Proton11-3",
+  "powered_by": "Wine",
+  "powered_by_wine": true,
+  "status": "PASS"
+}

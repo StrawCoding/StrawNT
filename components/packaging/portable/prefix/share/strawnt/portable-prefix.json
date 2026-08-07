@@ -1,0 +1,26 @@
+{
+  "schema": "strawnt-prefix/v1",
+  "product": "StrawNT",
+  "stage": "pc1-self-contained-prefix",
+  "version": "0.7.1.46",
+  "built_at": "2026-08-07T16:30:48Z",
+  "prefix": "/mnt/data/code/project/StrawCoding/StrawNT/components/packaging/portable/prefix",
+  "components": {
+    "runtime": "linked-into:strawnt",
+    "nt": "linked-into:strawnt",
+    "launcher": "bin/strawnt",
+    "cli": "linked-into:strawnt",
+    "graphics": "linked-into:strawnt",
+    "audio": "workspace-crate (static path via runtime when linked)",
+    "hub": "optional-skipped"
+  },
+  "binary": "bin/strawnt",
+  "compat_binary": "bin/strawwu",
+  "bundled_libs": [],
+  "notes": [
+    "Self-contained StrawNT CLI prefix; primary command is strawnt.",
+    "Host glibc / libgcc remain the ABI baseline.",
+    "Default execution_backend=wine (proton-ge; powered by Wine); not a full Windows OS claim; anti-cheat may fail.",
+    "Independent product — not an OS/ISO/desktop distribution."
+  ]
+}
