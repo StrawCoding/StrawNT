@@ -152,6 +152,34 @@ if ! rg -qi 'path_role|legacy_native|test-legacy-strawnt-nt6' \
     failures+=("nt6-openable.sh missing legacy/path_role labeling")
 fi
 
+# OpenCode tick4: integrate success path must declare wine (not native)
+if rg -n 'backend: native \(strawnt-native\)|Click-to-open enabled for Windows \.exe / \.msi \(native\)' \
+    "${REPO_ROOT}/components/strawwu-launcher/src/main.rs" >/dev/null 2>&1; then
+    failures+=("strawnt integrate still declares native backend in success output")
+fi
+if ! rg -n 'backend: wine \(proton-ge; powered by Wine\)' \
+    "${REPO_ROOT}/components/strawwu-launcher/src/main.rs" >/dev/null 2>&1; then
+    failures+=("strawnt integrate missing wine/proton-ge success marker")
+fi
+
+# OpenCode tick4: public portable smokes must not claim "no Wine" as PASS exclusion
+for f in tests/portable/smoke-prefix.sh tests/portable/smoke-appimage.sh; do
+    if rg -n 'no Wine/Proton substrate' "${REPO_ROOT}/${f}" >/dev/null 2>&1; then
+        failures+=("${f} still claims no Wine/Proton substrate in PASS exclusions")
+    fi
+    if ! rg -qi 'execution_backend=wine|powered by Wine' "${REPO_ROOT}/${f}"; then
+        failures+=("${f} missing wine default honesty in exclusions/checks")
+    fi
+done
+if rg -n 'no Wine/Proton substrate; default execution_backend=native' \
+    "${REPO_ROOT}/tests/portable/output/smoke-prefix.json" >/dev/null 2>&1; then
+    failures+=("smoke-prefix.json evidence still claims native / no Wine")
+fi
+if rg -n 'no Wine/Proton substrate' \
+    "${REPO_ROOT}/tests/portable/output/smoke-appimage.json" >/dev/null 2>&1; then
+    failures+=("smoke-appimage.json evidence still claims no Wine/Proton substrate")
+fi
+
 # nt3 must not scan product tree and write_fail on Wine markers
 if rg -n 'write_fail "wine substrate markers found|ensure no wine/proton substrate markers' \
     "${REPO_ROOT}/tests/strawnt/nt3-real-launchers.sh" >/dev/null 2>&1; then
@@ -240,6 +268,8 @@ doc = {
             "nt3-real-launchers wine substrate product-tree write_fail removed",
             "ExecutionBackend::Wine + launcher open/install product default wine",
             "root test-wincompat relabeled LEGACY; nt6 wine-ban asserts removed (tick3)",
+            "strawnt integrate success output + notify declare wine/proton-ge (tick4)",
+            "portable smoke-prefix/appimage/flatpak exclusions honor wine default (tick4)",
         ],
     },
     "artifacts": {

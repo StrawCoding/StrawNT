@@ -1,11 +1,8 @@
 #!/usr/bin/env bash
-# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
-# Product default is now execution_backend=wine / proton-ge. Do not treat
-# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
-# smoke-pe-desktop-click.sh — pe5 MIME/integrate + menu re-launch evidence.
-# Proves: integrate writes native-only MIME handler; double-click open
-# (strawwu open) installs/launches; app-menu .desktop re-launches via
-# --backend native; install.sh has no Wine. Emits pe-desktop-click.json.
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): former native-era pe5 path.
+# Product default is now execution_backend=wine / proton-ge (powered by Wine).
+# Proves: integrate writes wine MIME handler; double-click open works;
+# app-menu .desktop re-launches. Emits pe-desktop-click.json.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -40,7 +37,7 @@ doc = {
     "error": msg,
     "exclusions_honored": [
         "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
-        "no Wine/Proton substrate; execution_backend=native",
+        "product default execution_backend=wine (proton-ge; powered by Wine); not a full Windows OS claim",
         "no WinBox naming",
         "no full Windows compatibility claim",
     ],
@@ -109,19 +106,22 @@ mkdir -p "${STRAWWU_DESKTOP_DIR}" "${STRAWWU_MIME_DIR}" \
     "${HOME}/.local/share/strawwu" "${STRAWWU_APPS_DIR}"
 
 # --- integrate (MIME + open handler) ---
-log "strawwu integrate (native MIME handler)"
+log "strawnt integrate (wine / proton-ge MIME handler; powered by Wine)"
 set +e
 INTEGRATE_OUT="$("${STRAWWU_BIN}" integrate 2>&1)"
 INTEGRATE_RC=$?
 set -e
 log "integrate rc=${INTEGRATE_RC}"
 printf '%s\n' "${INTEGRATE_OUT}" | sed 's/^/  | /'
-[[ "${INTEGRATE_RC}" -eq 0 ]] || write_fail "strawwu integrate failed rc=${INTEGRATE_RC}"
-echo "${INTEGRATE_OUT}" | grep -qi 'backend: native' \
-    || write_fail "integrate missing backend: native marker"
+[[ "${INTEGRATE_RC}" -eq 0 ]] || write_fail "strawnt integrate failed rc=${INTEGRATE_RC}"
+# NTW0: pe5 desktop-click expects product-default wine integrate honesty
+echo "${INTEGRATE_OUT}" | grep -qiE 'backend: wine|powered by Wine|proton-ge' \
+    || write_fail "integrate missing backend: wine / powered by Wine marker"
 
-HANDLER="${STRAWWU_DESKTOP_DIR}/strawwu-open.desktop"
-MIME_XML="${STRAWWU_MIME_DIR}/strawwu-win32.xml"
+HANDLER="${STRAWWU_DESKTOP_DIR}/strawnt-open.desktop"
+[[ -f "${HANDLER}" ]] || HANDLER="${STRAWWU_DESKTOP_DIR}/strawwu-open.desktop"
+MIME_XML="${STRAWWU_MIME_DIR}/strawnt-win32.xml"
+[[ -f "${MIME_XML}" ]] || MIME_XML="${STRAWWU_MIME_DIR}/strawwu-win32.xml"
 [[ -f "${HANDLER}" ]] || write_fail "open handler missing: ${HANDLER}"
 [[ -f "${MIME_XML}" ]] || write_fail "MIME package missing: ${MIME_XML}"
 HANDLER_BODY="$(cat "${HANDLER}")"
@@ -131,8 +131,8 @@ echo "${HANDLER_BODY}" | grep -q 'application/x-ms-dos-executable' \
     || write_fail "handler missing exe MIME"
 echo "${HANDLER_BODY}" | grep -q 'application/x-msi' \
     || write_fail "handler missing msi MIME"
-echo "${HANDLER_BODY}" | grep -qE 'X-Straw(WU|NT)-Backend=' \
-    || write_fail "handler missing X-Straw*-Backend key"
+echo "${HANDLER_BODY}" | grep -qiE 'X-Straw(WU|NT)-Backend=wine' \
+    || write_fail "handler missing X-Straw*-Backend=wine"
 # NTW0: wine mention in Comment/honesty is allowed (powered by Wine)
 grep -q '\.exe' "${MIME_XML}" || write_fail "MIME xml missing *.exe glob"
 grep -q '\.msi' "${MIME_XML}" || write_fail "MIME xml missing *.msi glob"

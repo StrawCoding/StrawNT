@@ -2,22 +2,22 @@
   "schema": "strawwu-portable-smoke-prefix/v1",
   "stage": "pc1-self-contained-prefix",
   "status": "PASS",
-  "version": "0.7.1.25",
-  "prefix": "/mnt/data/code/project/StrawCoding/StrawWU-portable/components/packaging/portable/prefix",
-  "generated_at": "2026-07-29T07:27:20Z",
+  "version": "0.7.1.46",
+  "prefix": "/mnt/data/code/project/StrawCoding/StrawNT/components/packaging/portable/prefix",
+  "generated_at": "2026-08-07T16:30:54Z",
   "checks": {
     "version": {
       "status": "PASS",
-      "output": "strawwu 0.7.1-preview.25"
+      "output": "strawnt 0.7.1-preview.46"
     },
     "status_cmd": {
       "status": "PASS",
-      "output": "strawwu: status — runtime idle, 0 session(s), 0 app(s) registered\nstrawwu: execution_backend=native (strawwu-nt)\nstrawwu: default backend=native"
+      "output": "strawnt: status — runtime idle, 0 session(s), 0 app(s) registered\nstrawnt: execution_backend=wine (proton-ge)\nstrawnt: default backend=wine\nstrawnt: powered by Wine"
     },
     "no_system_deb_required": {
       "status": "PASS",
       "system_strawwu_debs": "absent",
-      "binary": "/mnt/data/code/project/StrawCoding/StrawWU-portable/components/packaging/portable/prefix/bin/strawwu"
+      "binary": "/mnt/data/code/project/StrawCoding/StrawNT/components/packaging/portable/prefix/bin/strawnt"
     },
     "prefix_layout": {
       "status": "PASS",
@@ -28,7 +28,7 @@
   },
   "exclusions_honored": [
     "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
-    "no Wine/Proton substrate; default execution_backend=native",
+    "product default execution_backend=wine (proton-ge; powered by Wine); not a full Windows OS claim",
     "no WinBox naming",
     "no full Windows compatibility claim"
   ]

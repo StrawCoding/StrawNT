@@ -3,9 +3,9 @@
   "stage": "ntw0-contract-legal",
   "status": "PASS",
   "product": "StrawNT",
-  "version": "0.7.1.45",
-  "generated_at": "2026-08-07T16:07:12Z",
-  "git_head": "d04f368d31f1339ac62713eca8fcd915451a16e4",
+  "version": "0.7.1.46",
+  "generated_at": "2026-08-07T16:32:11Z",
+  "git_head": "687dd2b1f27730640dd6c0bc7ea80b0a8d1db412",
   "backend": "wine",
   "execution_backend": "wine",
   "engine": "proton-ge",
@@ -33,7 +33,9 @@
       "components Phase 6 → test-legacy-wincompat; golden-apps backend_default=wine",
       "nt3-real-launchers wine substrate product-tree write_fail removed",
       "ExecutionBackend::Wine + launcher open/install product default wine",
-      "root test-wincompat relabeled LEGACY; nt6 wine-ban asserts removed (tick3)"
+      "root test-wincompat relabeled LEGACY; nt6 wine-ban asserts removed (tick3)",
+      "strawnt integrate success output + notify declare wine/proton-ge (tick4)",
+      "portable smoke-prefix/appimage/flatpak exclusions honor wine default (tick4)"
     ]
   },
   "artifacts": {

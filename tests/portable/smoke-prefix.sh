@@ -77,7 +77,7 @@ doc = {
     "checks": checks,
     "exclusions_honored": [
         "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
-        "no Wine/Proton substrate; default execution_backend=native",
+        "product default execution_backend=wine (proton-ge; powered by Wine); not a full Windows OS claim",
         "no WinBox naming",
         "no full Windows compatibility claim",
     ],
@@ -125,14 +125,20 @@ if [[ "${DRY_RUN}" -eq 1 ]]; then
     exit 0
 fi
 
-STRAWWU_BIN="${PREFIX}/bin/strawwu"
+STRAWWU_BIN="${PREFIX}/bin/strawnt"
+if [[ ! -x "${STRAWWU_BIN}" ]]; then
+    STRAWWU_BIN="${PREFIX}/bin/strawwu"
+fi
 if [[ ! -x "${STRAWWU_BIN}" ]]; then
     if [[ "${BUILD_IF_MISSING}" -eq 1 ]]; then
         log "prefix binary missing — invoking build-prefix.sh"
-        STRAWWU_PREFIX="${PREFIX}" bash "${PORTABLE_ROOT}/build-prefix.sh" \
+        STRAWWU_PREFIX="${PREFIX}" STRAWNT_PREFIX="${PREFIX}" \
+            bash "${PORTABLE_ROOT}/build-prefix.sh" \
             || fail_json "build-prefix.sh failed"
+        STRAWWU_BIN="${PREFIX}/bin/strawnt"
+        [[ -x "${STRAWWU_BIN}" ]] || STRAWWU_BIN="${PREFIX}/bin/strawwu"
     else
-        fail_json "prefix binary not built: ${STRAWWU_BIN}"
+        fail_json "prefix binary not built: ${PREFIX}/bin/strawnt (or strawwu)"
     fi
 fi
 [[ -x "${STRAWWU_BIN}" ]] || fail_json "prefix binary still missing after build"
@@ -165,6 +171,11 @@ STATUS_OUT="$("${STRAWWU_BIN}" status 2>&1)" || fail_json "strawwu status failed
 log "version: ${VERSION_OUT}"
 log "status:  ${STATUS_OUT}"
 
+# NTW0: product default must declare wine / powered by Wine (not native-only).
+if ! echo "${STATUS_OUT}" | grep -qiE 'execution_backend=wine|default backend=wine|powered by Wine'; then
+    fail_json "prefix status missing wine default honesty (got: ${STATUS_OUT})"
+fi
+
 # Confirm no NEEDED libs resolve exclusively via /usr/lib/strawwu (deb layout).
 if ldd "${STRAWWU_BIN}" 2>/dev/null | grep -E '/usr/lib/strawwu/' >/dev/null; then
     fail_json "binary links against /usr/lib/strawwu (system deb layout)"
@@ -176,7 +187,7 @@ write_json "PASS" \
     "$(python3 -c 'import json,sys; print("no_system_deb_required|"+json.dumps({"status":"PASS","system_strawwu_debs":sys.argv[1],"binary":sys.argv[2]}))' "${SYSTEM_DEB_STATE}" "${REAL_BIN}")" \
     "$(python3 -c 'import json,sys; print("prefix_layout|"+json.dumps({"status":"PASS","bin":True,"lib_dir":sys.argv[1]=="1","manifest":sys.argv[2]=="1"}))' \
         "$( [[ -d "${PREFIX}/lib" ]] && echo 1 || echo 0 )" \
-        "$( [[ -f "${PREFIX}/share/strawwu/portable-prefix.json" ]] && echo 1 || echo 0 )")"
+        "$( [[ -f "${PREFIX}/share/strawwu/portable-prefix.json" || -f "${PREFIX}/share/strawnt/portable-prefix.json" ]] && echo 1 || echo 0 )")"
 
 log "wrote ${OUT_JSON}"
 log "prefix smoke PASS"

@@ -77,7 +77,7 @@ doc = {
     "checks": checks,
     "exclusions_honored": [
         "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
-        "no Wine/Proton substrate",
+        "product default execution_backend=wine (proton-ge; powered by Wine); not a full Windows OS claim",
         "no WinBox naming",
         "no full Windows compatibility claim",
     ],
@@ -206,7 +206,8 @@ if [[ "${SMOKE_KIND}" == "portable.tar.gz" ]]; then
             VERSION_OUT="$("${APPDIR}/AppRun" --version)"
             STATUS_OUT="$("${APPDIR}/AppRun" status)"
             printf "VERSION=%s\n" "${VERSION_OUT}"
-            printf "STATUS=%s\n" "${STATUS_OUT}"
+            # Preserve multiline status for host-side wine honesty checks.
+            printf "STATUS_B64=%s\n" "$(printf '%s' "${STATUS_OUT}" | base64 -w0 2>/dev/null || printf '%s' "${STATUS_OUT}" | base64)"
             printf "APPDIR=%s\n" "${APPDIR}"
         ' >"${CONTAINER_OUT}" 2>&1 \
         || fail_json "clean-container smoke failed (see log): $(tail -c 400 "${CONTAINER_OUT}" | tr "\n" " ")"
@@ -224,7 +225,7 @@ elif [[ "${SMOKE_KIND}" == "AppImage" ]]; then
             VERSION_OUT="$(/tmp/squashfs-root/AppRun --version)"
             STATUS_OUT="$(/tmp/squashfs-root/AppRun status)"
             printf "VERSION=%s\n" "${VERSION_OUT}"
-            printf "STATUS=%s\n" "${STATUS_OUT}"
+            printf "STATUS_B64=%s\n" "$(printf '%s' "${STATUS_OUT}" | base64 -w0 2>/dev/null || printf '%s' "${STATUS_OUT}" | base64)"
             printf "APPDIR=/tmp/squashfs-root\n"
         ' >"${CONTAINER_OUT}" 2>&1 \
         || fail_json "clean-container AppImage smoke failed: $(tail -c 400 "${CONTAINER_OUT}" | tr "\n" " ")"
@@ -237,18 +238,31 @@ else
             VERSION_OUT="$(/smoke/AppDir/AppRun --version)"
             STATUS_OUT="$(/smoke/AppDir/AppRun status)"
             printf "VERSION=%s\n" "${VERSION_OUT}"
-            printf "STATUS=%s\n" "${STATUS_OUT}"
+            printf "STATUS_B64=%s\n" "$(printf '%s' "${STATUS_OUT}" | base64 -w0 2>/dev/null || printf '%s' "${STATUS_OUT}" | base64)"
             printf "APPDIR=/smoke/AppDir\n"
         ' >"${CONTAINER_OUT}" 2>&1 \
         || fail_json "clean-container AppDir smoke failed: $(tail -c 400 "${CONTAINER_OUT}" | tr "\n" " ")"
 fi
 
-VERSION_OUT="$(grep '^VERSION=' "${CONTAINER_OUT}" | sed 's/^VERSION=//')"
-STATUS_OUT="$(grep '^STATUS=' "${CONTAINER_OUT}" | sed 's/^STATUS=//')"
+VERSION_OUT="$(grep '^VERSION=' "${CONTAINER_OUT}" | sed 's/^VERSION=//' | head -n1)"
+STATUS_B64="$(grep '^STATUS_B64=' "${CONTAINER_OUT}" | sed 's/^STATUS_B64=//' | head -n1)"
+STATUS_OUT=""
+if [[ -n "${STATUS_B64}" ]]; then
+    STATUS_OUT="$(printf '%s' "${STATUS_B64}" | base64 -d 2>/dev/null || true)"
+fi
+if [[ -z "${STATUS_OUT}" ]]; then
+    # Compat with older STATUS= single-line encoding
+    STATUS_OUT="$(grep '^STATUS=' "${CONTAINER_OUT}" | sed 's/^STATUS=//' | head -n1)"
+fi
 [[ -n "${VERSION_OUT}" ]] || fail_json "container did not report VERSION"
 [[ -n "${STATUS_OUT}" ]] || fail_json "container did not report STATUS"
 log "container version: ${VERSION_OUT}"
 log "container status:  ${STATUS_OUT}"
+
+# NTW0: product default must declare wine / powered by Wine (not native-only).
+if ! echo "${STATUS_OUT}" | grep -qiE 'execution_backend=wine|default backend=wine|powered by Wine'; then
+    fail_json "appimage status missing wine default honesty (got: ${STATUS_OUT})"
+fi
 
 ARTIFACT_LIST="$(python3 -c 'import json,os,sys; dist=sys.argv[1]; names=sorted(n for n in os.listdir(dist) if n.endswith((".AppImage", ".portable.tar.gz")) or n.endswith(".AppDir")); print(json.dumps(names))' "${DIST}")"
 

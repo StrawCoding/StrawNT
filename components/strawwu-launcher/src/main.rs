@@ -250,14 +250,14 @@ fn main() {
         Command::Integrate => match desktop::install_desktop_integration_full() {
             Ok(info) => {
                 println!(
-                    "strawnt: desktop integration installed\n  menu: {}\n  handler: {}\n  cleared_stale: {}\n  backend: native (strawnt-native)\n  tip: app menu → StrawNT; double-click .exe / .msi to install & launch",
+                    "strawnt: desktop integration installed\n  menu: {}\n  handler: {}\n  cleared_stale: {}\n  backend: wine (proton-ge; powered by Wine)\n  tip: app menu → StrawNT; double-click .exe / .msi to install & launch",
                     info.menu_entry.display(),
                     info.open_handler.display(),
                     info.cleared_stale.len()
                 );
                 open::notify(
                     "StrawNT",
-                    "Click-to-open enabled for Windows .exe / .msi (native)",
+                    "Click-to-open enabled for Windows .exe / .msi (wine / proton-ge; powered by Wine)",
                 );
             }
             Err(e) => {

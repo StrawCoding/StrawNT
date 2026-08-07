@@ -2,21 +2,21 @@
   "schema": "strawwu-portable-smoke-appimage/v1",
   "stage": "pc2-appimage",
   "status": "PASS",
-  "version": "0.7.1.25",
-  "dist": "/mnt/data/code/project/StrawCoding/StrawWU-portable/components/packaging/portable/appimage/dist",
-  "generated_at": "2026-07-29T07:27:06Z",
+  "version": "0.7.1.46",
+  "dist": "/mnt/data/code/project/StrawCoding/StrawNT/components/packaging/portable/appimage/dist",
+  "generated_at": "2026-08-07T16:32:11Z",
   "checks": {
     "version": {
       "status": "PASS",
-      "output": "strawwu 0.7.1-preview.25"
+      "output": "strawnt 0.7.1-preview.46"
     },
     "status_cmd": {
       "status": "PASS",
-      "output": "strawwu: status — runtime idle, 0 session(s), 0 app(s) registered"
+      "output": "strawnt: status — runtime idle, 0 session(s), 0 app(s) registered\nstrawnt: execution_backend=wine (proton-ge)\nstrawnt: default backend=wine\nstrawnt: powered by Wine"
     },
     "sha256sums": {
       "status": "PASS",
-      "path": "/mnt/data/code/project/StrawCoding/StrawWU-portable/tests/portable/output/SHA256SUMS"
+      "path": "/mnt/data/code/project/StrawCoding/StrawNT/tests/portable/output/SHA256SUMS"
     },
     "clean_container": {
       "status": "PASS",
@@ -26,8 +26,17 @@
     },
     "artifacts": {
       "status": "PASS",
-      "dist": "/mnt/data/code/project/StrawCoding/StrawWU-portable/components/packaging/portable/appimage/dist",
+      "dist": "/mnt/data/code/project/StrawCoding/StrawNT/components/packaging/portable/appimage/dist",
       "files": [
+        "StrawNT-0.7.1.38-x86_64.AppDir",
+        "StrawNT-0.7.1.38-x86_64.AppImage",
+        "StrawNT-0.7.1.38-x86_64.portable.tar.gz",
+        "StrawNT-0.7.1.39-x86_64.AppDir",
+        "StrawNT-0.7.1.39-x86_64.AppImage",
+        "StrawNT-0.7.1.39-x86_64.portable.tar.gz",
+        "StrawNT-0.7.1.46-x86_64.AppDir",
+        "StrawNT-0.7.1.46-x86_64.AppImage",
+        "StrawNT-0.7.1.46-x86_64.portable.tar.gz",
         "StrawWU-Core-0.7.1.15-x86_64.AppDir",
         "StrawWU-Core-0.7.1.15-x86_64.AppImage",
         "StrawWU-Core-0.7.1.15-x86_64.portable.tar.gz",
@@ -39,13 +48,16 @@
         "StrawWU-Core-0.7.1.17-x86_64.portable.tar.gz",
         "StrawWU-Core-0.7.1.25-x86_64.AppDir",
         "StrawWU-Core-0.7.1.25-x86_64.AppImage",
-        "StrawWU-Core-0.7.1.25-x86_64.portable.tar.gz"
+        "StrawWU-Core-0.7.1.25-x86_64.portable.tar.gz",
+        "StrawWU-Core-0.7.1.32-x86_64.AppDir",
+        "StrawWU-Core-0.7.1.32-x86_64.AppImage",
+        "StrawWU-Core-0.7.1.32-x86_64.portable.tar.gz"
       ]
     }
   },
   "exclusions_honored": [
     "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
-    "no Wine/Proton substrate",
+    "product default execution_backend=wine (proton-ge; powered by Wine); not a full Windows OS claim",
     "no WinBox naming",
     "no full Windows compatibility claim"
   ]
