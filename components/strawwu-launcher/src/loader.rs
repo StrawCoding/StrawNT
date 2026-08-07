@@ -51,7 +51,7 @@ impl LaunchRequest {
             return Err("cannot launch unknown binary format".into());
         }
         if let Some(ref backend) = self.backend_override {
-            if !["native", "container", "microvm"].contains(&backend.as_str()) {
+            if !["wine", "native", "container", "microvm"].contains(&backend.as_str()) {
                 return Err(format!("invalid backend override: {backend}"));
             }
         }
@@ -73,7 +73,9 @@ impl LaunchRequest {
             return b.as_str();
         }
         match self.format.as_str() {
-            "PE" | "MSI" | "ELF" => "native",
+            // NTW0+: product default wine/proton-ge (powered by Wine).
+            "PE" | "MSI" => "wine",
+            "ELF" => "native",
             _ => "container",
         }
     }
@@ -203,9 +205,17 @@ mod tests {
     }
 
     #[test]
-    fn estimated_backend_pe_native() {
+    fn estimated_backend_pe_wine() {
         let req = LaunchRequest::new(PathBuf::from("/app/game.exe"), BinaryFormat::PE);
-        assert_eq!(req.estimated_backend(), "native");
+        assert_eq!(req.estimated_backend(), "wine");
+    }
+
+    #[test]
+    fn wine_backend_accepted() {
+        let req = LaunchRequest::new(PathBuf::from("/app/game.exe"), BinaryFormat::PE)
+            .with_backend("wine");
+        assert!(req.validate().is_ok());
+        assert_eq!(req.estimated_backend(), "wine");
     }
 
     #[test]

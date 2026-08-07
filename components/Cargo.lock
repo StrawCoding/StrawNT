@@ -306,7 +306,7 @@ checksum = "0c790de23124f9ab44544d7ac05d60440adc586479ce501c1d6d7da3cd8c9cf5"
 
 [[package]]
 name = "strawwu-anticheat"
-version = "0.7.1-preview.40"
+version = "0.7.1-preview.44"
 dependencies = [
  "chrono",
  "serde",
@@ -317,7 +317,7 @@ dependencies = [
 
 [[package]]
 name = "strawwu-app-registry"
-version = "0.7.1-preview.40"
+version = "0.7.1-preview.44"
 dependencies = [
  "chrono",
  "libc",
@@ -329,7 +329,7 @@ dependencies = [
 
 [[package]]
 name = "strawwu-audio"
-version = "0.7.1-preview.40"
+version = "0.7.1-preview.44"
 dependencies = [
  "serde",
  "serde_json",
@@ -338,7 +338,7 @@ dependencies = [
 
 [[package]]
 name = "strawwu-bridge"
-version = "0.7.1-preview.40"
+version = "0.7.1-preview.44"
 dependencies = [
  "serde",
  "serde_json",
@@ -347,7 +347,7 @@ dependencies = [
 
 [[package]]
 name = "strawwu-cli"
-version = "0.7.1-preview.40"
+version = "0.7.1-preview.44"
 dependencies = [
  "serde",
  "serde_json",
@@ -357,7 +357,7 @@ dependencies = [
 
 [[package]]
 name = "strawwu-device-proxy"
-version = "0.7.1-preview.40"
+version = "0.7.1-preview.44"
 dependencies = [
  "serde",
  "serde_json",
@@ -366,7 +366,7 @@ dependencies = [
 
 [[package]]
 name = "strawwu-graphics"
-version = "0.7.1-preview.40"
+version = "0.7.1-preview.44"
 dependencies = [
  "serde",
  "serde_json",
@@ -375,7 +375,7 @@ dependencies = [
 
 [[package]]
 name = "strawwu-launcher"
-version = "0.7.1-preview.40"
+version = "0.7.1-preview.44"
 dependencies = [
  "libc",
  "serde",
@@ -391,7 +391,7 @@ dependencies = [
 
 [[package]]
 name = "strawwu-nt"
-version = "0.7.1-preview.40"
+version = "0.7.1-preview.44"
 dependencies = [
  "serde",
  "serde_json",
@@ -402,7 +402,7 @@ dependencies = [
 
 [[package]]
 name = "strawwu-runtime"
-version = "0.7.1-preview.40"
+version = "0.7.1-preview.44"
 dependencies = [
  "chrono",
  "serde",

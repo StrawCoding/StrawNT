@@ -6,11 +6,12 @@
 	install-flatpak-setup install-bug-reporter install-calamares-settings install-update-notifier install-target-setup install-firstboot install-wincompat nosnap-harden build-debs bump-version check-version-bump generate-release-manifest release-sign publish-debs publish-fork-debs \
 	portable-prefix test-portable-prefix portable-appimage test-portable-appimage \
 	portable-flatpak test-portable-flatpak test-portable-matrix test-portable-closeout \
-	test-strawnt-ntw0-contract test-strawnt-nt6-openable \
+	test-strawnt-ntw0-contract \
 	test-legacy-portable-pe-closeout test-legacy-portable-gx-graphics \
 	test-legacy-portable-gx-audio-input test-legacy-portable-gx-anticheat \
 	test-legacy-portable-gx-closeout test-legacy-strawnt-nt1-graphics \
-	test-legacy-strawnt-nt4-anticheat test-legacy-strawnt-nt5-closeout
+	test-legacy-strawnt-nt3-launchers test-legacy-strawnt-nt4-anticheat \
+	test-legacy-strawnt-nt5-closeout test-legacy-strawnt-nt6-openable
 
 REPO_ROOT := $(abspath .)
 SCRIPTS   := os-image/scripts
@@ -144,12 +145,11 @@ help:
 	@echo "  test-portable-matrix          Cross-distro container matrix → matrix.json (pc4)"
 	@echo "  test-portable-closeout        Portable Core closeout → closeout.json (pc5)"
 	@echo "  test-strawnt-ntw0-contract    Wine pivot contract/legal evidence → ntw0-contract.json"
-	@echo "  test-strawnt-nt6-openable     StrawNT openable install/menu/open → nt6-openable.json"
 	@echo ""
 	@echo "Legacy/archive native-era verifies (NTW0 soft-reset — NOT product Wine-ban gates):"
 	@echo "  test-legacy-portable-pe-closeout"
 	@echo "  test-legacy-portable-gx-graphics | gx-audio-input | gx-anticheat | gx-closeout"
-	@echo "  test-legacy-strawnt-nt1-graphics | nt4-anticheat | nt5-closeout"
+	@echo "  test-legacy-strawnt-nt1-graphics | nt3-launchers | nt4-anticheat | nt5-closeout | nt6-openable"
 
 preflight:
 	bash tests/preflight/test-ubuntu-clone.sh
@@ -694,9 +694,6 @@ test-portable-closeout:
 test-strawnt-ntw0-contract:
 	bash tests/strawnt/ntw0-contract.sh
 
-test-strawnt-nt6-openable:
-	bash tests/strawnt/nt6-openable.sh
-
 # ---------------------------------------------------------------------------
 # LEGACY/ARCHIVE (NTW0 soft-reset) — native-era evidence only.
 # Not product gates; must not fail product verify solely because Wine is used.
@@ -727,6 +724,10 @@ test-legacy-strawnt-nt1-graphics:
 	@echo "[LEGACY/ARCHIVE NTW0] native-era nt1-graphics — not a product Wine-ban gate"
 	bash tests/strawnt/nt1-real-graphics.sh
 
+test-legacy-strawnt-nt3-launchers:
+	@echo "[LEGACY/ARCHIVE NTW0] native-era nt3-launchers — not a product Wine-ban gate"
+	bash tests/strawnt/nt3-real-launchers.sh
+
 test-legacy-strawnt-nt4-anticheat:
 	@echo "[LEGACY/ARCHIVE NTW0] native-era nt4-anticheat — not a product Wine-ban gate"
 	bash tests/strawnt/nt4-anticheat-honest.sh
@@ -734,6 +735,10 @@ test-legacy-strawnt-nt4-anticheat:
 test-legacy-strawnt-nt5-closeout:
 	@echo "[LEGACY/ARCHIVE NTW0] native-era nt5-closeout — not a product Wine-ban gate"
 	bash tests/strawnt/nt5-youwan-closeout.sh
+
+test-legacy-strawnt-nt6-openable:
+	@echo "[LEGACY/ARCHIVE NTW0] native-era nt6-openable — not a product Wine-ban gate"
+	bash tests/strawnt/nt6-openable.sh
 
 build-os-debs:
 	bash $(SCRIPTS)/build-os-debs.sh

@@ -60,18 +60,27 @@ components/
 ## 建置與測試
 
 ```bash
-make -C components test                  # 單元測試 + 規格完整性 + 結構檢查
-make -C components test-wincompat        # Phase 6 Windows 相容層全驗收
-make -C components test-execution-backends  # 6.2 執行後端測試
-make -C components test-graphics-vulkan  # 6.4 Vulkan 圖形棧測試
-make -C components test-graphics-opengl  # 6.4b OpenGL 圖形棧測試
-make -C components test-anticheat-matrix # 6.7 反作弊矩陣測試
-make -C components test-device-proxy     # 6.11 裝置代理測試
-make -C components generate-compat-matrix  # 產出 compat-matrix.json
-make -C components package               # 建置 release binary + .deb 打包
-make -C components build                  # 僅 cargo build --release
-make -C components check                  # 快速 cargo check
+make -C components test                     # 單元測試 + 規格完整性 + 結構檢查
+make -C components package                  # 建置 release binary + .deb 打包
+make -C components build                    # 僅 cargo build --release
+make -C components check                    # 快速 cargo check
 ```
+
+### Legacy／archive（NTW0 soft-reset — 非產品 Wine 預設驗收）
+
+下列 Phase 6 native-era 套件**不是**現行產品／完整 Windows 相容驗收；產品預設為 wine／proton-ge（**powered by Wine**）。見 `tests/archive/native/README.md`。
+
+```bash
+make -C components test-legacy-wincompat    # LEGACY Phase 6 套件（別名 test-wincompat）
+make -C components test-execution-backends  # 6.2 執行後端（含 wine enum）
+make -C components test-graphics-vulkan     # 6.4 Vulkan 圖形棧
+make -C components test-graphics-opengl     # 6.4b OpenGL 圖形棧
+make -C components test-anticheat-matrix    # 6.7 反作弊矩陣（禁排位宣稱）
+make -C components test-device-proxy        # 6.11 裝置代理
+make -C components generate-compat-matrix   # 產出 compat-matrix.json
+```
+
+Golden apps 契約：`tests/wincompat/golden-apps.json` → `backend_default=wine`。
 
 ## 設計原則
 

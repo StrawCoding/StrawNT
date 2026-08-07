@@ -362,41 +362,41 @@ fn build_case(app: &GoldenAppManifest) -> GoldenAppCase {
 
 pub fn default_manifest() -> GoldenAppsManifest {
     GoldenAppsManifest {
-        version: "0.7.0.8".into(),
-        locked_at: "2026-07-08".into(),
-        source: "user Q8 decision".into(),
+        version: "0.7.1.44".into(),
+        locked_at: "2026-08-07".into(),
+        source: "NTW0 Wine pivot — product default wine/proton-ge".into(),
         apps: vec![
             GoldenAppManifest {
                 id: "office".into(),
                 name: "Microsoft Office (suite)".into(),
                 priority: "P0".into(),
                 scope: "launch_and_basic_edit".into(),
-                backend_default: "native".into(),
-                notes: "Word/Excel 基本開檔與編輯".into(),
+                backend_default: "wine".into(),
+                notes: "Word/Excel 基本開檔與編輯（powered by Wine）".into(),
             },
             GoldenAppManifest {
                 id: "steam-launcher".into(),
                 name: "Steam Client".into(),
                 priority: "P0".into(),
                 scope: "launcher_only".into(),
-                backend_default: "native".into(),
-                notes: "啟動與登入 UI；不驗遊戲執行".into(),
+                backend_default: "wine".into(),
+                notes: "啟動與登入 UI；不驗遊戲執行（powered by Wine）".into(),
             },
             GoldenAppManifest {
                 id: "epic-launcher".into(),
                 name: "Epic Games Launcher".into(),
                 priority: "P0".into(),
                 scope: "launcher_only".into(),
-                backend_default: "native".into(),
-                notes: "啟動與登入 UI；不驗遊戲執行".into(),
+                backend_default: "wine".into(),
+                notes: "啟動與登入 UI；不驗遊戲執行（powered by Wine）".into(),
             },
             GoldenAppManifest {
                 id: "delta-force-launcher".into(),
                 name: "三角洲行動啟動器".into(),
                 priority: "P0".into(),
                 scope: "launcher_only".into(),
-                backend_default: "native".into(),
-                notes: "僅啟動器；不驗遊戲本體與反作弊連線".into(),
+                backend_default: "wine".into(),
+                notes: "僅啟動器；不驗遊戲本體與反作弊連線（powered by Wine）".into(),
             },
         ],
     }

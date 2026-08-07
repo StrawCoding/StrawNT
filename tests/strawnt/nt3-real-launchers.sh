@@ -9,7 +9,8 @@
 #
 # Top-level PASS only when ≥2 launchers reach mode=real with side effects.
 # Otherwise honest PARTIAL (real binaries acquired + native launch attempted).
-# Never marks simulated probes as top-level PASS. No Wine/Proton.
+# Never marks simulated probes as top-level PASS.
+# NTW0: Wine ban lifted — product tree MAY contain wine/GE markers (path_role=legacy_native).
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -582,14 +583,7 @@ jq -e '.status == "PASS" or .status == "PARTIAL"' "${OUT_JSON}" >/dev/null
 jq -e '(.launchers|length) >= 1 or (.results|length) >= 1 or (.apps|length) >= 1' "${OUT_JSON}" >/dev/null
 jq -e 'if .status == "PASS" then (.real_binaries == true or .claims.real_binaries == true) else true end' "${OUT_JSON}" >/dev/null
 
-log "ensure no wine/proton substrate markers in product tree"
-if command -v rg >/dev/null 2>&1; then
-    if rg -n -i 'ensure_wine|wine_backend|STRAWNT_BACKEND=wine|STRAWWU_BACKEND=wine' \
-        "${REPO_ROOT}/install.sh" "${REPO_ROOT}/README.md" "${REPO_ROOT}/components/strawwu-launcher" \
-        >/tmp/nt3-wine-rg.txt 2>/dev/null; then
-        write_fail "wine substrate markers found (see /tmp/nt3-wine-rg.txt)"
-    fi
-fi
+log "NTW0: skip wine-substrate product-tree ban (lift_ban; path_role=legacy_native)"
 
 log "nt3-real-launchers evidence ready: ${OUT_JSON}"
 jq -r '.status + " real_binaries=" + (.real_binaries|tostring) + " version=" + (.version|tostring) + " launchers=" + (.launchers|length|tostring) + " mode_real=" + (.summary.mode_real|tostring)' "${OUT_JSON}"

@@ -57,12 +57,7 @@ fn kind_for_format(format: BinaryFormat) -> AppKind {
 }
 
 fn backend_from_str(backend: Option<&str>) -> Option<ExecutionBackend> {
-    backend.and_then(|value| match value {
-        "native" => Some(ExecutionBackend::Native),
-        "container" => Some(ExecutionBackend::Container),
-        "microvm" => Some(ExecutionBackend::Microvm),
-        _ => None,
-    })
+    backend.and_then(ExecutionBackend::from_str)
 }
 
 fn install_path_for(binary: &Path) -> Option<String> {

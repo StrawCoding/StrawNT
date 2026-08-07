@@ -146,9 +146,10 @@ fn main() {
                     ),
                 );
 
-                // Double-click / MIME open always pins native (no Wine env override).
+                // NTW0+: MIME/open uses product default wine (proton-ge).
+                // Legacy native only when STRAWNT_LEGACY_NATIVE=1 (via resolve_backend).
                 if let Err(code) =
-                    launch_pe(&path, &[], Some("native"), &[], true, install_mode)
+                    launch_pe(&path, &[], None, &[], true, install_mode)
                 {
                     open::notify("StrawNT", &format!("Failed to open {name}"));
                     process::exit(code);
@@ -227,9 +228,9 @@ fn main() {
                                 );
                             }
                         }
-                        // Run the installer through the native strawnt-native path.
+                        // Run the installer through product default wine/GE path.
                         if let Err(code) =
-                            launch_pe(&installer, &[], Some("native"), &[], false, true)
+                            launch_pe(&installer, &[], None, &[], false, true)
                         {
                             open::notify("StrawNT", &format!("Install failed: {app_name}"));
                             process::exit(code);
@@ -526,7 +527,7 @@ fn launch_via_native(
                 "unresolved_imports": l.unresolved_imports,
             })),
             "error": exec.error,
-            "backend": "native",
+            "backend": backend_name,
             "app_id": app_id,
             "binary": req.binary_path.display().to_string(),
         });

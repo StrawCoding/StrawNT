@@ -136,7 +136,7 @@ pub fn execute_pe_with_side_effect_dir(
 
     let backend = profile.resolved_backend();
     let session_id = match backend {
-        ExecutionBackend::Native => "default".to_string(),
+        ExecutionBackend::Wine | ExecutionBackend::Native => "default".to_string(),
         ExecutionBackend::Container | ExecutionBackend::Microvm => {
             format!("isolated-{}", profile.app_id)
         }

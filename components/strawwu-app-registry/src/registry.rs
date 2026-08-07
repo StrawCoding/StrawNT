@@ -261,7 +261,7 @@ impl RegistryStore {
         entry.install_path = install_path;
         entry.desktop_entry = desktop_entry;
         entry.protected = protected;
-        entry.execution_backend = backend.or(Some(ExecutionBackend::Native));
+        entry.execution_backend = backend.or(Some(ExecutionBackend::Wine));
         self.register(entry)?;
         Ok(self.data.find(id).expect("just inserted"))
     }
@@ -300,7 +300,7 @@ impl RegistryStore {
             app.source = AppSource::Launcher;
             app.install_state = InstallState::Installed;
             app.install_path = install_path;
-            app.execution_backend = backend.or(Some(ExecutionBackend::Native));
+            app.execution_backend = backend.or(Some(ExecutionBackend::Wine));
             if desktop_entry.is_some() {
                 app.desktop_entry = desktop_entry;
             }
@@ -399,7 +399,7 @@ impl RegistryStore {
             app.source = AppSource::Installer;
             app.install_state = InstallState::Pending;
             app.install_path = installer_path;
-            app.execution_backend = Some(ExecutionBackend::Native);
+            app.execution_backend = Some(ExecutionBackend::Wine);
             app.touch();
             self.data.touch();
             self.flush()?;
@@ -410,7 +410,7 @@ impl RegistryStore {
         let mut entry = AppEntry::new(id, name, AppKind::Win32, AppSource::Installer);
         entry.install_state = InstallState::Pending;
         entry.install_path = installer_path;
-        entry.execution_backend = Some(ExecutionBackend::Native);
+        entry.execution_backend = Some(ExecutionBackend::Wine);
         self.register(entry)?;
         Ok(self.data.find(id).expect("just inserted"))
     }
@@ -430,7 +430,7 @@ impl RegistryStore {
             app.source = AppSource::Installer;
             app.install_state = InstallState::Installed;
             app.install_path = install_path;
-            app.execution_backend = backend.or(Some(ExecutionBackend::Native));
+            app.execution_backend = backend.or(Some(ExecutionBackend::Wine));
             if desktop_entry.is_some() {
                 app.desktop_entry = desktop_entry;
             }
@@ -445,7 +445,7 @@ impl RegistryStore {
         entry.install_state = InstallState::Installed;
         entry.install_path = install_path;
         entry.desktop_entry = desktop_entry;
-        entry.execution_backend = backend.or(Some(ExecutionBackend::Native));
+        entry.execution_backend = backend.or(Some(ExecutionBackend::Wine));
         self.register(entry)?;
         self.log_event("install-finalize", id);
         Ok(self.data.find(id).expect("just inserted"))

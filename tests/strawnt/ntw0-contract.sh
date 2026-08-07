@@ -81,16 +81,60 @@ if ! rg -qi 'LEGACY/ARCHIVE|lift_ban|skip wine-substrate' \
     failures+=("smoke-pe-real-exec.sh missing NTW0 legacy/lift marker")
 fi
 
-# Makefile must not expose native-era pe/gx as general product targets
-if rg -n '^test-portable-pe-closeout:|^test-portable-gx-graphics:|^test-portable-gx-closeout:|^test-strawnt-nt5-closeout:' \
+# Makefile must not expose native-era pe/gx/nt as general product targets
+if rg -n '^test-portable-pe-closeout:|^test-portable-gx-graphics:|^test-portable-gx-closeout:|^test-strawnt-nt5-closeout:|^test-strawnt-nt6-openable:' \
     "${REPO_ROOT}/Makefile" >/dev/null 2>&1; then
     failures+=("Makefile still exposes native-era pe/gx/nt as general product targets")
 fi
 if ! rg -n '^test-legacy-portable-pe-closeout:' "${REPO_ROOT}/Makefile" >/dev/null 2>&1; then
     failures+=("Makefile missing test-legacy-portable-pe-closeout")
 fi
+if ! rg -n '^test-legacy-strawnt-nt6-openable:' "${REPO_ROOT}/Makefile" >/dev/null 2>&1; then
+    failures+=("Makefile missing test-legacy-strawnt-nt6-openable")
+fi
+if ! rg -n '^test-legacy-strawnt-nt3-launchers:' "${REPO_ROOT}/Makefile" >/dev/null 2>&1; then
+    failures+=("Makefile missing test-legacy-strawnt-nt3-launchers")
+fi
 if ! rg -qi 'Legacy/archive native-era' "${REPO_ROOT}/Makefile"; then
     failures+=("Makefile help missing Legacy/archive native-era section")
+fi
+
+# nt3 must not fail product tree solely on Wine markers
+if rg -n 'write_fail "wine substrate markers found' \
+    "${REPO_ROOT}/tests/strawnt/nt3-real-launchers.sh" >/dev/null 2>&1; then
+    failures+=("nt3-real-launchers.sh still fails on wine substrate markers")
+fi
+if ! rg -qi 'skip wine-substrate|lift_ban' \
+    "${REPO_ROOT}/tests/strawnt/nt3-real-launchers.sh"; then
+    failures+=("nt3-real-launchers.sh missing NTW0 wine-substrate skip")
+fi
+
+# components Phase 6 must be labeled legacy — not general product Wine acceptance
+if ! rg -qi 'Legacy/archive|test-legacy-wincompat' \
+    "${REPO_ROOT}/components/Makefile"; then
+    failures+=("components/Makefile missing legacy wincompat labeling")
+fi
+if rg -n 'Full Phase 6 acceptance' "${REPO_ROOT}/components/Makefile" \
+    | rg -v -i 'legacy|archive|NOT|not product' >/dev/null 2>&1; then
+    failures+=("components/Makefile still advertises Full Phase 6 acceptance as product")
+fi
+if ! rg -qi 'Legacy|archive|test-legacy-wincompat' \
+    "${REPO_ROOT}/components/README.md"; then
+    failures+=("components/README.md missing legacy wincompat labeling")
+fi
+
+# golden-apps live contract must default to wine
+if ! jq -e '[.apps[].backend_default] | all(. == "wine")' \
+    "${REPO_ROOT}/components/tests/wincompat/golden-apps.json" >/dev/null 2>&1; then
+    failures+=("golden-apps.json backend_default is not wine for all apps")
+fi
+
+# runtime must accept wine as ExecutionBackend
+if ! rg -n 'Wine' "${REPO_ROOT}/components/strawwu-runtime/src/session.rs" >/dev/null 2>&1; then
+    failures+=("ExecutionBackend missing Wine variant")
+fi
+if ! rg -n '"wine"' "${REPO_ROOT}/components/strawwu-launcher/src/loader.rs" >/dev/null 2>&1; then
+    failures+=("launcher LaunchRequest does not allow wine backend")
 fi
 
 for f in README.md docs/plans/portable-core/USER-GUIDE.md; do
@@ -157,6 +201,10 @@ doc = {
             "smoke-pe-real-exec wine marker product-tree fail removed",
             "Makefile native-era pe/gx/nt renamed to test-legacy-* (not general product targets)",
             "execution-backends architecture diagram wine/GE primary",
+            "nt6-openable moved to test-legacy-strawnt-nt6-openable (not product target)",
+            "components Phase 6 → test-legacy-wincompat; golden-apps backend_default=wine",
+            "nt3-real-launchers wine substrate product-tree write_fail removed",
+            "ExecutionBackend::Wine + launcher open/install product default wine",
         ],
     },
     "artifacts": {

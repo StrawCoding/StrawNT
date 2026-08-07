@@ -79,7 +79,7 @@ impl AppProfile {
             schema_version: "0.2".to_string(),
             app_id: app_id.into(),
             runtime_kind: RuntimeKind::Win32,
-            execution_backend: "native".to_string(),
+            execution_backend: "wine".to_string(),
             session_mode: SessionMode::Shared,
             permissions: Permissions {
                 network: true,
@@ -100,7 +100,7 @@ impl AppProfile {
     }
 
     pub fn resolved_backend(&self) -> ExecutionBackend {
-        ExecutionBackend::from_str(&self.execution_backend).unwrap_or(ExecutionBackend::Native)
+        ExecutionBackend::from_str(&self.execution_backend).unwrap_or(ExecutionBackend::Wine)
     }
 
     pub fn validate(&self) -> Result<(), String> {
@@ -130,8 +130,16 @@ mod tests {
     fn default_profile_valid() {
         let p = AppProfile::default_win32("test-app");
         assert!(p.validate().is_ok());
-        assert_eq!(p.resolved_backend(), ExecutionBackend::Native);
+        assert_eq!(p.resolved_backend(), ExecutionBackend::Wine);
         assert_eq!(p.session_mode, SessionMode::Shared);
+    }
+
+    #[test]
+    fn wine_backend_accepted() {
+        let mut p = AppProfile::default_win32("wine-app");
+        p.execution_backend = "wine".into();
+        assert!(p.validate().is_ok());
+        assert_eq!(p.resolved_backend(), ExecutionBackend::Wine);
     }
 
     #[test]
@@ -153,6 +161,7 @@ mod tests {
     #[test]
     fn isolated_on_native_rejected() {
         let mut p = AppProfile::default_win32("bad2");
+        p.execution_backend = "native".into();
         p.permissions.filesystem_scope = FilesystemScope::Isolated;
         assert!(p.validate().is_err());
     }

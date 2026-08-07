@@ -231,12 +231,8 @@ fn parse_source(raw: &str) -> Result<AppSource, String> {
 }
 
 fn parse_backend(raw: &str) -> Result<ExecutionBackend, String> {
-    match raw {
-        "native" => Ok(ExecutionBackend::Native),
-        "container" => Ok(ExecutionBackend::Container),
-        "microvm" => Ok(ExecutionBackend::Microvm),
-        other => Err(format!("invalid backend: {other}")),
-    }
+    ExecutionBackend::from_str(raw)
+        .ok_or_else(|| format!("invalid backend: {raw} (expected wine|native|container|microvm)"))
 }
 
 #[cfg(test)]

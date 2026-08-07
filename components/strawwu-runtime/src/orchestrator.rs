@@ -25,7 +25,9 @@ impl RuntimeOrchestrator {
         let mut session = SubsystemSession::new(&id, backend);
         session.activate();
 
-        if backend == ExecutionBackend::Native && self.default_session_id.is_none() {
+        if matches!(backend, ExecutionBackend::Wine | ExecutionBackend::Native)
+            && self.default_session_id.is_none()
+        {
             self.default_session_id = Some(id.clone());
         }
 
@@ -48,12 +50,12 @@ impl RuntimeOrchestrator {
 
         let backend = profile.resolved_backend();
         let session_id = match backend {
-            ExecutionBackend::Native => {
+            ExecutionBackend::Wine | ExecutionBackend::Native => {
                 if let Some(ref id) = self.default_session_id {
                     id.clone()
                 } else {
                     let id = "default".to_string();
-                    self.create_session(&id, ExecutionBackend::Native);
+                    self.create_session(&id, backend);
                     id
                 }
             }

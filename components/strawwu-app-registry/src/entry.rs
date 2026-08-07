@@ -32,9 +32,33 @@ pub enum InstallState {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum ExecutionBackend {
+    /// Product default since NTW0 (Proton-GE / powered by Wine).
+    Wine,
+    /// Legacy / research native PE path.
     Native,
     Container,
     Microvm,
+}
+
+impl ExecutionBackend {
+    pub fn from_str(s: &str) -> Option<Self> {
+        match s {
+            "wine" => Some(Self::Wine),
+            "native" => Some(Self::Native),
+            "container" => Some(Self::Container),
+            "microvm" => Some(Self::Microvm),
+            _ => None,
+        }
+    }
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Wine => "wine",
+            Self::Native => "native",
+            Self::Container => "container",
+            Self::Microvm => "microvm",
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -75,7 +99,7 @@ impl AppEntry {
             protected: false,
             install_path: None,
             desktop_entry: None,
-            execution_backend: Some(ExecutionBackend::Native),
+            execution_backend: Some(ExecutionBackend::Wine),
             created_at: Some(now.clone()),
             updated_at: Some(now),
         }

@@ -411,7 +411,7 @@ COMMANDS:
     register --id <id> --name <name> [--kind win32|linux|flatpak|native]
              [--source installer|launcher|flatpak|seed|manual]
              [--install-path <path>] [--desktop-entry <path>] [--protected]
-             [--backend native|container|microvm]
+             [--backend wine|native|container|microvm]
     remove <id> [--deep] [--dry-run] [--json]
                                       Mark app removed; --deep deletes allowlisted paths first
     deep-remove <id> [--dry-run] [--json]

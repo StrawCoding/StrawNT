@@ -11,6 +11,9 @@ pub enum SessionState {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ExecutionBackend {
+    /// Product default since NTW0 (Proton-GE / powered by Wine).
+    Wine,
+    /// Legacy / research native PE path (`STRAWNT_LEGACY_NATIVE=1`).
     Native,
     Container,
     Microvm,
@@ -19,6 +22,7 @@ pub enum ExecutionBackend {
 impl ExecutionBackend {
     pub fn from_str(s: &str) -> Option<Self> {
         match s {
+            "wine" => Some(Self::Wine),
             "native" => Some(Self::Native),
             "container" => Some(Self::Container),
             "microvm" => Some(Self::Microvm),
@@ -28,6 +32,7 @@ impl ExecutionBackend {
 
     pub fn as_str(&self) -> &'static str {
         match self {
+            Self::Wine => "wine",
             Self::Native => "native",
             Self::Container => "container",
             Self::Microvm => "microvm",
@@ -213,7 +218,12 @@ mod tests {
 
     #[test]
     fn backend_str_roundtrip() {
-        for b in [ExecutionBackend::Native, ExecutionBackend::Container, ExecutionBackend::Microvm] {
+        for b in [
+            ExecutionBackend::Wine,
+            ExecutionBackend::Native,
+            ExecutionBackend::Container,
+            ExecutionBackend::Microvm,
+        ] {
             assert_eq!(ExecutionBackend::from_str(b.as_str()), Some(b));
         }
     }

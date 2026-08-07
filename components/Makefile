@@ -1,13 +1,13 @@
 .PHONY: help build test package clean check fmt \
-	test-wincompat test-execution-backends test-graphics-vulkan test-graphics-opengl \
-	test-anticheat-matrix test-device-proxy generate-compat-matrix test-hub
+	test-legacy-wincompat test-wincompat test-execution-backends test-graphics-vulkan \
+	test-graphics-opengl test-anticheat-matrix test-device-proxy generate-compat-matrix test-hub
 
 VERSION ?= 0.3.0
 COMPONENTS_DIR := $(abspath .)
 HUB_DIR := $(abspath $(COMPONENTS_DIR)/../hub)
 
 help:
-	@echo "StrawWU components $(VERSION)"
+	@echo "StrawNT components $(VERSION)"
 	@echo ""
 	@echo "Targets:"
 	@echo "  build                    Build all workspace crates (release)"
@@ -16,16 +16,18 @@ help:
 	@echo "  check                    Cargo check (fast compile check)"
 	@echo "  fmt                      Format code"
 	@echo "  clean                    Remove build artifacts"
+	@echo "  test-hub                 Hub / Settings Center unit tests (W4-D3)"
 	@echo ""
-	@echo "Phase 6 — Windows compat tests:"
-	@echo "  test-wincompat           Full Phase 6 acceptance (all sub-stages)"
+	@echo "Legacy/archive — Phase 6 native-era wincompat (NTW0 soft-reset):"
+	@echo "  NOT product Wine-default acceptance; NOT full Windows claim."
+	@echo "  Product default is wine/proton-ge (powered by Wine)."
+	@echo "  test-legacy-wincompat    Legacy Phase 6 suite (alias: test-wincompat)"
 	@echo "  test-execution-backends  Execution backend + runtime cooperation tests"
 	@echo "  test-graphics-vulkan     Vulkan/DXGI graphics stack tests"
 	@echo "  test-graphics-opengl     OpenGL/WGL graphics stack tests"
 	@echo "  test-anticheat-matrix    Anti-cheat probe matrix tests"
 	@echo "  test-device-proxy        Device proxy + IOCTL tests"
 	@echo "  generate-compat-matrix   Generate compat-matrix.json"
-	@echo "  test-hub                 Hub / Settings Center unit tests (W4-D3)"
 
 build:
 	cargo build --release --workspace --manifest-path $(COMPONENTS_DIR)/Cargo.toml
@@ -58,46 +60,49 @@ test:
 	@echo ""
 	@echo "=== ALL TESTS PASSED ==="
 
-# Phase 6 — Windows compatibility test targets
+# LEGACY/ARCHIVE (NTW0) — Phase 6 native-era wincompat suite.
+# Not product Wine-default acceptance; not a full Windows claim.
+# Prefer: make -C components test-legacy-wincompat
 
-test-wincompat: test-execution-backends test-graphics-vulkan test-graphics-opengl test-anticheat-matrix test-device-proxy generate-compat-matrix
+test-legacy-wincompat: test-execution-backends test-graphics-vulkan test-graphics-opengl test-anticheat-matrix test-device-proxy generate-compat-matrix
 	@echo ""
-	@echo "=== Phase 6 — Windows compatibility test suite ==="
+	@echo "=== [LEGACY/ARCHIVE NTW0] Phase 6 native-era wincompat suite ==="
+	@echo "Product default: wine/proton-ge (powered by Wine). This target is historical."
 	@echo ""
 	@echo "--- 6.1 strawwu-nt (TEB/PEB/PE loader) ---"
 	cargo test --manifest-path $(COMPONENTS_DIR)/Cargo.toml -p strawwu-nt -- --nocapture
-	@echo "6.1 strawwu-nt: PASS (PARTIAL — stubs only)"
+	@echo "6.1 strawwu-nt: PASS (PARTIAL — stubs only; legacy)"
 	@echo ""
 	@echo "--- 6.3 Daily app stubs (USER32/GDI32/COM) ---"
 	cargo test --manifest-path $(COMPONENTS_DIR)/Cargo.toml -p strawwu-nt win32_stubs -- --nocapture
-	@echo "6.3 Daily app stubs: PASS (PARTIAL — stub registry)"
+	@echo "6.3 Daily app stubs: PASS (PARTIAL — stub registry; legacy)"
 	@echo ""
 	@echo "--- 6.5 Audio/Input (WASAPI/XInput) ---"
 	cargo test --manifest-path $(COMPONENTS_DIR)/Cargo.toml -p strawwu-audio -- --nocapture
-	@echo "6.5 Audio/Input: PASS (PARTIAL — bridge stubs)"
+	@echo "6.5 Audio/Input: PASS (PARTIAL — bridge stubs; legacy)"
 	@echo ""
 	@echo "--- 6.6 Game path (D3D11→VK) ---"
 	cargo test --manifest-path $(COMPONENTS_DIR)/Cargo.toml -p strawwu-graphics d3d11 -- --nocapture
-	@echo "6.6 Game path D3D11→VK: PASS (PARTIAL — translation stubs)"
+	@echo "6.6 Game path D3D11→VK: PASS (PARTIAL — translation stubs; legacy)"
 	@echo ""
 	@echo "--- 6.8 Installer (strawwu install + repair) ---"
 	cargo test --manifest-path $(COMPONENTS_DIR)/Cargo.toml -p strawwu-nt installer -- --nocapture
-	@echo "6.8 Installer: PASS (PARTIAL — app database + snapshot)"
+	@echo "6.8 Installer: PASS (PARTIAL — app database + snapshot; legacy)"
 	@echo ""
 	@echo "--- 6.9 WoW64 (32-bit PE path) ---"
 	cargo test --manifest-path $(COMPONENTS_DIR)/Cargo.toml -p strawwu-nt wow64 -- --nocapture
-	@echo "6.9 WoW64: PASS (PARTIAL — path redirect stubs)"
+	@echo "6.9 WoW64: PASS (PARTIAL — path redirect stubs; legacy)"
 	@echo ""
 	@echo "--- 6.10 compat-db + Hub integration ---"
 	@test -f $(COMPONENTS_DIR)/tests/wincompat/output/compat-matrix.json || (echo "FAIL: compat-matrix.json not generated" && exit 1)
-	@echo "6.10 compat-db: PASS (PARTIAL — compat-matrix.json produced)"
+	@echo "6.10 compat-db: PASS (PARTIAL — compat-matrix.json produced; legacy)"
 	@echo ""
 	@echo "--- 6.12 VFIO passthrough PoC ---"
 	@test -f $(COMPONENTS_DIR)/specs/vfio-passthrough-poc.md || (echo "FAIL: VFIO doc missing" && exit 1)
-	@echo "6.12 VFIO PoC: PASS (PARTIAL — experimental documentation only)"
+	@echo "6.12 VFIO PoC: PASS (PARTIAL — experimental documentation only; legacy)"
 	@echo ""
 	@echo "============================================"
-	@echo "Phase 6 sub-stage results:"
+	@echo "Phase 6 sub-stage results (LEGACY/ARCHIVE — not product Wine gate):"
 	@echo "  6.1  strawwu-nt (TEB/PEB/PE):     PARTIAL"
 	@echo "  6.2  Execution backends:           PARTIAL"
 	@echo "  6.3  Daily apps (USER32/GDI32):    PARTIAL"
@@ -113,7 +118,10 @@ test-wincompat: test-execution-backends test-graphics-vulkan test-graphics-openg
 	@echo "  6.12 VFIO PoC:                     PARTIAL"
 	@echo "============================================"
 	@echo ""
-	@echo "=== test-wincompat: PASS ==="
+	@echo "=== test-legacy-wincompat: PASS (legacy; not product Wine acceptance) ==="
+
+# Compat alias — prefer test-legacy-wincompat
+test-wincompat: test-legacy-wincompat
 
 test-execution-backends:
 	@echo "=== 6.2 Execution backends + runtime cooperation ==="
