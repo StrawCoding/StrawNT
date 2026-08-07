@@ -3,9 +3,9 @@
   "status": "PASS",
   "stage": "ntw7-packaging",
   "product": "StrawNT",
-  "version": "0.7.1.63",
-  "git_head": "b224b2344",
-  "timestamp_utc": "2026-08-07T19:56:09Z",
+  "version": "0.7.1.64",
+  "git_head": "89666c19b",
+  "timestamp_utc": "2026-08-07T19:58:09Z",
   "execution_backend": "wine",
   "engine": "proton-ge",
   "powered_by": "Wine",
@@ -17,8 +17,8 @@
     "flatpak": "PARTIAL"
   },
   "artefacts": {
-    "deb": "strawnt_0.7.1+d63-1_amd64.deb",
-    "rpm": "strawnt-0.7.1.63-1.fc41.x86_64.rpm",
+    "deb": "strawnt_0.7.1+d64-1_amd64.deb",
+    "rpm": "strawnt-0.7.1.64-1.fc41.x86_64.rpm",
     "sha256sums": "SHA256SUMS",
     "sha256sums_dist": "dist/SHA256SUMS",
     "sha256sums_tests": "tests/strawnt/output/SHA256SUMS",
@@ -50,10 +50,10 @@
     "build": {
       "status": "PASS",
       "detail": {
-        "deb": "/mnt/data/code/project/StrawCoding/StrawNT/dist/strawnt_0.7.1+d63-1_amd64.deb",
-        "rpm": "/mnt/data/code/project/StrawCoding/StrawNT/dist/strawnt-0.7.1.63-1.fc41.x86_64.rpm",
+        "deb": "/mnt/data/code/project/StrawCoding/StrawNT/dist/strawnt_0.7.1+d64-1_amd64.deb",
+        "rpm": "/mnt/data/code/project/StrawCoding/StrawNT/dist/strawnt-0.7.1.64-1.fc41.x86_64.rpm",
         "flatpak": "PARTIAL",
-        "version": "0.7.1.63"
+        "version": "0.7.1.64"
       }
     },
     "sha256_sign": {
@@ -64,10 +64,10 @@
         "gpg_key_hint": "apt@wastebase.xyz",
         "files": [
           "flatpak-status.json",
-          "strawnt-0.7.1.63-1.fc41.x86_64.rpm",
-          "strawnt_0.7.1+d63-1_amd64.deb"
+          "strawnt-0.7.1.64-1.fc41.x86_64.rpm",
+          "strawnt_0.7.1+d64-1_amd64.deb"
         ],
-        "sha256sums": "cd11bbe0ce370cb37b9a8ab4a139c6bf5a1fb04e666918ae2286d8a3a888a8c1  flatpak-status.json\nd2f32e96db8b31f36463a9177d8c31218827ad03ee22a717ae5574f41f661b86  strawnt-0.7.1.63-1.fc41.x86_64.rpm\n2d23bdf2fc7f3b4d195147b34ea0e88b3c5b0770040b39b700b96e0558ca1d9d  strawnt_0.7.1+d63-1_amd64.deb\n",
+        "sha256sums": "cd11bbe0ce370cb37b9a8ab4a139c6bf5a1fb04e666918ae2286d8a3a888a8c1  flatpak-status.json\n0dc206888cba9f069a0772534e32787b815041cf5eb4d777b310b3137ce5be11  strawnt-0.7.1.64-1.fc41.x86_64.rpm\nb15341023af467f3718e77867a96f0d69d0b43ddd66f9eeb9057e4f4e658411f  strawnt_0.7.1+d64-1_amd64.deb\n",
         "execution_backend": "wine",
         "engine": "proton-ge",
         "powered_by": "Wine"
@@ -78,7 +78,7 @@
       "detail": {
         "doctor_backend": "wine",
         "doctor_status": "PASS",
-        "version": "0.7.1.63",
+        "version": "0.7.1.64",
         "gui_local": "strawnt-hub --version OK",
         "desktop_mime": "present",
         "distro": "ubuntu-26.04"
@@ -115,10 +115,11 @@
       }
     }
   },
-  "sha256sums": "cd11bbe0ce370cb37b9a8ab4a139c6bf5a1fb04e666918ae2286d8a3a888a8c1  flatpak-status.json\nd2f32e96db8b31f36463a9177d8c31218827ad03ee22a717ae5574f41f661b86  strawnt-0.7.1.63-1.fc41.x86_64.rpm\n2d23bdf2fc7f3b4d195147b34ea0e88b3c5b0770040b39b700b96e0558ca1d9d  strawnt_0.7.1+d63-1_amd64.deb\n",
+  "sha256sums": "cd11bbe0ce370cb37b9a8ab4a139c6bf5a1fb04e666918ae2286d8a3a888a8c1  flatpak-status.json\n0dc206888cba9f069a0772534e32787b815041cf5eb4d777b310b3137ce5be11  strawnt-0.7.1.64-1.fc41.x86_64.rpm\nb15341023af467f3718e77867a96f0d69d0b43ddd66f9eeb9057e4f4e658411f  strawnt_0.7.1+d64-1_amd64.deb\n",
   "notes": [
     "deb/rpm omit multi-GB Proton-GE dist; PIN + fetch scripts shipped; smoke bind-mounts GE",
     "flatpak honest PARTIAL",
-    "not a full Windows / ranked anti-cheat claim"
+    "not a full Windows / ranked anti-cheat claim",
+    "git_head captured at smoke time; packaging artefacts rebuilt under VERSION"
   ]
 }
