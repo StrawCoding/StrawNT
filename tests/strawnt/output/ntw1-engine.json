@@ -3,9 +3,9 @@
   "stage": "ntw1-vendor-engine",
   "status": "PASS",
   "product": "StrawNT",
-  "version": "0.7.1.49",
-  "generated_at": "2026-08-07T17:06:54Z",
-  "git_head": "f57162fa8a4e5448bb1309f072279b78b832d948",
+  "version": "0.7.1.50",
+  "generated_at": "2026-08-07T17:11:50Z",
+  "git_head": "11ad81b45f9f961ac0a8376865f750eedde1bb1d",
   "backend": "wine",
   "execution_backend": "wine",
   "engine": "proton-ge",
@@ -33,7 +33,7 @@
     "hello_stdout": "tests/strawnt/output/ntw1-hello.txt"
   },
   "smoke": {
-    "hello_marker": "STRAWNT_HELLO_1786122421",
+    "hello_marker": "STRAWNT_HELLO_1786122717",
     "hello_status": "PASS",
     "cmd_status": "PASS",
     "engine_status_json_ok": true,
