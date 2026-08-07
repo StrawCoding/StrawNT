@@ -1,0 +1,17 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=StrawNT Installer Wizard
+GenericName=Installer Wizard
+Comment=Wraps strawnt install / App Manager install (powered by Wine)
+Exec=strawnt-hub --tab sys-installer
+Icon=strawnt
+Terminal=false
+Categories=System;Settings;
+Keywords=strawnt;wine;proton;installer_wizard;
+StartupNotify=true
+X-StrawNT-Role=installer_wizard
+X-StrawNT-Backend=wine
+X-StrawNT-Engine=proton-ge
+X-StrawNT-PoweredBy=Wine
+X-StrawNT-Launch=strawnt sysapps launch installer_wizard

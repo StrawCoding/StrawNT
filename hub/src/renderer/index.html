@@ -45,6 +45,34 @@
         <span class="nav-icon">▦</span>
         <span data-i18n="nav.apps">Applications</span>
       </button>
+      <button class="nav-btn" data-tab="sys-library">
+        <span class="nav-icon">▣</span>
+        <span data-i18n="nav.sys_library">App Library</span>
+      </button>
+      <button class="nav-btn" data-tab="sys-installer">
+        <span class="nav-icon">⇩</span>
+        <span data-i18n="nav.sys_installer">Installer</span>
+      </button>
+      <button class="nav-btn" data-tab="sys-settings">
+        <span class="nav-icon">☰</span>
+        <span data-i18n="nav.sys_settings">Settings</span>
+      </button>
+      <button class="nav-btn" data-tab="sys-run">
+        <span class="nav-icon">▶</span>
+        <span data-i18n="nav.sys_run">Run</span>
+      </button>
+      <button class="nav-btn" data-tab="sys-compat">
+        <span class="nav-icon">◫</span>
+        <span data-i18n="nav.sys_compat">Compat Center</span>
+      </button>
+      <button class="nav-btn" data-tab="sys-taskmgr">
+        <span class="nav-icon">☰</span>
+        <span data-i18n="nav.sys_taskmgr">Task Manager</span>
+      </button>
+      <button class="nav-btn" data-tab="sys-files">
+        <span class="nav-icon">📁</span>
+        <span data-i18n="nav.sys_files">Files</span>
+      </button>
       <button class="nav-btn" data-tab="flathub">
         <span class="nav-icon">⬡</span>
         <span data-i18n="nav.flathub">Flathub</span>
@@ -186,6 +214,53 @@
         <div id="apps-meta" class="apps-meta muted-text"></div>
         <div id="apps-list" class="apps-list"></div>
         <div id="apps-status" class="channel-status"></div>
+      </section>
+
+      <!-- NTW6 dedicated system apps (thin Electron Hub panels) -->
+      <section id="tab-sys-library" class="tab-panel">
+        <h2 data-i18n="sysapps.library.title">App Library</h2>
+        <p class="muted-text" data-i18n="sysapps.library.description">Front of App Manager — browse installed and catalog apps (execution_backend=wine · powered by Wine).</p>
+        <p class="muted-text">backend=wine · engine=proton-ge · powered by Wine</p>
+        <div class="actions-bar">
+          <button id="btn-sys-library-refresh" class="btn btn-secondary" data-i18n="sysapps.refresh">Refresh</button>
+        </div>
+        <div id="sys-library-body" class="info-card">Open via <code>strawnt sysapps launch app_library</code></div>
+      </section>
+
+      <section id="tab-sys-installer" class="tab-panel">
+        <h2 data-i18n="sysapps.installer.title">Installer Wizard</h2>
+        <p class="muted-text" data-i18n="sysapps.installer.description">Wraps strawnt install / App Manager install for Windows apps (powered by Wine).</p>
+        <div id="sys-installer-body" class="info-card">Open via <code>strawnt sysapps launch installer_wizard</code></div>
+      </section>
+
+      <section id="tab-sys-settings" class="tab-panel">
+        <h2 data-i18n="sysapps.settings.title">Settings</h2>
+        <p class="muted-text" data-i18n="sysapps.settings.description">Engine pin, MIME, and permission defaults (powered by Wine).</p>
+        <div id="sys-settings-body" class="info-card">Open via <code>strawnt sysapps launch settings</code></div>
+      </section>
+
+      <section id="tab-sys-run" class="tab-panel">
+        <h2 data-i18n="sysapps.run.title">Run</h2>
+        <p class="muted-text" data-i18n="sysapps.run.description">Win+R equivalent — run a command in a Wine prefix (powered by Wine).</p>
+        <div id="sys-run-body" class="info-card">Open via <code>strawnt sysapps launch run_dialog</code></div>
+      </section>
+
+      <section id="tab-sys-compat" class="tab-panel">
+        <h2 data-i18n="sysapps.compat.title">Compat Center</h2>
+        <p class="muted-text" data-i18n="sysapps.compat.description">Strict PASS/PARTIAL/FAIL/UNKNOWN matrix (powered by Wine · never claim full Windows).</p>
+        <div id="sys-compat-body" class="info-card">Open via <code>strawnt sysapps launch compat_center</code></div>
+      </section>
+
+      <section id="tab-sys-taskmgr" class="tab-panel">
+        <h2 data-i18n="sysapps.taskmgr.title">Task Manager</h2>
+        <p class="muted-text" data-i18n="sysapps.taskmgr.description">Host + Wine process list (powered by Wine).</p>
+        <div id="sys-taskmgr-body" class="info-card">Open via <code>strawnt sysapps launch task_manager</code></div>
+      </section>
+
+      <section id="tab-sys-files" class="tab-panel">
+        <h2 data-i18n="sysapps.files.title">File Manager</h2>
+        <p class="muted-text" data-i18n="sysapps.files.description">Browse prefix drive_c / Z: — not a full Explorer clone (powered by Wine).</p>
+        <div id="sys-files-body" class="info-card">Open via <code>strawnt sysapps launch file_manager</code></div>
       </section>
 
       <!-- Flathub Panel -->

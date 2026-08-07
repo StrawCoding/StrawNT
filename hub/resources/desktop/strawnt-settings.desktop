@@ -1,0 +1,17 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=StrawNT Settings
+GenericName=Settings
+Comment=Engine pin, MIME, and permission defaults (powered by Wine)
+Exec=strawnt-hub --tab sys-settings
+Icon=strawnt
+Terminal=false
+Categories=System;Settings;
+Keywords=strawnt;wine;proton;settings;
+StartupNotify=true
+X-StrawNT-Role=settings
+X-StrawNT-Backend=wine
+X-StrawNT-Engine=proton-ge
+X-StrawNT-PoweredBy=Wine
+X-StrawNT-Launch=strawnt sysapps launch settings

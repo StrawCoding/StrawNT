@@ -1,0 +1,17 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=StrawNT App Library
+GenericName=App Library
+Comment=Front of App Manager — browse installed and catalog apps (powered by Wine)
+Exec=strawnt-hub --tab sys-library
+Icon=strawnt
+Terminal=false
+Categories=System;Settings;
+Keywords=strawnt;wine;proton;app_library;
+StartupNotify=true
+X-StrawNT-Role=app_library
+X-StrawNT-Backend=wine
+X-StrawNT-Engine=proton-ge
+X-StrawNT-PoweredBy=Wine
+X-StrawNT-Launch=strawnt sysapps launch app_library

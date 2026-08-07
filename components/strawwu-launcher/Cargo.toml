@@ -25,6 +25,7 @@ strawwu-nt = { path = "../strawwu-nt" }
 strawnt-engine = { path = "../strawnt-engine" }
 strawnt-interop = { path = "../strawnt-interop" }
 strawnt-appmgr = { path = "../strawnt-appmgr" }
+strawnt-sysapps = { path = "../strawnt-sysapps" }
 
 [target.'cfg(unix)'.dependencies]
 libc = "0.2"

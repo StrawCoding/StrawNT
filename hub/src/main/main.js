@@ -15,7 +15,7 @@ let mainWindow = null;
 let runtimeClient = null;
 let currentChannel = 'stable';
 
-function createWindow() {
+function createWindow(initialTab) {
   nativeTheme.themeSource = 'dark';
 
   mainWindow = new BrowserWindow({
@@ -24,7 +24,7 @@ function createWindow() {
     minWidth: 720,
     minHeight: 520,
     backgroundColor: '#0A0E14',
-    title: 'StrawWU Hub',
+    title: 'StrawNT Hub',
     icon: path.join(__dirname, '..', '..', 'assets', 'icon.png'),
     autoHideMenuBar: true,
     webPreferences: {
@@ -37,7 +37,12 @@ function createWindow() {
     },
   });
 
-  mainWindow.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'));
+  const htmlPath = path.join(__dirname, '..', 'renderer', 'index.html');
+  if (initialTab) {
+    mainWindow.loadFile(htmlPath, { query: { tab: initialTab } });
+  } else {
+    mainWindow.loadFile(htmlPath);
+  }
 
   // Navigation guards: this is a single local-file UI. Block any in-page
   // navigation away from the bundled renderer and route new-window requests to
@@ -197,15 +202,29 @@ function setupIpcHandlers() {
   );
 }
 
+function parseInitialTab(argv) {
+  // strawnt-hub --tab sys-settings  (NTW6 dedicated system apps)
+  for (let i = 0; i < argv.length; i += 1) {
+    if (argv[i] === '--tab' && argv[i + 1]) {
+      return String(argv[i + 1]);
+    }
+    if (argv[i].startsWith('--tab=')) {
+      return argv[i].slice('--tab='.length);
+    }
+  }
+  return null;
+}
+
 app.whenReady().then(() => {
   i18n.init();
   setupRuntimeClient();
   setupIpcHandlers();
-  createWindow();
+  const initialTab = parseInitialTab(process.argv);
+  createWindow(initialTab);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
+      createWindow(initialTab);
     }
   });
 });

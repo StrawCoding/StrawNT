@@ -427,7 +427,7 @@ pub fn launch_app(app_id: &str, home: Option<&Path>) -> Result<Value, AppMgrErro
             "command": "apps launch",
             "app_id": app_id,
             "dedicated_role": app.dedicated_role,
-            "message": "Dedicated system app UI ships in NTW6; registered via App Manager",
+            "message": "Dedicated system app — use strawnt sysapps launch <role> (NTW6)",
             "execution_backend": "wine",
             "powered_by": "Wine",
             "powered_by_wine": true,

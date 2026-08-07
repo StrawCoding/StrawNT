@@ -1,0 +1,17 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=StrawNT Run
+GenericName=Run
+Comment=Win+R equivalent — run a command in a Wine prefix (powered by Wine)
+Exec=strawnt-hub --tab sys-run
+Icon=strawnt
+Terminal=false
+Categories=System;Settings;
+Keywords=strawnt;wine;proton;run_dialog;
+StartupNotify=true
+X-StrawNT-Role=run_dialog
+X-StrawNT-Backend=wine
+X-StrawNT-Engine=proton-ge
+X-StrawNT-PoweredBy=Wine
+X-StrawNT-Launch=strawnt sysapps launch run_dialog

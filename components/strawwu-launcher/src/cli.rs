@@ -55,9 +55,24 @@ pub enum Command {
     },
     /// NTW4: Win32 IPC interop (same/cross prefix).
     Interop(InteropSubcommand),
+    /// NTW6: dedicated system apps suite.
+    Sysapps(SysappsSubcommand),
     Config(ConfigSubcommand),
     Version,
     Help,
+}
+
+#[derive(Debug, Clone)]
+pub enum SysappsSubcommand {
+    List { json: bool, home: Option<PathBuf> },
+    Launch {
+        role: String,
+        arg: Option<String>,
+        json: bool,
+        home: Option<PathBuf>,
+    },
+    Manifest { role: String, json: bool },
+    Smoke { json: bool, home: Option<PathBuf> },
 }
 
 #[derive(Debug, Clone)]
@@ -239,10 +254,61 @@ pub fn parse_args(args: &[String]) -> Result<Command, String> {
         "matrix" => parse_matrix(&args[1..]),
         "bench" => parse_bench(&args[1..]),
         "interop" => parse_interop(&args[1..]),
+        "sysapps" => parse_sysapps(&args[1..]),
         "config" => parse_config(&args[1..]),
         "--version" | "version" => Ok(Command::Version),
         "--help" | "help" => Ok(Command::Help),
         _ => Err(format!("unknown command: {}", args[0])),
+    }
+}
+
+fn parse_sysapps(args: &[String]) -> Result<Command, String> {
+    if args.is_empty() {
+        return Ok(Command::Sysapps(SysappsSubcommand::List {
+            json: false,
+            home: None,
+        }));
+    }
+    match args[0].as_str() {
+        "list" => {
+            let (json, home, rest) = parse_home_json(&args[1..])?;
+            if !rest.is_empty() {
+                return Err(format!("unexpected sysapps list args: {}", rest.join(" ")));
+            }
+            Ok(Command::Sysapps(SysappsSubcommand::List { json, home }))
+        }
+        "launch" | "open" => {
+            let (json, home, rest) = parse_home_json(&args[1..])?;
+            let role = rest
+                .first()
+                .cloned()
+                .ok_or_else(|| "sysapps launch requires <role>".to_string())?;
+            let arg = rest.get(1).cloned();
+            Ok(Command::Sysapps(SysappsSubcommand::Launch {
+                role,
+                arg,
+                json,
+                home,
+            }))
+        }
+        "manifest" => {
+            let (json, _home, rest) = parse_home_json(&args[1..])?;
+            let role = rest
+                .first()
+                .cloned()
+                .ok_or_else(|| "sysapps manifest requires <role>".to_string())?;
+            Ok(Command::Sysapps(SysappsSubcommand::Manifest { role, json }))
+        }
+        "smoke" => {
+            let (json, home, rest) = parse_home_json(&args[1..])?;
+            if !rest.is_empty() {
+                return Err(format!("unexpected sysapps smoke args: {}", rest.join(" ")));
+            }
+            Ok(Command::Sysapps(SysappsSubcommand::Smoke { json, home }))
+        }
+        other => Err(format!(
+            "unknown sysapps subcommand: {other} (list|launch|manifest|smoke)"
+        )),
     }
 }
 

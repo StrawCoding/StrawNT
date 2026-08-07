@@ -338,6 +338,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "strawnt-sysapps"
+version = "0.7.1-preview.59"
+dependencies = [
+ "serde",
+ "serde_json",
+ "strawnt-appmgr",
+ "strawnt-engine",
+ "tempfile",
+ "thiserror",
+]
+
+[[package]]
 name = "strawwu-anticheat"
 version = "0.7.1-preview.59"
 dependencies = [
@@ -416,6 +428,7 @@ dependencies = [
  "strawnt-appmgr",
  "strawnt-engine",
  "strawnt-interop",
+ "strawnt-sysapps",
  "strawwu-app-registry",
  "strawwu-bridge",
  "strawwu-cli",

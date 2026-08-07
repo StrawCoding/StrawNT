@@ -3,6 +3,7 @@ use std::process;
 
 use strawwu_launcher::cli::{
     self, AppsSubcommand, Command, EngineSubcommand, InteropSubcommand, MatrixSubcommand, OpenMode,
+    SysappsSubcommand,
     PrefixSubcommand, RecipesSubcommand,
 };
 use strawwu_launcher::desktop;
@@ -356,16 +357,32 @@ fn main() {
                     }
                 }
                 AppsSubcommand::Launch { id, json, home } => {
-                    match strawnt_appmgr::launch_app(&id, home.as_deref()) {
-                        Ok(v) => {
-                            emit_json_or_human(json, &v);
-                            if v.get("status").and_then(|s| s.as_str()) == Some("FAIL") {
+                    // NTW6: dedicated system apps launch via strawnt-sysapps.
+                    if let Some(role) = strawnt_sysapps::DedicatedRole::from_app_id(&id) {
+                        match strawnt_sysapps::launch_role(role, home.as_deref(), None) {
+                            Ok(v) => {
+                                emit_json_or_human(json, &v);
+                                if v.get("status").and_then(|s| s.as_str()) == Some("FAIL") {
+                                    process::exit(1);
+                                }
+                            }
+                            Err(e) => {
+                                eprintln!("strawnt apps launch (sysapp) failed: {e}");
                                 process::exit(1);
                             }
                         }
-                        Err(e) => {
-                            eprintln!("strawnt apps launch failed: {e}");
-                            process::exit(1);
+                    } else {
+                        match strawnt_appmgr::launch_app(&id, home.as_deref()) {
+                            Ok(v) => {
+                                emit_json_or_human(json, &v);
+                                if v.get("status").and_then(|s| s.as_str()) == Some("FAIL") {
+                                    process::exit(1);
+                                }
+                            }
+                            Err(e) => {
+                                eprintln!("strawnt apps launch failed: {e}");
+                                process::exit(1);
+                            }
                         }
                     }
                 }
@@ -907,6 +924,73 @@ fn main() {
                 emit_json_or_human(json, &v);
             }
         },
+        Command::Sysapps(sub) => match sub {
+            SysappsSubcommand::List { json, home } => {
+                match strawnt_sysapps::list_apps(home.as_deref()) {
+                    Ok(v) => emit_json_or_human(json, &v),
+                    Err(e) => {
+                        eprintln!("strawnt sysapps list failed: {e}");
+                        process::exit(1);
+                    }
+                }
+            }
+            SysappsSubcommand::Launch {
+                role,
+                arg,
+                json,
+                home,
+            } => {
+                let role = match role.parse::<strawnt_sysapps::DedicatedRole>() {
+                    Ok(r) => r,
+                    Err(e) => {
+                        eprintln!("strawnt sysapps launch: {e}");
+                        process::exit(1);
+                    }
+                };
+                match strawnt_sysapps::launch_role(role, home.as_deref(), arg.as_deref()) {
+                    Ok(v) => {
+                        emit_json_or_human(json, &v);
+                        if v.get("status").and_then(|s| s.as_str()) == Some("FAIL") {
+                            process::exit(1);
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("strawnt sysapps launch failed: {e}");
+                        process::exit(1);
+                    }
+                }
+            }
+            SysappsSubcommand::Manifest { role, json } => {
+                let role = match role.parse::<strawnt_sysapps::DedicatedRole>() {
+                    Ok(r) => r,
+                    Err(e) => {
+                        eprintln!("strawnt sysapps manifest: {e}");
+                        process::exit(1);
+                    }
+                };
+                match strawnt_sysapps::load_manifest(role) {
+                    Ok(v) => emit_json_or_human(json, &v),
+                    Err(e) => {
+                        eprintln!("strawnt sysapps manifest failed: {e}");
+                        process::exit(1);
+                    }
+                }
+            }
+            SysappsSubcommand::Smoke { json, home } => {
+                match strawnt_sysapps::run_sysapps_smoke(home.as_deref()) {
+                    Ok(v) => {
+                        emit_json_or_human(json, &v);
+                        if v.get("status").and_then(|s| s.as_str()) != Some("PASS") {
+                            process::exit(1);
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("strawnt sysapps smoke failed: {e}");
+                        process::exit(1);
+                    }
+                }
+            }
+        },
         Command::Config(_) => {
             println!("strawnt: config (stub)");
         }
@@ -1243,6 +1327,8 @@ COMMANDS:
         Enable double-click for .exe/.msi (MIME + desktop handler)
     apps status|list|show|install|uninstall|launch|prefix|recipes|channel|permissions|compat|catalog|sysapps|smoke [--json] [--home DIR]
         NTW5 system App Manager (install/list/launch/prefix/deps/channel/perms/catalog)
+    sysapps list|launch|manifest|smoke [--json] [--home DIR]
+        NTW6 dedicated system apps (settings/run/installer/library/compat/taskmgr/files)
     devices list [--json]
     mfp smoke [--json]
     profile inspect|export <app-id>

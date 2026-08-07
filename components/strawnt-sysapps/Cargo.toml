@@ -1,0 +1,16 @@
+[package]
+name = "strawnt-sysapps"
+version.workspace = true
+edition.workspace = true
+description = "StrawNT dedicated system apps suite (NTW6): settings/run/installer/library/compat/taskmgr/files"
+license.workspace = true
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+strawnt-engine = { path = "../strawnt-engine" }
+strawnt-appmgr = { path = "../strawnt-appmgr" }
+
+[dev-dependencies]
+tempfile = "3"

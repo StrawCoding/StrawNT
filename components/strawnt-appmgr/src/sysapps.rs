@@ -45,10 +45,11 @@ pub fn ensure_sysapps_registered(home: Option<&Path>) -> Result<Value, AppMgrErr
         m.compat_status = "PARTIAL".into();
         m.engine_pin = pin.clone();
         m.notes = Some(format!(
-            "Dedicated system app '{role}' — UI smoke in NTW6; App Manager owns lifecycle"
+            "Dedicated system app '{role}' — NTW6 thin UI slice; App Manager owns lifecycle"
         ));
         m.scopes.insert("registered".into(), "PASS".into());
-        m.scopes.insert("ui".into(), "UNKNOWN".into());
+        m.scopes.insert("ui".into(), "PARTIAL".into());
+        m.scopes.insert("launch".into(), "PASS".into());
         db.upsert(m);
         registered.push(json!({"id": id, "role": role, "action": "registered"}));
     }

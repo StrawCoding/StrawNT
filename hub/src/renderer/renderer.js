@@ -132,14 +132,36 @@ if ($languageSearch) {
 }
 
 // --- Tab Navigation ---
+function activateTab(tabId) {
+  if (!tabId) return;
+  const btn = document.querySelector(`.nav-btn[data-tab="${tabId}"]`);
+  const panel = document.getElementById(`tab-${tabId}`);
+  if (!btn || !panel) return;
+  document.querySelectorAll('.nav-btn').forEach((b) => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('active'));
+  btn.classList.add('active');
+  panel.classList.add('active');
+}
+
 document.querySelectorAll('.nav-btn').forEach((btn) => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.nav-btn').forEach((b) => b.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+    activateTab(btn.dataset.tab);
   });
 });
+
+// Desktop / CLI: strawnt-hub --tab sys-settings (NTW6 sysapps)
+(function applyInitialTab() {
+  const params = new URLSearchParams(window.location.search);
+  const fromQuery = params.get('tab');
+  if (fromQuery) {
+    activateTab(fromQuery);
+    return;
+  }
+  // main process may set hash #tab=sys-settings
+  const hash = window.location.hash || '';
+  const m = hash.match(/tab=([a-z0-9-]+)/i);
+  if (m) activateTab(m[1]);
+})();
 
 // --- Status ---
 function formatUptime(seconds) {

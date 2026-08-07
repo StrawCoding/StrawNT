@@ -1,0 +1,1718 @@
+{
+  "apps": [
+    {
+      "desktop": "hub/resources/desktop/strawnt-settings.desktop",
+      "hub_tab": "sys-settings",
+      "id": "sys-settings",
+      "launch_status": "PASS",
+      "manifest": "components/strawnt-sysapps/manifests/settings.json",
+      "manifest_ok": true,
+      "name": "Settings",
+      "role": "settings",
+      "side_effect": "/tmp/strawnt-ntw6.L86rtL/home/sysapps/settings/last-run.json",
+      "status": "PASS"
+    },
+    {
+      "desktop": "hub/resources/desktop/strawnt-run-dialog.desktop",
+      "hub_tab": "sys-run",
+      "id": "sys-run-dialog",
+      "launch_status": "PASS",
+      "manifest": "components/strawnt-sysapps/manifests/run_dialog.json",
+      "manifest_ok": true,
+      "name": "Run Dialog",
+      "role": "run_dialog",
+      "side_effect": "/tmp/strawnt-ntw6.L86rtL/home/sysapps/run_dialog/last-run.json",
+      "status": "PASS"
+    },
+    {
+      "desktop": "hub/resources/desktop/strawnt-installer-wizard.desktop",
+      "hub_tab": "sys-installer",
+      "id": "sys-installer-wizard",
+      "launch_status": "PASS",
+      "manifest": "components/strawnt-sysapps/manifests/installer_wizard.json",
+      "manifest_ok": true,
+      "name": "Installer Wizard",
+      "role": "installer_wizard",
+      "side_effect": "/tmp/strawnt-ntw6.L86rtL/home/sysapps/installer_wizard/last-run.json",
+      "status": "PASS"
+    },
+    {
+      "desktop": "hub/resources/desktop/strawnt-app-library.desktop",
+      "hub_tab": "sys-library",
+      "id": "sys-app-library",
+      "launch_status": "PASS",
+      "manifest": "components/strawnt-sysapps/manifests/app_library.json",
+      "manifest_ok": true,
+      "name": "App Library",
+      "role": "app_library",
+      "side_effect": "/tmp/strawnt-ntw6.L86rtL/home/sysapps/app_library/last-run.json",
+      "status": "PASS"
+    },
+    {
+      "desktop": "hub/resources/desktop/strawnt-compat-center.desktop",
+      "hub_tab": "sys-compat",
+      "id": "sys-compat-center",
+      "launch_status": "PASS",
+      "manifest": "components/strawnt-sysapps/manifests/compat_center.json",
+      "manifest_ok": true,
+      "name": "Compat Center",
+      "role": "compat_center",
+      "side_effect": "/tmp/strawnt-ntw6.L86rtL/home/sysapps/compat_center/last-run.json",
+      "status": "PASS"
+    },
+    {
+      "desktop": "hub/resources/desktop/strawnt-task-manager.desktop",
+      "hub_tab": "sys-taskmgr",
+      "id": "sys-task-manager",
+      "launch_status": "PASS",
+      "manifest": "components/strawnt-sysapps/manifests/task_manager.json",
+      "manifest_ok": true,
+      "name": "Task Manager",
+      "role": "task_manager",
+      "side_effect": "/tmp/strawnt-ntw6.L86rtL/home/sysapps/task_manager/last-run.json",
+      "status": "PASS"
+    },
+    {
+      "desktop": "hub/resources/desktop/strawnt-file-manager.desktop",
+      "hub_tab": "sys-files",
+      "id": "sys-file-manager",
+      "launch_status": "PASS",
+      "manifest": "components/strawnt-sysapps/manifests/file_manager.json",
+      "manifest_ok": true,
+      "name": "File Manager",
+      "role": "file_manager",
+      "side_effect": "/tmp/strawnt-ntw6.L86rtL/home/sysapps/file_manager/last-run.json",
+      "status": "PASS"
+    }
+  ],
+  "backend": "wine",
+  "claims": {
+    "app_count": 7,
+    "dedicated_system_apps": true,
+    "full_windows_claimed": false,
+    "hub_electron": true,
+    "powered_by_wine": true,
+    "ranked_anticheat_claimed": false,
+    "simulated": false
+  },
+  "engine": "proton-ge",
+  "engine_pin": "GE-Proton11-3",
+  "execution_backend": "wine",
+  "failures": [],
+  "hub": "electron",
+  "list": {
+    "apps": [
+      {
+        "dedicated_role": "settings",
+        "desktop": "hub/resources/desktop/strawnt-settings.desktop",
+        "desktop_present": true,
+        "engine": "proton-ge",
+        "engine_pin": "GE-Proton11-3",
+        "execution_backend": "wine",
+        "hub": "electron",
+        "hub_tab": "sys-settings",
+        "id": "sys-settings",
+        "kind": "system",
+        "launch_entry": "strawnt sysapps launch settings",
+        "manifest": "components/strawnt-sysapps/manifests/settings.json",
+        "manifest_present": true,
+        "name": "Settings",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "role": "settings",
+        "system_app": true
+      },
+      {
+        "dedicated_role": "run_dialog",
+        "desktop": "hub/resources/desktop/strawnt-run-dialog.desktop",
+        "desktop_present": true,
+        "engine": "proton-ge",
+        "engine_pin": "GE-Proton11-3",
+        "execution_backend": "wine",
+        "hub": "electron",
+        "hub_tab": "sys-run",
+        "id": "sys-run-dialog",
+        "kind": "system",
+        "launch_entry": "strawnt sysapps launch run_dialog",
+        "manifest": "components/strawnt-sysapps/manifests/run_dialog.json",
+        "manifest_present": true,
+        "name": "Run Dialog",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "role": "run_dialog",
+        "system_app": true
+      },
+      {
+        "dedicated_role": "installer_wizard",
+        "desktop": "hub/resources/desktop/strawnt-installer-wizard.desktop",
+        "desktop_present": true,
+        "engine": "proton-ge",
+        "engine_pin": "GE-Proton11-3",
+        "execution_backend": "wine",
+        "hub": "electron",
+        "hub_tab": "sys-installer",
+        "id": "sys-installer-wizard",
+        "kind": "system",
+        "launch_entry": "strawnt sysapps launch installer_wizard",
+        "manifest": "components/strawnt-sysapps/manifests/installer_wizard.json",
+        "manifest_present": true,
+        "name": "Installer Wizard",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "role": "installer_wizard",
+        "system_app": true
+      },
+      {
+        "dedicated_role": "app_library",
+        "desktop": "hub/resources/desktop/strawnt-app-library.desktop",
+        "desktop_present": true,
+        "engine": "proton-ge",
+        "engine_pin": "GE-Proton11-3",
+        "execution_backend": "wine",
+        "hub": "electron",
+        "hub_tab": "sys-library",
+        "id": "sys-app-library",
+        "kind": "system",
+        "launch_entry": "strawnt sysapps launch app_library",
+        "manifest": "components/strawnt-sysapps/manifests/app_library.json",
+        "manifest_present": true,
+        "name": "App Library",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "role": "app_library",
+        "system_app": true
+      },
+      {
+        "dedicated_role": "compat_center",
+        "desktop": "hub/resources/desktop/strawnt-compat-center.desktop",
+        "desktop_present": true,
+        "engine": "proton-ge",
+        "engine_pin": "GE-Proton11-3",
+        "execution_backend": "wine",
+        "hub": "electron",
+        "hub_tab": "sys-compat",
+        "id": "sys-compat-center",
+        "kind": "system",
+        "launch_entry": "strawnt sysapps launch compat_center",
+        "manifest": "components/strawnt-sysapps/manifests/compat_center.json",
+        "manifest_present": true,
+        "name": "Compat Center",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "role": "compat_center",
+        "system_app": true
+      },
+      {
+        "dedicated_role": "task_manager",
+        "desktop": "hub/resources/desktop/strawnt-task-manager.desktop",
+        "desktop_present": true,
+        "engine": "proton-ge",
+        "engine_pin": "GE-Proton11-3",
+        "execution_backend": "wine",
+        "hub": "electron",
+        "hub_tab": "sys-taskmgr",
+        "id": "sys-task-manager",
+        "kind": "system",
+        "launch_entry": "strawnt sysapps launch task_manager",
+        "manifest": "components/strawnt-sysapps/manifests/task_manager.json",
+        "manifest_present": true,
+        "name": "Task Manager",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "role": "task_manager",
+        "system_app": true
+      },
+      {
+        "dedicated_role": "file_manager",
+        "desktop": "hub/resources/desktop/strawnt-file-manager.desktop",
+        "desktop_present": true,
+        "engine": "proton-ge",
+        "engine_pin": "GE-Proton11-3",
+        "execution_backend": "wine",
+        "hub": "electron",
+        "hub_tab": "sys-files",
+        "id": "sys-file-manager",
+        "kind": "system",
+        "launch_entry": "strawnt sysapps launch file_manager",
+        "manifest": "components/strawnt-sysapps/manifests/file_manager.json",
+        "manifest_present": true,
+        "name": "File Manager",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "role": "file_manager",
+        "system_app": true
+      }
+    ],
+    "command": "sysapps list",
+    "count": 7,
+    "engine": "proton-ge",
+    "engine_pin": "GE-Proton11-3",
+    "execution_backend": "wine",
+    "hub": "electron",
+    "notes": [
+      "NTW6 dedicated system apps \u2014 thin vertical slices",
+      "powered by Wine \u2014 not a full Windows / ranked anti-cheat claim"
+    ],
+    "powered_by": "Wine",
+    "powered_by_wine": true,
+    "product": "StrawNT",
+    "schema": "strawnt-sysapps-list/v1",
+    "status": "PASS"
+  },
+  "notes": [
+    "NTW6 dedicated system apps smoke",
+    "powered by Wine \u2014 not a full Windows / ranked anti-cheat claim",
+    "Hub = Electron; thin vertical slices only"
+  ],
+  "powered_by": "Wine",
+  "powered_by_wine": true,
+  "product": "StrawNT",
+  "results": [
+    {
+      "launch": {
+        "app_id": "sys-settings",
+        "command": "sysapps launch",
+        "detail": {
+          "engine_pin": "GE-Proton11-3",
+          "engine_present": true,
+          "execution_backend": "wine",
+          "home": "/tmp/strawnt-ntw6.L86rtL/home",
+          "mime_entry_present": true,
+          "permission_defaults": {
+            "interop.cross_prefix": "default_deny",
+            "interop.same_prefix": "allow",
+            "note": "Permissions defaults owned by App Manager; settings surfaces them"
+          },
+          "powered_by": "Wine",
+          "status": "PASS",
+          "surface": "settings",
+          "wine_bin": "/mnt/data/code/project/StrawCoding/StrawNT/third_party/proton-ge/dist/files/bin/wine"
+        },
+        "engine": "proton-ge",
+        "execution_backend": "wine",
+        "home": "/tmp/strawnt-ntw6.L86rtL/home",
+        "honesty": {
+          "full_windows_claimed": false,
+          "powered_by_wine": true,
+          "ranked_anticheat_claimed": false,
+          "simulated": false
+        },
+        "hub": "electron",
+        "hub_tab": "sys-settings",
+        "name": "Settings",
+        "notes": [
+          "Thin vertical slice \u2014 not a Windows Explorer / TaskMgr clone",
+          "Hub Electron panel provides GUI; CLI launch proves side effects"
+        ],
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "role": "settings",
+        "scopes": {
+          "launch": "PASS",
+          "manifest": "PASS",
+          "ui": "PARTIAL"
+        },
+        "side_effect": "/tmp/strawnt-ntw6.L86rtL/home/sysapps/settings/last-run.json",
+        "side_effect_exists": true,
+        "status": "PASS"
+      },
+      "list_row": {
+        "dedicated_role": "settings",
+        "desktop": "hub/resources/desktop/strawnt-settings.desktop",
+        "desktop_present": true,
+        "engine": "proton-ge",
+        "engine_pin": "GE-Proton11-3",
+        "execution_backend": "wine",
+        "hub": "electron",
+        "hub_tab": "sys-settings",
+        "id": "sys-settings",
+        "kind": "system",
+        "launch_entry": "strawnt sysapps launch settings",
+        "manifest": "components/strawnt-sysapps/manifests/settings.json",
+        "manifest_present": true,
+        "name": "Settings",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "role": "settings",
+        "system_app": true
+      },
+      "manifest": {
+        "compat_status": "PARTIAL",
+        "dedicated_role": "settings",
+        "engine": "proton-ge",
+        "execution_backend": "wine",
+        "honesty": {
+          "full_windows_claimed": false,
+          "ranked_anticheat_claimed": false,
+          "simulated": false
+        },
+        "id": "sys-settings",
+        "install_state": "registered",
+        "kind": "system",
+        "manifest_path": "/mnt/data/code/project/StrawCoding/StrawNT/components/strawnt-sysapps/manifests/settings.json",
+        "name": "Settings",
+        "notes": "NTW6 dedicated system app 'settings' \u2014 thin vertical slice; Hub=Electron; powered by Wine",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "protected": true,
+        "schema": "strawnt-app-manifest/v1",
+        "scopes": {
+          "launch": "PASS",
+          "manifest": "PASS",
+          "ui": "PARTIAL"
+        },
+        "source": "system",
+        "system_app": true
+      },
+      "role": "settings"
+    },
+    {
+      "launch": {
+        "app_id": "sys-run-dialog",
+        "command": "sysapps launch",
+        "detail": {
+          "cmdline": "cmd /c echo STRAWNT_RUN_DIALOG_OK",
+          "marker": "/tmp/strawnt-ntw6.L86rtL/home/sysapps/run_dialog/run-out.txt",
+          "powered_by": "Wine",
+          "prefix": "sys-run",
+          "prefix_create": {
+            "arch": "win64",
+            "backend": "wine",
+            "create_mode": "template_clone",
+            "created": true,
+            "detail": {
+              "clone": {
+                "arch": "win64",
+                "created": true,
+                "duration_ms": 667.7890789999999,
+                "mode": "template_clone",
+                "name": "sys-run",
+                "path": "/tmp/strawnt-ntw6.L86rtL/home/prefixes/sys-run",
+                "status": "PASS",
+                "template": "/tmp/strawnt-ntw6.L86rtL/home/templates/win64"
+              },
+              "ensure_template": {
+                "arch": "win64",
+                "created": true,
+                "path": "/tmp/strawnt-ntw6.L86rtL/home/templates/win64",
+                "status": "PASS",
+                "wineboot": {
+                  "command": [
+                    "/usr/bin/xvfb-run",
+                    "-a",
+                    "/mnt/data/code/project/StrawCoding/StrawNT/third_party/proton-ge/dist/files/bin/wine",
+                    "wineboot",
+                    "-u"
+                  ],
+                  "duration_sec": 25.895078576,
+                  "exit_code": 0,
+                  "pin": "GE-Proton11-3",
+                  "status": "PASS",
+                  "stderr_tail": "",
+                  "stdout_tail": "fsync: up and running.\n",
+                  "used_xvfb": true,
+                  "wine_bin": "/mnt/data/code/project/StrawCoding/StrawNT/third_party/proton-ge/dist/files/bin/wine"
+                }
+              },
+              "mode": "template_clone"
+            },
+            "engine": "proton-ge",
+            "execution_backend": "wine",
+            "home": "/tmp/strawnt-ntw6.L86rtL/home",
+            "name": "sys-run",
+            "path": "/tmp/strawnt-ntw6.L86rtL/home/prefixes/sys-run",
+            "pin": "GE-Proton11-3",
+            "powered_by": "Wine",
+            "powered_by_wine": true,
+            "status": "PASS"
+          },
+          "status": "PASS",
+          "stdout_snippet": "STRAWNT_RUN_DIALOG_OK\r\n",
+          "surface": "run_dialog",
+          "win_r_equivalent": true,
+          "wine_exit": 0
+        },
+        "engine": "proton-ge",
+        "execution_backend": "wine",
+        "home": "/tmp/strawnt-ntw6.L86rtL/home",
+        "honesty": {
+          "full_windows_claimed": false,
+          "powered_by_wine": true,
+          "ranked_anticheat_claimed": false,
+          "simulated": false
+        },
+        "hub": "electron",
+        "hub_tab": "sys-run",
+        "name": "Run Dialog",
+        "notes": [
+          "Thin vertical slice \u2014 not a Windows Explorer / TaskMgr clone",
+          "Hub Electron panel provides GUI; CLI launch proves side effects"
+        ],
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "role": "run_dialog",
+        "scopes": {
+          "launch": "PASS",
+          "manifest": "PASS",
+          "ui": "PARTIAL"
+        },
+        "side_effect": "/tmp/strawnt-ntw6.L86rtL/home/sysapps/run_dialog/last-run.json",
+        "side_effect_exists": true,
+        "status": "PASS"
+      },
+      "list_row": {
+        "dedicated_role": "run_dialog",
+        "desktop": "hub/resources/desktop/strawnt-run-dialog.desktop",
+        "desktop_present": true,
+        "engine": "proton-ge",
+        "engine_pin": "GE-Proton11-3",
+        "execution_backend": "wine",
+        "hub": "electron",
+        "hub_tab": "sys-run",
+        "id": "sys-run-dialog",
+        "kind": "system",
+        "launch_entry": "strawnt sysapps launch run_dialog",
+        "manifest": "components/strawnt-sysapps/manifests/run_dialog.json",
+        "manifest_present": true,
+        "name": "Run Dialog",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "role": "run_dialog",
+        "system_app": true
+      },
+      "manifest": {
+        "compat_status": "PARTIAL",
+        "dedicated_role": "run_dialog",
+        "engine": "proton-ge",
+        "execution_backend": "wine",
+        "honesty": {
+          "full_windows_claimed": false,
+          "ranked_anticheat_claimed": false,
+          "simulated": false
+        },
+        "id": "sys-run-dialog",
+        "install_state": "registered",
+        "kind": "system",
+        "manifest_path": "/mnt/data/code/project/StrawCoding/StrawNT/components/strawnt-sysapps/manifests/run_dialog.json",
+        "name": "Run Dialog",
+        "notes": "NTW6 dedicated system app 'run_dialog' \u2014 thin vertical slice; Hub=Electron; powered by Wine",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "protected": true,
+        "schema": "strawnt-app-manifest/v1",
+        "scopes": {
+          "launch": "PASS",
+          "manifest": "PASS",
+          "ui": "PARTIAL"
+        },
+        "source": "system",
+        "system_app": true
+      },
+      "role": "run_dialog"
+    },
+    {
+      "launch": {
+        "app_id": "sys-installer-wizard",
+        "command": "sysapps launch",
+        "detail": {
+          "install_result": {
+            "app_id": "line",
+            "command": "apps install",
+            "engine": "proton-ge",
+            "exe": "line.exe",
+            "execution_backend": "wine",
+            "fixture": "/mnt/data/code/project/StrawCoding/StrawNT/components/strawnt-appmgr/fixtures/build/strawnt_app_stub.exe",
+            "honesty": {
+              "full_windows_claimed": false,
+              "note": "Staged real Win32 PE via App Manager; vendor LINE/Steam installer UI remains PARTIAL",
+              "ranked_anticheat_claimed": false,
+              "simulated": false
+            },
+            "install_marker": "/tmp/strawnt-ntw6.L86rtL/home/prefixes/line/drive_c/strawnt/apps/line/INSTALLED.json",
+            "install_mode": "pe_staged",
+            "name": "LINE",
+            "powered_by": "Wine",
+            "powered_by_wine": true,
+            "prefix": "line",
+            "prefix_create": {
+              "arch": "win64",
+              "backend": "wine",
+              "create_mode": "template_clone",
+              "created": true,
+              "detail": {
+                "clone": {
+                  "arch": "win64",
+                  "created": true,
+                  "duration_ms": 638.4146830000001,
+                  "mode": "template_clone",
+                  "name": "line",
+                  "path": "/tmp/strawnt-ntw6.L86rtL/home/prefixes/line",
+                  "status": "PASS",
+                  "template": "/tmp/strawnt-ntw6.L86rtL/home/templates/win64"
+                },
+                "ensure_template": {
+                  "arch": "win64",
+                  "created": false,
+                  "message": "template already present",
+                  "path": "/tmp/strawnt-ntw6.L86rtL/home/templates/win64",
+                  "status": "PASS"
+                },
+                "mode": "template_clone"
+              },
+              "engine": "proton-ge",
+              "execution_backend": "wine",
+              "home": "/tmp/strawnt-ntw6.L86rtL/home",
+              "name": "line",
+              "path": "/tmp/strawnt-ntw6.L86rtL/home/prefixes/line",
+              "pin": "GE-Proton11-3",
+              "powered_by": "Wine",
+              "powered_by_wine": true,
+              "status": "PASS"
+            },
+            "recipes_applied": [
+              "crypt32-signature"
+            ],
+            "recipes_recommended": [
+              "crypt32-signature",
+              "vcrun",
+              "corefonts"
+            ],
+            "source": "catalog",
+            "staged_pe": "/tmp/strawnt-ntw6.L86rtL/home/prefixes/line/drive_c/strawnt/apps/line/line.exe",
+            "status": "PASS"
+          },
+          "powered_by": "Wine",
+          "status": "PASS",
+          "surface": "installer_wizard",
+          "target": "line",
+          "wraps": "strawnt apps install"
+        },
+        "engine": "proton-ge",
+        "execution_backend": "wine",
+        "home": "/tmp/strawnt-ntw6.L86rtL/home",
+        "honesty": {
+          "full_windows_claimed": false,
+          "powered_by_wine": true,
+          "ranked_anticheat_claimed": false,
+          "simulated": false
+        },
+        "hub": "electron",
+        "hub_tab": "sys-installer",
+        "name": "Installer Wizard",
+        "notes": [
+          "Thin vertical slice \u2014 not a Windows Explorer / TaskMgr clone",
+          "Hub Electron panel provides GUI; CLI launch proves side effects"
+        ],
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "role": "installer_wizard",
+        "scopes": {
+          "launch": "PASS",
+          "manifest": "PASS",
+          "ui": "PARTIAL"
+        },
+        "side_effect": "/tmp/strawnt-ntw6.L86rtL/home/sysapps/installer_wizard/last-run.json",
+        "side_effect_exists": true,
+        "status": "PASS"
+      },
+      "list_row": {
+        "dedicated_role": "installer_wizard",
+        "desktop": "hub/resources/desktop/strawnt-installer-wizard.desktop",
+        "desktop_present": true,
+        "engine": "proton-ge",
+        "engine_pin": "GE-Proton11-3",
+        "execution_backend": "wine",
+        "hub": "electron",
+        "hub_tab": "sys-installer",
+        "id": "sys-installer-wizard",
+        "kind": "system",
+        "launch_entry": "strawnt sysapps launch installer_wizard",
+        "manifest": "components/strawnt-sysapps/manifests/installer_wizard.json",
+        "manifest_present": true,
+        "name": "Installer Wizard",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "role": "installer_wizard",
+        "system_app": true
+      },
+      "manifest": {
+        "compat_status": "PARTIAL",
+        "dedicated_role": "installer_wizard",
+        "engine": "proton-ge",
+        "execution_backend": "wine",
+        "honesty": {
+          "full_windows_claimed": false,
+          "ranked_anticheat_claimed": false,
+          "simulated": false
+        },
+        "id": "sys-installer-wizard",
+        "install_state": "registered",
+        "kind": "system",
+        "manifest_path": "/mnt/data/code/project/StrawCoding/StrawNT/components/strawnt-sysapps/manifests/installer_wizard.json",
+        "name": "Installer Wizard",
+        "notes": "NTW6 dedicated system app 'installer_wizard' \u2014 thin vertical slice; Hub=Electron; powered by Wine",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "protected": true,
+        "schema": "strawnt-app-manifest/v1",
+        "scopes": {
+          "launch": "PASS",
+          "manifest": "PASS",
+          "ui": "PARTIAL"
+        },
+        "source": "system",
+        "system_app": true
+      },
+      "role": "installer_wizard"
+    },
+    {
+      "launch": {
+        "app_id": "sys-app-library",
+        "command": "sysapps launch",
+        "detail": {
+          "app_count": 9,
+          "catalog_status": "PASS",
+          "front_of": "app_manager",
+          "list": {
+            "apps": [
+              {
+                "compat_status": "PARTIAL",
+                "created_at": "1786130308",
+                "dedicated_role": "app_manager",
+                "engine": "proton-ge",
+                "engine_pin": "GE-Proton11-3",
+                "exe": null,
+                "execution_backend": "wine",
+                "honesty": {
+                  "full_windows_claimed": false,
+                  "ranked_anticheat_claimed": false,
+                  "simulated": false
+                },
+                "id": "sys-app-manager",
+                "install_path": null,
+                "install_state": "registered",
+                "kind": "system",
+                "name": "App Manager",
+                "notes": "Dedicated system app 'app_manager' \u2014 NTW6 thin UI slice; App Manager owns lifecycle",
+                "permissions": [],
+                "powered_by": "Wine",
+                "powered_by_wine": true,
+                "prefix": null,
+                "protected": true,
+                "recipes_applied": [],
+                "recipes_recommended": [],
+                "schema": "strawnt-app-manifest/v1",
+                "scopes": {
+                  "launch": "PASS",
+                  "registered": "PASS",
+                  "ui": "PARTIAL"
+                },
+                "source": "system",
+                "system_app": true,
+                "update_channel": "stable",
+                "updated_at": "1786130308"
+              },
+              {
+                "compat_status": "PARTIAL",
+                "created_at": "1786130308",
+                "dedicated_role": "file_manager",
+                "engine": "proton-ge",
+                "engine_pin": "GE-Proton11-3",
+                "exe": null,
+                "execution_backend": "wine",
+                "honesty": {
+                  "full_windows_claimed": false,
+                  "ranked_anticheat_claimed": false,
+                  "simulated": false
+                },
+                "id": "sys-file-manager",
+                "install_path": null,
+                "install_state": "registered",
+                "kind": "system",
+                "name": "File Manager",
+                "notes": "Dedicated system app 'file_manager' \u2014 NTW6 thin UI slice; App Manager owns lifecycle",
+                "permissions": [],
+                "powered_by": "Wine",
+                "powered_by_wine": true,
+                "prefix": null,
+                "protected": true,
+                "recipes_applied": [],
+                "recipes_recommended": [],
+                "schema": "strawnt-app-manifest/v1",
+                "scopes": {
+                  "launch": "PASS",
+                  "registered": "PASS",
+                  "ui": "PARTIAL"
+                },
+                "source": "system",
+                "system_app": true,
+                "update_channel": "stable",
+                "updated_at": "1786130308"
+              },
+              {
+                "compat_status": "PARTIAL",
+                "created_at": "1786130308",
+                "dedicated_role": "settings",
+                "engine": "proton-ge",
+                "engine_pin": "GE-Proton11-3",
+                "exe": null,
+                "execution_backend": "wine",
+                "honesty": {
+                  "full_windows_claimed": false,
+                  "ranked_anticheat_claimed": false,
+                  "simulated": false
+                },
+                "id": "sys-settings",
+                "install_path": null,
+                "install_state": "registered",
+                "kind": "system",
+                "name": "Settings",
+                "notes": "Dedicated system app 'settings' \u2014 NTW6 thin UI slice; App Manager owns lifecycle",
+                "permissions": [],
+                "powered_by": "Wine",
+                "powered_by_wine": true,
+                "prefix": null,
+                "protected": true,
+                "recipes_applied": [],
+                "recipes_recommended": [],
+                "schema": "strawnt-app-manifest/v1",
+                "scopes": {
+                  "launch": "PASS",
+                  "registered": "PASS",
+                  "ui": "PARTIAL"
+                },
+                "source": "system",
+                "system_app": true,
+                "update_channel": "stable",
+                "updated_at": "1786130308"
+              },
+              {
+                "compat_status": "PARTIAL",
+                "created_at": "1786130308",
+                "dedicated_role": "run_dialog",
+                "engine": "proton-ge",
+                "engine_pin": "GE-Proton11-3",
+                "exe": null,
+                "execution_backend": "wine",
+                "honesty": {
+                  "full_windows_claimed": false,
+                  "ranked_anticheat_claimed": false,
+                  "simulated": false
+                },
+                "id": "sys-run-dialog",
+                "install_path": null,
+                "install_state": "registered",
+                "kind": "system",
+                "name": "Run Dialog",
+                "notes": "Dedicated system app 'run_dialog' \u2014 NTW6 thin UI slice; App Manager owns lifecycle",
+                "permissions": [],
+                "powered_by": "Wine",
+                "powered_by_wine": true,
+                "prefix": null,
+                "protected": true,
+                "recipes_applied": [],
+                "recipes_recommended": [],
+                "schema": "strawnt-app-manifest/v1",
+                "scopes": {
+                  "launch": "PASS",
+                  "registered": "PASS",
+                  "ui": "PARTIAL"
+                },
+                "source": "system",
+                "system_app": true,
+                "update_channel": "stable",
+                "updated_at": "1786130308"
+              },
+              {
+                "compat_status": "PARTIAL",
+                "created_at": "1786130308",
+                "dedicated_role": "task_manager",
+                "engine": "proton-ge",
+                "engine_pin": "GE-Proton11-3",
+                "exe": null,
+                "execution_backend": "wine",
+                "honesty": {
+                  "full_windows_claimed": false,
+                  "ranked_anticheat_claimed": false,
+                  "simulated": false
+                },
+                "id": "sys-task-manager",
+                "install_path": null,
+                "install_state": "registered",
+                "kind": "system",
+                "name": "Task Manager",
+                "notes": "Dedicated system app 'task_manager' \u2014 NTW6 thin UI slice; App Manager owns lifecycle",
+                "permissions": [],
+                "powered_by": "Wine",
+                "powered_by_wine": true,
+                "prefix": null,
+                "protected": true,
+                "recipes_applied": [],
+                "recipes_recommended": [],
+                "schema": "strawnt-app-manifest/v1",
+                "scopes": {
+                  "launch": "PASS",
+                  "registered": "PASS",
+                  "ui": "PARTIAL"
+                },
+                "source": "system",
+                "system_app": true,
+                "update_channel": "stable",
+                "updated_at": "1786130308"
+              },
+              {
+                "compat_status": "PARTIAL",
+                "created_at": "1786130308",
+                "dedicated_role": "app_library",
+                "engine": "proton-ge",
+                "engine_pin": "GE-Proton11-3",
+                "exe": null,
+                "execution_backend": "wine",
+                "honesty": {
+                  "full_windows_claimed": false,
+                  "ranked_anticheat_claimed": false,
+                  "simulated": false
+                },
+                "id": "sys-app-library",
+                "install_path": null,
+                "install_state": "registered",
+                "kind": "system",
+                "name": "App Library",
+                "notes": "Dedicated system app 'app_library' \u2014 NTW6 thin UI slice; App Manager owns lifecycle",
+                "permissions": [],
+                "powered_by": "Wine",
+                "powered_by_wine": true,
+                "prefix": null,
+                "protected": true,
+                "recipes_applied": [],
+                "recipes_recommended": [],
+                "schema": "strawnt-app-manifest/v1",
+                "scopes": {
+                  "launch": "PASS",
+                  "registered": "PASS",
+                  "ui": "PARTIAL"
+                },
+                "source": "system",
+                "system_app": true,
+                "update_channel": "stable",
+                "updated_at": "1786130308"
+              },
+              {
+                "compat_status": "PARTIAL",
+                "created_at": "1786130308",
+                "dedicated_role": "installer_wizard",
+                "engine": "proton-ge",
+                "engine_pin": "GE-Proton11-3",
+                "exe": null,
+                "execution_backend": "wine",
+                "honesty": {
+                  "full_windows_claimed": false,
+                  "ranked_anticheat_claimed": false,
+                  "simulated": false
+                },
+                "id": "sys-installer-wizard",
+                "install_path": null,
+                "install_state": "registered",
+                "kind": "system",
+                "name": "Installer Wizard",
+                "notes": "Dedicated system app 'installer_wizard' \u2014 NTW6 thin UI slice; App Manager owns lifecycle",
+                "permissions": [],
+                "powered_by": "Wine",
+                "powered_by_wine": true,
+                "prefix": null,
+                "protected": true,
+                "recipes_applied": [],
+                "recipes_recommended": [],
+                "schema": "strawnt-app-manifest/v1",
+                "scopes": {
+                  "launch": "PASS",
+                  "registered": "PASS",
+                  "ui": "PARTIAL"
+                },
+                "source": "system",
+                "system_app": true,
+                "update_channel": "stable",
+                "updated_at": "1786130308"
+              },
+              {
+                "compat_status": "PARTIAL",
+                "created_at": "1786130308",
+                "dedicated_role": "compat_center",
+                "engine": "proton-ge",
+                "engine_pin": "GE-Proton11-3",
+                "exe": null,
+                "execution_backend": "wine",
+                "honesty": {
+                  "full_windows_claimed": false,
+                  "ranked_anticheat_claimed": false,
+                  "simulated": false
+                },
+                "id": "sys-compat-center",
+                "install_path": null,
+                "install_state": "registered",
+                "kind": "system",
+                "name": "Compat Center",
+                "notes": "Dedicated system app 'compat_center' \u2014 NTW6 thin UI slice; App Manager owns lifecycle",
+                "permissions": [],
+                "powered_by": "Wine",
+                "powered_by_wine": true,
+                "prefix": null,
+                "protected": true,
+                "recipes_applied": [],
+                "recipes_recommended": [],
+                "schema": "strawnt-app-manifest/v1",
+                "scopes": {
+                  "launch": "PASS",
+                  "registered": "PASS",
+                  "ui": "PARTIAL"
+                },
+                "source": "system",
+                "system_app": true,
+                "update_channel": "stable",
+                "updated_at": "1786130308"
+              },
+              {
+                "compat_status": "PARTIAL",
+                "created_at": "1786130338",
+                "dedicated_role": null,
+                "engine": "proton-ge",
+                "engine_pin": "GE-Proton11-3",
+                "exe": "line.exe",
+                "execution_backend": "wine",
+                "honesty": {
+                  "full_windows_claimed": false,
+                  "ranked_anticheat_claimed": false,
+                  "simulated": false
+                },
+                "id": "line",
+                "install_path": "/tmp/strawnt-ntw6.L86rtL/home/prefixes/line/drive_c/strawnt/apps/line",
+                "install_state": "installed",
+                "kind": "win32",
+                "name": "LINE",
+                "notes": "Catalog install of line \u2014 prefix + staged PE; vendor installer UI remains PARTIAL",
+                "permissions": [],
+                "powered_by": "Wine",
+                "powered_by_wine": true,
+                "prefix": "line",
+                "protected": false,
+                "recipes_applied": [
+                  "crypt32-signature"
+                ],
+                "recipes_recommended": [
+                  "crypt32-signature",
+                  "vcrun",
+                  "corefonts"
+                ],
+                "schema": "strawnt-app-manifest/v1",
+                "scopes": {
+                  "install": "PARTIAL",
+                  "launch": "PARTIAL",
+                  "visible_ui": "UNKNOWN"
+                },
+                "source": "catalog",
+                "system_app": false,
+                "update_channel": "stable",
+                "updated_at": "1786130338"
+              }
+            ],
+            "command": "apps list",
+            "count": 9,
+            "db": "/tmp/strawnt-ntw6.L86rtL/home/appmgr/apps.json",
+            "engine": "proton-ge",
+            "execution_backend": "wine",
+            "home": "/tmp/strawnt-ntw6.L86rtL/home",
+            "powered_by": "Wine",
+            "powered_by_wine": true,
+            "status": "PASS"
+          },
+          "powered_by": "Wine",
+          "status": "PASS",
+          "surface": "app_library"
+        },
+        "engine": "proton-ge",
+        "execution_backend": "wine",
+        "home": "/tmp/strawnt-ntw6.L86rtL/home",
+        "honesty": {
+          "full_windows_claimed": false,
+          "powered_by_wine": true,
+          "ranked_anticheat_claimed": false,
+          "simulated": false
+        },
+        "hub": "electron",
+        "hub_tab": "sys-library",
+        "name": "App Library",
+        "notes": [
+          "Thin vertical slice \u2014 not a Windows Explorer / TaskMgr clone",
+          "Hub Electron panel provides GUI; CLI launch proves side effects"
+        ],
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "role": "app_library",
+        "scopes": {
+          "launch": "PASS",
+          "manifest": "PASS",
+          "ui": "PARTIAL"
+        },
+        "side_effect": "/tmp/strawnt-ntw6.L86rtL/home/sysapps/app_library/last-run.json",
+        "side_effect_exists": true,
+        "status": "PASS"
+      },
+      "list_row": {
+        "dedicated_role": "app_library",
+        "desktop": "hub/resources/desktop/strawnt-app-library.desktop",
+        "desktop_present": true,
+        "engine": "proton-ge",
+        "engine_pin": "GE-Proton11-3",
+        "execution_backend": "wine",
+        "hub": "electron",
+        "hub_tab": "sys-library",
+        "id": "sys-app-library",
+        "kind": "system",
+        "launch_entry": "strawnt sysapps launch app_library",
+        "manifest": "components/strawnt-sysapps/manifests/app_library.json",
+        "manifest_present": true,
+        "name": "App Library",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "role": "app_library",
+        "system_app": true
+      },
+      "manifest": {
+        "compat_status": "PARTIAL",
+        "dedicated_role": "app_library",
+        "engine": "proton-ge",
+        "execution_backend": "wine",
+        "honesty": {
+          "full_windows_claimed": false,
+          "ranked_anticheat_claimed": false,
+          "simulated": false
+        },
+        "id": "sys-app-library",
+        "install_state": "registered",
+        "kind": "system",
+        "manifest_path": "/mnt/data/code/project/StrawCoding/StrawNT/components/strawnt-sysapps/manifests/app_library.json",
+        "name": "App Library",
+        "notes": "NTW6 dedicated system app 'app_library' \u2014 thin vertical slice; Hub=Electron; powered by Wine",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "protected": true,
+        "schema": "strawnt-app-manifest/v1",
+        "scopes": {
+          "launch": "PASS",
+          "manifest": "PASS",
+          "ui": "PARTIAL"
+        },
+        "source": "system",
+        "system_app": true
+      },
+      "role": "app_library"
+    },
+    {
+      "launch": {
+        "app_id": "sys-compat-center",
+        "command": "sysapps launch",
+        "detail": {
+          "honesty": {
+            "full_windows_claimed": false,
+            "ranked_anticheat_claimed": false
+          },
+          "matrix": {
+            "backend": "wine",
+            "count": 1,
+            "counts": {
+              "FAIL": 0,
+              "PARTIAL": 1,
+              "PASS": 0,
+              "UNKNOWN": 0
+            },
+            "engine": "proton-ge",
+            "entries": [
+              {
+                "app_key": "line.exe",
+                "backend": "wine",
+                "catalog_id": "line",
+                "engine": "proton-ge",
+                "execution_backend": "wine",
+                "name": "line.exe",
+                "notes": "LINE Desktop (install/launch UI scope; IgnoreCodeSign path)",
+                "powered_by": "Wine",
+                "powered_by_wine": true,
+                "prefix": "line",
+                "scopes": {
+                  "install": "PARTIAL",
+                  "launch": "PARTIAL",
+                  "visible_ui": "UNKNOWN"
+                },
+                "status": "PARTIAL",
+                "updated_at": 1786130338,
+                "via": "strawnt-appmgr",
+                "wine_flavor": "proton-ge"
+              }
+            ],
+            "execution_backend": "wine",
+            "home": "/tmp/strawnt-ntw6.L86rtL/home",
+            "notes": [
+              "Unknown software must stay UNKNOWN \u2014 never fake all-green.",
+              "Statuses are scoped to declared Wine / prefix conditions.",
+              "line.exe / steam.exe golden rows are PARTIAL until install+visible UI proven."
+            ],
+            "powered_by": "Wine",
+            "powered_by_wine": true,
+            "status": "PASS"
+          },
+          "powered_by": "Wine",
+          "seeded": null,
+          "status": "PASS",
+          "strict_grades": [
+            "PASS",
+            "PARTIAL",
+            "FAIL",
+            "UNKNOWN"
+          ],
+          "surface": "compat_center"
+        },
+        "engine": "proton-ge",
+        "execution_backend": "wine",
+        "home": "/tmp/strawnt-ntw6.L86rtL/home",
+        "honesty": {
+          "full_windows_claimed": false,
+          "powered_by_wine": true,
+          "ranked_anticheat_claimed": false,
+          "simulated": false
+        },
+        "hub": "electron",
+        "hub_tab": "sys-compat",
+        "name": "Compat Center",
+        "notes": [
+          "Thin vertical slice \u2014 not a Windows Explorer / TaskMgr clone",
+          "Hub Electron panel provides GUI; CLI launch proves side effects"
+        ],
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "role": "compat_center",
+        "scopes": {
+          "launch": "PASS",
+          "manifest": "PASS",
+          "ui": "PARTIAL"
+        },
+        "side_effect": "/tmp/strawnt-ntw6.L86rtL/home/sysapps/compat_center/last-run.json",
+        "side_effect_exists": true,
+        "status": "PASS"
+      },
+      "list_row": {
+        "dedicated_role": "compat_center",
+        "desktop": "hub/resources/desktop/strawnt-compat-center.desktop",
+        "desktop_present": true,
+        "engine": "proton-ge",
+        "engine_pin": "GE-Proton11-3",
+        "execution_backend": "wine",
+        "hub": "electron",
+        "hub_tab": "sys-compat",
+        "id": "sys-compat-center",
+        "kind": "system",
+        "launch_entry": "strawnt sysapps launch compat_center",
+        "manifest": "components/strawnt-sysapps/manifests/compat_center.json",
+        "manifest_present": true,
+        "name": "Compat Center",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "role": "compat_center",
+        "system_app": true
+      },
+      "manifest": {
+        "compat_status": "PARTIAL",
+        "dedicated_role": "compat_center",
+        "engine": "proton-ge",
+        "execution_backend": "wine",
+        "honesty": {
+          "full_windows_claimed": false,
+          "ranked_anticheat_claimed": false,
+          "simulated": false
+        },
+        "id": "sys-compat-center",
+        "install_state": "registered",
+        "kind": "system",
+        "manifest_path": "/mnt/data/code/project/StrawCoding/StrawNT/components/strawnt-sysapps/manifests/compat_center.json",
+        "name": "Compat Center",
+        "notes": "NTW6 dedicated system app 'compat_center' \u2014 thin vertical slice; Hub=Electron; powered by Wine",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "protected": true,
+        "schema": "strawnt-app-manifest/v1",
+        "scopes": {
+          "launch": "PASS",
+          "manifest": "PASS",
+          "ui": "PARTIAL"
+        },
+        "source": "system",
+        "system_app": true
+      },
+      "role": "compat_center"
+    },
+    {
+      "launch": {
+        "app_id": "sys-task-manager",
+        "command": "sysapps launch",
+        "detail": {
+          "host_process_count_sampled": 32,
+          "host_process_sample": [
+            {
+              "comm": "systemd",
+              "pid": "1"
+            },
+            {
+              "comm": "kthreadd",
+              "pid": "2"
+            },
+            {
+              "comm": "pool_workqueue_release",
+              "pid": "3"
+            },
+            {
+              "comm": "kworker/R-rcu_g",
+              "pid": "4"
+            },
+            {
+              "comm": "kworker/R-rcu_p",
+              "pid": "5"
+            },
+            {
+              "comm": "kworker/R-slub_",
+              "pid": "6"
+            },
+            {
+              "comm": "kworker/R-netns",
+              "pid": "7"
+            },
+            {
+              "comm": "kworker/0:0H-events_highpri",
+              "pid": "10"
+            },
+            {
+              "comm": "kworker/R-mm_pe",
+              "pid": "12"
+            },
+            {
+              "comm": "rcu_tasks_kthread",
+              "pid": "13"
+            },
+            {
+              "comm": "rcu_tasks_rude_kthread",
+              "pid": "14"
+            },
+            {
+              "comm": "rcu_tasks_trace_kthread",
+              "pid": "15"
+            },
+            {
+              "comm": "ksoftirqd/0",
+              "pid": "16"
+            },
+            {
+              "comm": "rcu_preempt",
+              "pid": "17"
+            },
+            {
+              "comm": "migration/0",
+              "pid": "18"
+            },
+            {
+              "comm": "idle_inject/0",
+              "pid": "19"
+            },
+            {
+              "comm": "cpuhp/0",
+              "pid": "20"
+            },
+            {
+              "comm": "cpuhp/1",
+              "pid": "21"
+            },
+            {
+              "comm": "idle_inject/1",
+              "pid": "22"
+            },
+            {
+              "comm": "migration/1",
+              "pid": "23"
+            },
+            {
+              "comm": "ksoftirqd/1",
+              "pid": "24"
+            },
+            {
+              "comm": "kworker/1:0H-events_highpri",
+              "pid": "26"
+            },
+            {
+              "comm": "cpuhp/2",
+              "pid": "27"
+            },
+            {
+              "comm": "idle_inject/2",
+              "pid": "28"
+            },
+            {
+              "comm": "migration/2",
+              "pid": "29"
+            },
+            {
+              "comm": "ksoftirqd/2",
+              "pid": "30"
+            },
+            {
+              "comm": "kworker/2:0H-events_highpri",
+              "pid": "32"
+            },
+            {
+              "comm": "cpuhp/3",
+              "pid": "33"
+            },
+            {
+              "comm": "idle_inject/3",
+              "pid": "34"
+            },
+            {
+              "comm": "migration/3",
+              "pid": "35"
+            },
+            {
+              "comm": "ksoftirqd/3",
+              "pid": "36"
+            },
+            {
+              "comm": "kworker/3:0H-events_highpri",
+              "pid": "38"
+            }
+          ],
+          "note": "Host + Wine process view \u2014 not a claim of full Windows Task Manager",
+          "powered_by": "Wine",
+          "prefixes": {
+            "backend": "wine",
+            "count": 2,
+            "engine": "proton-ge",
+            "execution_backend": "wine",
+            "home": "/tmp/strawnt-ntw6.L86rtL/home",
+            "powered_by": "Wine",
+            "powered_by_wine": true,
+            "prefixes": [
+              {
+                "initialized": true,
+                "meta": {
+                  "arch": "win64",
+                  "create_mode": "template_clone",
+                  "created_at": "1786130337",
+                  "engine": "proton-ge",
+                  "execution_backend": "wine",
+                  "last_status": "PASS",
+                  "path": "/tmp/strawnt-ntw6.L86rtL/home/prefixes/line",
+                  "pin": "GE-Proton11-3"
+                },
+                "name": "line",
+                "path": "/tmp/strawnt-ntw6.L86rtL/home/prefixes/line"
+              },
+              {
+                "initialized": true,
+                "meta": {
+                  "arch": "win64",
+                  "create_mode": "template_clone",
+                  "created_at": "1786130308",
+                  "engine": "proton-ge",
+                  "execution_backend": "wine",
+                  "last_status": "PASS",
+                  "path": "/tmp/strawnt-ntw6.L86rtL/home/prefixes/sys-run",
+                  "pin": "GE-Proton11-3"
+                },
+                "name": "sys-run",
+                "path": "/tmp/strawnt-ntw6.L86rtL/home/prefixes/sys-run"
+              }
+            ],
+            "status": "PASS"
+          },
+          "status": "PASS",
+          "surface": "task_manager",
+          "wineserver": {
+            "path": "/mnt/data/code/project/StrawCoding/StrawNT/third_party/proton-ge/dist/files/bin/wineserver",
+            "present": true
+          }
+        },
+        "engine": "proton-ge",
+        "execution_backend": "wine",
+        "home": "/tmp/strawnt-ntw6.L86rtL/home",
+        "honesty": {
+          "full_windows_claimed": false,
+          "powered_by_wine": true,
+          "ranked_anticheat_claimed": false,
+          "simulated": false
+        },
+        "hub": "electron",
+        "hub_tab": "sys-taskmgr",
+        "name": "Task Manager",
+        "notes": [
+          "Thin vertical slice \u2014 not a Windows Explorer / TaskMgr clone",
+          "Hub Electron panel provides GUI; CLI launch proves side effects"
+        ],
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "role": "task_manager",
+        "scopes": {
+          "launch": "PASS",
+          "manifest": "PASS",
+          "ui": "PARTIAL"
+        },
+        "side_effect": "/tmp/strawnt-ntw6.L86rtL/home/sysapps/task_manager/last-run.json",
+        "side_effect_exists": true,
+        "status": "PASS"
+      },
+      "list_row": {
+        "dedicated_role": "task_manager",
+        "desktop": "hub/resources/desktop/strawnt-task-manager.desktop",
+        "desktop_present": true,
+        "engine": "proton-ge",
+        "engine_pin": "GE-Proton11-3",
+        "execution_backend": "wine",
+        "hub": "electron",
+        "hub_tab": "sys-taskmgr",
+        "id": "sys-task-manager",
+        "kind": "system",
+        "launch_entry": "strawnt sysapps launch task_manager",
+        "manifest": "components/strawnt-sysapps/manifests/task_manager.json",
+        "manifest_present": true,
+        "name": "Task Manager",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "role": "task_manager",
+        "system_app": true
+      },
+      "manifest": {
+        "compat_status": "PARTIAL",
+        "dedicated_role": "task_manager",
+        "engine": "proton-ge",
+        "execution_backend": "wine",
+        "honesty": {
+          "full_windows_claimed": false,
+          "ranked_anticheat_claimed": false,
+          "simulated": false
+        },
+        "id": "sys-task-manager",
+        "install_state": "registered",
+        "kind": "system",
+        "manifest_path": "/mnt/data/code/project/StrawCoding/StrawNT/components/strawnt-sysapps/manifests/task_manager.json",
+        "name": "Task Manager",
+        "notes": "NTW6 dedicated system app 'task_manager' \u2014 thin vertical slice; Hub=Electron; powered by Wine",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "protected": true,
+        "schema": "strawnt-app-manifest/v1",
+        "scopes": {
+          "launch": "PASS",
+          "manifest": "PASS",
+          "ui": "PARTIAL"
+        },
+        "source": "system",
+        "system_app": true
+      },
+      "role": "task_manager"
+    },
+    {
+      "launch": {
+        "app_id": "sys-file-manager",
+        "command": "sysapps launch",
+        "detail": {
+          "drive_count": 3,
+          "drives": [
+            {
+              "drive_c": "/tmp/strawnt-ntw6.L86rtL/home/prefixes/sys-run/drive_c",
+              "drive_c_present": true,
+              "entries": [
+                {
+                  "is_dir": true,
+                  "name": "Program Files (x86)"
+                },
+                {
+                  "is_dir": true,
+                  "name": "Program Files"
+                },
+                {
+                  "is_dir": true,
+                  "name": "users"
+                },
+                {
+                  "is_dir": true,
+                  "name": "windows"
+                },
+                {
+                  "is_dir": true,
+                  "name": "ProgramData"
+                }
+              ],
+              "path": "/tmp/strawnt-ntw6.L86rtL/home/prefixes/sys-run",
+              "prefix": "sys-run",
+              "z_host_root": "/"
+            },
+            {
+              "drive_c": "/tmp/strawnt-ntw6.L86rtL/home/prefixes/sys-files/drive_c",
+              "drive_c_present": true,
+              "entries": [
+                {
+                  "is_dir": true,
+                  "name": "Program Files (x86)"
+                },
+                {
+                  "is_dir": true,
+                  "name": "Program Files"
+                },
+                {
+                  "is_dir": true,
+                  "name": "users"
+                },
+                {
+                  "is_dir": true,
+                  "name": "windows"
+                },
+                {
+                  "is_dir": true,
+                  "name": "ProgramData"
+                }
+              ],
+              "path": "/tmp/strawnt-ntw6.L86rtL/home/prefixes/sys-files",
+              "prefix": "sys-files",
+              "z_host_root": "/"
+            },
+            {
+              "drive_c": "/tmp/strawnt-ntw6.L86rtL/home/prefixes/line/drive_c",
+              "drive_c_present": true,
+              "entries": [
+                {
+                  "is_dir": true,
+                  "name": "strawnt"
+                },
+                {
+                  "is_dir": true,
+                  "name": "Program Files (x86)"
+                },
+                {
+                  "is_dir": true,
+                  "name": "Program Files"
+                },
+                {
+                  "is_dir": true,
+                  "name": "users"
+                },
+                {
+                  "is_dir": true,
+                  "name": "windows"
+                },
+                {
+                  "is_dir": true,
+                  "name": "ProgramData"
+                }
+              ],
+              "path": "/tmp/strawnt-ntw6.L86rtL/home/prefixes/line",
+              "prefix": "line",
+              "z_host_root": "/"
+            }
+          ],
+          "listing": "/tmp/strawnt-ntw6.L86rtL/home/sysapps/file_manager/listing.json",
+          "note": "Browse prefix drives / Z: \u2014 not a full Windows Explorer clone",
+          "powered_by": "Wine",
+          "status": "PASS",
+          "surface": "file_manager"
+        },
+        "engine": "proton-ge",
+        "execution_backend": "wine",
+        "home": "/tmp/strawnt-ntw6.L86rtL/home",
+        "honesty": {
+          "full_windows_claimed": false,
+          "powered_by_wine": true,
+          "ranked_anticheat_claimed": false,
+          "simulated": false
+        },
+        "hub": "electron",
+        "hub_tab": "sys-files",
+        "name": "File Manager",
+        "notes": [
+          "Thin vertical slice \u2014 not a Windows Explorer / TaskMgr clone",
+          "Hub Electron panel provides GUI; CLI launch proves side effects"
+        ],
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "role": "file_manager",
+        "scopes": {
+          "launch": "PASS",
+          "manifest": "PASS",
+          "ui": "PARTIAL"
+        },
+        "side_effect": "/tmp/strawnt-ntw6.L86rtL/home/sysapps/file_manager/last-run.json",
+        "side_effect_exists": true,
+        "status": "PASS"
+      },
+      "list_row": {
+        "dedicated_role": "file_manager",
+        "desktop": "hub/resources/desktop/strawnt-file-manager.desktop",
+        "desktop_present": true,
+        "engine": "proton-ge",
+        "engine_pin": "GE-Proton11-3",
+        "execution_backend": "wine",
+        "hub": "electron",
+        "hub_tab": "sys-files",
+        "id": "sys-file-manager",
+        "kind": "system",
+        "launch_entry": "strawnt sysapps launch file_manager",
+        "manifest": "components/strawnt-sysapps/manifests/file_manager.json",
+        "manifest_present": true,
+        "name": "File Manager",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "role": "file_manager",
+        "system_app": true
+      },
+      "manifest": {
+        "compat_status": "PARTIAL",
+        "dedicated_role": "file_manager",
+        "engine": "proton-ge",
+        "execution_backend": "wine",
+        "honesty": {
+          "full_windows_claimed": false,
+          "ranked_anticheat_claimed": false,
+          "simulated": false
+        },
+        "id": "sys-file-manager",
+        "install_state": "registered",
+        "kind": "system",
+        "manifest_path": "/mnt/data/code/project/StrawCoding/StrawNT/components/strawnt-sysapps/manifests/file_manager.json",
+        "name": "File Manager",
+        "notes": "NTW6 dedicated system app 'file_manager' \u2014 thin vertical slice; Hub=Electron; powered by Wine",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "protected": true,
+        "schema": "strawnt-app-manifest/v1",
+        "scopes": {
+          "launch": "PASS",
+          "manifest": "PASS",
+          "ui": "PARTIAL"
+        },
+        "source": "system",
+        "system_app": true
+      },
+      "role": "file_manager"
+    }
+  ],
+  "schema": "strawnt-ntw6-sysapps/v1",
+  "simulated": false,
+  "stage": "ntw6-sysapps",
+  "status": "PASS",
+  "version": "0.7.1.59",
+  "generated_at": "2026-08-07T19:18:28Z",
+  "git_head": "1001cf023e67d3ef32184e6b7391f14958f8c1b2",
+  "pin": "GE-Proton11-3",
+  "hub_sysapps_entry": true,
+  "fixture_pe": "/mnt/data/code/project/StrawCoding/StrawNT/components/strawnt-appmgr/fixtures/build/strawnt_app_stub.exe",
+  "artifacts": {
+    "crate": "components/strawnt-sysapps",
+    "manifests": "components/strawnt-sysapps/manifests",
+    "desktops": "hub/resources/desktop/",
+    "harness": "tests/strawnt/ntw6-sysapps.sh",
+    "hub": "hub/"
+  }
+}

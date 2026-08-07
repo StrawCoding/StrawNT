@@ -1,0 +1,27 @@
+{
+  "schema": "strawnt-app-manifest/v1",
+  "id": "sys-compat-center",
+  "name": "Compat Center",
+  "kind": "system",
+  "source": "system",
+  "install_state": "registered",
+  "execution_backend": "wine",
+  "engine": "proton-ge",
+  "powered_by": "Wine",
+  "powered_by_wine": true,
+  "compat_status": "PARTIAL",
+  "scopes": {
+    "manifest": "PASS",
+    "launch": "PASS",
+    "ui": "PARTIAL"
+  },
+  "protected": true,
+  "system_app": true,
+  "dedicated_role": "compat_center",
+  "honesty": {
+    "full_windows_claimed": false,
+    "ranked_anticheat_claimed": false,
+    "simulated": false
+  },
+  "notes": "NTW6 dedicated system app 'compat_center' — thin vertical slice; Hub=Electron; powered by Wine"
+}

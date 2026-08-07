@@ -1,0 +1,17 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=StrawNT Task Manager
+GenericName=Task Manager
+Comment=Host + Wine process list (powered by Wine)
+Exec=strawnt-hub --tab sys-taskmgr
+Icon=strawnt
+Terminal=false
+Categories=System;Settings;
+Keywords=strawnt;wine;proton;task_manager;
+StartupNotify=true
+X-StrawNT-Role=task_manager
+X-StrawNT-Backend=wine
+X-StrawNT-Engine=proton-ge
+X-StrawNT-PoweredBy=Wine
+X-StrawNT-Launch=strawnt sysapps launch task_manager

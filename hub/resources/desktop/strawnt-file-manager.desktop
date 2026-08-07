@@ -1,0 +1,17 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=StrawNT File Manager
+GenericName=File Manager
+Comment=Browse prefix drive_c / Z: (powered by Wine)
+Exec=strawnt-hub --tab sys-files
+Icon=strawnt
+Terminal=false
+Categories=System;Settings;
+Keywords=strawnt;wine;proton;file_manager;
+StartupNotify=true
+X-StrawNT-Role=file_manager
+X-StrawNT-Backend=wine
+X-StrawNT-Engine=proton-ge
+X-StrawNT-PoweredBy=Wine
+X-StrawNT-Launch=strawnt sysapps launch file_manager

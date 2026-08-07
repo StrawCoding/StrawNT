@@ -1,0 +1,17 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=StrawNT Compat Center
+GenericName=Compat Center
+Comment=Strict PASS/PARTIAL/FAIL/UNKNOWN compat matrix UI (powered by Wine)
+Exec=strawnt-hub --tab sys-compat
+Icon=strawnt
+Terminal=false
+Categories=System;Settings;
+Keywords=strawnt;wine;proton;compat_center;
+StartupNotify=true
+X-StrawNT-Role=compat_center
+X-StrawNT-Backend=wine
+X-StrawNT-Engine=proton-ge
+X-StrawNT-PoweredBy=Wine
+X-StrawNT-Launch=strawnt sysapps launch compat_center

@@ -14,9 +14,10 @@ members = [
     "strawnt-engine",
     "strawnt-interop",
     "strawnt-appmgr",
+    "strawnt-sysapps",
 ]
 
 [workspace.package]
-version = "0.7.1-preview.59"
+version = "0.7.1-preview.60"
 edition = "2021"
 license = "MIT"
