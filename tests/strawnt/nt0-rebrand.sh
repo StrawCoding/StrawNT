@@ -87,10 +87,18 @@ else
   fail "git remote not StrawNT yet: ${REMOTE_URL}"
 fi
 
-if rg -n -i 'uses wine|via wine|via proton|depends on wine|依賴.*[Ww]ine|依賴.*[Pp]roton' README.md install.sh >/dev/null; then
-  fail "README/install appears to depend on Wine/Proton"
+# NTW0: product honesty is powered-by-Wine (not a Wine ban). Still forbid
+# claiming a silent rebrand of Wine as self-made PE / full Windows OS.
+if rg -qi 'powered by Wine|execution_backend=wine|backend=wine' README.md; then
+  pass "README declares wine / powered by Wine honesty (NTW0)"
 else
-  pass "no Wine/Proton substrate claim in README/install"
+  fail "README missing wine / powered by Wine honesty"
+fi
+if rg -n -i '完整 Windows|full Windows OS|ranked anti-cheat|排位.*通過' README.md install.sh \
+  | rg -v -i '禁|不|not|no |legacy|archive|歷史|廢止' >/dev/null; then
+  fail "README/install appears to claim full Windows / ranked AC"
+else
+  pass "README/install does not claim full Windows / ranked AC"
 fi
 
 STATUS="PASS"

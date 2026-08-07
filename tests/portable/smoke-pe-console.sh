@@ -40,7 +40,7 @@ doc = {
     "error": msg,
     "exclusions_honored": [
         "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
-        "no Wine/Proton substrate; execution_backend=native",
+        "legacy/archive native-era path; product default execution_backend=wine (proton-ge; powered by Wine); not a full Windows OS claim",
         "no WinBox naming",
         "no full Windows compatibility claim",
     ],
@@ -201,7 +201,7 @@ doc = {
     ],
     "exclusions_honored": [
         "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
-        "no Wine/Proton substrate; execution_backend=native",
+        "legacy/archive native-era path; product default execution_backend=wine (proton-ge; powered by Wine); not a full Windows OS claim",
         "no WinBox naming",
         "no full Windows compatibility claim",
         "mode=simulated is not accepted as success",

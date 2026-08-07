@@ -3,9 +3,9 @@
   "stage": "ntw0-contract-legal",
   "status": "PASS",
   "product": "StrawNT",
-  "version": "0.7.1.46",
-  "generated_at": "2026-08-07T16:33:14Z",
-  "git_head": "78d5fe3534b52f29bc7ea482fd9ee3b18d3d6664",
+  "version": "0.7.1.48",
+  "generated_at": "2026-08-07T16:37:20Z",
+  "git_head": "7602e3747707abe21dd049c6c91eed3498ce5963",
   "backend": "wine",
   "execution_backend": "wine",
   "engine": "proton-ge",
@@ -35,7 +35,9 @@
       "ExecutionBackend::Wine + launcher open/install product default wine",
       "root test-wincompat relabeled LEGACY; nt6 wine-ban asserts removed (tick3)",
       "strawnt integrate success output + notify declare wine/proton-ge (tick4)",
-      "portable smoke-prefix/appimage/flatpak exclusions honor wine default (tick4)"
+      "portable smoke-prefix/appimage/flatpak exclusions honor wine default (tick4)",
+      "USER-GUIDE public smokes (flatpak/matrix/closeout) evidence + scripts wine (tick5)",
+      "legacy pe/gx/nt script exclusions no longer claim product no-Wine ban (tick5)"
     ]
   },
   "artifacts": {

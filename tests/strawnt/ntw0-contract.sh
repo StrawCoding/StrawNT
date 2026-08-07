@@ -162,22 +162,55 @@ if ! rg -n 'backend: wine \(proton-ge; powered by Wine\)' \
     failures+=("strawnt integrate missing wine/proton-ge success marker")
 fi
 
-# OpenCode tick4: public portable smokes must not claim "no Wine" as PASS exclusion
-for f in tests/portable/smoke-prefix.sh tests/portable/smoke-appimage.sh; do
-    if rg -n 'no Wine/Proton substrate' "${REPO_ROOT}/${f}" >/dev/null 2>&1; then
-        failures+=("${f} still claims no Wine/Proton substrate in PASS exclusions")
+# OpenCode tick4/5: public portable smokes (USER-GUIDE targets) must not claim "no Wine"
+PUBLIC_SMOKE_SCRIPTS=(
+    tests/portable/smoke-prefix.sh
+    tests/portable/smoke-appimage.sh
+    tests/portable/smoke-flatpak.sh
+    tests/portable/smoke-matrix.sh
+    tests/portable/closeout.sh
+)
+for f in "${PUBLIC_SMOKE_SCRIPTS[@]}"; do
+    if rg -n 'no Wine/Proton substrate|execution_backend=native' "${REPO_ROOT}/${f}" \
+        | rg -v -i 'legacy|archive|historical|retired|廢止|lift' >/dev/null 2>&1; then
+        failures+=("${f} still claims no Wine / native as product PASS exclusion")
     fi
     if ! rg -qi 'execution_backend=wine|powered by Wine' "${REPO_ROOT}/${f}"; then
         failures+=("${f} missing wine default honesty in exclusions/checks")
     fi
 done
-if rg -n 'no Wine/Proton substrate; default execution_backend=native' \
-    "${REPO_ROOT}/tests/portable/output/smoke-prefix.json" >/dev/null 2>&1; then
-    failures+=("smoke-prefix.json evidence still claims native / no Wine")
+PUBLIC_SMOKE_JSON=(
+    tests/portable/output/smoke-prefix.json
+    tests/portable/output/smoke-appimage.json
+    tests/portable/output/smoke-flatpak.json
+    tests/portable/output/matrix.json
+    tests/portable/output/closeout.json
+)
+for f in "${PUBLIC_SMOKE_JSON[@]}"; do
+    if rg -n 'no Wine/Proton substrate|default execution_backend=native' \
+        "${REPO_ROOT}/${f}" >/dev/null 2>&1; then
+        failures+=("${f} evidence still claims native / no Wine")
+    fi
+    if ! rg -qi 'execution_backend=wine|powered by Wine' "${REPO_ROOT}/${f}"; then
+        failures+=("${f} evidence missing wine default honesty")
+    fi
+done
+# Product integrate success path must be present in source (binary may lag in CI)
+if ! rg -n 'Click-to-open enabled for Windows \.exe / \.msi \(wine / proton-ge; powered by Wine\)' \
+    "${REPO_ROOT}/components/strawwu-launcher/src/main.rs" >/dev/null 2>&1; then
+    failures+=("strawnt integrate notify still missing wine/proton-ge marker")
 fi
-if rg -n 'no Wine/Proton substrate' \
-    "${REPO_ROOT}/tests/portable/output/smoke-appimage.json" >/dev/null 2>&1; then
-    failures+=("smoke-appimage.json evidence still claims no Wine/Proton substrate")
+# Installed/local strawnt (if present) must not print native as default status
+if command -v strawnt >/dev/null 2>&1; then
+    STATUS_OUT="$(strawnt status 2>&1 || true)"
+    if echo "${STATUS_OUT}" | grep -qiE 'default backend=native|execution_backend=native \(strawnt-native\)'; then
+        if ! echo "${STATUS_OUT}" | grep -qi 'STRAWNT_LEGACY_NATIVE'; then
+            failures+=("installed strawnt status still declares native default")
+        fi
+    fi
+    if ! echo "${STATUS_OUT}" | grep -qiE 'execution_backend=wine|default backend=wine|powered by Wine'; then
+        failures+=("installed strawnt status missing wine / powered by Wine")
+    fi
 fi
 
 # nt3 must not scan product tree and write_fail on Wine markers
@@ -270,6 +303,8 @@ doc = {
             "root test-wincompat relabeled LEGACY; nt6 wine-ban asserts removed (tick3)",
             "strawnt integrate success output + notify declare wine/proton-ge (tick4)",
             "portable smoke-prefix/appimage/flatpak exclusions honor wine default (tick4)",
+            "USER-GUIDE public smokes (flatpak/matrix/closeout) evidence + scripts wine (tick5)",
+            "legacy pe/gx/nt script exclusions no longer claim product no-Wine ban (tick5)",
         ],
     },
     "artifacts": {

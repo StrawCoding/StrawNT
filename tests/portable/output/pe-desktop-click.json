@@ -115,7 +115,7 @@
   ],
   "exclusions_honored": [
     "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
-    "no Wine/Proton substrate; execution_backend=native",
+    "legacy_native path_role; wine ban lifted (NTW0)",
     "no WinBox naming",
     "no full Windows compatibility claim",
     "mode=simulated is not accepted as success"

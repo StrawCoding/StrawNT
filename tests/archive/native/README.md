@@ -17,7 +17,8 @@
 ## 已軟重置的產品閘（scripts／claims）
 
 - `tests/strawnt/nt0-rebrand.sh` … `nt6-openable.sh` — 廢止「禁 Wine」產品 assert；標 legacy
-- `tests/portable/smoke-gx-*.sh`、`gx-closeout.sh`、`pe-closeout.sh`、`smoke-pe-*.sh` — 同上
+- `tests/portable/smoke-gx-*.sh`、`gx-closeout.sh`、`pe-closeout.sh`、`smoke-pe-*.sh` — 同上；腳本 exclusions 已改寫為 legacy + wine 產品預設（**歷史 output JSON** `pe-*.json`／`gx-*.json`／`nt*.json` 仍保留舊宣稱作 archive）
+- 公開產品煙測（USER-GUIDE）：`smoke-prefix`／`smoke-appimage`／`smoke-flatpak`／`matrix`／`closeout` — 腳本與現行證據皆為 `execution_backend=wine`
 - `tests/portable/smoke-pe-real-exec.sh`、`tests/strawnt/nt3-real-launchers.sh` — **不再**因產品樹出現 Wine marker 而 `write_fail`
 - Makefile：**產品目標**僅 `test-strawnt-ntw0-contract`；native-era 改名為 `test-legacy-portable-pe-*`／`test-legacy-portable-gx-*`／`test-legacy-strawnt-nt*`（含 nt3／nt6；help 獨立 Legacy 區）
 - 根 `test-wincompat`：**LEGACY 別名** → `components test-legacy-wincompat`（不再宣稱一般 Phase 6 Windows 產品驗收）
