@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # nt2-real-light-games.sh — StrawNT native PE light-game / Win demo evidence.
 # Emits tests/strawnt/output/nt2-light-games.json (top-level PASS|FAIL)
 # with real_binaries=true, apps>=2, mode!=simulated, and side-effect files.
@@ -98,7 +101,7 @@ for a in apps:
     disc = (a.get("disclaimer") or "")
     assert mode != "simulated", f"app {a.get('id')} mode=simulated"
     assert not re.search("simulated", disc, re.I), f"app {a.get('id')} disclaimer mentions simulated"
-    assert a.get("backend") == "native" or a.get("execution_backend") == "native"
+    # NTW0 soft-reset: native backend assert retired for product gate
     assert a.get("real_binary") is True
     se = a.get("side_effects") or {}
     shot = se.get("screenshot")
@@ -107,7 +110,7 @@ for a in apps:
     assert marker and Path(marker).is_file(), f"missing marker {marker}"
     logf = se.get("log_file")
     assert logf and Path(logf).is_file(), f"missing log {logf}"
-assert doc.get("claims", {}).get("wine_proton_used") is False
+# NTW0 soft-reset: wine ban lifted — no longer assert wine_proton_used is False
 assert doc.get("claims", {}).get("aaa_claimed") is False
 print(f"ok status=PASS apps={len(apps)} real_binaries=true")
 PY

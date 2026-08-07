@@ -121,7 +121,7 @@ manifest = {
     "notes": [
         "Self-contained StrawNT CLI prefix; primary command is strawnt.",
         "Host glibc / libgcc remain the ABI baseline.",
-        "Default execution_backend=native; not a full Windows OS claim; anti-cheat may fail.",
+        "Default execution_backend=wine (proton-ge; powered by Wine); not a full Windows OS claim; anti-cheat may fail.",
         "Independent product — not an OS/ISO/desktop distribution.",
     ],
 }

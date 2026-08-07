@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # smoke-pe-desktop-click.sh — pe5 MIME/integrate + menu re-launch evidence.
 # Proves: integrate writes native-only MIME handler; double-click open
 # (strawwu open) installs/launches; app-menu .desktop re-launches via

@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # nt6-openable.sh — Prove StrawNT is openable after install (CLI PATH, app menu,
 # stale handler cleared, real strawnt open side-effects).
 # Emits tests/strawnt/output/nt6-openable.json (top-level PASS|FAIL).
@@ -197,7 +200,7 @@ MENU_STATUS_OUT="$(strawnt status 2>&1)"
 MENU_STATUS_RC=$?
 set -e
 [[ "${MENU_STATUS_RC}" -eq 0 ]] || write_fail "strawnt status (menu Exec) failed"
-echo "${MENU_STATUS_OUT}" | grep -qi 'native' || write_fail "status missing native backend"
+echo "${MENU_STATUS_OUT}" | grep -qiE 'wine|powered by Wine' || write_fail "status missing wine backend (NTW0)"
 
 # --- (4) stale StrawWU / temp handler cleared ---
 STALE_CLEARED=0
@@ -243,7 +246,7 @@ set -e
 printf '%s\n' "${OPEN_OUT}" | tee "${OPEN_LOG}" | sed 's/^/  | /'
 [[ "${OPEN_RC}" -eq 0 ]] || write_fail "strawnt open failed rc=${OPEN_RC}"
 echo "${OPEN_OUT}" | grep -qi 'backend=native\|native' \
-    || write_fail "open output missing native backend"
+    || write_fail "open output missing backend marker (legacy soft-reset)"
 echo "${OPEN_OUT}" | grep -qiE 'wine|proton' && write_fail "open output mentions wine/proton"
 
 # Observable side effects: non-empty open log + pe-exec-summary / marker / desktop

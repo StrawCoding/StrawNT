@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # smoke-pe-installer.sh — pe4 native EXE/MSI installer evidence.
 # Unpacks SWUP/SWUM packages, writes app-registry, creates desktop shortcuts,
 # runs open on the same path, and emits tests/portable/output/pe-installer.json

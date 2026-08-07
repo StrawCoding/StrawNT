@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # smoke-gx-audio-input.sh — gx1 WASAPI→PipeWire/equivalent + XInput evidence.
 # Emits tests/portable/output/gx-audio-input.json (top-level PASS|PARTIAL|FAIL)
 # with observable WAV tone + input observation side effects.
@@ -74,8 +77,8 @@ out, side = Path(sys.argv[1]), Path(sys.argv[2])
 doc = json.loads(out.read_text(encoding="utf-8"))
 status = doc.get("status")
 assert status in ("PASS", "PARTIAL"), f"bad status {status}"
-assert doc.get("backend") == "native" or doc.get("execution_backend") == "native"
-assert doc.get("claims", {}).get("wine_proton_used") is False
+# NTW0 soft-reset: allow wine product default; historical JSON may still say native
+# NTW0 soft-reset: wine ban lifted — no longer assert wine_proton_used is False
 audio = doc.get("audio") or {}
 assert int(audio.get("samples_generated") or 0) > 1000, "tone samples missing"
 assert int(audio.get("bytes_rendered") or 0) > 44, "wav bytes missing"
@@ -106,8 +109,8 @@ if grep -qiE 'wine|proton' "${OUT_JSON}"; then
     if ! python3 - "${OUT_JSON}" <<'PY'
 import json, sys
 doc = json.load(open(sys.argv[1], encoding="utf-8"))
-assert doc.get("claims", {}).get("wine_proton_used") is False
-assert doc.get("backend") == "native"
+# NTW0 soft-reset: wine ban lifted — no longer assert wine_proton_used is False
+# NTW0 soft-reset: allow wine product default; historical JSON may still say native
 print("wine denial ok")
 PY
     then

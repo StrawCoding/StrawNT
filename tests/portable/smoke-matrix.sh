@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # smoke-matrix.sh — Portable Core cross-distro container matrix (pc4).
 # Installs the portable bundle into ≥3 distro containers and smokes CLI/runtime.
 # Writes tests/portable/output/matrix.json (top-level status=PASS|FAIL).

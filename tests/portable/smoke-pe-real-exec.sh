@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # smoke-pe-real-exec.sh — pe1 real CPU / instruction loop evidence.
 # Runs the minimal console PE fixture through native strawwu-nt CPU loop,
 # asserts observable stdout/file side effects, and writes

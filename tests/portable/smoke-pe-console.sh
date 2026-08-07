@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # smoke-pe-console.sh — pe2 Win32 console MVP evidence.
 # Runs a console PE that exercises kernel32 file/process + msvcrt CRT paths
 # via the native CPU loop (not stub-registry-only), and writes

@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # smoke-appimage.sh — Portable Core AppImage/bundle smoke in a clean container (pc2).
 # Writes tests/portable/output/smoke-appimage.json (top-level status=PASS|FAIL)
 # and ensures tests/portable/output/SHA256SUMS exists.

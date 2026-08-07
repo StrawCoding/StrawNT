@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # smoke-prefix.sh — Portable Core prefix smoke (pc1).
 # Builds prefix if missing, probes strawwu --version / status without system debs,
 # writes tests/portable/output/smoke-prefix.json (top-level status=PASS|FAIL).

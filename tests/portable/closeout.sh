@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # closeout.sh — Portable Core A+3 pc5 closeout evidence generator.
 # Validates prior stage evidence, docs, artifacts/SHA256, and main merge;
 # writes tests/portable/output/closeout.json (top-level status=PASS|FAIL).

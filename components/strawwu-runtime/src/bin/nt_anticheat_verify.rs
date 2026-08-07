@@ -240,6 +240,7 @@ fn main() {
         "claims": {
             "real_binaries": real_pe_count >= 1,
             "wine_proton_used": false,
+            "path_role": "legacy_native",
             "native_pe_backend": true,
             "anti_cheat_claimed": false,
             "ranked_pass_claimed": false,
@@ -271,7 +272,7 @@ fn main() {
         ],
         "exclusions_honored": [
             "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
-            "no Wine/Proton substrate; execution_backend=native",
+            "legacy_native research path; product default wine/proton-ge (NTW0); powered by Wine",
             "no WinBox naming",
             "no full Windows compatibility claim",
             "no anti-cheat ranked pass claim",

@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # smoke-pe-golden.sh — pe6 golden smoke: ≥2 real public Win PE via native.
 # Apps: 7-Zip CLI (x64/7za.exe) + BusyBox-w32 (busybox64u.exe).
 # Honest PARTIAL when PE loads + CPU runs but full CRT/CLI side effects incomplete.

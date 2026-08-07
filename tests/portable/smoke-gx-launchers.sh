@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # smoke-gx-launchers.sh — gx3 Steam/Epic/Delta launcher evidence.
 # Emits tests/portable/output/gx-launchers.json with top-level PASS|PARTIAL|FAIL.
 set -euo pipefail
@@ -170,7 +173,7 @@ results = doc.get("results") or []
 apps = doc.get("apps") or []
 assert len(launchers) >= 2 or len(results) >= 2 or len(apps) >= 2, "need at least 2 launchers/results/apps"
 claims = doc.get("claims") or {}
-assert claims.get("wine_proton_used") is False, "wine/proton claim invalid"
+# NTW0 soft-reset: wine ban lifted — no longer assert wine_proton_used is False
 assert claims.get("anti_cheat_claimed") is False, "anti-cheat claim must stay false"
 assert claims.get("aaa_claimed") is False, "3A claim must stay false"
 for row in launchers:
@@ -185,7 +188,7 @@ if grep -qiE 'wine|proton' "${OUT_JSON}" >/dev/null; then
 import json, sys
 doc = json.load(open(sys.argv[1], encoding="utf-8"))
 claims = doc.get("claims") or {}
-assert claims.get("wine_proton_used") is False
+# NTW0 soft-reset: wine ban lifted — no longer assert wine_proton_used is False
 print("wine/proton denial only: ok")
 PY
 fi

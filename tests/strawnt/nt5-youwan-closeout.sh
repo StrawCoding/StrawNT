@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # nt5-youwan-closeout.sh — StrawNT youwan closeout evidence generator.
 # Validates nt0–nt4 evidence, docs, release artifacts/SHA256, cross-distro
 # matrix, HTML report; writes tests/strawnt/output/nt5-closeout.json.
@@ -366,8 +369,8 @@ assert len(arts) >= 2, "need >=2 artifacts"
 for a in arts:
     assert "name" in a and "sha256" in a and "kind" in a, a
 notes = " ".join(str(x) for x in (d.get("notes") or [])).lower()
-assert "native" in notes, "artifacts notes missing native"
-assert "wine" not in notes or any(k in notes for k in ("removed", "not", "no", "禁", "forbid"))
+# NTW0: wine is product substrate; notes may mention wine without forbid keywords
+assert ("wine" in notes) or ("native" in notes) or ("powered" in notes), "artifacts notes missing backend honesty"
 names = " ".join(a.get("name", "") for a in arts)
 if version not in names:
     raise SystemExit(f"artifacts.json names missing VERSION {version}")
@@ -389,23 +392,14 @@ DIST="${REPO_ROOT}/components/packaging/portable/appimage/dist"
 [[ -f "${DIST}/StrawNT-${VERSION}-x86_64.portable.tar.gz" ]] \
     || failures+=("missing portable.tar.gz for ${VERSION}")
 
-# Product path: no Wine substrate markers
-if command -v rg >/dev/null 2>&1; then
-    if rg -n -i 'ensure_wine|wine_backend|STRAWWU_BACKEND=wine|STRAWNT_BACKEND=wine|backend=wine' \
-        --glob '!docs/**' --glob '!.git/**' --glob '!tests/**' \
-        --glob '!**/target/**' --glob '!**/pe*-side-effects/**' \
-        --glob '!**/gx*-side-effects/**' --glob '!**/nt*-side-effects/**' \
-        "${REPO_ROOT}/components" "${REPO_ROOT}/install.sh" "${REPO_ROOT}/README.md" \
-        "${REPO_ROOT}/hub" >/tmp/nt5-wine-rg.txt 2>/dev/null; then
-        failures+=("wine substrate markers in product tree (see /tmp/nt5-wine-rg.txt)")
+# NTW0 soft-reset: product default is wine (lift ban). Historical native-era gate retired.
+if ! grep -qiE 'execution_backend=wine|backend=wine|powered by Wine' "${REPO_ROOT}/README.md"; then
+    failures+=("README missing wine backend / powered by Wine (NTW0)")
+fi
+if grep -qiE '禁 Wine|不使用 Wine|（\*\*不\*\*使用 Wine' "${REPO_ROOT}/README.md"; then
+    if ! grep -qiE '廢止|lift|archive|legacy|歷史' "${REPO_ROOT}/README.md"; then
+        failures+=("README still hard-bans Wine without soft-reset wording")
     fi
-fi
-
-if grep -qiE 'default backend\s*=\s*wine|via Wine|STRAWWU_BACKEND=wine|STRAWNT_BACKEND=wine' "${REPO_ROOT}/README.md"; then
-    failures+=("README still documents Wine as default")
-fi
-if ! grep -qiE 'execution_backend=native|backend=native' "${REPO_ROOT}/README.md"; then
-    failures+=("README missing native backend documentation")
 fi
 if ! grep -q 'StrawNT' "${REPO_ROOT}/README.md"; then
     failures+=("README missing StrawNT")
@@ -452,11 +446,8 @@ PY
 PREFIX_BIN="${REPO_ROOT}/components/packaging/portable/prefix/bin/strawnt"
 if [[ -x "${PREFIX_BIN}" ]]; then
     status_out="$("${PREFIX_BIN}" status 2>&1 || true)"
-    if echo "${status_out}" | grep -qiE 'default backend=wine|execution_backend=wine'; then
-        failures+=("prefix strawnt still reports wine backend")
-    fi
-    if ! echo "${status_out}" | grep -qiE 'execution_backend=native|default backend=native'; then
-        failures+=("prefix strawnt missing native backend status")
+    if ! echo "${status_out}" | grep -qiE 'execution_backend=wine|default backend=wine|powered by Wine'; then
+        failures+=("prefix strawnt missing wine backend status (NTW0)")
     fi
     ver_out="$("${PREFIX_BIN}" --version 2>&1 || true)"
     if ! echo "${ver_out}" | grep -qi 'strawnt'; then

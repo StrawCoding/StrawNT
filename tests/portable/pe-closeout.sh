@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # pe-closeout.sh — Native PE Real Exec pe7 closeout evidence generator.
 # Validates pe0–pe6 evidence, docs, release artifacts/SHA256, cross-distro
 # matrix, HTML report; writes tests/portable/output/pe-closeout.json.
@@ -333,37 +336,23 @@ DIST="${REPO_ROOT}/components/packaging/portable/appimage/dist"
 [[ -f "${DIST}/StrawWU-Core-${VERSION}-x86_64.portable.tar.gz" ]] \
     || failures+=("missing portable.tar.gz for ${VERSION}")
 
-# Product path: no Wine substrate markers (exclude tests/docs that only scan for wine)
-if command -v rg >/dev/null 2>&1; then
-    if rg -n -i 'ensure_wine|wine_backend|STRAWWU_BACKEND=wine|backend=wine' \
-        --glob '!docs/**' --glob '!.git/**' --glob '!tests/**' \
-        --glob '!**/target/**' --glob '!**/pe*-side-effects/**' \
-        "${REPO_ROOT}/components" "${REPO_ROOT}/install.sh" "${REPO_ROOT}/README.md" \
-        "${REPO_ROOT}/hub" >/tmp/pe7-wine-rg.txt 2>/dev/null; then
-        failures+=("wine substrate markers in product tree (see /tmp/pe7-wine-rg.txt)")
-    fi
+# NTW0 soft-reset: product default is wine (historical pe-closeout wine ban retired)
+if ! grep -qiE 'execution_backend=wine|backend=wine|powered by Wine' "${REPO_ROOT}/README.md"; then
+    failures+=("README missing wine backend / powered by Wine (NTW0)")
 fi
 
-# README / USER-GUIDE must document native, not Wine default
-if grep -qiE 'default backend\s*=\s*wine|via Wine|STRAWWU_BACKEND=wine' "${REPO_ROOT}/README.md"; then
-    failures+=("README still documents Wine as default")
+# Binary smoke: prefix must report wine (if built)
+PREFIX_BIN="${REPO_ROOT}/components/packaging/portable/prefix/bin/strawnt"
+if [[ ! -x "${PREFIX_BIN}" ]]; then
+    PREFIX_BIN="${REPO_ROOT}/components/packaging/portable/prefix/bin/strawwu"
 fi
-if ! grep -qiE 'execution_backend=native|strawwu-nt|backend=native' "${REPO_ROOT}/README.md"; then
-    failures+=("README missing native backend documentation")
-fi
-
-# Binary smoke: prefix strawwu must report native (if built)
-PREFIX_BIN="${REPO_ROOT}/components/packaging/portable/prefix/bin/strawwu"
 if [[ -x "${PREFIX_BIN}" ]]; then
     status_out="$("${PREFIX_BIN}" status 2>&1 || true)"
-    if echo "${status_out}" | grep -qiE 'default backend=wine|execution_backend=wine'; then
-        failures+=("prefix strawwu still reports wine backend")
-    fi
-    if ! echo "${status_out}" | grep -qiE 'execution_backend=native|default backend=native'; then
-        failures+=("prefix strawwu missing native backend status")
+    if ! echo "${status_out}" | grep -qiE 'execution_backend=wine|default backend=wine|powered by Wine'; then
+        failures+=("prefix strawnt missing wine backend status (NTW0)")
     fi
 else
-    failures+=("prefix strawwu binary missing — rebuild required")
+    failures+=("prefix strawnt/strawwu binary missing — rebuild required")
 fi
 
 # Render HTML

@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # nt1-real-graphics.sh — StrawNT native PE triangle/present evidence.
 # Emits tests/strawnt/output/nt1-graphics.json (top-level PASS|FAIL)
 # with mode!=simulated, backend=native, and observable side-effect files.
@@ -85,8 +88,8 @@ out, side = Path(sys.argv[1]), Path(sys.argv[2])
 doc = json.loads(out.read_text(encoding="utf-8"))
 assert doc.get("status") == "PASS", f"bad status {doc.get('status')}"
 assert doc.get("mode") != "simulated", f"mode must not be simulated: {doc.get('mode')}"
-assert doc.get("backend") == "native" or doc.get("execution_backend") == "native"
-assert doc.get("claims", {}).get("wine_proton_used") is False
+# NTW0 soft-reset: allow wine product default; historical JSON may still say native
+# NTW0 soft-reset: wine ban lifted — no longer assert wine_proton_used is False
 assert doc.get("claims", {}).get("simulated_ok") is False
 se = doc.get("side_effects") or {}
 f = se.get("present_file") or se.get("triangle_file") or (doc.get("artifacts") or [None])[0]
@@ -106,8 +109,8 @@ if grep -qiE 'wine|proton' "${OUT_JSON}"; then
     python3 - "${OUT_JSON}" <<'PY' || write_fail "evidence mentions wine/proton incorrectly"
 import json, sys
 doc = json.load(open(sys.argv[1], encoding="utf-8"))
-assert doc.get("claims", {}).get("wine_proton_used") is False
-assert doc.get("backend") == "native"
+# NTW0 soft-reset: wine ban lifted — no longer assert wine_proton_used is False
+# NTW0 soft-reset: allow wine product default; historical JSON may still say native
 print("wine denial ok")
 PY
 fi

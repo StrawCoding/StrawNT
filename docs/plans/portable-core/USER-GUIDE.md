@@ -1,12 +1,14 @@
 # StrawNT — 使用者指南
 
 在通用 Linux（deb／rpm／Arch 等）以最少系統依賴執行
-**StrawNT** native PE／NT ABI 執行核心（runtime／nt／launcher／graphics·audio／Hub／CLI）。
+**StrawNT**（Wine／Proton-GE 執行核心 + Electron Hub／CLI／prefix）。
 
-> **誠實邊界**：預設以自研 **native PE**（`execution_backend=native`）處理 `.exe`／`.msi`。
-> **不**使用 Wine／Proton。不保證所有 Windows 軟體都可跑；反作弊／核心驅動可能失敗。
+> **誠實邊界**：預設以 **Wine／Proton-GE**（`execution_backend=wine`）處理 `.exe`／`.msi`。
+> 狀態須標示 **powered by Wine**。不保證所有 Windows 軟體都可跑；反作弊／核心驅動可能失敗。
 > Flatpak 對 PE／SubsystemSession 為 **PARTIAL**。不是 ISO／桌面發行版。
 > StrawNT 為獨立產品，與任何 OS ISO／桌面／kernel 發行軌道無關。
+>
+> **契約翻轉（2026-08-07／NTW0）：** 已**廢止**舊「禁 Wine／不使用 Wine」產品硬契約（歷史 archive／legacy 證據除外）。見 `docs/decisions/2026-08-07-wine-pivot.md`。
 
 ## 選擇哪一種包裝
 
@@ -77,31 +79,34 @@ jq .status tests/portable/output/matrix.json
 | 變數 | 說明 |
 |------|------|
 | `STRAWNT_PREFIX` | 安裝／prefix 根目錄（主路徑） |
-| `STRAWNT_BACKEND` | 預設 `native` |
+| `STRAWNT_BACKEND` | 預設 `wine`（產品路徑） |
+| `STRAWNT_LEGACY_NATIVE` | 設為 `1` 啟用舊 native PE 研究路徑（**unsupported**） |
 | `STRAWNT_APP_REGISTRY` | 本機 app-registry JSON |
 | `STRAWNT_BIN` | desktop Exec 使用的 CLI 路徑 |
 
 舊 `STRAWWU_*` 變數仍可讀作相容層，新部署請改用 `STRAWNT_*`。
 
-## 優玩軌道（nt0–nt5）摘要
+## 優玩軌道（nt0–nt6）摘要 — 歷史／legacy
+
+下列為 Wine pivot **之前**的 native 預設軌道證據（保留；非現行產品契約）：
 
 | 階段 | 證據 | 誠實狀態 |
 |------|------|----------|
-| nt0 更名 | `tests/strawnt/output/nt0-rebrand.json` | PASS |
-| nt1 圖形 | `nt1-graphics.json` | PASS（真實 present／triangle） |
-| nt2 輕量遊戲 | `nt2-light-games.json` | PASS（真實二進位） |
-| nt3 啟動器 | `nt3-launchers.json` | **PARTIAL**（僅驗啟動） |
-| nt4 反作弊 | `nt4-anticheat.json` | **PARTIAL**（探測矩陣；禁排位宣稱） |
-| nt5 closeout | `nt5-closeout.json` | 本輪 closeout |
-| nt6 openable | `nt6-openable.json` | PASS（CLI／選單／清 stale／真實 open） |
+| nt0 更名 | `tests/strawnt/output/nt0-rebrand.json` | 歷史 PASS（native-era） |
+| nt1 圖形 | `nt1-graphics.json` | 歷史 PASS（native-era） |
+| nt2 輕量遊戲 | `nt2-light-games.json` | 歷史 PASS（native-era） |
+| nt3 啟動器 | `nt3-launchers.json` | 歷史 PARTIAL |
+| nt4 反作弊 | `nt4-anticheat.json` | 歷史 PARTIAL（禁排位宣稱仍有效） |
+| nt5 closeout | `nt5-closeout.json` | 歷史 closeout |
+| nt6 openable | `nt6-openable.json` | 歷史 PASS |
 
-Closeout 報告：`docs/plans/portable-core/nt5-closeout-report.md`（HTML：`html/nt5-closeout-report.html`）。
+Wine pivot 契約證據：`tests/strawnt/output/ntw0-contract.json`。盤點：`tests/archive/native/README.md`。
 
 ## 誠實非目標
 
 - 不宣稱完整 Windows 應用相容／反作弊排位通過／官方 AC 簽章通過／3A 全開
-- 啟動器（nt3）僅驗啟動；**不**保證遊戲本體完整暢玩
-- 反作弊為探測矩陣（誠實 PARTIAL；grade A/B/C/F，Vanguard=F）；見 `tests/strawnt/output/nt4-anticheat.json`
-- 不使用 Wine／Proton 當底層
-- 不使用 `WinBox`／`winbox` 命名
+- 啟動器僅驗啟動範圍內行為；**不**保證遊戲本體完整暢玩
+- 反作弊為探測矩陣（誠實 PARTIAL）；**禁止**排位／官方通過宣稱
+- 不以自研 PE **偽裝**取代 Wine；旗艦為 **powered by Wine**／proton-ge
+- 不使用 `WinBox`／`winbox` 命名混淆 StrawWinBox
 - 不提供／不依賴任何 OS ISO／桌面／kernel 產物

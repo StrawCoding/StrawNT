@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # smoke-gx-light-games.sh — gx2 lightweight 2D/3D game launcher evidence.
 # Emits tests/portable/output/gx-light-games.json with top-level PASS|PARTIAL|FAIL.
 set -euo pipefail
@@ -164,9 +167,9 @@ assert status in ("PASS", "PARTIAL"), f"bad status={status}"
 apps = doc.get("apps") or []
 results = doc.get("results") or []
 assert len(apps) >= 2 or len(results) >= 2, "need at least 2 apps/results"
-assert doc.get("backend") == "native" or doc.get("execution_backend") == "native"
+# NTW0 soft-reset: allow wine product default; historical JSON may still say native
 claims = doc.get("claims") or {}
-assert claims.get("wine_proton_used") is False, "wine/proton claim invalid"
+# NTW0 soft-reset: wine ban lifted — no longer assert wine_proton_used is False
 assert claims.get("anti_cheat_claimed") is False, "anti-cheat claim must stay false"
 assert claims.get("aaa_claimed") is False, "3A claim must stay false"
 for row in results:

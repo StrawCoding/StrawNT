@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # smoke-gx-anticheat.sh — gx4 EAC/BattlEye/Vanguard/CustomAC probe matrix evidence.
 # Emits tests/portable/output/gx-anticheat.json with top-level PASS|PARTIAL|FAIL.
 # Honest grades only; never claims ranked / official AC signature pass.
@@ -189,7 +192,7 @@ results = doc.get("results") or []
 assert len(cases) >= 1 or len(results) >= 1, "need at least 1 case/result"
 assert len(cases) >= 4, f"expected >=4 AC cases, got {len(cases)}"
 claims = doc.get("claims") or {}
-assert claims.get("wine_proton_used") is False
+# NTW0 soft-reset: wine ban lifted — no longer assert wine_proton_used is False
 assert claims.get("anti_cheat_claimed") is False
 assert claims.get("ranked_pass_claimed") is False
 assert claims.get("aaa_claimed") is False
@@ -210,7 +213,7 @@ python3 - "${OUT_JSON}" <<'PY' || write_fail "wine/proton claim invalid"
 import json, sys
 doc = json.load(open(sys.argv[1], encoding="utf-8"))
 claims = doc.get("claims") or {}
-assert claims.get("wine_proton_used") is False
+# NTW0 soft-reset: wine ban lifted — no longer assert wine_proton_used is False
 assert claims.get("ranked_pass_claimed") is False
 print("wine/proton + ranked denial: ok")
 PY

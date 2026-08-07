@@ -118,6 +118,7 @@ fn main() {
             "anticheat_ranked_pass": false,
             "libpipewire_spa_linked": false,
             "wine_proton_used": false,
+            "path_role": "legacy_native",
         },
     });
 
@@ -135,7 +136,7 @@ fn main() {
 fn exclusions() -> Vec<&'static str> {
     vec![
         "no ISO/os-image/Plymouth/Calamares/kernel/desktop changes",
-        "no Wine/Proton substrate; execution_backend=native",
+        "legacy_native research path; product default wine/proton-ge (NTW0); powered by Wine",
         "no WinBox naming",
         "no full Windows compatibility claim",
         "no anti-cheat ranked pass claim",

@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # nt3-real-launchers.sh — StrawNT real store-launcher / installer PE smoke.
 # Downloads ≥2 public Windows store/installer PEs, launches each via strawnt
 # native, records host-observable side effects, and emits
@@ -555,7 +558,7 @@ results = doc.get("results") or []
 apps = doc.get("apps") or []
 assert len(launchers) >= 1 or len(results) >= 1 or len(apps) >= 1, "need >=1 launchers/results/apps"
 claims = doc.get("claims") or {}
-assert claims.get("wine_proton_used") is False
+# NTW0 soft-reset: wine ban lifted — no longer assert wine_proton_used is False
 assert claims.get("anti_cheat_claimed") is False
 assert claims.get("aaa_claimed") is False
 assert claims.get("simulated_ok") is False

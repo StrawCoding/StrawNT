@@ -321,7 +321,7 @@ ${STATUS_OUT}
 Try:
   strawnt --version
   strawnt status
-  strawnt open setup.exe     # native PE path + app-menu shortcut
+  strawnt open setup.exe     # wine/proton-ge path + app-menu shortcut
   # Or double-click any .exe / .msi in your file manager
   # App menu: StrawNT (runs status); MIME handler is hidden (NoDisplay)
 
@@ -329,7 +329,8 @@ If 'strawnt' is not found, add to PATH (or open a new login shell):
   export PATH="${BIN_DIR}:\$PATH"
   # or: source ~/.config/strawnt/env.sh
 
-Note: .exe/.msi execution uses StrawNT native PE (execution_backend=native).
+Note: .exe/.msi execution uses Wine/Proton-GE (execution_backend=wine; powered by Wine).
 Not every Windows app will run; anti-cheat / kernel drivers may still fail.
+Do not claim ranked / official anti-cheat pass. See docs/legal/WINE-LGPL.md.
 StrawNT is an independent product — not an OS / ISO / desktop distribution.
 EOF

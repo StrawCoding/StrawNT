@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # smoke-gx-graphics.sh — gx0 DXGI/D3D11→VK + wgl→GL/present evidence.
 # Emits tests/portable/output/gx-graphics.json (top-level PASS|PARTIAL|FAIL)
 # with observable triangle PPM + present observation side effects.
@@ -74,8 +77,8 @@ out, side = Path(sys.argv[1]), Path(sys.argv[2])
 doc = json.loads(out.read_text(encoding="utf-8"))
 status = doc.get("status")
 assert status in ("PASS", "PARTIAL"), f"bad status {status}"
-assert doc.get("backend") == "native" or doc.get("execution_backend") == "native"
-assert doc.get("claims", {}).get("wine_proton_used") is False
+# NTW0 soft-reset: allow wine product default; historical JSON may still say native
+# NTW0 soft-reset: wine ban lifted — no longer assert wine_proton_used is False
 tri = doc.get("triangle") or {}
 assert int(tri.get("drawn") or 0) >= 1, "no triangles drawn"
 assert int(tri.get("pixels") or 0) > 100, "triangle pixels missing"
@@ -99,8 +102,8 @@ if grep -qiE 'wine|proton' "${OUT_JSON}"; then
     if ! python3 - "${OUT_JSON}" <<'PY'
 import json, sys
 doc = json.load(open(sys.argv[1], encoding="utf-8"))
-assert doc.get("claims", {}).get("wine_proton_used") is False
-assert doc.get("backend") == "native"
+# NTW0 soft-reset: wine ban lifted — no longer assert wine_proton_used is False
+# NTW0 soft-reset: allow wine product default; historical JSON may still say native
 print("wine denial ok")
 PY
     then

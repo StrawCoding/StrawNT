@@ -6,7 +6,7 @@
 
 ## 目標
 
-在 **app workload**（container 或 microvm 後端內）支援 Windows 遊戲與日常 app 的圖形需求：**Vulkan** 與 **OpenGL** 雙路徑，乾淨實作，禁止 Wine/Proton 嵌入。
+在 **app workload**（container 或 microvm 後端內）支援 Windows 遊戲與日常 app 的圖形需求：**Vulkan** 與 **OpenGL** 雙路徑，乾淨實作，（歷史 GX0 規格；NTW0 起產品預設改 wine／proton-ge，本檔保留為 legacy 圖形軌道說明。）
 
 ## 架構
 

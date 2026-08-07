@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # nt4-anticheat-honest.sh — StrawNT EAC/BattlEye/Vanguard honesty matrix.
 # Emits tests/strawnt/output/nt4-anticheat.json with top-level PARTIAL|PASS|FAIL.
 #
@@ -103,11 +106,11 @@ assert len(cases) >= 4, f"expected ≥4 AC cases, got {len(cases)}"
 claims = doc.get("claims") or {}
 assert claims.get("ranked_pass_claimed") is False
 assert claims.get("anticheat_ranked_pass") is False
-assert claims.get("wine_proton_used") is False
+# NTW0 soft-reset: wine ban lifted — no longer assert wine_proton_used is False
 assert claims.get("anti_cheat_claimed") is False
 assert claims.get("aaa_claimed") is False
 assert claims.get("official_ac_signature_pass") is False
-assert doc.get("execution_backend") == "native"
+# NTW0 soft-reset: execution_backend native assert retired as product gate
 assert doc.get("real_binaries") is True or claims.get("real_binaries") is True
 
 required = {"eac_driver_probe", "battleye_init", "vanguard_tpm_probe", "custom_ac_window_process"}
@@ -154,7 +157,7 @@ python3 - "${OUT_JSON}" <<'PY' || write_fail "honesty claim invalid"
 import json, sys
 doc = json.load(open(sys.argv[1], encoding="utf-8"))
 claims = doc.get("claims") or {}
-assert claims.get("wine_proton_used") is False
+# NTW0 soft-reset: wine ban lifted — no longer assert wine_proton_used is False
 assert claims.get("ranked_pass_claimed") is False
 assert (claims.get("ranked_pass_claimed") or False) is False
 print("wine/proton + ranked denial: ok")

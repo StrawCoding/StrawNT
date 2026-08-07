@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # nt0-rebrand.sh — Evidence for StrawNT rebrand + StrawWU product disconnect.
 set -euo pipefail
 
@@ -67,11 +70,11 @@ if [[ "${BUILD_OK}" == "1" && -x "${CLI}" ]]; then
   else
     fail "strawnt --version unexpected: ${VER_OUT}"
   fi
-  if printf '%s' "${STATUS_OUT}" | rg -q 'execution_backend=native|backend=native'; then
+  if printf '%s' "${STATUS_OUT}" | rg -q 'execution_backend=wine|backend=wine|powered by Wine'; then
     BACKEND_NATIVE=1
-    pass "strawnt status reports native backend"
+    pass "strawnt status reports wine backend (NTW0)"
   else
-    fail "strawnt status missing native backend"
+    fail "strawnt status missing wine backend (NTW0)"
   fi
 fi
 

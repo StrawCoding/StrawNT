@@ -124,9 +124,9 @@ pub fn write_launcher_desktop_in(
             .unwrap_or_else(|| derive_app_name(binary)),
     );
     let strawwu = strawwu_bin_for_exec();
-    // Menu shortcuts always pin --backend native (no Wine/Proton env override).
+    // Menu shortcuts pin product default wine (Proton-GE). Legacy: STRAWNT_LEGACY_NATIVE=1.
     let exec = format!(
-        "{} run --backend native {}",
+        "{} run --backend wine {}",
         desktop_exec_arg(&strawwu),
         desktop_exec_arg(&binary.display().to_string())
     );
@@ -138,7 +138,7 @@ pub fn write_launcher_desktop_in(
         "[Desktop Entry]\n\
          Type=Application\n\
          Name={display_name}\n\
-         Comment=Launch with StrawNT (native PE)\n\
+         Comment=Launch with StrawNT (Wine/Proton-GE; powered by Wine)\n\
          Exec={exec}\n\
          Icon=application-x-ms-dos-executable\n\
          Terminal=false\n\
@@ -147,7 +147,7 @@ pub fn write_launcher_desktop_in(
          X-StrawNT-App-Id={app_id}\n\
          X-StrawNT-Source=launcher\n\
          X-StrawNT-Kind=win32\n\
-         X-StrawNT-Backend=native\n"
+         X-StrawNT-Backend=wine\n"
     );
 
     fs::write(&path, body).map_err(|e| e.to_string())?;
@@ -207,7 +207,7 @@ pub fn install_desktop_integration_in(
          Type=Application\n\
          Name=StrawNT\n\
          GenericName=Windows App Runtime\n\
-         Comment=StrawNT native PE / NT ABI runtime\n\
+         Comment=StrawNT Wine/Proton-GE runtime (powered by Wine)\n\
          Exec={bin_exec} status\n\
          TryExec={try_exec}\n\
          Icon=strawnt\n\
@@ -216,7 +216,7 @@ pub fn install_desktop_integration_in(
          NoDisplay=false\n\
          StartupNotify=true\n\
          X-StrawNT-Kind=menu-launcher\n\
-         X-StrawNT-Backend=native\n"
+         X-StrawNT-Backend=wine\n"
     );
     fs::write(&menu_entry, menu_body).map_err(|e| e.to_string())?;
 
@@ -228,7 +228,7 @@ pub fn install_desktop_integration_in(
          Type=Application\n\
          Name=StrawNT (Open)\n\
          GenericName=Windows App Launcher\n\
-         Comment=Install or run Windows .exe/.msi via StrawNT native PE\n\
+         Comment=Install or run Windows .exe/.msi via StrawNT Wine/Proton-GE\n\
          Exec={open_exec}\n\
          TryExec={try_exec}\n\
          Icon=strawnt\n\
@@ -238,7 +238,7 @@ pub fn install_desktop_integration_in(
          NoDisplay=true\n\
          StartupNotify=true\n\
          X-StrawNT-Kind=open-handler\n\
-         X-StrawNT-Backend=native\n"
+         X-StrawNT-Backend=wine\n"
     );
     fs::write(&open_handler, open_body).map_err(|e| e.to_string())?;
 
@@ -498,8 +498,8 @@ mod tests {
         assert!(content.contains("Name=Notepad"));
         assert!(content.contains("X-StrawNT-App-Id=notepad"));
         assert!(content.contains("strawnt"));
-        assert!(content.contains(" run --backend native "));
-        assert!(content.contains("X-StrawNT-Backend=native"));
+        assert!(content.contains(" run --backend wine "));
+        assert!(content.contains("X-StrawNT-Backend=wine"));
         std::env::remove_var("STRAWNT_BIN");
     }
 
@@ -548,9 +548,10 @@ mod tests {
         assert!(open.contains("MimeType="));
         assert!(open.contains(" open %f"));
         assert!(open.contains("application/x-ms-dos-executable"));
-        assert!(open.contains("X-StrawNT-Backend=native"));
+        assert!(open.contains("X-StrawNT-Backend=wine"));
         assert!(open.contains("NoDisplay=true"));
-        assert!(!open.to_lowercase().contains("wine"));
+        assert!(open.to_lowercase().contains("wine"));
+        assert!(open.to_lowercase().contains("powered by wine") || open.contains("Proton-GE") || open.contains("Wine"));
         assert!(mime.path().join("strawnt-win32.xml").exists());
     }
 

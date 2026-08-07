@@ -23,10 +23,10 @@
   ],
   "sha256sums": "tests/portable/output/SHA256SUMS",
   "notes": [
-    "StrawNT redistribution artifacts for GitHub Releases (nt6-openable-app).",
-    "Default PE backend=native (strawnt-native); Wine/Proton not used as substrate.",
-    "nt6: clean install → strawnt on PATH; app-menu TryExec exists; stale StrawWU/tmp handlers cleared; strawnt open real fixture with side effects.",
+    "StrawNT redistribution artifacts (NTW0 Wine pivot).",
+    "Default PE backend=wine (proton-ge; powered by Wine); GE tree vendored in NTW1 via git-lfs.",
+    "Native PE path archived as legacy (STRAWNT_LEGACY_NATIVE=1 unsupported).",
     "Product is independent of StrawWU OS/ISO/desktop/kernel.",
-    "Not a full Windows OS claim; anti-cheat may fail; no 3A complete claim."
+    "Not a full Windows OS claim; anti-cheat may fail; no ranked / 3A complete claim."
   ]
 }

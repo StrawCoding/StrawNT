@@ -333,8 +333,14 @@ fn main() {
                     sessions,
                     apps.len()
                 );
-                println!("strawnt: execution_backend=native (strawnt-native)");
-                println!("strawnt: default backend=native");
+                if legacy_native_enabled() {
+                    println!("strawnt: execution_backend=native (legacy unsupported)");
+                    println!("strawnt: default backend=native (STRAWNT_LEGACY_NATIVE=1)");
+                } else {
+                    println!("strawnt: execution_backend=wine (proton-ge)");
+                    println!("strawnt: default backend=wine");
+                    println!("strawnt: powered by Wine");
+                }
             }
             Err(e) => {
                 eprintln!("strawnt: status failed: {e}");
@@ -347,13 +353,22 @@ fn main() {
     }
 }
 
-/// Resolve execution backend. Default is **native** (self-built strawnt-native).
+/// NTW0+: product default is **wine** (Proton-GE). Legacy native via STRAWNT_LEGACY_NATIVE=1.
+fn legacy_native_enabled() -> bool {
+    matches!(
+        std::env::var("STRAWNT_LEGACY_NATIVE").ok().as_deref(),
+        Some("1") | Some("true") | Some("TRUE") | Some("yes")
+    )
+}
+
+/// Resolve execution backend. Default is **wine** (proton-ge); legacy native is opt-in only.
 fn resolve_backend(requested: Option<&str>) -> String {
     match requested {
         Some(b) if !b.is_empty() => b.to_string(),
+        _ if legacy_native_enabled() => "native".into(),
         _ => std::env::var("STRAWNT_BACKEND")
             .or_else(|_| std::env::var("STRAWWU_BACKEND"))
-            .unwrap_or_else(|_| "native".into()),
+            .unwrap_or_else(|_| "wine".into()),
     }
 }
 
@@ -616,18 +631,18 @@ fn launch_via_native(
 
 fn print_help() {
     println!(
-        "strawnt {VERSION} — StrawNT native PE / NT ABI runtime
+        "strawnt {VERSION} — StrawNT Wine/Proton-GE runtime (powered by Wine)
 
 USAGE:
     strawnt <COMMAND> [OPTIONS]
 
 COMMANDS:
     open <file.exe|.msi> [--auto|--run|--install]
-        Click-to-open via native strawnt-native (execution_backend=native)
-    run <binary> [--backend native|container|microvm] [--bundle a,b,c]
-        Default backend=native (self-built PE / strawnt-native)
+        Click-to-open via Wine/Proton-GE (execution_backend=wine; powered by Wine)
+    run <binary> [--backend wine|native|container|microvm] [--bundle a,b,c]
+        Default backend=wine (proton-ge); legacy native via STRAWNT_LEGACY_NATIVE=1
     install <installer.exe|.msi>
-        Native unpack (SWUP/SWUM) → app-registry + shortcut; else pending + run
+        Install via wine/GE path → app-registry + shortcut; else pending + run
     integrate
         Enable double-click for .exe/.msi (MIME + desktop handler)
     apps list
@@ -642,12 +657,13 @@ COMMANDS:
 CLICK TO INSTALL & LAUNCH:
     1) curl …/install.sh | bash
     2) strawnt integrate          # if needed after desktop change
-    3) double-click any .exe/.msi — native strawnt-native path
+    3) double-click any .exe/.msi — wine/proton-ge path
     4) relaunch from the app menu (~/.local/share/applications)
 
 BACKEND:
-    Default: native (STRAWNT_BACKEND / STRAWWU_BACKEND unset or native)
-    Override: STRAWNT_BACKEND=native|container|microvm
+    Default: wine (STRAWNT_BACKEND unset; engine=proton-ge; powered by Wine)
+    Override: STRAWNT_BACKEND=wine|native|container|microvm
+    Legacy: STRAWNT_LEGACY_NATIVE=1 (unsupported research path)
 
 REGISTRY:
     run/install/open register apps in the local app-registry

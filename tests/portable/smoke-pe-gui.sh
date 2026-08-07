@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
+# Product default is now execution_backend=wine / proton-ge. Do not treat
+# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
 # smoke-pe-gui.sh — pe3 user32/gdi GUI MVP evidence.
 # Runs a GUI PE that exercises RegisterClass/CreateWindow/ShowWindow/message
 # loop + GetDC/BitBlt via the native CPU loop, writes screenshot + compositor
