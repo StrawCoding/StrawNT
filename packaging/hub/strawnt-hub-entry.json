@@ -6,7 +6,9 @@
     "stack": "electron",
     "entry": "hub/",
     "desktop": "strawnt-hub.desktop",
-    "executable": "strawnt-hub"
+    "executable": "strawnt-hub",
+    "bundled_runtime": "hub/electron-runtime/electron",
+    "window_title": "StrawNT Hub"
   },
   "execution_backend": "wine",
   "engine": "proton-ge",

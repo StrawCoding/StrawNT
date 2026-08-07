@@ -3,12 +3,13 @@
   "status": "PASS",
   "stage": "ntw7-packaging",
   "product": "StrawNT",
-  "version": "0.7.1.64",
-  "git_head": "9809110c3",
-  "timestamp_utc": "2026-08-07T19:58:09Z",
+  "version": "0.7.1.65",
+  "git_head": "6536c0e5a",
+  "timestamp_utc": "2026-08-07T20:12:22Z",
   "execution_backend": "wine",
   "engine": "proton-ge",
   "powered_by": "Wine",
+  "simulated": false,
   "delivery": {
     "gui_local": "PASS",
     "desktop_mime": "PASS",
@@ -16,15 +17,26 @@
     "rpm": "PASS",
     "flatpak": "PARTIAL"
   },
+  "gui_local": {
+    "status": "PASS",
+    "method": "xvfb+xwininfo",
+    "display": ":95",
+    "window_match": "0x200003 \"StrawNT Hub\": (\"strawwu-hub\" \"strawwu-hub\")  960x680+160+20  +160+20",
+    "simulated": false,
+    "bundled_electron": "35.7.5",
+    "electron_path": "usr/lib/strawnt/hub/electron-runtime/electron",
+    "hub_version": "strawnt-hub 0.7.1.65 (gui_local; electron=35.7.5; powered by Wine)"
+  },
   "artefacts": {
-    "deb": "strawnt_0.7.1+d64-1_amd64.deb",
-    "rpm": "strawnt-0.7.1.64-1.fc41.x86_64.rpm",
+    "deb": "strawnt_0.7.1+d65-1_amd64.deb",
+    "rpm": "strawnt-0.7.1.65-1.fc41.x86_64.rpm",
     "sha256sums": "SHA256SUMS",
     "sha256sums_dist": "dist/SHA256SUMS",
     "sha256sums_tests": "tests/strawnt/output/SHA256SUMS",
     "gpg": "signed",
     "flatpak": "PARTIAL",
-    "packaging_dir": "packaging"
+    "packaging_dir": "packaging",
+    "bundled_electron": "usr/lib/strawnt/hub/electron-runtime/electron"
   },
   "distros": [
     "ubuntu-24.04",
@@ -42,6 +54,7 @@
           "packaging/mime/strawnt-win32.xml"
         ],
         "hub_entry": "packaging/hub/strawnt-hub-entry.json",
+        "bundled_electron": "hub/electron-runtime (via build-release.sh)",
         "flatpak_manifest": "packaging/flatpak/org.strawcoding.strawnt.yml",
         "execution_backend": "wine",
         "powered_by": "Wine"
@@ -50,10 +63,11 @@
     "build": {
       "status": "PASS",
       "detail": {
-        "deb": "/mnt/data/code/project/StrawCoding/StrawNT/dist/strawnt_0.7.1+d64-1_amd64.deb",
-        "rpm": "/mnt/data/code/project/StrawCoding/StrawNT/dist/strawnt-0.7.1.64-1.fc41.x86_64.rpm",
+        "deb": "/mnt/data/code/project/StrawCoding/StrawNT/dist/strawnt_0.7.1+d65-1_amd64.deb",
+        "rpm": "/mnt/data/code/project/StrawCoding/StrawNT/dist/strawnt-0.7.1.65-1.fc41.x86_64.rpm",
         "flatpak": "PARTIAL",
-        "version": "0.7.1.64"
+        "version": "0.7.1.65",
+        "skipped_rebuild": true
       }
     },
     "sha256_sign": {
@@ -64,10 +78,10 @@
         "gpg_key_hint": "apt@wastebase.xyz",
         "files": [
           "flatpak-status.json",
-          "strawnt-0.7.1.64-1.fc41.x86_64.rpm",
-          "strawnt_0.7.1+d64-1_amd64.deb"
+          "strawnt-0.7.1.65-1.fc41.x86_64.rpm",
+          "strawnt_0.7.1+d65-1_amd64.deb"
         ],
-        "sha256sums": "cd11bbe0ce370cb37b9a8ab4a139c6bf5a1fb04e666918ae2286d8a3a888a8c1  flatpak-status.json\n0dc206888cba9f069a0772534e32787b815041cf5eb4d777b310b3137ce5be11  strawnt-0.7.1.64-1.fc41.x86_64.rpm\nb15341023af467f3718e77867a96f0d69d0b43ddd66f9eeb9057e4f4e658411f  strawnt_0.7.1+d64-1_amd64.deb\n",
+        "sha256sums": "cd11bbe0ce370cb37b9a8ab4a139c6bf5a1fb04e666918ae2286d8a3a888a8c1  flatpak-status.json\neb1011c44952a0901e2891c852152d4778ba405bc9612d38fd8a4a23d3d0e36a  strawnt-0.7.1.65-1.fc41.x86_64.rpm\ne881d09f0ac3fe50f389ef2ebcd00a591070aea1366c0d3a610dc5011f411a5b  strawnt_0.7.1+d65-1_amd64.deb\n",
         "execution_backend": "wine",
         "engine": "proton-ge",
         "powered_by": "Wine"
@@ -78,8 +92,17 @@
       "detail": {
         "doctor_backend": "wine",
         "doctor_status": "PASS",
-        "version": "0.7.1.64",
-        "gui_local": "strawnt-hub --version OK",
+        "version": "0.7.1.65",
+        "gui_local": {
+          "status": "PASS",
+          "method": "xvfb+xwininfo",
+          "display": ":95",
+          "window_match": "0x200003 \"StrawNT Hub\": (\"strawwu-hub\" \"strawwu-hub\")  960x680+160+20  +160+20",
+          "simulated": false,
+          "bundled_electron": "35.7.5",
+          "electron_path": "usr/lib/strawnt/hub/electron-runtime/electron",
+          "hub_version": "strawnt-hub 0.7.1.65 (gui_local; electron=35.7.5; powered by Wine)"
+        },
         "desktop_mime": "present",
         "distro": "ubuntu-26.04"
       }
@@ -91,6 +114,7 @@
         "artefact": "deb",
         "execution_backend": "wine",
         "powered_by": "Wine",
+        "gui_local_electron_bundled": true,
         "status": "PASS"
       }
     },
@@ -101,6 +125,7 @@
         "artefact": "deb",
         "execution_backend": "wine",
         "powered_by": "Wine",
+        "gui_local_electron_bundled": true,
         "status": "PASS"
       }
     },
@@ -111,15 +136,17 @@
         "artefact": "rpm",
         "execution_backend": "wine",
         "powered_by": "Wine",
+        "gui_local_electron_bundled": true,
         "status": "PASS"
       }
     }
   },
-  "sha256sums": "cd11bbe0ce370cb37b9a8ab4a139c6bf5a1fb04e666918ae2286d8a3a888a8c1  flatpak-status.json\n0dc206888cba9f069a0772534e32787b815041cf5eb4d777b310b3137ce5be11  strawnt-0.7.1.64-1.fc41.x86_64.rpm\nb15341023af467f3718e77867a96f0d69d0b43ddd66f9eeb9057e4f4e658411f  strawnt_0.7.1+d64-1_amd64.deb\n",
+  "sha256sums": "cd11bbe0ce370cb37b9a8ab4a139c6bf5a1fb04e666918ae2286d8a3a888a8c1  flatpak-status.json\neb1011c44952a0901e2891c852152d4778ba405bc9612d38fd8a4a23d3d0e36a  strawnt-0.7.1.65-1.fc41.x86_64.rpm\ne881d09f0ac3fe50f389ef2ebcd00a591070aea1366c0d3a610dc5011f411a5b  strawnt_0.7.1+d65-1_amd64.deb\n",
   "notes": [
     "deb/rpm omit multi-GB Proton-GE dist; PIN + fetch scripts shipped; smoke bind-mounts GE",
+    "deb/rpm bundle Electron under hub/electron-runtime for post-install gui_local",
+    "gui_local PASS requires real X11 window (xvfb+xwininfo), not --version alone",
     "flatpak honest PARTIAL",
-    "not a full Windows / ranked anti-cheat claim",
-    "git_head captured at smoke time; packaging artefacts rebuilt under VERSION"
+    "not a full Windows / ranked anti-cheat claim"
   ]
 }

@@ -57,6 +57,7 @@ grep -qi 'X-StrawNT-Kind=gui-local' "${REPO_ROOT}/packaging/desktop/strawnt-hub.
 jq -e '.execution_backend == "wine"' "${REPO_ROOT}/packaging/hub/strawnt-hub-entry.json" >/dev/null
 jq -e '.powered_by == "Wine"' "${REPO_ROOT}/packaging/hub/strawnt-hub-entry.json" >/dev/null
 jq -e '.hub.stack == "electron"' "${REPO_ROOT}/packaging/hub/strawnt-hub-entry.json" >/dev/null
+jq -e '.hub.bundled_runtime | type == "string"' "${REPO_ROOT}/packaging/hub/strawnt-hub-entry.json" >/dev/null
 python3 - <<PY
 import json
 from pathlib import Path
@@ -64,6 +65,7 @@ Path("${WORK}/contracts.json").write_text(json.dumps({
   "gui_local": "packaging/desktop/strawnt-hub.desktop.in",
   "desktop_mime": ["packaging/desktop/strawnt-open.desktop.in", "packaging/mime/strawnt-win32.xml"],
   "hub_entry": "packaging/hub/strawnt-hub-entry.json",
+  "bundled_electron": "hub/electron-runtime (via build-release.sh)",
   "flatpak_manifest": "packaging/flatpak/org.strawcoding.strawnt.yml",
   "execution_backend": "wine",
   "powered_by": "Wine",
@@ -136,7 +138,7 @@ PY
   record_check sha256_sign PASS "${SIGN_JSON}"
 fi
 
-echo "== host extract smoke (.deb + GE bind) =="
+echo "== host extract smoke (.deb + GE bind + gui_local window) =="
 HOST_ROOT="${WORK}/host-root"
 mkdir -p "${HOST_ROOT}"
 dpkg-deb -x "${DEB}" "${HOST_ROOT}"
@@ -151,9 +153,10 @@ if [[ -d "${GE_SRC}/dist" ]]; then
 fi
 cp -f "${GE_SRC}/PIN" "${STRAWNT_ROOT}/third_party/proton-ge/PIN"
 
-# gui_local + MIME presence in package
+# gui_local + MIME + bundled Electron presence in package
 [[ -x "${HOST_ROOT}/usr/bin/strawnt" ]] || die "packaged strawnt missing"
 [[ -x "${HOST_ROOT}/usr/bin/strawnt-hub" ]] || die "packaged strawnt-hub missing"
+[[ -x "${STRAWNT_ROOT}/hub/electron-runtime/electron" ]] || die "bundled Electron runtime missing from deb (gui_local cannot start)"
 [[ -f "${HOST_ROOT}/usr/share/applications/strawnt.desktop" ]] || die "menu desktop missing in deb"
 [[ -f "${HOST_ROOT}/usr/share/applications/strawnt-open.desktop" ]] || die "open desktop missing in deb"
 [[ -f "${HOST_ROOT}/usr/share/applications/strawnt-hub.desktop" ]] || die "hub desktop missing in deb"
@@ -163,6 +166,66 @@ grep -q 'X-StrawNT-Kind=gui-local' "${HOST_ROOT}/usr/share/applications/strawnt-
 grep -q 'MimeType=' "${HOST_ROOT}/usr/share/applications/strawnt-open.desktop"
 HUB_VER="$("${HOST_ROOT}/usr/bin/strawnt-hub" --version)"
 echo "${HUB_VER}" | grep -q "${VERSION}" || die "hub version mismatch: ${HUB_VER}"
+echo "${HUB_VER}" | grep -qi 'electron=' || die "hub --version must report bundled electron=…"
+ELE_VER_PKG="$(tr -d '[:space:]' < "${STRAWNT_ROOT}/hub/electron-runtime/version")"
+[[ -n "${ELE_VER_PKG}" ]] || die "electron-runtime/version empty"
+
+# Real gui_local window side-effect (Xvfb + xwininfo) — not --version alone
+command -v Xvfb >/dev/null || die "Xvfb required for gui_local window smoke"
+command -v xwininfo >/dev/null || die "xwininfo required for gui_local window smoke"
+GUI_DISP_NUM=$(( 80 + (RANDOM % 40) ))
+GUI_DISPLAY=":${GUI_DISP_NUM}"
+GUI_LOG="${WORK}/gui-local.log"
+GUI_TREE="${WORK}/gui-xwininfo.txt"
+Xvfb "${GUI_DISPLAY}" -screen 0 1280x720x24 >"${WORK}/xvfb.log" 2>&1 &
+XVFB_PID=$!
+cleanup_gui() {
+  if [[ -n "${HUB_PID:-}" ]]; then
+    kill "${HUB_PID}" 2>/dev/null || true
+    wait "${HUB_PID}" 2>/dev/null || true
+  fi
+  if [[ -n "${XVFB_PID:-}" ]]; then
+    kill "${XVFB_PID}" 2>/dev/null || true
+    wait "${XVFB_PID}" 2>/dev/null || true
+  fi
+}
+trap 'cleanup_gui; rm -rf "${WORK}"' EXIT
+sleep 0.6
+export DISPLAY="${GUI_DISPLAY}"
+export STRAWNT_ELECTRON_NO_SANDBOX=1
+"${HOST_ROOT}/usr/bin/strawnt-hub" >"${GUI_LOG}" 2>&1 &
+HUB_PID=$!
+GUI_FOUND=0
+GUI_TITLE=""
+for _i in $(seq 1 80); do
+  if ! kill -0 "${HUB_PID}" 2>/dev/null; then
+    echo "strawnt-hub exited early during gui_local smoke" >&2
+    cat "${GUI_LOG}" >&2 || true
+    die "gui_local process died before window"
+  fi
+  xwininfo -root -tree >"${GUI_TREE}" 2>/dev/null || true
+  if grep -Eiq 'StrawNT Hub|StrawWU Hub|"strawwu-hub"|"strawnt-hub"' "${GUI_TREE}"; then
+    GUI_FOUND=1
+    GUI_TITLE="$(grep -Ei 'StrawNT Hub|StrawWU Hub|strawwu-hub|strawnt-hub' "${GUI_TREE}" | head -1 | sed 's/^[[:space:]]*//')"
+    break
+  fi
+  sleep 0.25
+done
+[[ "${GUI_FOUND}" -eq 1 ]] || {
+  echo "gui_local window not found on ${GUI_DISPLAY}" >&2
+  cat "${GUI_TREE}" >&2 || true
+  cat "${GUI_LOG}" >&2 || true
+  die "gui_local missing real window side-effect"
+}
+kill "${HUB_PID}" 2>/dev/null || true
+wait "${HUB_PID}" 2>/dev/null || true
+HUB_PID=""
+kill "${XVFB_PID}" 2>/dev/null || true
+wait "${XVFB_PID}" 2>/dev/null || true
+XVFB_PID=""
+# restore original EXIT trap (WORK cleanup only)
+trap 'rm -rf "${WORK}"' EXIT
+unset DISPLAY
 
 HOST_JSON="${WORK}/host-doctor.json"
 "${HOST_ROOT}/usr/bin/strawnt" doctor --json | tee "${HOST_JSON}" >/dev/null
@@ -174,16 +237,32 @@ HOST_VER="$("${HOST_ROOT}/usr/bin/strawnt" version 2>/dev/null | head -1 || true
 PKG_VER="$(tr -d '[:space:]' < "${STRAWNT_ROOT}/VERSION")"
 [[ "${PKG_VER}" == "${VERSION}" ]] || die "packaged VERSION ${PKG_VER} != ${VERSION}"
 
-python3 - <<PY
-import json
+export NTW7_HOST_JSON="${WORK}/host.json"
+export NTW7_PKG_VER="${PKG_VER}"
+export NTW7_GUI_DISPLAY="${GUI_DISPLAY}"
+export NTW7_GUI_TITLE="${GUI_TITLE}"
+export NTW7_ELE_VER="${ELE_VER_PKG}"
+export NTW7_HUB_VER="${HUB_VER}"
+export NTW7_DISTRO="$(. /etc/os-release; echo ${ID}-${VERSION_ID})"
+python3 - <<'PY'
+import json, os
 from pathlib import Path
-Path("${WORK}/host.json").write_text(json.dumps({
+Path(os.environ["NTW7_HOST_JSON"]).write_text(json.dumps({
   "doctor_backend": "wine",
   "doctor_status": "PASS",
-  "version": "${PKG_VER}",
-  "gui_local": "strawnt-hub --version OK",
+  "version": os.environ["NTW7_PKG_VER"],
+  "gui_local": {
+    "status": "PASS",
+    "method": "xvfb+xwininfo",
+    "display": os.environ["NTW7_GUI_DISPLAY"],
+    "window_match": os.environ["NTW7_GUI_TITLE"],
+    "simulated": False,
+    "bundled_electron": os.environ["NTW7_ELE_VER"],
+    "electron_path": "usr/lib/strawnt/hub/electron-runtime/electron",
+    "hub_version": os.environ["NTW7_HUB_VER"],
+  },
   "desktop_mime": "present",
-  "distro": "$(. /etc/os-release; echo ${ID}-${VERSION_ID})",
+  "distro": os.environ["NTW7_DISTRO"],
 }, indent=2) + "\n", encoding="utf-8")
 PY
 record_check host_smoke PASS "${WORK}/host.json"
@@ -194,7 +273,7 @@ smoke_deb_in_docker() {
   cid="$(docker create \
     -v "${DEB}:/pkg/strawnt.deb:ro" \
     -v "${GE_SRC}:/ge:ro" \
-    "${image}" sleep 240)"
+    "${image}" sleep 600)"
   docker start "${cid}" >/dev/null
   if ! docker exec "${cid}" bash -lc '
     set -euo pipefail
@@ -204,15 +283,17 @@ smoke_deb_in_docker() {
     dpkg -i /pkg/strawnt.deb >/dev/null 2>&1 || apt-get install -f -y -qq >/dev/null
     command -v strawnt >/dev/null
     command -v strawnt-hub >/dev/null
+    test -x /usr/lib/strawnt/hub/electron-runtime/electron
     test -f /usr/share/applications/strawnt-hub.desktop
     test -f /usr/share/mime/packages/strawnt-win32.xml
-    # Mount GE for doctor
     mkdir -p /usr/lib/strawnt/third_party/proton-ge
     rm -rf /usr/lib/strawnt/third_party/proton-ge/dist
     ln -sfn /ge/dist /usr/lib/strawnt/third_party/proton-ge/dist
     cp -f /ge/PIN /usr/lib/strawnt/third_party/proton-ge/PIN
     export STRAWNT_ROOT=/usr/lib/strawnt
-    strawnt-hub --version >/dev/null
+    HUB_VER="$(strawnt-hub --version)"
+    echo "${HUB_VER}" | grep -qi electron=
+    echo "${HUB_VER}" > /tmp/hub-ver.txt
     set +e
     strawnt doctor --json > /tmp/nt-doctor.json 2>/tmp/nt-doctor.err
     ec=$?
@@ -243,13 +324,14 @@ smoke_rpm_in_docker() {
   cid="$(docker create \
     -v "${RPM}:/pkg/${rpm_base}:ro" \
     -v "${GE_SRC}:/ge:ro" \
-    "${image}" sleep 300)"
+    "${image}" sleep 600)"
   docker start "${cid}" >/dev/null
   if ! docker exec "${cid}" bash -lc "
     set -euo pipefail
     dnf install -y -q /pkg/${rpm_base} >/dev/null
     command -v strawnt >/dev/null
     command -v strawnt-hub >/dev/null
+    test -x /usr/lib/strawnt/hub/electron-runtime/electron
     test -f /usr/share/applications/strawnt.desktop
     test -f /usr/share/mime/packages/strawnt-win32.xml
     mkdir -p /usr/lib/strawnt/third_party/proton-ge
@@ -257,7 +339,8 @@ smoke_rpm_in_docker() {
     ln -sfn /ge/dist /usr/lib/strawnt/third_party/proton-ge/dist
     cp -f /ge/PIN /usr/lib/strawnt/third_party/proton-ge/PIN
     export STRAWNT_ROOT=/usr/lib/strawnt
-    strawnt-hub --version >/dev/null
+    HUB_VER=\"\$(strawnt-hub --version)\"
+    echo \"\${HUB_VER}\" | grep -qi electron=
     set +e
     strawnt doctor --json > /tmp/nt-doctor.json 2>/tmp/nt-doctor.err
     ec=\$?
@@ -291,6 +374,7 @@ Path("${WORK}/ubuntu.json").write_text(json.dumps({
   "distro": "ubuntu-24.04", "artefact": "deb",
   "execution_backend": doc.get("execution_backend"),
   "powered_by": doc.get("powered_by"),
+  "gui_local_electron_bundled": True,
   "status": "PASS",
 }, indent=2)+"\n")
 PY
@@ -306,6 +390,7 @@ Path("${WORK}/debian.json").write_text(json.dumps({
   "distro": "debian-bookworm", "artefact": "deb",
   "execution_backend": doc.get("execution_backend"),
   "powered_by": doc.get("powered_by"),
+  "gui_local_electron_bundled": True,
   "status": "PASS",
 }, indent=2)+"\n")
 PY
@@ -321,6 +406,7 @@ Path("${WORK}/fedora.json").write_text(json.dumps({
   "distro": "fedora-41", "artefact": "rpm",
   "execution_backend": doc.get("execution_backend"),
   "powered_by": doc.get("powered_by"),
+  "gui_local_electron_bundled": True,
   "status": "PASS",
 }, indent=2)+"\n")
 PY
@@ -342,6 +428,11 @@ flatpak = json.loads(Path("${DIST}/flatpak-status.json").read_text(encoding="utf
 sha_text = Path("${REPO_ROOT}/SHA256SUMS").read_text(encoding="utf-8")
 sign = json.loads(Path("${SIGN_JSON}").read_text(encoding="utf-8"))
 
+host_gui = ((checks.get("host_smoke") or {}).get("detail") or {}).get("gui_local") or {}
+gui_status = "PASS" if isinstance(host_gui, dict) and host_gui.get("status") == "PASS" and host_gui.get("simulated") is False else "FAIL"
+if gui_status != "PASS":
+    overall = "FAIL"
+
 evidence = {
     "schema": "strawnt-ntw7-packaging/v1",
     "status": overall,
@@ -353,13 +444,15 @@ evidence = {
     "execution_backend": "wine",
     "engine": "proton-ge",
     "powered_by": "Wine",
+    "simulated": False,
     "delivery": {
-        "gui_local": "PASS",
+        "gui_local": gui_status,
         "desktop_mime": "PASS",
         "deb": "PASS",
         "rpm": "PASS",
         "flatpak": flatpak.get("status", "PARTIAL"),
     },
+    "gui_local": host_gui,
     "artefacts": {
         "deb": Path("${DEB}").name,
         "rpm": Path("${RPM}").name,
@@ -369,6 +462,7 @@ evidence = {
         "gpg": sign.get("gpg"),
         "flatpak": flatpak.get("status"),
         "packaging_dir": "packaging",
+        "bundled_electron": "usr/lib/strawnt/hub/electron-runtime/electron",
     },
     "distros": ["ubuntu-24.04", "debian-bookworm", "fedora-41"],
     "hub_entry": "packaging/hub/strawnt-hub-entry.json",
@@ -376,6 +470,8 @@ evidence = {
     "sha256sums": sha_text,
     "notes": [
         "deb/rpm omit multi-GB Proton-GE dist; PIN + fetch scripts shipped; smoke bind-mounts GE",
+        "deb/rpm bundle Electron under hub/electron-runtime for post-install gui_local",
+        "gui_local PASS requires real X11 window (xvfb+xwininfo), not --version alone",
         "flatpak honest PARTIAL",
         "not a full Windows / ranked anti-cheat claim",
     ],
@@ -388,4 +484,4 @@ if overall not in ("PASS", "PARTIAL"):
 PY
 
 echo "ntw7 packaging smoke OK"
-jq '{status, version, delivery, artefacts}' "${OUT_JSON}"
+jq '{status, version, delivery, gui_local, artefacts}' "${OUT_JSON}"

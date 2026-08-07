@@ -86,7 +86,7 @@ install -m 0644 "${REPO_ROOT}/README.md" "${SHARE_DOC}/README.md"
 install -m 0755 "${REPO_ROOT}/scripts/fetch-proton-ge.sh" "${LIB}/scripts/fetch-proton-ge.sh"
 install -m 0755 "${REPO_ROOT}/scripts/verify-proton-ge.sh" "${LIB}/scripts/verify-proton-ge.sh"
 
-# Hub sources for gui_local (Electron app directory; runtime needs electron)
+# Hub sources for gui_local + vendored Electron runtime (required for post-install GUI)
 rsync -a \
   --exclude 'node_modules/' \
   --exclude 'dist/' \
@@ -97,6 +97,43 @@ rsync -a \
 # Desktop entries for system apps (gui_local)
 mkdir -p "${LIB}/hub/resources/desktop"
 rsync -a "${REPO_ROOT}/hub/resources/desktop/" "${LIB}/hub/resources/desktop/"
+
+log "vendoring Electron runtime into package (gui_local)"
+ELE_SRC=""
+if [[ -x "${REPO_ROOT}/hub/node_modules/electron/dist/electron" ]]; then
+  ELE_SRC="${REPO_ROOT}/hub/node_modules/electron/dist"
+  log "reusing host hub/node_modules/electron/dist"
+else
+  command -v npm >/dev/null || die "npm required to vendor Electron for gui_local"
+  HUB_BUILD="${STAGE}/hub-build"
+  rm -rf "${HUB_BUILD}"
+  mkdir -p "${HUB_BUILD}"
+  rsync -a \
+    --exclude 'node_modules/' \
+    --exclude 'dist/' \
+    --exclude 'test/' \
+    --exclude 'tests/' \
+    "${REPO_ROOT}/hub/" "${HUB_BUILD}/"
+  (
+    cd "${HUB_BUILD}"
+    if [[ -f package-lock.json ]]; then
+      npm ci
+    else
+      npm install
+    fi
+  )
+  ELE_SRC="${HUB_BUILD}/node_modules/electron/dist"
+fi
+[[ -x "${ELE_SRC}/electron" ]] || die "electron binary missing (${ELE_SRC})"
+mkdir -p "${LIB}/hub/electron-runtime"
+rsync -a "${ELE_SRC}/" "${LIB}/hub/electron-runtime/"
+chmod 0755 "${LIB}/hub/electron-runtime/electron"
+if [[ -f "${LIB}/hub/electron-runtime/chrome-sandbox" ]]; then
+  chmod 0755 "${LIB}/hub/electron-runtime/chrome-sandbox"
+fi
+ELE_VER="$(tr -d '[:space:]' < "${LIB}/hub/electron-runtime/version" 2>/dev/null || echo unknown)"
+printf '%s\n' "${ELE_VER}" > "${LIB}/hub/electron-runtime/ELECTRON_VERSION"
+log "bundled Electron ${ELE_VER} → /usr/lib/strawnt/hub/electron-runtime/"
 
 install -m 0644 "${REPO_ROOT}/packaging/hub/strawnt-hub-entry.json" "${LIB}/packaging/hub/"
 install -m 0644 "${REPO_ROOT}/packaging/mime/strawnt-win32.xml" "${LIB}/packaging/mime/"
@@ -125,40 +162,57 @@ exec "${STRAWNT_ROOT}/bin/strawnt-real" "$@"
 EOF
 chmod 0755 "${BIN}/strawnt"
 
-# Hub / gui_local wrapper
+# Hub / gui_local wrapper — prefers packaged Electron runtime
 cat > "${BIN}/strawnt-hub" <<'EOF'
 #!/usr/bin/env bash
 # StrawNT Electron Hub (gui_local) — powered by Wine · execution_backend=wine
 set -euo pipefail
 export STRAWNT_ROOT="${STRAWNT_ROOT:-/usr/lib/strawnt}"
 HUB_DIR="${STRAWNT_ROOT}/hub"
+BUNDLE_ELE="${HUB_DIR}/electron-runtime/electron"
 export PATH="${STRAWNT_ROOT}/bin:${PATH}"
 
 if [[ "${1:-}" == "--version" ]] || [[ "${1:-}" == "version" ]]; then
-  echo "strawnt-hub $(tr -d '[:space:]' < "${STRAWNT_ROOT}/VERSION" 2>/dev/null || echo unknown) (gui_local; powered by Wine)"
+  ELE_VER="$(tr -d '[:space:]' < "${HUB_DIR}/electron-runtime/version" 2>/dev/null || echo missing)"
+  echo "strawnt-hub $(tr -d '[:space:]' < "${STRAWNT_ROOT}/VERSION" 2>/dev/null || echo unknown) (gui_local; electron=${ELE_VER}; powered by Wine)"
   exit 0
 fi
 
 pick_electron() {
-  if command -v electron >/dev/null 2>&1; then
-    command -v electron
+  # 1) Packaged runtime (deb/rpm must ship this for gui_local PASS)
+  if [[ -x "${BUNDLE_ELE}" ]]; then
+    echo "${BUNDLE_ELE}"
+    return 0
+  fi
+  # 2) Dev / system fallbacks
+  if [[ -x "${HUB_DIR}/node_modules/electron/dist/electron" ]]; then
+    echo "${HUB_DIR}/node_modules/electron/dist/electron"
     return 0
   fi
   if [[ -x "${HUB_DIR}/node_modules/.bin/electron" ]]; then
     echo "${HUB_DIR}/node_modules/.bin/electron"
     return 0
   fi
+  if command -v electron >/dev/null 2>&1; then
+    command -v electron
+    return 0
+  fi
   return 1
 }
 
+ELE_ARGS=()
+# Chromium refuses root without --no-sandbox (CI / container smoke)
+if [[ "$(id -u)" -eq 0 ]] || [[ "${STRAWNT_ELECTRON_NO_SANDBOX:-0}" == "1" ]]; then
+  ELE_ARGS+=(--no-sandbox)
+fi
+
 if ELE="$(pick_electron)"; then
-  exec "${ELE}" "${HUB_DIR}" "$@"
+  exec "${ELE}" "${ELE_ARGS[@]}" "${HUB_DIR}" "$@"
 fi
 
 cat >&2 <<MSG
 strawnt-hub: Electron runtime not found.
-Install electron (or npm --prefix ${HUB_DIR} install) to run gui_local.
-Packaged Hub sources: ${HUB_DIR}
+Expected packaged binary: ${BUNDLE_ELE}
 MSG
 exit 127
 EOF
@@ -218,9 +272,10 @@ StrawNT ${VERSION} package
 
   /usr/bin/strawnt       CLI wrapper (STRAWNT_ROOT=/usr/lib/strawnt)
   /usr/bin/strawnt-hub   Electron Hub gui_local launcher
-  /usr/lib/strawnt/      Product root (PIN, hub sources, scripts)
+  /usr/lib/strawnt/      Product root (PIN, hub sources, Electron runtime, scripts)
+  /usr/lib/strawnt/hub/electron-runtime/  Vendored Electron (gui_local)
 
-Fetch engine (not embedded in deb/rpm):
+Fetch Proton-GE engine (not embedded in deb/rpm; multi-GB git-lfs):
   STRAWNT_ROOT=/usr/lib/strawnt /usr/lib/strawnt/scripts/fetch-proton-ge.sh
 
 execution_backend=wine · engine=proton-ge · powered by Wine
@@ -240,15 +295,16 @@ Package: strawnt
 Version: ${DEB_VER}-1
 Architecture: ${ARCH}
 Maintainer: StrawCoding <dev@strawcoding.org>
-Depends: libc6 (>= 2.35)
-Recommends: libvulkan1, xdg-utils
+Depends: libc6 (>= 2.35), libgtk-3-0, libnss3, libxss1, libxtst6, libasound2 | libasound2t64, libgbm1, libdrm2, libxkbcommon0, libxcomposite1, libxdamage1, libxfixes3, libxrandr2, libpango-1.0-0, libcairo2, libcups2 | libcups2t64, libatk-bridge2.0-0 | libatk-bridge2.0-0t64, libatk1.0-0 | libatk1.0-0t64
+Recommends: libvulkan1, xdg-utils, libnotify4
 Section: utils
 Priority: optional
 Homepage: https://github.com/StrawCoding/StrawNT
 Description: StrawNT — Windows apps on Linux, powered by Wine
  Product shell for vendored Proton-GE / Wine (execution_backend=wine).
- Provides CLI, MIME handlers, Electron Hub gui_local entry, App Manager.
- Does not claim full Windows or ranked anti-cheat. Flatpak is PARTIAL.
+ Provides CLI, MIME handlers, Electron Hub gui_local (bundled runtime),
+ App Manager. Does not claim full Windows or ranked anti-cheat.
+ Flatpak is PARTIAL. Proton-GE dist fetched separately (PIN + scripts).
 EOF
 
 DEB_NAME="strawnt_${DEB_VER}-1_${ARCH}.deb"
@@ -281,10 +337,12 @@ Summary: StrawNT — Windows apps on Linux via Wine/Proton-GE
 License: MIT AND LGPL-2.1-or-later
 URL: https://github.com/StrawCoding/StrawNT
 BuildArch: x86_64
+Requires: gtk3, nss, libXScrnSaver, libXtst, alsa-lib, mesa-libgbm, libdrm, libxkbcommon, libXcomposite, libXdamage, libXfixes, libXrandr, pango, cairo, cups-libs, at-spi2-atk, atk
 
 %description
 StrawNT product shell and CLI (execution_backend=wine, engine=proton-ge).
-Powered by Wine. Does not claim full Windows or ranked anti-cheat.
+Powered by Wine. Bundles Electron for gui_local Hub. Does not claim full
+Windows or ranked anti-cheat. Proton-GE dist is fetched separately.
 
 %install
 mkdir -p %{buildroot}
@@ -301,7 +359,7 @@ cp -a /src/rootfs/. %{buildroot}/
 
 %changelog
 * Sat Aug 08 2026 StrawCoding <dev@strawcoding.org> - ${RPM_VER_SAFE}-1
-- NTW7 packaging: deb/rpm + MIME + gui_local (powered by Wine)
+- NTW7 packaging: deb/rpm + MIME + gui_local with bundled Electron (powered by Wine)
 EOF
 
 docker run --rm \

@@ -32,6 +32,11 @@ Full GE dist (git-lfs) is **not** embedded in deb/rpm (~1.5G); install via
 `scripts/fetch-proton-ge.sh` or bind-mount for CI smoke. Wrapper sets
 `STRAWNT_ROOT=/usr/lib/strawnt`.
 
+GUI note: deb/rpm **bundle** Electron under
+`/usr/lib/strawnt/hub/electron-runtime/` so `strawnt-hub` starts after a normal
+install (no separate `npm install`). gui_local smoke must observe a real X11
+window (`xwininfo`), not only `--version`.
+
 ## Smoke
 
 ```bash
