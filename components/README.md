@@ -1,6 +1,8 @@
-# StrawWU components — greenfield
+# StrawNT components
 
-v3.0-cleanroom 全新實作，禁止複製封存 legacy crate。
+> **NTW0（2026-08-07）：** 產品預設 `execution_backend=wine`／`engine=proton-ge`（**powered by Wine**）。舊「native 預設／禁 Wine」已廢止。見 `docs/decisions/2026-08-07-wine-pivot.md`。
+
+v3.0-cleanroom 元件樹；旗艦執行路徑為 Wine／Proton-GE；native PE crate 保留為 legacy／research。
 
 ## 結構
 

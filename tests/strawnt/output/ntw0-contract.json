@@ -3,9 +3,9 @@
   "stage": "ntw0-contract-legal",
   "status": "PASS",
   "product": "StrawNT",
-  "version": "0.7.1.42",
-  "generated_at": "2026-08-07T15:47:01Z",
-  "git_head": "2b914c6fefc8780ed9708805990a97164a56cb18",
+  "version": "0.7.1.43",
+  "generated_at": "2026-08-07T15:50:18Z",
+  "git_head": "2f432a53febc4987c1fc5a9f11a5aa4e184ffbac",
   "backend": "wine",
   "execution_backend": "wine",
   "engine": "proton-ge",
@@ -26,7 +26,9 @@
     "opencode_gaps_addressed": [
       "components/README.md + execution-backends.md live contract flipped to wine",
       "kickoff/A3 historical Wine ban marked retired",
-      "smoke-pe-real-exec wine marker product-tree fail removed; Makefile marks pe/gx legacy"
+      "smoke-pe-real-exec wine marker product-tree fail removed",
+      "Makefile native-era pe/gx/nt renamed to test-legacy-* (not general product targets)",
+      "execution-backends architecture diagram wine/GE primary"
     ]
   },
   "artifacts": {

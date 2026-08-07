@@ -18,7 +18,7 @@
 - `tests/strawnt/nt0-rebrand.sh` … `nt6-openable.sh` — 廢止「禁 Wine」產品 assert；標 legacy
 - `tests/portable/smoke-gx-*.sh`、`gx-closeout.sh`、`pe-closeout.sh`、`smoke-pe-*.sh` — 同上
 - `tests/portable/smoke-pe-real-exec.sh` — **不再**因產品樹出現 Wine marker 而 `write_fail`
-- Makefile：`test-portable-pe-*`／`test-portable-gx-*`／部分 `test-strawnt-nt*` 標 **LEGACY/ARCHIVE**；產品契約閘改 `test-strawnt-ntw0-contract`
+- Makefile：**產品目標**僅 `test-strawnt-ntw0-contract`／`test-strawnt-nt6-openable` 等；native-era 改名為 `test-legacy-portable-pe-*`／`test-legacy-portable-gx-*`／`test-legacy-strawnt-nt*`（help 獨立 Legacy 區；不再作為一般產品測試目標公開）
 - launcher／desktop：`X-StrawNT-Backend=wine`；unit test 不再禁 wine 字串
 - verify bins（`nt_*_verify`、`gx_*_verify`）：輸出可含 `path_role=legacy_native`；**不得**再當產品「禁 Wine」閘
 - 現行規格：`components/README.md`、`components/specs/execution-backends.md` — 預設 wine；禁靜默改名

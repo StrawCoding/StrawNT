@@ -15,34 +15,32 @@ Windows 應用由 **`strawnt`／runtime 編排層** 統一啟動。產品預設�
 
 **禁止** `WinBox` / `winbox` 命名（與 StrawWinBox 專案區隔）；禁止 merge StrawWinBox 原始碼；禁止將 Wine 靜默改名為自研 PE。
 
-## 架構（對齊原始計畫）
+## 架構（對齊 Wine pivot）
 
 ```
                     ┌─────────────────────────┐
-                    │  strawwu-runtime        │
-                    │  Orchestrator           │
-                    │  - SubsystemSession     │
-                    │  - app profile / IPC    │
+                    │  strawnt CLI + Hub      │
+                    │  (Electron)             │
+                    │  - prefix / recipes     │
+                    │  - App Manager (NTW5+)  │
                     │  - 選 execution_backend │
                     └───────────┬─────────────┘
-                                │ RuntimeSession API
+                                │
               ┌─────────────────┼─────────────────┐
               │                 │                 │
     ┌─────────▼────────┐ ┌──────▼──────┐ ┌───────▼────────┐
-    │  strawwu-nt        │ │ Linux apps │ │ strawwu-hub    │
-    │  共享 Win32 子系統  │ │ (native)   │ │ (Electron)     │
-    │  多 process 互通   │ │            │ │                │
+    │  Proton-GE / Wine │ │ container / │ │ legacy native  │
+    │  （產品預設）      │ │ microvm 覆寫│ │ STRAWNT_LEGACY │
+    │  prefix 互通      │ │             │ │ _NATIVE=1      │
     └─────────┬──────────┘ └────────────┘ └────────────────┘
-              │ BridgeRequest ABI
-    ┌─────────▼──────────────────────────┐
-    │  strawwu-bridge（kernel 橋接）        │
-    │  seccomp / policy（非第二個 OS）      │
-    └─────────┬──────────────────────────┘
               │
     ┌─────────▼────────┐
-    │  Linux Kernel    │
+    │  Linux x86_64    │
+    │  Wayland/X11     │
     └──────────────────┘
 ```
+
+歷史 native Orchestrator／SubsystemSession 圖見 git 歷史與 `archive/native-pe/`；不作產品預設。
 
 ### execution_backend 策略
 

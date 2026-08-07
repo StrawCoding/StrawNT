@@ -5,7 +5,9 @@
 # gx-closeout.sh — Game Compat gx5 closeout evidence generator.
 # Validates gx0–gx4 evidence, docs, release artifacts/SHA256, cross-distro
 # matrix, HTML report; writes tests/portable/output/gx-closeout.json.
-# Forbidden: Wine/Proton substrate, WinBox naming, full Windows / ranked AC claims, ISO work.
+# Historical exclusions for THIS evidence path only (not product contract):
+# no ISO work; no WinBox naming; no full Windows / ranked AC claims.
+# Invoke via: make test-legacy-portable-gx-closeout
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"

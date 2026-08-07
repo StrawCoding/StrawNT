@@ -5,7 +5,9 @@
 # pe-closeout.sh — Native PE Real Exec pe7 closeout evidence generator.
 # Validates pe0–pe6 evidence, docs, release artifacts/SHA256, cross-distro
 # matrix, HTML report; writes tests/portable/output/pe-closeout.json.
-# Forbidden: Wine/Proton substrate, WinBox naming, full Windows claims, ISO work.
+# Historical exclusions for THIS evidence path only (not product contract):
+# no ISO work; no WinBox naming; no full Windows claims.
+# Invoke via: make test-legacy-portable-pe-closeout
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"

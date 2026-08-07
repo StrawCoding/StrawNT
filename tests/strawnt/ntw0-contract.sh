@@ -81,6 +81,18 @@ if ! rg -qi 'LEGACY/ARCHIVE|lift_ban|skip wine-substrate' \
     failures+=("smoke-pe-real-exec.sh missing NTW0 legacy/lift marker")
 fi
 
+# Makefile must not expose native-era pe/gx as general product targets
+if rg -n '^test-portable-pe-closeout:|^test-portable-gx-graphics:|^test-portable-gx-closeout:|^test-strawnt-nt5-closeout:' \
+    "${REPO_ROOT}/Makefile" >/dev/null 2>&1; then
+    failures+=("Makefile still exposes native-era pe/gx/nt as general product targets")
+fi
+if ! rg -n '^test-legacy-portable-pe-closeout:' "${REPO_ROOT}/Makefile" >/dev/null 2>&1; then
+    failures+=("Makefile missing test-legacy-portable-pe-closeout")
+fi
+if ! rg -qi 'Legacy/archive native-era' "${REPO_ROOT}/Makefile"; then
+    failures+=("Makefile help missing Legacy/archive native-era section")
+fi
+
 for f in README.md docs/plans/portable-core/USER-GUIDE.md; do
     if ! rg -qi 'powered by Wine|execution_backend=wine|backend=wine' "${REPO_ROOT}/${f}"; then
         failures+=("${f} missing wine / powered by Wine honesty")
@@ -142,7 +154,9 @@ doc = {
         "opencode_gaps_addressed": [
             "components/README.md + execution-backends.md live contract flipped to wine",
             "kickoff/A3 historical Wine ban marked retired",
-            "smoke-pe-real-exec wine marker product-tree fail removed; Makefile marks pe/gx legacy",
+            "smoke-pe-real-exec wine marker product-tree fail removed",
+            "Makefile native-era pe/gx/nt renamed to test-legacy-* (not general product targets)",
+            "execution-backends architecture diagram wine/GE primary",
         ],
     },
     "artifacts": {
