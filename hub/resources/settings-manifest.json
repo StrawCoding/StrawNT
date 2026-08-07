@@ -12,7 +12,7 @@
     { "id": "updates", "group": "system" },
     { "id": "backup", "group": "system" },
     { "id": "software-sources", "group": "system" },
-    { "id": "apps", "group": "applications" },
+    { "id": "apps", "group": "applications", "role": "app_manager" },
     { "id": "flathub", "group": "applications" },
     { "id": "drivers", "group": "system" },
     { "id": "devices", "group": "system" },

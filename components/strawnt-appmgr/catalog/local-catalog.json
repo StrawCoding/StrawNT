@@ -1,0 +1,48 @@
+{
+  "schema": "strawnt-app-catalog/v1",
+  "product": "StrawNT",
+  "execution_backend": "wine",
+  "engine": "proton-ge",
+  "powered_by": "Wine",
+  "channel_default": "stable",
+  "notes": [
+    "Local catalog first — network store is optional later.",
+    "line.exe / steam.exe are P0 golden rows; scopes stay PARTIAL until real-window proof.",
+    "Not a full Windows / ranked anti-cheat claim."
+  ],
+  "entries": [
+    {
+      "id": "line",
+      "name": "LINE",
+      "exe": "line.exe",
+      "kind": "win32",
+      "prefix_default": "line",
+      "recipes_recommended": ["crypt32-signature", "vcrun", "corefonts"],
+      "update_channel": "stable",
+      "compat_status": "PARTIAL",
+      "scopes": {
+        "install": "PARTIAL",
+        "launch": "PARTIAL",
+        "visible_ui": "UNKNOWN"
+      },
+      "description": "LINE Desktop (install/launch UI scope; IgnoreCodeSign path)"
+    },
+    {
+      "id": "steam",
+      "name": "Steam",
+      "exe": "steam.exe",
+      "kind": "win32",
+      "prefix_default": "steam",
+      "recipes_recommended": ["vcrun", "corefonts", "dxvk"],
+      "update_channel": "stable",
+      "compat_status": "PARTIAL",
+      "scopes": {
+        "install": "PARTIAL",
+        "launch": "PARTIAL",
+        "all_games": "UNKNOWN",
+        "visible_ui": "UNKNOWN"
+      },
+      "description": "Steam launcher start/login UI only — not all-games-play"
+    }
+  ]
+}

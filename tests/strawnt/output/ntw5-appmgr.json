@@ -1,0 +1,1177 @@
+{
+  "backend": "wine",
+  "capabilities": {
+    "dedicated_system_apps": true,
+    "deps_recipes": true,
+    "install": true,
+    "list_launch": true,
+    "permissions": true,
+    "prefix": true,
+    "store_catalog": true,
+    "telemetry_compat": true,
+    "uninstall": true,
+    "update_channel": true
+  },
+  "claims": {
+    "full_windows_claimed": false,
+    "install": true,
+    "list_launch": true,
+    "powered_by_wine": true,
+    "prefix": true,
+    "ranked_anticheat_claimed": false,
+    "simulated": false
+  },
+  "engine": "proton-ge",
+  "engine_label": "proton-ge",
+  "execution_backend": "wine",
+  "failures": [],
+  "notes": [
+    "NTW5 system App Manager smoke",
+    "powered by Wine \u2014 not a full Windows / ranked anti-cheat claim"
+  ],
+  "powered_by": "Wine",
+  "powered_by_wine": true,
+  "product": "StrawNT",
+  "results": {
+    "catalog": {
+      "catalog_path": "/mnt/data/code/project/StrawCoding/StrawNT/components/strawnt-appmgr/catalog/local-catalog.json",
+      "channel_default": "stable",
+      "command": "apps catalog",
+      "engine": "proton-ge",
+      "entries": [
+        {
+          "compat_status": "PARTIAL",
+          "description": "LINE Desktop (install/launch UI scope; IgnoreCodeSign path)",
+          "exe": "line.exe",
+          "id": "line",
+          "kind": "win32",
+          "name": "LINE",
+          "prefix_default": "line",
+          "recipes_recommended": [
+            "crypt32-signature",
+            "vcrun",
+            "corefonts"
+          ],
+          "scopes": {
+            "install": "PARTIAL",
+            "launch": "PARTIAL",
+            "visible_ui": "UNKNOWN"
+          },
+          "update_channel": "stable"
+        },
+        {
+          "compat_status": "PARTIAL",
+          "description": "Steam launcher start/login UI only \u2014 not all-games-play",
+          "exe": "steam.exe",
+          "id": "steam",
+          "kind": "win32",
+          "name": "Steam",
+          "prefix_default": "steam",
+          "recipes_recommended": [
+            "vcrun",
+            "corefonts",
+            "dxvk"
+          ],
+          "scopes": {
+            "all_games": "UNKNOWN",
+            "install": "PARTIAL",
+            "launch": "PARTIAL",
+            "visible_ui": "UNKNOWN"
+          },
+          "update_channel": "stable"
+        }
+      ],
+      "execution_backend": "wine",
+      "notes": [
+        "Local catalog first \u2014 network store is optional later.",
+        "line.exe / steam.exe are P0 golden rows; scopes stay PARTIAL until real-window proof.",
+        "Not a full Windows / ranked anti-cheat claim."
+      ],
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "product": "StrawNT",
+      "schema": "strawnt-app-catalog/v1",
+      "status": "PASS"
+    },
+    "channel_before": {
+      "allowed": [
+        "stable",
+        "beta",
+        "nightly"
+      ],
+      "channel": "stable",
+      "command": "apps channel",
+      "execution_backend": "wine",
+      "home": "/tmp/strawnt-ntw5.bvH9Q8/home",
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "status": "PASS"
+    },
+    "channel_set": {
+      "channel": "beta",
+      "command": "apps channel set",
+      "execution_backend": "wine",
+      "home": "/tmp/strawnt-ntw5.bvH9Q8/home",
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "status": "PASS"
+    },
+    "compat": {
+      "app_id": "line",
+      "command": "apps compat",
+      "compat_status": "PARTIAL",
+      "engine": "proton-ge",
+      "engine_pin": "GE-Proton11-3",
+      "execution_backend": "wine",
+      "honesty": {
+        "full_windows_claimed": false,
+        "powered_by_wine": true,
+        "ranked_anticheat_claimed": false,
+        "simulated": false
+      },
+      "matrix": {
+        "app_key": "line.exe",
+        "backend": "wine",
+        "catalog_id": "line",
+        "engine": "proton-ge",
+        "execution_backend": "wine",
+        "found": true,
+        "name": "line.exe",
+        "notes": "LINE Desktop (install/launch UI scope; IgnoreCodeSign path)",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "prefix": "line",
+        "scopes": {
+          "install": "PARTIAL",
+          "launch": "PARTIAL",
+          "visible_ui": "UNKNOWN"
+        },
+        "status": "PARTIAL",
+        "updated_at": 1786128438,
+        "via": "strawnt-appmgr",
+        "wine_flavor": "proton-ge"
+      },
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "scopes": {
+        "install": "PARTIAL",
+        "launch": "PARTIAL",
+        "visible_ui": "UNKNOWN"
+      },
+      "status": "PASS",
+      "telemetry": {
+        "enabled": false,
+        "note": "Local compat matrix only \u2014 no remote telemetry in NTW5"
+      }
+    },
+    "install_line": {
+      "app_id": "line",
+      "command": "apps install",
+      "engine": "proton-ge",
+      "exe": "line.exe",
+      "execution_backend": "wine",
+      "honesty": {
+        "full_windows_claimed": false,
+        "note": "Catalog install registers lifecycle + prefix; real vendor installer UI is PARTIAL until proven",
+        "ranked_anticheat_claimed": false,
+        "simulated": false
+      },
+      "install_marker": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/line/drive_c/strawnt/apps/line/INSTALLED.json",
+      "name": "LINE",
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "prefix": "line",
+      "prefix_create": {
+        "arch": "win64",
+        "backend": "wine",
+        "create_mode": "template_clone",
+        "created": true,
+        "detail": {
+          "clone": {
+            "arch": "win64",
+            "created": true,
+            "duration_ms": 671.648504,
+            "mode": "template_clone",
+            "name": "line",
+            "path": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/line",
+            "status": "PASS",
+            "template": "/tmp/strawnt-ntw5.bvH9Q8/home/templates/win64"
+          },
+          "ensure_template": {
+            "arch": "win64",
+            "created": true,
+            "path": "/tmp/strawnt-ntw5.bvH9Q8/home/templates/win64",
+            "status": "PASS",
+            "wineboot": {
+              "command": [
+                "/usr/bin/xvfb-run",
+                "-a",
+                "/mnt/data/code/project/StrawCoding/StrawNT/third_party/proton-ge/dist/files/bin/wine",
+                "wineboot",
+                "-u"
+              ],
+              "duration_sec": 16.02069525,
+              "exit_code": 0,
+              "pin": "GE-Proton11-3",
+              "status": "PASS",
+              "stderr_tail": "",
+              "stdout_tail": "fsync: up and running.\n",
+              "used_xvfb": true,
+              "wine_bin": "/mnt/data/code/project/StrawCoding/StrawNT/third_party/proton-ge/dist/files/bin/wine"
+            }
+          },
+          "mode": "template_clone"
+        },
+        "engine": "proton-ge",
+        "execution_backend": "wine",
+        "home": "/tmp/strawnt-ntw5.bvH9Q8/home",
+        "name": "line",
+        "path": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/line",
+        "pin": "GE-Proton11-3",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "status": "PASS"
+      },
+      "recipes_applied": [
+        "crypt32-signature"
+      ],
+      "recipes_recommended": [
+        "crypt32-signature",
+        "vcrun",
+        "corefonts"
+      ],
+      "source": "catalog",
+      "status": "PASS"
+    },
+    "install_steam": {
+      "app_id": "steam",
+      "command": "apps install",
+      "engine": "proton-ge",
+      "exe": "steam.exe",
+      "execution_backend": "wine",
+      "honesty": {
+        "full_windows_claimed": false,
+        "note": "Catalog install registers lifecycle + prefix; real vendor installer UI is PARTIAL until proven",
+        "ranked_anticheat_claimed": false,
+        "simulated": false
+      },
+      "install_marker": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/steam/drive_c/strawnt/apps/steam/INSTALLED.json",
+      "name": "Steam",
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "prefix": "steam",
+      "prefix_create": {
+        "arch": "win64",
+        "backend": "wine",
+        "create_mode": "template_clone",
+        "created": true,
+        "detail": {
+          "clone": {
+            "arch": "win64",
+            "created": true,
+            "duration_ms": 672.3896219999999,
+            "mode": "template_clone",
+            "name": "steam",
+            "path": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/steam",
+            "status": "PASS",
+            "template": "/tmp/strawnt-ntw5.bvH9Q8/home/templates/win64"
+          },
+          "ensure_template": {
+            "arch": "win64",
+            "created": false,
+            "message": "template already present",
+            "path": "/tmp/strawnt-ntw5.bvH9Q8/home/templates/win64",
+            "status": "PASS"
+          },
+          "mode": "template_clone"
+        },
+        "engine": "proton-ge",
+        "execution_backend": "wine",
+        "home": "/tmp/strawnt-ntw5.bvH9Q8/home",
+        "name": "steam",
+        "path": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/steam",
+        "pin": "GE-Proton11-3",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "status": "PASS"
+      },
+      "recipes_applied": [],
+      "recipes_recommended": [
+        "vcrun",
+        "corefonts",
+        "dxvk"
+      ],
+      "source": "catalog",
+      "status": "PASS"
+    },
+    "launch": {
+      "app_id": "line",
+      "command": "apps launch",
+      "engine": "proton-ge",
+      "engine_pin": "GE-Proton11-3",
+      "execution_backend": "wine",
+      "exit_code": 0,
+      "honesty": {
+        "full_windows_claimed": false,
+        "ranked_anticheat_claimed": false,
+        "simulated": false,
+        "visible_ui": "n/a_cmd"
+      },
+      "marker": "STRAWNT_APPMGR_LAUNCH_1786128440",
+      "mode": "cmd_marker",
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "prefix": "line",
+      "status": "PASS",
+      "stderr_tail": "",
+      "stdout_tail": "fsync: up and running.\nSTRAWNT_APPMGR_LAUNCH_1786128440\r\n"
+    },
+    "list": {
+      "apps": [
+        {
+          "compat_status": "PARTIAL",
+          "created_at": "1786128421",
+          "dedicated_role": "app_manager",
+          "engine": "proton-ge",
+          "engine_pin": "GE-Proton11-3",
+          "exe": null,
+          "execution_backend": "wine",
+          "honesty": {
+            "full_windows_claimed": false,
+            "ranked_anticheat_claimed": false,
+            "simulated": false
+          },
+          "id": "sys-app-manager",
+          "install_path": null,
+          "install_state": "registered",
+          "kind": "system",
+          "name": "App Manager",
+          "notes": "Dedicated system app 'app_manager' \u2014 UI smoke in NTW6; App Manager owns lifecycle",
+          "permissions": [],
+          "powered_by": "Wine",
+          "powered_by_wine": true,
+          "prefix": null,
+          "protected": true,
+          "recipes_applied": [],
+          "recipes_recommended": [],
+          "schema": "strawnt-app-manifest/v1",
+          "scopes": {
+            "registered": "PASS",
+            "ui": "UNKNOWN"
+          },
+          "source": "system",
+          "system_app": true,
+          "update_channel": "stable",
+          "updated_at": "1786128421"
+        },
+        {
+          "compat_status": "PARTIAL",
+          "created_at": "1786128421",
+          "dedicated_role": "file_manager",
+          "engine": "proton-ge",
+          "engine_pin": "GE-Proton11-3",
+          "exe": null,
+          "execution_backend": "wine",
+          "honesty": {
+            "full_windows_claimed": false,
+            "ranked_anticheat_claimed": false,
+            "simulated": false
+          },
+          "id": "sys-file-manager",
+          "install_path": null,
+          "install_state": "registered",
+          "kind": "system",
+          "name": "File Manager",
+          "notes": "Dedicated system app 'file_manager' \u2014 UI smoke in NTW6; App Manager owns lifecycle",
+          "permissions": [],
+          "powered_by": "Wine",
+          "powered_by_wine": true,
+          "prefix": null,
+          "protected": true,
+          "recipes_applied": [],
+          "recipes_recommended": [],
+          "schema": "strawnt-app-manifest/v1",
+          "scopes": {
+            "registered": "PASS",
+            "ui": "UNKNOWN"
+          },
+          "source": "system",
+          "system_app": true,
+          "update_channel": "stable",
+          "updated_at": "1786128421"
+        },
+        {
+          "compat_status": "PARTIAL",
+          "created_at": "1786128421",
+          "dedicated_role": "settings",
+          "engine": "proton-ge",
+          "engine_pin": "GE-Proton11-3",
+          "exe": null,
+          "execution_backend": "wine",
+          "honesty": {
+            "full_windows_claimed": false,
+            "ranked_anticheat_claimed": false,
+            "simulated": false
+          },
+          "id": "sys-settings",
+          "install_path": null,
+          "install_state": "registered",
+          "kind": "system",
+          "name": "Settings",
+          "notes": "Dedicated system app 'settings' \u2014 UI smoke in NTW6; App Manager owns lifecycle",
+          "permissions": [],
+          "powered_by": "Wine",
+          "powered_by_wine": true,
+          "prefix": null,
+          "protected": true,
+          "recipes_applied": [],
+          "recipes_recommended": [],
+          "schema": "strawnt-app-manifest/v1",
+          "scopes": {
+            "registered": "PASS",
+            "ui": "UNKNOWN"
+          },
+          "source": "system",
+          "system_app": true,
+          "update_channel": "stable",
+          "updated_at": "1786128421"
+        },
+        {
+          "compat_status": "PARTIAL",
+          "created_at": "1786128421",
+          "dedicated_role": "run_dialog",
+          "engine": "proton-ge",
+          "engine_pin": "GE-Proton11-3",
+          "exe": null,
+          "execution_backend": "wine",
+          "honesty": {
+            "full_windows_claimed": false,
+            "ranked_anticheat_claimed": false,
+            "simulated": false
+          },
+          "id": "sys-run-dialog",
+          "install_path": null,
+          "install_state": "registered",
+          "kind": "system",
+          "name": "Run Dialog",
+          "notes": "Dedicated system app 'run_dialog' \u2014 UI smoke in NTW6; App Manager owns lifecycle",
+          "permissions": [],
+          "powered_by": "Wine",
+          "powered_by_wine": true,
+          "prefix": null,
+          "protected": true,
+          "recipes_applied": [],
+          "recipes_recommended": [],
+          "schema": "strawnt-app-manifest/v1",
+          "scopes": {
+            "registered": "PASS",
+            "ui": "UNKNOWN"
+          },
+          "source": "system",
+          "system_app": true,
+          "update_channel": "stable",
+          "updated_at": "1786128421"
+        },
+        {
+          "compat_status": "PARTIAL",
+          "created_at": "1786128421",
+          "dedicated_role": "task_manager",
+          "engine": "proton-ge",
+          "engine_pin": "GE-Proton11-3",
+          "exe": null,
+          "execution_backend": "wine",
+          "honesty": {
+            "full_windows_claimed": false,
+            "ranked_anticheat_claimed": false,
+            "simulated": false
+          },
+          "id": "sys-task-manager",
+          "install_path": null,
+          "install_state": "registered",
+          "kind": "system",
+          "name": "Task Manager",
+          "notes": "Dedicated system app 'task_manager' \u2014 UI smoke in NTW6; App Manager owns lifecycle",
+          "permissions": [],
+          "powered_by": "Wine",
+          "powered_by_wine": true,
+          "prefix": null,
+          "protected": true,
+          "recipes_applied": [],
+          "recipes_recommended": [],
+          "schema": "strawnt-app-manifest/v1",
+          "scopes": {
+            "registered": "PASS",
+            "ui": "UNKNOWN"
+          },
+          "source": "system",
+          "system_app": true,
+          "update_channel": "stable",
+          "updated_at": "1786128421"
+        },
+        {
+          "compat_status": "PARTIAL",
+          "created_at": "1786128421",
+          "dedicated_role": "app_library",
+          "engine": "proton-ge",
+          "engine_pin": "GE-Proton11-3",
+          "exe": null,
+          "execution_backend": "wine",
+          "honesty": {
+            "full_windows_claimed": false,
+            "ranked_anticheat_claimed": false,
+            "simulated": false
+          },
+          "id": "sys-app-library",
+          "install_path": null,
+          "install_state": "registered",
+          "kind": "system",
+          "name": "App Library",
+          "notes": "Dedicated system app 'app_library' \u2014 UI smoke in NTW6; App Manager owns lifecycle",
+          "permissions": [],
+          "powered_by": "Wine",
+          "powered_by_wine": true,
+          "prefix": null,
+          "protected": true,
+          "recipes_applied": [],
+          "recipes_recommended": [],
+          "schema": "strawnt-app-manifest/v1",
+          "scopes": {
+            "registered": "PASS",
+            "ui": "UNKNOWN"
+          },
+          "source": "system",
+          "system_app": true,
+          "update_channel": "stable",
+          "updated_at": "1786128421"
+        },
+        {
+          "compat_status": "PARTIAL",
+          "created_at": "1786128421",
+          "dedicated_role": "installer_wizard",
+          "engine": "proton-ge",
+          "engine_pin": "GE-Proton11-3",
+          "exe": null,
+          "execution_backend": "wine",
+          "honesty": {
+            "full_windows_claimed": false,
+            "ranked_anticheat_claimed": false,
+            "simulated": false
+          },
+          "id": "sys-installer-wizard",
+          "install_path": null,
+          "install_state": "registered",
+          "kind": "system",
+          "name": "Installer Wizard",
+          "notes": "Dedicated system app 'installer_wizard' \u2014 UI smoke in NTW6; App Manager owns lifecycle",
+          "permissions": [],
+          "powered_by": "Wine",
+          "powered_by_wine": true,
+          "prefix": null,
+          "protected": true,
+          "recipes_applied": [],
+          "recipes_recommended": [],
+          "schema": "strawnt-app-manifest/v1",
+          "scopes": {
+            "registered": "PASS",
+            "ui": "UNKNOWN"
+          },
+          "source": "system",
+          "system_app": true,
+          "update_channel": "stable",
+          "updated_at": "1786128421"
+        },
+        {
+          "compat_status": "PARTIAL",
+          "created_at": "1786128421",
+          "dedicated_role": "compat_center",
+          "engine": "proton-ge",
+          "engine_pin": "GE-Proton11-3",
+          "exe": null,
+          "execution_backend": "wine",
+          "honesty": {
+            "full_windows_claimed": false,
+            "ranked_anticheat_claimed": false,
+            "simulated": false
+          },
+          "id": "sys-compat-center",
+          "install_path": null,
+          "install_state": "registered",
+          "kind": "system",
+          "name": "Compat Center",
+          "notes": "Dedicated system app 'compat_center' \u2014 UI smoke in NTW6; App Manager owns lifecycle",
+          "permissions": [],
+          "powered_by": "Wine",
+          "powered_by_wine": true,
+          "prefix": null,
+          "protected": true,
+          "recipes_applied": [],
+          "recipes_recommended": [],
+          "schema": "strawnt-app-manifest/v1",
+          "scopes": {
+            "registered": "PASS",
+            "ui": "UNKNOWN"
+          },
+          "source": "system",
+          "system_app": true,
+          "update_channel": "stable",
+          "updated_at": "1786128421"
+        },
+        {
+          "compat_status": "PARTIAL",
+          "created_at": "1786128438",
+          "dedicated_role": null,
+          "engine": "proton-ge",
+          "engine_pin": "GE-Proton11-3",
+          "exe": "line.exe",
+          "execution_backend": "wine",
+          "honesty": {
+            "full_windows_claimed": false,
+            "ranked_anticheat_claimed": false,
+            "simulated": false
+          },
+          "id": "line",
+          "install_path": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/line/drive_c/strawnt/apps/line",
+          "install_state": "installed",
+          "kind": "win32",
+          "name": "LINE",
+          "notes": "Catalog install of line \u2014 prefix created; full installer download may remain PARTIAL",
+          "permissions": [],
+          "powered_by": "Wine",
+          "powered_by_wine": true,
+          "prefix": "line",
+          "protected": false,
+          "recipes_applied": [
+            "crypt32-signature"
+          ],
+          "recipes_recommended": [
+            "crypt32-signature",
+            "vcrun",
+            "corefonts"
+          ],
+          "schema": "strawnt-app-manifest/v1",
+          "scopes": {
+            "install": "PARTIAL",
+            "launch": "PARTIAL",
+            "visible_ui": "UNKNOWN"
+          },
+          "source": "catalog",
+          "system_app": false,
+          "update_channel": "stable",
+          "updated_at": "1786128438"
+        },
+        {
+          "compat_status": "PARTIAL",
+          "created_at": "1786128439",
+          "dedicated_role": null,
+          "engine": "proton-ge",
+          "engine_pin": "GE-Proton11-3",
+          "exe": "steam.exe",
+          "execution_backend": "wine",
+          "honesty": {
+            "full_windows_claimed": false,
+            "ranked_anticheat_claimed": false,
+            "simulated": false
+          },
+          "id": "steam",
+          "install_path": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/steam/drive_c/strawnt/apps/steam",
+          "install_state": "installed",
+          "kind": "win32",
+          "name": "Steam",
+          "notes": "Catalog install of steam \u2014 prefix created; full installer download may remain PARTIAL",
+          "permissions": [],
+          "powered_by": "Wine",
+          "powered_by_wine": true,
+          "prefix": "steam",
+          "protected": false,
+          "recipes_applied": [],
+          "recipes_recommended": [
+            "vcrun",
+            "corefonts",
+            "dxvk"
+          ],
+          "schema": "strawnt-app-manifest/v1",
+          "scopes": {
+            "all_games": "UNKNOWN",
+            "install": "PARTIAL",
+            "launch": "PARTIAL",
+            "visible_ui": "UNKNOWN"
+          },
+          "source": "catalog",
+          "system_app": false,
+          "update_channel": "stable",
+          "updated_at": "1786128439"
+        }
+      ],
+      "command": "apps list",
+      "count": 10,
+      "db": "/tmp/strawnt-ntw5.bvH9Q8/home/appmgr/apps.json",
+      "engine": "proton-ge",
+      "execution_backend": "wine",
+      "home": "/tmp/strawnt-ntw5.bvH9Q8/home",
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "status": "PASS"
+    },
+    "permissions_grant": {
+      "app_id": "line",
+      "capability": "interop.cross_prefix",
+      "command": "apps permissions grant",
+      "execution_backend": "wine",
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "status": "PASS"
+    },
+    "permissions_list": {
+      "app_id": "line",
+      "command": "apps permissions",
+      "execution_backend": "wine",
+      "grants": [
+        {
+          "app_id": "line",
+          "capability": "interop.cross_prefix",
+          "default_deny_cross_prefix": false,
+          "granted_at": 1786128440
+        }
+      ],
+      "manifest_permissions": [
+        "interop.cross_prefix"
+      ],
+      "notes": [
+        "cross-prefix IPC is default-deny; grant via App Manager",
+        "not a ranked / vendor anti-cheat PASS"
+      ],
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "status": "PASS"
+    },
+    "prefix": {
+      "app_id": "line",
+      "command": "apps prefix",
+      "execution_backend": "wine",
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "prefix": "line",
+      "prefix_create": {
+        "arch": "win64",
+        "backend": "wine",
+        "created": false,
+        "engine": "proton-ge",
+        "execution_backend": "wine",
+        "message": "prefix already exists",
+        "name": "line",
+        "path": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/line",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    "recipes": {
+      "app_id": "line",
+      "applied_recipe": "crypt32-signature",
+      "command": "apps recipes",
+      "execution_backend": "wine",
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "prefix": "line",
+      "recipe_result": {
+        "apply": {
+          "execution_backend": "wine",
+          "marker": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/line/strawnt-crypt32-signature.json",
+          "powered_by": "Wine",
+          "recipe": "crypt32-signature",
+          "status": "PARTIAL"
+        },
+        "backend": "wine",
+        "engine": "proton-ge",
+        "execution_backend": "wine",
+        "home": "/tmp/strawnt-ntw5.bvH9Q8/home",
+        "powered_by": "Wine",
+        "powered_by_wine": true,
+        "prefix": "line",
+        "prefix_path": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/line",
+        "recipe": "crypt32-signature",
+        "status": "PARTIAL"
+      },
+      "recommended": [
+        "crypt32-signature",
+        "vcrun",
+        "corefonts"
+      ],
+      "status": "PARTIAL"
+    },
+    "status": {
+      "app_count": 8,
+      "capabilities": {
+        "dedicated_system_apps": true,
+        "deps_recipes": true,
+        "install": true,
+        "list_launch": true,
+        "permissions": true,
+        "prefix": true,
+        "store_catalog": true,
+        "telemetry_compat": true,
+        "uninstall": true,
+        "update_channel": true
+      },
+      "command": "apps status",
+      "engine": "proton-ge",
+      "execution_backend": "wine",
+      "home": "/tmp/strawnt-ntw5.bvH9Q8/home",
+      "notes": [
+        "App Manager is the system lifecycle owner (NTW5)",
+        "Dedicated UI apps smoke in NTW6",
+        "powered by Wine \u2014 not a full Windows claim"
+      ],
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "product": "StrawNT",
+      "role": "system_manager_app",
+      "status": "PASS",
+      "system_app_count": 8,
+      "update_channel": "stable"
+    },
+    "sysapps": {
+      "apps": [
+        {
+          "compat_status": "PARTIAL",
+          "created_at": "1786128421",
+          "dedicated_role": "app_manager",
+          "engine": "proton-ge",
+          "engine_pin": "GE-Proton11-3",
+          "exe": null,
+          "execution_backend": "wine",
+          "honesty": {
+            "full_windows_claimed": false,
+            "ranked_anticheat_claimed": false,
+            "simulated": false
+          },
+          "id": "sys-app-manager",
+          "install_path": null,
+          "install_state": "registered",
+          "kind": "system",
+          "name": "App Manager",
+          "notes": "Dedicated system app 'app_manager' \u2014 UI smoke in NTW6; App Manager owns lifecycle",
+          "permissions": [],
+          "powered_by": "Wine",
+          "powered_by_wine": true,
+          "prefix": null,
+          "protected": true,
+          "recipes_applied": [],
+          "recipes_recommended": [],
+          "schema": "strawnt-app-manifest/v1",
+          "scopes": {
+            "registered": "PASS",
+            "ui": "UNKNOWN"
+          },
+          "source": "system",
+          "system_app": true,
+          "update_channel": "stable",
+          "updated_at": "1786128421"
+        },
+        {
+          "compat_status": "PARTIAL",
+          "created_at": "1786128421",
+          "dedicated_role": "file_manager",
+          "engine": "proton-ge",
+          "engine_pin": "GE-Proton11-3",
+          "exe": null,
+          "execution_backend": "wine",
+          "honesty": {
+            "full_windows_claimed": false,
+            "ranked_anticheat_claimed": false,
+            "simulated": false
+          },
+          "id": "sys-file-manager",
+          "install_path": null,
+          "install_state": "registered",
+          "kind": "system",
+          "name": "File Manager",
+          "notes": "Dedicated system app 'file_manager' \u2014 UI smoke in NTW6; App Manager owns lifecycle",
+          "permissions": [],
+          "powered_by": "Wine",
+          "powered_by_wine": true,
+          "prefix": null,
+          "protected": true,
+          "recipes_applied": [],
+          "recipes_recommended": [],
+          "schema": "strawnt-app-manifest/v1",
+          "scopes": {
+            "registered": "PASS",
+            "ui": "UNKNOWN"
+          },
+          "source": "system",
+          "system_app": true,
+          "update_channel": "stable",
+          "updated_at": "1786128421"
+        },
+        {
+          "compat_status": "PARTIAL",
+          "created_at": "1786128421",
+          "dedicated_role": "settings",
+          "engine": "proton-ge",
+          "engine_pin": "GE-Proton11-3",
+          "exe": null,
+          "execution_backend": "wine",
+          "honesty": {
+            "full_windows_claimed": false,
+            "ranked_anticheat_claimed": false,
+            "simulated": false
+          },
+          "id": "sys-settings",
+          "install_path": null,
+          "install_state": "registered",
+          "kind": "system",
+          "name": "Settings",
+          "notes": "Dedicated system app 'settings' \u2014 UI smoke in NTW6; App Manager owns lifecycle",
+          "permissions": [],
+          "powered_by": "Wine",
+          "powered_by_wine": true,
+          "prefix": null,
+          "protected": true,
+          "recipes_applied": [],
+          "recipes_recommended": [],
+          "schema": "strawnt-app-manifest/v1",
+          "scopes": {
+            "registered": "PASS",
+            "ui": "UNKNOWN"
+          },
+          "source": "system",
+          "system_app": true,
+          "update_channel": "stable",
+          "updated_at": "1786128421"
+        },
+        {
+          "compat_status": "PARTIAL",
+          "created_at": "1786128421",
+          "dedicated_role": "run_dialog",
+          "engine": "proton-ge",
+          "engine_pin": "GE-Proton11-3",
+          "exe": null,
+          "execution_backend": "wine",
+          "honesty": {
+            "full_windows_claimed": false,
+            "ranked_anticheat_claimed": false,
+            "simulated": false
+          },
+          "id": "sys-run-dialog",
+          "install_path": null,
+          "install_state": "registered",
+          "kind": "system",
+          "name": "Run Dialog",
+          "notes": "Dedicated system app 'run_dialog' \u2014 UI smoke in NTW6; App Manager owns lifecycle",
+          "permissions": [],
+          "powered_by": "Wine",
+          "powered_by_wine": true,
+          "prefix": null,
+          "protected": true,
+          "recipes_applied": [],
+          "recipes_recommended": [],
+          "schema": "strawnt-app-manifest/v1",
+          "scopes": {
+            "registered": "PASS",
+            "ui": "UNKNOWN"
+          },
+          "source": "system",
+          "system_app": true,
+          "update_channel": "stable",
+          "updated_at": "1786128421"
+        },
+        {
+          "compat_status": "PARTIAL",
+          "created_at": "1786128421",
+          "dedicated_role": "task_manager",
+          "engine": "proton-ge",
+          "engine_pin": "GE-Proton11-3",
+          "exe": null,
+          "execution_backend": "wine",
+          "honesty": {
+            "full_windows_claimed": false,
+            "ranked_anticheat_claimed": false,
+            "simulated": false
+          },
+          "id": "sys-task-manager",
+          "install_path": null,
+          "install_state": "registered",
+          "kind": "system",
+          "name": "Task Manager",
+          "notes": "Dedicated system app 'task_manager' \u2014 UI smoke in NTW6; App Manager owns lifecycle",
+          "permissions": [],
+          "powered_by": "Wine",
+          "powered_by_wine": true,
+          "prefix": null,
+          "protected": true,
+          "recipes_applied": [],
+          "recipes_recommended": [],
+          "schema": "strawnt-app-manifest/v1",
+          "scopes": {
+            "registered": "PASS",
+            "ui": "UNKNOWN"
+          },
+          "source": "system",
+          "system_app": true,
+          "update_channel": "stable",
+          "updated_at": "1786128421"
+        },
+        {
+          "compat_status": "PARTIAL",
+          "created_at": "1786128421",
+          "dedicated_role": "app_library",
+          "engine": "proton-ge",
+          "engine_pin": "GE-Proton11-3",
+          "exe": null,
+          "execution_backend": "wine",
+          "honesty": {
+            "full_windows_claimed": false,
+            "ranked_anticheat_claimed": false,
+            "simulated": false
+          },
+          "id": "sys-app-library",
+          "install_path": null,
+          "install_state": "registered",
+          "kind": "system",
+          "name": "App Library",
+          "notes": "Dedicated system app 'app_library' \u2014 UI smoke in NTW6; App Manager owns lifecycle",
+          "permissions": [],
+          "powered_by": "Wine",
+          "powered_by_wine": true,
+          "prefix": null,
+          "protected": true,
+          "recipes_applied": [],
+          "recipes_recommended": [],
+          "schema": "strawnt-app-manifest/v1",
+          "scopes": {
+            "registered": "PASS",
+            "ui": "UNKNOWN"
+          },
+          "source": "system",
+          "system_app": true,
+          "update_channel": "stable",
+          "updated_at": "1786128421"
+        },
+        {
+          "compat_status": "PARTIAL",
+          "created_at": "1786128421",
+          "dedicated_role": "installer_wizard",
+          "engine": "proton-ge",
+          "engine_pin": "GE-Proton11-3",
+          "exe": null,
+          "execution_backend": "wine",
+          "honesty": {
+            "full_windows_claimed": false,
+            "ranked_anticheat_claimed": false,
+            "simulated": false
+          },
+          "id": "sys-installer-wizard",
+          "install_path": null,
+          "install_state": "registered",
+          "kind": "system",
+          "name": "Installer Wizard",
+          "notes": "Dedicated system app 'installer_wizard' \u2014 UI smoke in NTW6; App Manager owns lifecycle",
+          "permissions": [],
+          "powered_by": "Wine",
+          "powered_by_wine": true,
+          "prefix": null,
+          "protected": true,
+          "recipes_applied": [],
+          "recipes_recommended": [],
+          "schema": "strawnt-app-manifest/v1",
+          "scopes": {
+            "registered": "PASS",
+            "ui": "UNKNOWN"
+          },
+          "source": "system",
+          "system_app": true,
+          "update_channel": "stable",
+          "updated_at": "1786128421"
+        },
+        {
+          "compat_status": "PARTIAL",
+          "created_at": "1786128421",
+          "dedicated_role": "compat_center",
+          "engine": "proton-ge",
+          "engine_pin": "GE-Proton11-3",
+          "exe": null,
+          "execution_backend": "wine",
+          "honesty": {
+            "full_windows_claimed": false,
+            "ranked_anticheat_claimed": false,
+            "simulated": false
+          },
+          "id": "sys-compat-center",
+          "install_path": null,
+          "install_state": "registered",
+          "kind": "system",
+          "name": "Compat Center",
+          "notes": "Dedicated system app 'compat_center' \u2014 UI smoke in NTW6; App Manager owns lifecycle",
+          "permissions": [],
+          "powered_by": "Wine",
+          "powered_by_wine": true,
+          "prefix": null,
+          "protected": true,
+          "recipes_applied": [],
+          "recipes_recommended": [],
+          "schema": "strawnt-app-manifest/v1",
+          "scopes": {
+            "registered": "PASS",
+            "ui": "UNKNOWN"
+          },
+          "source": "system",
+          "system_app": true,
+          "update_channel": "stable",
+          "updated_at": "1786128421"
+        }
+      ],
+      "command": "apps sysapps",
+      "count": 8,
+      "execution_backend": "wine",
+      "home": "/tmp/strawnt-ntw5.bvH9Q8/home",
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "roles": [
+        "app_manager",
+        "file_manager",
+        "settings",
+        "run_dialog",
+        "task_manager",
+        "app_library",
+        "installer_wizard",
+        "compat_center"
+      ],
+      "status": "PASS"
+    },
+    "uninstall_steam": {
+      "app_id": "steam",
+      "command": "apps uninstall",
+      "execution_backend": "wine",
+      "note": "Manifest marked removed; prefix retained (deep-remove is separate)",
+      "powered_by": "Wine",
+      "powered_by_wine": true,
+      "prefix_retained": "steam",
+      "status": "PASS"
+    }
+  },
+  "schema": "strawnt-ntw5-appmgr/v1",
+  "simulated": false,
+  "stage": "ntw5-app-manager",
+  "status": "PASS",
+  "version": "0.7.1.58",
+  "generated_at": "2026-08-07T18:46:55Z",
+  "git_head": "e7e7491d9891ebfc0a885d55304a9dff0b788768",
+  "pin": "GE-Proton11-3",
+  "engine_pin": "GE-Proton11-3",
+  "hub": "electron",
+  "hub_app_manager_entry": true,
+  "schema_present": true,
+  "artifacts": {
+    "crate": "components/strawnt-appmgr",
+    "catalog": "components/strawnt-appmgr/catalog/local-catalog.json",
+    "schema": "docs/schemas/app-manifest.schema.json",
+    "harness": "tests/strawnt/ntw5-appmgr.sh",
+    "hub_desktop": "hub/resources/desktop/strawnt-app-manager.desktop",
+    "hub": "hub/"
+  },
+  "install": true,
+  "list_launch": true,
+  "prefix": true
+}

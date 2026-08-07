@@ -428,7 +428,7 @@ function renderApps(apps) {
       </div>
       <div class="app-meta">
         <span>${t('apps.source')}: ${escapeHtml(app.source || '—')}</span>
-        <span>${t('apps.backend')}: ${escapeHtml(app.execution_backend || 'native')}</span>
+        <span>${t('apps.backend')}: ${escapeHtml(app.execution_backend || 'wine')}</span>
         <span>${t('apps.state')}: ${escapeHtml(app.install_state || 'installed')}</span>
       </div>
       ${

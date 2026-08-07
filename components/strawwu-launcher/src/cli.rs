@@ -135,7 +135,62 @@ pub enum ConfigSubcommand {
 
 #[derive(Debug, Clone)]
 pub enum AppsSubcommand {
-    List,
+    /// NTW5 App Manager control-plane status.
+    Status { json: bool, home: Option<PathBuf> },
+    List { json: bool, home: Option<PathBuf> },
+    Show {
+        id: String,
+        json: bool,
+        home: Option<PathBuf>,
+    },
+    Install {
+        target: String,
+        prefix: Option<String>,
+        json: bool,
+        home: Option<PathBuf>,
+    },
+    Uninstall {
+        id: String,
+        json: bool,
+        home: Option<PathBuf>,
+    },
+    Launch {
+        id: String,
+        json: bool,
+        home: Option<PathBuf>,
+    },
+    Prefix {
+        id: String,
+        set_to: Option<String>,
+        json: bool,
+        home: Option<PathBuf>,
+    },
+    Recipes {
+        id: String,
+        apply: Option<String>,
+        json: bool,
+        home: Option<PathBuf>,
+    },
+    Channel {
+        set_to: Option<String>,
+        json: bool,
+        home: Option<PathBuf>,
+    },
+    Permissions {
+        id: Option<String>,
+        grant: Option<String>,
+        revoke: Option<String>,
+        json: bool,
+        home: Option<PathBuf>,
+    },
+    Compat {
+        id: String,
+        json: bool,
+        home: Option<PathBuf>,
+    },
+    Catalog { json: bool },
+    Sysapps { json: bool, home: Option<PathBuf> },
+    Smoke { json: bool, home: Option<PathBuf> },
 }
 
 #[derive(Debug, Clone)]
@@ -636,9 +691,154 @@ fn parse_install(args: &[String]) -> Result<Command, String> {
 }
 
 fn parse_apps(args: &[String]) -> Result<Command, String> {
-    match args.first().map(|s| s.as_str()) {
-        Some("list") | None => Ok(Command::Apps(AppsSubcommand::List)),
-        Some(other) => Err(format!("unknown apps subcommand: {other}")),
+    let mut json = false;
+    let mut home: Option<PathBuf> = None;
+    let mut prefix: Option<String> = None;
+    let mut set_to: Option<String> = None;
+    let mut apply: Option<String> = None;
+    let mut grant: Option<String> = None;
+    let mut revoke: Option<String> = None;
+    let mut positional: Vec<String> = Vec::new();
+    let mut i = 0;
+    while i < args.len() {
+        match args[i].as_str() {
+            "--json" => json = true,
+            "--home" => {
+                i += 1;
+                let v = args
+                    .get(i)
+                    .ok_or_else(|| "--home requires a path".to_string())?;
+                home = Some(PathBuf::from(v));
+            }
+            "--prefix" => {
+                i += 1;
+                let v = args
+                    .get(i)
+                    .ok_or_else(|| "--prefix requires a name".to_string())?;
+                prefix = Some(v.clone());
+            }
+            "--set" => {
+                i += 1;
+                let v = args
+                    .get(i)
+                    .ok_or_else(|| "--set requires a value".to_string())?;
+                set_to = Some(v.clone());
+            }
+            "--apply" => {
+                i += 1;
+                let v = args
+                    .get(i)
+                    .ok_or_else(|| "--apply requires a recipe id".to_string())?;
+                apply = Some(v.clone());
+            }
+            "--grant" => {
+                i += 1;
+                let v = args
+                    .get(i)
+                    .ok_or_else(|| "--grant requires a capability".to_string())?;
+                grant = Some(v.clone());
+            }
+            "--revoke" => {
+                i += 1;
+                let v = args
+                    .get(i)
+                    .ok_or_else(|| "--revoke requires a capability".to_string())?;
+                revoke = Some(v.clone());
+            }
+            other => positional.push(other.to_string()),
+        }
+        i += 1;
+    }
+
+    let sub = positional.first().map(|s| s.as_str()).unwrap_or("list");
+    match sub {
+        "status" => Ok(Command::Apps(AppsSubcommand::Status { json, home })),
+        "list" => Ok(Command::Apps(AppsSubcommand::List { json, home })),
+        "show" => {
+            let id = positional
+                .get(1)
+                .cloned()
+                .ok_or_else(|| "apps show requires <id>".to_string())?;
+            Ok(Command::Apps(AppsSubcommand::Show { id, json, home }))
+        }
+        "install" => {
+            let target = positional
+                .get(1)
+                .cloned()
+                .ok_or_else(|| "apps install requires <catalog-id|path>".to_string())?;
+            Ok(Command::Apps(AppsSubcommand::Install {
+                target,
+                prefix,
+                json,
+                home,
+            }))
+        }
+        "uninstall" | "remove" => {
+            let id = positional
+                .get(1)
+                .cloned()
+                .ok_or_else(|| "apps uninstall requires <id>".to_string())?;
+            Ok(Command::Apps(AppsSubcommand::Uninstall { id, json, home }))
+        }
+        "launch" | "run" => {
+            let id = positional
+                .get(1)
+                .cloned()
+                .ok_or_else(|| "apps launch requires <id>".to_string())?;
+            Ok(Command::Apps(AppsSubcommand::Launch { id, json, home }))
+        }
+        "prefix" => {
+            let id = positional
+                .get(1)
+                .cloned()
+                .ok_or_else(|| "apps prefix requires <id>".to_string())?;
+            Ok(Command::Apps(AppsSubcommand::Prefix {
+                id,
+                set_to,
+                json,
+                home,
+            }))
+        }
+        "recipes" => {
+            let id = positional
+                .get(1)
+                .cloned()
+                .ok_or_else(|| "apps recipes requires <id>".to_string())?;
+            Ok(Command::Apps(AppsSubcommand::Recipes {
+                id,
+                apply,
+                json,
+                home,
+            }))
+        }
+        "channel" => Ok(Command::Apps(AppsSubcommand::Channel {
+            set_to,
+            json,
+            home,
+        })),
+        "permissions" => {
+            let id = positional.get(1).cloned();
+            Ok(Command::Apps(AppsSubcommand::Permissions {
+                id,
+                grant,
+                revoke,
+                json,
+                home,
+            }))
+        }
+        "compat" => {
+            let id = positional
+                .get(1)
+                .cloned()
+                .ok_or_else(|| "apps compat requires <id>".to_string())?;
+            Ok(Command::Apps(AppsSubcommand::Compat { id, json, home }))
+        }
+        "catalog" => Ok(Command::Apps(AppsSubcommand::Catalog { json })),
+        "sysapps" => Ok(Command::Apps(AppsSubcommand::Sysapps { json, home })),
+        "smoke" => Ok(Command::Apps(AppsSubcommand::Smoke { json, home })),
+        other => Err(format!(
+            "unknown apps subcommand: {other} (status|list|show|install|uninstall|launch|prefix|recipes|channel|permissions|compat|catalog|sysapps|smoke)"
+        )),
     }
 }
 

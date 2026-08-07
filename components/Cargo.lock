@@ -305,8 +305,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0c790de23124f9ab44544d7ac05d60440adc586479ce501c1d6d7da3cd8c9cf5"
 
 [[package]]
+name = "strawnt-appmgr"
+version = "0.7.1-preview.58"
+dependencies = [
+ "serde",
+ "serde_json",
+ "strawnt-engine",
+ "strawwu-app-registry",
+ "tempfile",
+ "thiserror",
+]
+
+[[package]]
 name = "strawnt-engine"
-version = "0.7.1-preview.57"
+version = "0.7.1-preview.58"
 dependencies = [
  "serde",
  "serde_json",
@@ -316,7 +328,7 @@ dependencies = [
 
 [[package]]
 name = "strawnt-interop"
-version = "0.7.1-preview.57"
+version = "0.7.1-preview.58"
 dependencies = [
  "serde",
  "serde_json",
@@ -327,7 +339,7 @@ dependencies = [
 
 [[package]]
 name = "strawwu-anticheat"
-version = "0.7.1-preview.57"
+version = "0.7.1-preview.58"
 dependencies = [
  "chrono",
  "serde",
@@ -338,7 +350,7 @@ dependencies = [
 
 [[package]]
 name = "strawwu-app-registry"
-version = "0.7.1-preview.57"
+version = "0.7.1-preview.58"
 dependencies = [
  "chrono",
  "libc",
@@ -350,7 +362,7 @@ dependencies = [
 
 [[package]]
 name = "strawwu-audio"
-version = "0.7.1-preview.57"
+version = "0.7.1-preview.58"
 dependencies = [
  "serde",
  "serde_json",
@@ -359,7 +371,7 @@ dependencies = [
 
 [[package]]
 name = "strawwu-bridge"
-version = "0.7.1-preview.57"
+version = "0.7.1-preview.58"
 dependencies = [
  "serde",
  "serde_json",
@@ -368,7 +380,7 @@ dependencies = [
 
 [[package]]
 name = "strawwu-cli"
-version = "0.7.1-preview.57"
+version = "0.7.1-preview.58"
 dependencies = [
  "serde",
  "serde_json",
@@ -378,7 +390,7 @@ dependencies = [
 
 [[package]]
 name = "strawwu-device-proxy"
-version = "0.7.1-preview.57"
+version = "0.7.1-preview.58"
 dependencies = [
  "serde",
  "serde_json",
@@ -387,7 +399,7 @@ dependencies = [
 
 [[package]]
 name = "strawwu-graphics"
-version = "0.7.1-preview.57"
+version = "0.7.1-preview.58"
 dependencies = [
  "serde",
  "serde_json",
@@ -396,11 +408,12 @@ dependencies = [
 
 [[package]]
 name = "strawwu-launcher"
-version = "0.7.1-preview.57"
+version = "0.7.1-preview.58"
 dependencies = [
  "libc",
  "serde",
  "serde_json",
+ "strawnt-appmgr",
  "strawnt-engine",
  "strawnt-interop",
  "strawwu-app-registry",
@@ -414,7 +427,7 @@ dependencies = [
 
 [[package]]
 name = "strawwu-nt"
-version = "0.7.1-preview.57"
+version = "0.7.1-preview.58"
 dependencies = [
  "serde",
  "serde_json",
@@ -425,7 +438,7 @@ dependencies = [
 
 [[package]]
 name = "strawwu-runtime"
-version = "0.7.1-preview.57"
+version = "0.7.1-preview.58"
 dependencies = [
  "chrono",
  "serde",

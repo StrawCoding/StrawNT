@@ -1,0 +1,16 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=StrawNT App Manager
+GenericName=App Manager
+Comment=StrawNT system App Manager — install/list/launch Windows apps via Wine/Proton-GE (powered by Wine)
+Exec=strawnt-hub --tab apps
+Icon=strawnt
+Terminal=false
+Categories=Settings;System;PackageManager;
+Keywords=strawnt;apps;wine;proton;appmanager;
+StartupNotify=true
+X-StrawNT-Role=app_manager
+X-StrawNT-Backend=wine
+X-StrawNT-Engine=proton-ge
+X-StrawNT-PoweredBy=Wine

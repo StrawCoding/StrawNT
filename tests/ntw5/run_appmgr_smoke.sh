@@ -1,0 +1,1 @@
+../strawnt/ntw5-appmgr.sh

@@ -2,8 +2,8 @@ use std::path::{Path, PathBuf};
 use std::process;
 
 use strawwu_launcher::cli::{
-    self, Command, EngineSubcommand, InteropSubcommand, MatrixSubcommand, OpenMode, PrefixSubcommand,
-    RecipesSubcommand,
+    self, AppsSubcommand, Command, EngineSubcommand, InteropSubcommand, MatrixSubcommand, OpenMode,
+    PrefixSubcommand, RecipesSubcommand,
 };
 use strawwu_launcher::desktop;
 use strawwu_launcher::detect::{detect_from_path, BinaryFormat};
@@ -269,22 +269,211 @@ fn main() {
                 process::exit(1);
             }
         },
-        Command::Apps(sub) => match sub {
-            cli::AppsSubcommand::List => match registry::list_registered_apps() {
-                Ok(apps) if apps.is_empty() => {
-                    println!("strawnt: no apps registered");
-                }
-                Ok(apps) => {
-                    for (id, name, kind) in apps {
-                        println!("{id}\t{name}\t{kind}");
+        Command::Apps(sub) => {
+            let _ = require_repo_root("apps");
+            match sub {
+                AppsSubcommand::Status { json, home } => {
+                    match strawnt_appmgr::status(home.as_deref()) {
+                        Ok(v) => emit_json_or_human(json, &v),
+                        Err(e) => {
+                            eprintln!("strawnt apps status failed: {e}");
+                            process::exit(1);
+                        }
                     }
                 }
-                Err(e) => {
-                    eprintln!("strawnt: registry list failed: {e}");
-                    process::exit(1);
+                AppsSubcommand::List { json, home } => {
+                    match strawnt_appmgr::list_apps(home.as_deref()) {
+                        Ok(v) => {
+                            if json {
+                                emit_json_or_human(true, &v);
+                            } else {
+                                let apps = v.get("apps").and_then(|a| a.as_array());
+                                if apps.map(|a| a.is_empty()).unwrap_or(true) {
+                                    println!("strawnt: no apps registered");
+                                } else if let Some(apps) = apps {
+                                    for app in apps {
+                                        let id = app.get("id").and_then(|x| x.as_str()).unwrap_or("?");
+                                        let name =
+                                            app.get("name").and_then(|x| x.as_str()).unwrap_or("?");
+                                        let kind =
+                                            app.get("kind").and_then(|x| x.as_str()).unwrap_or("?");
+                                        let state = app
+                                            .get("install_state")
+                                            .and_then(|x| x.as_str())
+                                            .unwrap_or("?");
+                                        println!("{id}\t{name}\t{kind}\t{state}");
+                                    }
+                                }
+                            }
+                        }
+                        Err(e) => {
+                            eprintln!("strawnt apps list failed: {e}");
+                            process::exit(1);
+                        }
+                    }
                 }
-            },
-        },
+                AppsSubcommand::Show { id, json, home } => {
+                    match strawnt_appmgr::show_app(&id, home.as_deref()) {
+                        Ok(v) => emit_json_or_human(json, &v),
+                        Err(e) => {
+                            eprintln!("strawnt apps show failed: {e}");
+                            process::exit(1);
+                        }
+                    }
+                }
+                AppsSubcommand::Install {
+                    target,
+                    prefix,
+                    json,
+                    home,
+                } => {
+                    let path = PathBuf::from(&target);
+                    let result = if path.exists() {
+                        strawnt_appmgr::install_path(&path, prefix.as_deref(), home.as_deref())
+                    } else {
+                        strawnt_appmgr::install_catalog(&target, prefix.as_deref(), home.as_deref())
+                    };
+                    match result {
+                        Ok(v) => {
+                            emit_json_or_human(json, &v);
+                            if v.get("status").and_then(|s| s.as_str()) == Some("FAIL") {
+                                process::exit(1);
+                            }
+                        }
+                        Err(e) => {
+                            eprintln!("strawnt apps install failed: {e}");
+                            process::exit(1);
+                        }
+                    }
+                }
+                AppsSubcommand::Uninstall { id, json, home } => {
+                    match strawnt_appmgr::uninstall_app(&id, home.as_deref()) {
+                        Ok(v) => emit_json_or_human(json, &v),
+                        Err(e) => {
+                            eprintln!("strawnt apps uninstall failed: {e}");
+                            process::exit(1);
+                        }
+                    }
+                }
+                AppsSubcommand::Launch { id, json, home } => {
+                    match strawnt_appmgr::launch_app(&id, home.as_deref()) {
+                        Ok(v) => {
+                            emit_json_or_human(json, &v);
+                            if v.get("status").and_then(|s| s.as_str()) == Some("FAIL") {
+                                process::exit(1);
+                            }
+                        }
+                        Err(e) => {
+                            eprintln!("strawnt apps launch failed: {e}");
+                            process::exit(1);
+                        }
+                    }
+                }
+                AppsSubcommand::Prefix {
+                    id,
+                    set_to,
+                    json,
+                    home,
+                } => match strawnt_appmgr::app_prefix(&id, set_to.as_deref(), home.as_deref()) {
+                    Ok(v) => emit_json_or_human(json, &v),
+                    Err(e) => {
+                        eprintln!("strawnt apps prefix failed: {e}");
+                        process::exit(1);
+                    }
+                },
+                AppsSubcommand::Recipes {
+                    id,
+                    apply,
+                    json,
+                    home,
+                } => match strawnt_appmgr::app_recipes(&id, apply.as_deref(), home.as_deref()) {
+                    Ok(v) => emit_json_or_human(json, &v),
+                    Err(e) => {
+                        eprintln!("strawnt apps recipes failed: {e}");
+                        process::exit(1);
+                    }
+                },
+                AppsSubcommand::Channel {
+                    set_to,
+                    json,
+                    home,
+                } => {
+                    let result = if let Some(ch) = set_to {
+                        strawnt_appmgr::set_channel(&ch, home.as_deref())
+                    } else {
+                        strawnt_appmgr::get_channel(home.as_deref())
+                    };
+                    match result {
+                        Ok(v) => emit_json_or_human(json, &v),
+                        Err(e) => {
+                            eprintln!("strawnt apps channel failed: {e}");
+                            process::exit(1);
+                        }
+                    }
+                }
+                AppsSubcommand::Permissions {
+                    id,
+                    grant,
+                    revoke,
+                    json,
+                    home,
+                } => {
+                    let result = if let (Some(app_id), Some(cap)) = (id.as_ref(), grant.as_ref()) {
+                        strawnt_appmgr::grant_permission(app_id, cap, home.as_deref())
+                    } else if let (Some(app_id), Some(cap)) = (id.as_ref(), revoke.as_ref()) {
+                        strawnt_appmgr::revoke_permission(app_id, cap, home.as_deref())
+                    } else {
+                        strawnt_appmgr::list_permissions(id.as_deref(), home.as_deref())
+                    };
+                    match result {
+                        Ok(v) => emit_json_or_human(json, &v),
+                        Err(e) => {
+                            eprintln!("strawnt apps permissions failed: {e}");
+                            process::exit(1);
+                        }
+                    }
+                }
+                AppsSubcommand::Compat { id, json, home } => {
+                    match strawnt_appmgr::app_compat(&id, home.as_deref()) {
+                        Ok(v) => emit_json_or_human(json, &v),
+                        Err(e) => {
+                            eprintln!("strawnt apps compat failed: {e}");
+                            process::exit(1);
+                        }
+                    }
+                }
+                AppsSubcommand::Catalog { json } => match strawnt_appmgr::list_catalog() {
+                    Ok(v) => emit_json_or_human(json, &v),
+                    Err(e) => {
+                        eprintln!("strawnt apps catalog failed: {e}");
+                        process::exit(1);
+                    }
+                },
+                AppsSubcommand::Sysapps { json, home } => {
+                    match strawnt_appmgr::list_sysapps(home.as_deref()) {
+                        Ok(v) => emit_json_or_human(json, &v),
+                        Err(e) => {
+                            eprintln!("strawnt apps sysapps failed: {e}");
+                            process::exit(1);
+                        }
+                    }
+                }
+                AppsSubcommand::Smoke { json, home } => {
+                    match strawnt_appmgr::run_appmgr_smoke(home.as_deref()) {
+                        Ok(v) => {
+                            emit_json_or_human(json, &v);
+                            if v.get("status").and_then(|s| s.as_str()) != Some("PASS") {
+                                process::exit(1);
+                            }
+                        }
+                        Err(e) => {
+                            eprintln!("strawnt apps smoke failed: {e}");
+                            process::exit(1);
+                        }
+                    }
+                }
+            }
+        }
         Command::Devices(sub) => match sub {
             cli::DevicesSubcommand::List { json } => {
                 use strawwu_cli::devices::{list_devices, ListFormat};
@@ -1052,7 +1241,8 @@ COMMANDS:
         Install via wine/GE path → app-registry + shortcut; else pending + run
     integrate
         Enable double-click for .exe/.msi (MIME + desktop handler)
-    apps list
+    apps status|list|show|install|uninstall|launch|prefix|recipes|channel|permissions|compat|catalog|sysapps|smoke [--json] [--home DIR]
+        NTW5 system App Manager (install/list/launch/prefix/deps/channel/perms/catalog)
     devices list [--json]
     mfp smoke [--json]
     profile inspect|export <app-id>

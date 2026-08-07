@@ -13,9 +13,10 @@ members = [
     "strawwu-app-registry",
     "strawnt-engine",
     "strawnt-interop",
+    "strawnt-appmgr",
 ]
 
 [workspace.package]
-version = "0.7.1-preview.57"
+version = "0.7.1-preview.58"
 edition = "2021"
 license = "MIT"

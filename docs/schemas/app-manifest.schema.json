@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://strawnt.local/schemas/app-manifest.schema.json",
+  "title": "StrawNT App Manifest",
+  "description": "NTW5 App Manager manifest for installed / catalog / dedicated system apps. Honesty: PASS/PARTIAL/FAIL/UNKNOWN only; powered by Wine.",
+  "type": "object",
+  "required": ["schema", "id", "name", "kind", "install_state", "execution_backend"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "strawnt-app-manifest/v1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+    },
+    "name": { "type": "string", "minLength": 1 },
+    "kind": {
+      "type": "string",
+      "enum": ["win32", "linux", "flatpak", "native", "system"]
+    },
+    "source": {
+      "type": "string",
+      "enum": ["installer", "catalog", "launcher", "system", "manual", "seed"]
+    },
+    "install_state": {
+      "type": "string",
+      "enum": ["pending", "installing", "installed", "failed", "removed", "registered"]
+    },
+    "execution_backend": {
+      "type": "string",
+      "enum": ["wine", "native", "container", "microvm"]
+    },
+    "engine": { "type": "string" },
+    "engine_pin": { "type": "string" },
+    "powered_by": { "type": "string", "const": "Wine" },
+    "powered_by_wine": { "type": "boolean", "const": true },
+    "prefix": { "type": ["string", "null"] },
+    "exe": { "type": ["string", "null"] },
+    "install_path": { "type": ["string", "null"] },
+    "recipes_recommended": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "recipes_applied": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "update_channel": {
+      "type": "string",
+      "enum": ["stable", "beta", "nightly"]
+    },
+    "permissions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Capability tokens (e.g. interop.cross_prefix)"
+    },
+    "compat_status": {
+      "type": "string",
+      "enum": ["PASS", "PARTIAL", "FAIL", "UNKNOWN"]
+    },
+    "scopes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "enum": ["PASS", "PARTIAL", "FAIL", "UNKNOWN"]
+      }
+    },
+    "protected": { "type": "boolean" },
+    "system_app": { "type": "boolean" },
+    "dedicated_role": {
+      "type": ["string", "null"],
+      "enum": [
+        null,
+        "file_manager",
+        "settings",
+        "run_dialog",
+        "task_manager",
+        "app_library",
+        "installer_wizard",
+        "compat_center",
+        "app_manager"
+      ]
+    },
+    "honesty": {
+      "type": "object",
+      "properties": {
+        "full_windows_claimed": { "type": "boolean" },
+        "ranked_anticheat_claimed": { "type": "boolean" },
+        "simulated": { "type": "boolean" }
+      }
+    },
+    "created_at": { "type": "string" },
+    "updated_at": { "type": "string" },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": true
+}
