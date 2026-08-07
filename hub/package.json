@@ -1,6 +1,6 @@
 {
   "name": "strawwu-hub",
-  "version": "0.7.1.53",
+  "version": "0.7.1.54",
   "description": "StrawWU System Settings Center — subsystem status, Windows compat, legal docs, and update channel management",
   "main": "src/main/main.js",
   "scripts": {

@@ -1,0 +1,246 @@
+{
+  "schema": "strawnt-ntw3-optimize/v1",
+  "stage": "ntw3-optimize",
+  "status": "PASS",
+  "product": "StrawNT",
+  "version": "0.7.1.54",
+  "generated_at": "2026-08-07T17:56:00Z",
+  "git_head": "4d2cbe709e2b67066227c4e9cb52c46e2e667c5f",
+  "profile": "optimized",
+  "execution_backend": "wine",
+  "backend": "wine",
+  "engine": "proton-ge",
+  "pin": "GE-Proton11-3",
+  "engine_pin": "GE-Proton11-3",
+  "powered_by": "Wine",
+  "powered_by_wine": true,
+  "simulated": false,
+  "metrics": {
+    "cold_start_ms": 1219.84975,
+    "prefix_create_clone_ms": 668.5478390000001,
+    "prefix_create_mode": "template_clone",
+    "prefix_create_ms": 870.7518869999999,
+    "rss_after_idle_kb": 90696,
+    "rss_idle_sec": 10,
+    "rss_pids": [
+      1399474,
+      1399497,
+      1399502,
+      1399512,
+      1399518,
+      1399525
+    ]
+  },
+  "baseline_metrics": {
+    "cold_start_ms": 1130.909315,
+    "prefix_create_clone_ms": null,
+    "prefix_create_mode": "wineboot",
+    "prefix_create_ms": 15893.190382,
+    "rss_after_idle_kb": 90380,
+    "rss_idle_sec": 10,
+    "rss_pids": [
+      1398512,
+      1398517,
+      1398520,
+      1398530,
+      1398536,
+      1398615
+    ]
+  },
+  "deltas": {
+    "cold_start_ms": {
+      "before": 1130.909315,
+      "after": 1219.84975,
+      "delta": 88.94043499999998,
+      "delta_pct": 7.864506359645643,
+      "improved": false
+    },
+    "rss_after_idle_kb": {
+      "before": 90380.0,
+      "after": 90696.0,
+      "delta": 316.0,
+      "delta_pct": 0.34963487497233897,
+      "improved": false
+    },
+    "prefix_create_ms": {
+      "before": 15893.190382,
+      "after": 870.7518869999999,
+      "delta": -15022.438495,
+      "delta_pct": -94.52122660037988,
+      "improved": true
+    },
+    "prefix_create_clone_ms": {
+      "before": null,
+      "after": 668.5478390000001,
+      "delta": null,
+      "delta_pct": null,
+      "improved": null
+    },
+    "prefix_create_fair_ms": {
+      "before": 15893.190382,
+      "after": 668.5478390000001,
+      "delta": -15224.642543,
+      "delta_pct": -95.79349505712099,
+      "improved": true,
+      "notes": "baseline wineboot wall vs optimized template clone duration"
+    }
+  },
+  "optimizations_applied": [
+    "prefix_template_clone",
+    "WINEDEBUG=-all",
+    "WINEDLLOVERRIDES=winemenubuilder.exe=d;mscoree=d;mshtml=d",
+    "WINEESYNC=1",
+    "WINEFSYNC=1",
+    "DXVK_LOG_LEVEL=none"
+  ],
+  "bench": {
+    "backend": "wine",
+    "claims": {
+      "full_windows_claimed": false,
+      "measurable": true,
+      "powered_by_wine": true,
+      "ranked_anticheat_claimed": false,
+      "simulated": false
+    },
+    "cold_start": {
+      "cold_start_ms": 1219.84975,
+      "exit_code": 0,
+      "marker": "STRAWNT_NTW3_optimized_1398893",
+      "status": "PASS",
+      "stderr_tail": "",
+      "stdout_has_marker": true,
+      "stdout_tail": "fsync: up and running.\nSTRAWNT_NTW3_optimized_1398893\r\n",
+      "used_xvfb": true,
+      "wine_bin": "/mnt/data/code/project/StrawCoding/StrawNT/third_party/proton-ge/dist/files/bin/wine"
+    },
+    "engine": "proton-ge",
+    "engine_pin": "GE-Proton11-3",
+    "execution_backend": "wine",
+    "graphics": {
+      "dxvk_dll_count": 6,
+      "dxvk_dll_sample": [
+        "d3d11.dll",
+        "d3d10core.dll",
+        "d3d8.dll",
+        "d3d9.dll",
+        "openvr_api_dxvk.dll",
+        "dxgi.dll"
+      ],
+      "dxvk_tree_present": true,
+      "engine_pin": "GE-Proton11-3",
+      "frames_sampled": false,
+      "notes": "No GUI frame counter in headless NTW3 harness; DXVK/Vulkan presence only",
+      "vulkan": {
+        "devices": null,
+        "status": "UNKNOWN",
+        "vulkaninfo_present": false
+      }
+    },
+    "home": "/tmp/strawnt-ntw3-opt.5cQME0/home",
+    "metrics": {
+      "cold_start_ms": 1219.84975,
+      "prefix_create_clone_ms": 668.5478390000001,
+      "prefix_create_mode": "template_clone",
+      "prefix_create_ms": 870.7518869999999,
+      "rss_after_idle_kb": 90696,
+      "rss_idle_sec": 10,
+      "rss_pids": [
+        1399474,
+        1399497,
+        1399502,
+        1399512,
+        1399518,
+        1399525
+      ]
+    },
+    "notes": [
+      "profile=optimized",
+      "prefix_mode=template_clone",
+      "powered by Wine",
+      "not a full Windows claim",
+      "not a ranked anti-cheat claim",
+      "optimizations: template_clone+WINEDEBUG=-all+WINEDLLOVERRIDES+WINEESYNC+WINEFSYNC+DXVK_LOG_LEVEL=none"
+    ],
+    "pin": "GE-Proton11-3",
+    "powered_by": "Wine",
+    "powered_by_wine": true,
+    "prefix": "/tmp/strawnt-ntw3-opt.5cQME0/home/prefixes/ntw3-optimized-1398893",
+    "prefix_create": {
+      "clone": {
+        "arch": "win64",
+        "created": true,
+        "duration_ms": 668.5478390000001,
+        "mode": "template_clone",
+        "name": "ntw3-optimized-1398893",
+        "path": "/tmp/strawnt-ntw3-opt.5cQME0/home/prefixes/ntw3-optimized-1398893",
+        "status": "PASS",
+        "template": "/tmp/strawnt-ntw3-opt.5cQME0/home/templates/win64"
+      },
+      "ensure_template": {
+        "arch": "win64",
+        "created": true,
+        "path": "/tmp/strawnt-ntw3-opt.5cQME0/home/templates/win64",
+        "status": "PASS",
+        "wineboot": {
+          "command": [
+            "/usr/bin/xvfb-run",
+            "-a",
+            "/mnt/data/code/project/StrawCoding/StrawNT/third_party/proton-ge/dist/files/bin/wine",
+            "wineboot",
+            "-u"
+          ],
+          "duration_sec": 16.047661641,
+          "exit_code": 0,
+          "pin": "GE-Proton11-3",
+          "status": "PASS",
+          "stderr_tail": "",
+          "stdout_tail": "fsync: up and running.\n",
+          "used_xvfb": true,
+          "wine_bin": "/mnt/data/code/project/StrawCoding/StrawNT/third_party/proton-ge/dist/files/bin/wine"
+        }
+      },
+      "mode": "template_clone",
+      "status": "PASS",
+      "timed_window": "clone_only"
+    },
+    "product": "StrawNT",
+    "profile": "optimized",
+    "rss": {
+      "idle_sec": 10,
+      "pids": [
+        1399474,
+        1399497,
+        1399502,
+        1399512,
+        1399518,
+        1399525
+      ],
+      "rss_kb": 90696,
+      "status": "PASS"
+    },
+    "schema": "strawnt-ntw3-bench/v1",
+    "simulated": false,
+    "stage": "ntw3-optimize",
+    "status": "PASS"
+  },
+  "claims": {
+    "measurable": true,
+    "powered_by_wine": true,
+    "full_windows_claimed": false,
+    "ranked_anticheat_claimed": false,
+    "simulated": false,
+    "improvement_proven": true
+  },
+  "artifacts": {
+    "baseline": "tests/strawnt/output/ntw3-baseline.json",
+    "schema": "tests/strawnt/bench_schema.json",
+    "harness": "tests/strawnt/ntw3-optimize.sh",
+    "engine": "components/strawnt-engine/src/optimize.rs"
+  },
+  "notes": [
+    "NTW3: measurable Wine/GE optimize round vs baseline harness",
+    "Primary win expected: prefix_create via template clone",
+    "Cold start: quiet env + esync/fsync vs baseline default Wine debug",
+    "powered by Wine — not a full Windows / ranked anti-cheat claim"
+  ]
+}

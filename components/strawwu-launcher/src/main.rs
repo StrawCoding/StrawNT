@@ -587,6 +587,33 @@ fn main() {
                 }
             }
         },
+        Command::Bench {
+            profile,
+            json,
+            home,
+        } => {
+            let root = require_repo_root("bench");
+            let profile = match strawnt_engine::optimize::OptProfile::parse(&profile) {
+                Ok(p) => p,
+                Err(e) => {
+                    eprintln!("strawnt bench: {e}");
+                    process::exit(1);
+                }
+            };
+            match strawnt_engine::optimize::run_bench(&root, home.as_deref(), profile) {
+                Ok(v) => {
+                    emit_json_or_human(json, &v);
+                    let st = v.get("status").and_then(|s| s.as_str()).unwrap_or("FAIL");
+                    if st == "FAIL" {
+                        process::exit(1);
+                    }
+                }
+                Err(e) => {
+                    eprintln!("strawnt bench failed: {e}");
+                    process::exit(1);
+                }
+            }
+        }
         Command::Config(_) => {
             println!("strawnt: config (stub)");
         }
@@ -922,6 +949,8 @@ COMMANDS:
         Recipes: vcrun, corefonts, dxvk, fontsmooth, crypt32-signature (NTW2)
     matrix list|get <key>|set <name> <status>|seed [--home DIR] [--json]
         Honest PASS/PARTIAL/FAIL/UNKNOWN matrix; seed line.exe+steam.exe (NTW2)
+    bench [--profile baseline|optimized] [--home DIR] [--json]
+        NTW3 measurable Wine/GE bench (cold start / RSS / prefix create)
     version
     help
 
@@ -935,6 +964,7 @@ BACKEND:
     Default: wine (STRAWNT_BACKEND unset; engine=proton-ge; powered by Wine)
     Override: STRAWNT_BACKEND=wine|native|container|microvm
     Legacy: STRAWNT_LEGACY_NATIVE=1 (unsupported research path)
+    Prefix create: template clone by default (STRAWNT_PREFIX_MODE=wineboot to force)
 
 REGISTRY:
     run/install/open register apps in the local app-registry

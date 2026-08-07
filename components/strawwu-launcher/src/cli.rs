@@ -47,6 +47,12 @@ pub enum Command {
     Recipes(RecipesSubcommand),
     /// NTW2: honest compat matrix.
     Matrix(MatrixSubcommand),
+    /// NTW3: measurable Wine/GE bench (baseline|optimized).
+    Bench {
+        profile: String,
+        json: bool,
+        home: Option<PathBuf>,
+    },
     Config(ConfigSubcommand),
     Version,
     Help,
@@ -159,11 +165,39 @@ pub fn parse_args(args: &[String]) -> Result<Command, String> {
         "prefix" => parse_prefix(&args[1..]),
         "recipes" => parse_recipes(&args[1..]),
         "matrix" => parse_matrix(&args[1..]),
+        "bench" => parse_bench(&args[1..]),
         "config" => parse_config(&args[1..]),
         "--version" | "version" => Ok(Command::Version),
         "--help" | "help" => Ok(Command::Help),
         _ => Err(format!("unknown command: {}", args[0])),
     }
+}
+
+fn parse_bench(args: &[String]) -> Result<Command, String> {
+    let (json, home, rest) = parse_home_json(args)?;
+    let mut profile = "optimized".to_string();
+    let mut i = 0;
+    while i < rest.len() {
+        match rest[i].as_str() {
+            "--profile" => {
+                i += 1;
+                profile = rest
+                    .get(i)
+                    .cloned()
+                    .ok_or_else(|| "--profile requires baseline|optimized".to_string())?;
+            }
+            "baseline" | "optimized" => {
+                profile = rest[i].clone();
+            }
+            other => return Err(format!("unexpected bench arg: {other}")),
+        }
+        i += 1;
+    }
+    Ok(Command::Bench {
+        profile,
+        json,
+        home,
+    })
 }
 
 fn parse_engine(args: &[String]) -> Result<Command, String> {
@@ -780,6 +814,24 @@ mod tests {
             cmd3,
             Command::Matrix(MatrixSubcommand::Seed { json: true, .. })
         ));
+    }
+
+    #[test]
+    fn parse_bench() {
+        let cmd = parse_args(&args("bench --profile baseline --json")).unwrap();
+        match cmd {
+            Command::Bench {
+                profile,
+                json: true,
+                ..
+            } => assert_eq!(profile, "baseline"),
+            _ => panic!("expected bench"),
+        }
+        let cmd2 = parse_args(&args("bench optimized --json")).unwrap();
+        match cmd2 {
+            Command::Bench { profile, .. } => assert_eq!(profile, "optimized"),
+            _ => panic!("expected bench optimized"),
+        }
     }
 
     #[test]

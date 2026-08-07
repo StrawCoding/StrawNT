@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "strawnt-ntw3-bench/v1",
+  "title": "StrawNT NTW3 Wine/GE optimization bench",
+  "type": "object",
+  "required": [
+    "schema",
+    "stage",
+    "status",
+    "product",
+    "execution_backend",
+    "engine",
+    "pin",
+    "powered_by_wine",
+    "metrics",
+    "claims"
+  ],
+  "properties": {
+    "schema": { "const": "strawnt-ntw3-bench/v1" },
+    "stage": { "type": "string" },
+    "status": { "enum": ["PASS", "PARTIAL", "FAIL", "UNKNOWN"] },
+    "product": { "const": "StrawNT" },
+    "profile": { "enum": ["baseline", "optimized"] },
+    "execution_backend": { "const": "wine" },
+    "engine": { "const": "proton-ge" },
+    "pin": { "type": "string", "minLength": 1 },
+    "powered_by_wine": { "const": true },
+    "simulated": { "const": false },
+    "metrics": {
+      "type": "object",
+      "required": ["cold_start_ms", "rss_after_idle_kb", "prefix_create_ms"],
+      "properties": {
+        "cold_start_ms": { "type": ["number", "null"] },
+        "rss_after_idle_kb": { "type": ["number", "null"] },
+        "prefix_create_ms": { "type": ["number", "null"] },
+        "prefix_create_clone_ms": { "type": ["number", "null"] },
+        "prefix_create_mode": { "type": "string" },
+        "rss_idle_sec": { "type": "number" }
+      }
+    },
+    "deltas": {
+      "type": "object",
+      "description": "Numeric before/after deltas (optimize report only)"
+    },
+    "claims": {
+      "type": "object",
+      "required": ["measurable"],
+      "properties": {
+        "measurable": { "const": true },
+        "powered_by_wine": { "type": "boolean" },
+        "full_windows_claimed": { "const": false },
+        "ranked_anticheat_claimed": { "const": false },
+        "simulated": { "const": false }
+      }
+    }
+  }
+}

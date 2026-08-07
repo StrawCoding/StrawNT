@@ -6,6 +6,7 @@
 //! NTW2: prefix / recipes / matrix (patterns absorbed from straw-wine).
 
 pub mod matrix;
+pub mod optimize;
 pub mod paths;
 pub mod prefix;
 pub mod recipes;
@@ -303,16 +304,21 @@ pub fn run_hello_cmd(repo: &Path, prefix: &Path) -> Result<RunResult> {
             .unwrap_or(0)
     );
     let script = format!("echo {marker}");
-    let output = Command::new(&wine)
+    let mut command = Command::new(&wine);
+    command
         .arg("cmd")
         .arg("/c")
         .arg(&script)
-        .env("WINEPREFIX", prefix)
-        .env("WINEDEBUG", "-all")
-        .env("WINEDLLOVERRIDES", "winemenubuilder.exe=d")
         .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .output()?;
+        .stderr(Stdio::piped());
+    // NTW3: product default = optimized Wine env (quiet + esync/fsync).
+    optimize::apply_wine_env(
+        &mut command,
+        optimize::OptProfile::Optimized,
+        prefix,
+        "win64",
+    );
+    let output = command.output()?;
 
     let stdout = String::from_utf8_lossy(&output.stdout).to_string();
     let stderr = String::from_utf8_lossy(&output.stderr).to_string();

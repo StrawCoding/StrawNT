@@ -6,6 +6,9 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
 
+use crate::optimize::{
+    clone_prefix_from_template, default_prefix_mode, ensure_template, PrefixCreateMode,
+};
 use crate::paths::{ensure_layout, prefixes_dir, read_index, write_index};
 use crate::{load_pin, wine_bin_path, EngineError, Result};
 
@@ -112,7 +115,12 @@ pub fn wineboot_init(repo: &Path, prefix: &Path, arch: &str) -> Result<Value> {
         .env("WINEPREFIX", prefix)
         .env("WINEARCH", arch)
         .env("WINEDEBUG", "-all")
-        .env("WINEDLLOVERRIDES", "winemenubuilder.exe=d")
+        .env(
+            "WINEDLLOVERRIDES",
+            "winemenubuilder.exe=d;mscoree=d;mshtml=d",
+        )
+        .env("WINEESYNC", "1")
+        .env("WINEFSYNC", "1")
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
 
@@ -185,10 +193,40 @@ pub fn create_prefix(
         }));
     }
 
-    let boot = wineboot_init(repo, &target, arch)?;
-    let ok = boot.get("status").and_then(|v| v.as_str()) == Some("PASS") && is_initialized(&target);
+    let mode = default_prefix_mode();
     let pin = load_pin(repo)?;
     let now = unix_now_iso();
+
+    let (ok, detail) = match mode {
+        PrefixCreateMode::Wineboot => {
+            let boot = wineboot_init(repo, &target, arch)?;
+            let ok = boot.get("status").and_then(|v| v.as_str()) == Some("PASS")
+                && is_initialized(&target);
+            (ok, json!({ "mode": mode.as_str(), "wineboot": boot }))
+        }
+        PrefixCreateMode::TemplateClone => {
+            let ens = ensure_template(repo, &root, arch)?;
+            if ens.get("status").and_then(|v| v.as_str()) != Some("PASS") {
+                (false, json!({ "mode": mode.as_str(), "ensure_template": ens }))
+            } else {
+                // clone_prefix_from_template writes into prefixes/<name>
+                if target.exists() {
+                    let _ = fs::remove_dir_all(&target);
+                }
+                let clone = clone_prefix_from_template(repo, &root, &name, arch)?;
+                let ok = clone.get("status").and_then(|v| v.as_str()) == Some("PASS")
+                    && is_initialized(&target);
+                (
+                    ok,
+                    json!({
+                        "mode": mode.as_str(),
+                        "ensure_template": ens,
+                        "clone": clone,
+                    }),
+                )
+            }
+        }
+    };
 
     let mut index = read_index(&root)?;
     index["prefixes"][&name] = json!({
@@ -198,6 +236,7 @@ pub fn create_prefix(
         "engine": "proton-ge",
         "pin": pin.tag,
         "execution_backend": "wine",
+        "create_mode": mode.as_str(),
         "last_status": if ok { "PASS" } else { "FAIL" },
     });
     write_index(&root, &index)?;
@@ -208,13 +247,14 @@ pub fn create_prefix(
         "path": target.display().to_string(),
         "arch": arch,
         "created": true,
+        "create_mode": mode.as_str(),
         "execution_backend": "wine",
         "backend": "wine",
         "engine": "proton-ge",
         "pin": pin.tag,
         "powered_by": "Wine",
         "powered_by_wine": true,
-        "wineboot": boot,
+        "detail": detail,
         "home": root.display().to_string(),
     }))
 }

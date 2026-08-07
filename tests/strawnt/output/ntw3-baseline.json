@@ -1,0 +1,158 @@
+{
+  "schema": "strawnt-ntw3-baseline/v1",
+  "stage": "ntw3-optimize",
+  "status": "PASS",
+  "product": "StrawNT",
+  "version": "0.7.1.54",
+  "generated_at": "2026-08-07T17:55:31Z",
+  "git_head": "4d2cbe709e2b67066227c4e9cb52c46e2e667c5f",
+  "profile": "baseline",
+  "execution_backend": "wine",
+  "backend": "wine",
+  "engine": "proton-ge",
+  "pin": "GE-Proton11-3",
+  "engine_pin": "GE-Proton11-3",
+  "powered_by": "Wine",
+  "powered_by_wine": true,
+  "simulated": false,
+  "metrics": {
+    "cold_start_ms": 1130.909315,
+    "prefix_create_clone_ms": null,
+    "prefix_create_mode": "wineboot",
+    "prefix_create_ms": 15893.190382,
+    "rss_after_idle_kb": 90380,
+    "rss_idle_sec": 10,
+    "rss_pids": [
+      1398512,
+      1398517,
+      1398520,
+      1398530,
+      1398536,
+      1398615
+    ]
+  },
+  "bench": {
+    "backend": "wine",
+    "claims": {
+      "full_windows_claimed": false,
+      "measurable": true,
+      "powered_by_wine": true,
+      "ranked_anticheat_claimed": false,
+      "simulated": false
+    },
+    "cold_start": {
+      "cold_start_ms": 1130.909315,
+      "exit_code": 0,
+      "marker": "STRAWNT_NTW3_baseline_1398042",
+      "status": "PASS",
+      "stderr_tail": "",
+      "stdout_has_marker": true,
+      "stdout_tail": "e:winediag:loader_init wine-staging 11.0 is a testing version containing experimental patches.\n00e0:fixme:winediag:loader_init Please mention your exact version when filing bug reports on winehq.org.\n",
+      "used_xvfb": true,
+      "wine_bin": "/mnt/data/code/project/StrawCoding/StrawNT/third_party/proton-ge/dist/files/bin/wine"
+    },
+    "engine": "proton-ge",
+    "engine_pin": "GE-Proton11-3",
+    "execution_backend": "wine",
+    "graphics": {
+      "dxvk_dll_count": 6,
+      "dxvk_dll_sample": [
+        "d3d11.dll",
+        "d3d10core.dll",
+        "d3d8.dll",
+        "d3d9.dll",
+        "openvr_api_dxvk.dll",
+        "dxgi.dll"
+      ],
+      "dxvk_tree_present": true,
+      "engine_pin": "GE-Proton11-3",
+      "frames_sampled": false,
+      "notes": "No GUI frame counter in headless NTW3 harness; DXVK/Vulkan presence only",
+      "vulkan": {
+        "devices": null,
+        "status": "UNKNOWN",
+        "vulkaninfo_present": false
+      }
+    },
+    "home": "/tmp/strawnt-ntw3-base.ly0PTY/home",
+    "metrics": {
+      "cold_start_ms": 1130.909315,
+      "prefix_create_clone_ms": null,
+      "prefix_create_mode": "wineboot",
+      "prefix_create_ms": 15893.190382,
+      "rss_after_idle_kb": 90380,
+      "rss_idle_sec": 10,
+      "rss_pids": [
+        1398512,
+        1398517,
+        1398520,
+        1398530,
+        1398536,
+        1398615
+      ]
+    },
+    "notes": [
+      "profile=baseline",
+      "prefix_mode=wineboot",
+      "powered by Wine",
+      "not a full Windows claim",
+      "not a ranked anti-cheat claim",
+      "baseline: full wineboot + default Wine debug (no esync/fsync/dll overrides)"
+    ],
+    "pin": "GE-Proton11-3",
+    "powered_by": "Wine",
+    "powered_by_wine": true,
+    "prefix": "/tmp/strawnt-ntw3-base.ly0PTY/home/prefixes/ntw3-baseline-1398042",
+    "prefix_create": {
+      "mode": "wineboot",
+      "status": "PASS",
+      "wineboot": {
+        "command": [
+          "/usr/bin/xvfb-run",
+          "-a",
+          "/mnt/data/code/project/StrawCoding/StrawNT/third_party/proton-ge/dist/files/bin/wine",
+          "wineboot",
+          "-u"
+        ],
+        "duration_sec": 15.893004991,
+        "exit_code": 0,
+        "pin": "GE-Proton11-3",
+        "status": "PASS",
+        "stderr_tail": "",
+        "stdout_tail": "fsync: up and running.\n",
+        "used_xvfb": true,
+        "wine_bin": "/mnt/data/code/project/StrawCoding/StrawNT/third_party/proton-ge/dist/files/bin/wine"
+      }
+    },
+    "product": "StrawNT",
+    "profile": "baseline",
+    "rss": {
+      "idle_sec": 10,
+      "pids": [
+        1398512,
+        1398517,
+        1398520,
+        1398530,
+        1398536,
+        1398615
+      ],
+      "rss_kb": 90380,
+      "status": "PASS"
+    },
+    "schema": "strawnt-ntw3-bench/v1",
+    "simulated": false,
+    "stage": "ntw3-optimize",
+    "status": "PASS"
+  },
+  "claims": {
+    "measurable": true,
+    "powered_by_wine": true,
+    "full_windows_claimed": false,
+    "ranked_anticheat_claimed": false,
+    "simulated": false
+  },
+  "artifacts": {
+    "schema": "tests/strawnt/bench_schema.json",
+    "harness": "scripts/ntw3-baseline.sh"
+  }
+}
