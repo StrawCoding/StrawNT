@@ -220,11 +220,13 @@ LINE_MATCH="$(cat "${SHOTS}/line.match" 2>/dev/null || true)"
 [[ -s "${SHOTS}/line.png" ]] || die "LINE screenshot empty"
 
 # ---- STEAM ----
-# Root-cause notes (NTW8 FAIL):
+# Root-cause notes (NTW8 FAIL + OpenCode REQUEST_CHANGES):
 # 1) Proton-GE ships builtin windows/{system32,syswow64}/steam.exe stubs — never treat as Steam.
 # 2) SteamSetup.exe manifest requires Administrator; EnableLUA must be 0 or UI never maps.
-# 3) Silent /S hides the installer window — golden needs real visible UI, so no /S.
-echo "== STEAM: prefix + NSIS stage Steam.exe + SteamSetup visible UI =="
+# 3) Silent /S hides the installer window — never use /S for golden UI.
+# 4) OpenCode: SteamSetup installer UI alone must NOT claim steam.exe launch=PASS —
+#    always launch staged Steam.exe and capture its real window for launch/visible_ui.
+echo "== STEAM: prefix + NSIS stage Steam.exe + SteamSetup + steam.exe launch =="
 "${STRAWNT_BIN}" prefix create steam --json --home "${STRAWNT_HOME}" \
   | tee "${WORK}/steam-prefix.json" >/dev/null
 STEAM_PREFIX="${STRAWNT_HOME}/prefixes/steam"
@@ -235,26 +237,14 @@ STEAM_PF="${STEAM_PREFIX}/drive_c/Program Files (x86)/Steam"
 mkdir -p "${STEAM_APP}" "${STEAM_PF}"
 cp -a "${STEAM_FIXTURE}" "${STEAM_APP}/SteamSetup.exe"
 
-STEAM_EXTRACT="${WORK}/steam-extract"
-mkdir -p "${STEAM_EXTRACT}"
-7z x -y -o"${STEAM_EXTRACT}" "${STEAM_FIXTURE}" >/dev/null
-[[ -f "${STEAM_EXTRACT}/Steam.exe" ]] || die "Steam.exe missing after NSIS extract of SteamSetup"
-# Stage real Steam PE (not Wine stub) for install scope + App Manager path
-cp -a "${STEAM_EXTRACT}/Steam.exe" "${STEAM_PF}/Steam.exe"
-cp -a "${STEAM_EXTRACT}/Steam.exe" "${STEAM_APP}/steam.exe"
-# Copy supporting NSIS payload bits when present (bin/public)
-if [[ -d "${STEAM_EXTRACT}/bin" ]]; then
-  rsync -a "${STEAM_EXTRACT}/bin/" "${STEAM_PF}/bin/" 2>/dev/null || \
-    cp -a "${STEAM_EXTRACT}/bin" "${STEAM_PF}/" 2>/dev/null || true
-fi
-if [[ -d "${STEAM_EXTRACT}/public" ]]; then
-  rsync -a "${STEAM_EXTRACT}/public/" "${STEAM_PF}/public/" 2>/dev/null || \
-    cp -a "${STEAM_EXTRACT}/public" "${STEAM_PF}/" 2>/dev/null || true
-fi
+# Full NSIS extract into Program Files (bin/ + public/ required for Steam.exe UI)
+7z x -y -o"${STEAM_PF}" "${STEAM_FIXTURE}" >/dev/null
+[[ -f "${STEAM_PF}/Steam.exe" ]] || die "Steam.exe missing after NSIS extract of SteamSetup"
+cp -a "${STEAM_PF}/Steam.exe" "${STEAM_APP}/steam.exe"
 STEAM_EXE="${STEAM_PF}/Steam.exe"
-STEAM_LAUNCH_MODE="setup_ui"
+STEAM_LAUNCH_MODE="steam_exe"
 
-# Disable UAC so requireAdministrator NSIS UI can map under Wine
+# Disable UAC so requireAdministrator NSIS / Steam bootstrap can map under Wine
 wine_env "${STEAM_PREFIX}"
 DISP_REG_S=193
 Xvfb ":${DISP_REG_S}" -screen 0 1280x800x24 >"${WORK}/xvfb-steam-reg.log" 2>&1 &
@@ -279,36 +269,41 @@ REAL_STEAM="$(find_real_steam_exe)"
 [[ -n "${REAL_STEAM}" ]] || die "real Steam.exe not staged (only Wine stubs present?)"
 STEAM_EXE="${REAL_STEAM}"
 
-echo "== STEAM: launch SteamSetup (no /S) + capture installer window =="
-# Primary visible_ui evidence = SteamSetup installer UI ("Steam 安裝" / Steam Setup)
-capture_window steam "${STEAM_PREFIX}" "${STEAM_APP}" "SteamSetup.exe" \
-  'Steam[[:space:]]*安裝|Steam[[:space:]]*Setup|SteamSetup|"Steam"' 194 55
+echo "== STEAM: SteamSetup installer window (install-UI evidence only; NEVER launch=PASS) =="
+capture_window steam-setup "${STEAM_PREFIX}" "${STEAM_APP}" "SteamSetup.exe" \
+  'Steam[[:space:]]*安裝|Steam[[:space:]]*Setup|SteamSetup|安裝精靈' 194 40
+STEAM_SETUP_FOUND="$(cat "${SHOTS}/steam-setup.found" 2>/dev/null || echo 0)"
+STEAM_SETUP_MATCH="$(cat "${SHOTS}/steam-setup.match" 2>/dev/null || true)"
+# Never alias steam.exe shot onto steam-setup — that caused OpenCode tick-16 REJECT.
+
+echo "== STEAM: launch staged Steam.exe + capture real window (REQUIRED for launch=PASS) =="
+STEAM_LAUNCH_MODE="steam_exe"
+# Prefer client/updater titles; exclude installer locale titles via post-filter below.
+capture_window steam "${STEAM_PREFIX}" "$(dirname "${STEAM_EXE}")" "$(basename "${STEAM_EXE}")" \
+  'Updating[[:space:]]*Steam|"Steam"|steamwebhelper|Steam[[:space:]]*Login' 195 70
 
 STEAM_FOUND="$(cat "${SHOTS}/steam.found" 2>/dev/null || echo 0)"
 STEAM_MATCH="$(cat "${SHOTS}/steam.match" 2>/dev/null || true)"
 
-# Fallback: launch staged Steam.exe client bootstrap if setup UI missed
-if [[ "${STEAM_FOUND}" != "1" || -z "${STEAM_MATCH// }" ]]; then
-  echo "== STEAM: fallback launch staged Steam.exe =="
-  STEAM_LAUNCH_MODE="steam_exe"
-  capture_window steam "${STEAM_PREFIX}" "$(dirname "${STEAM_EXE}")" "$(basename "${STEAM_EXE}")" \
-    'steam|Steam|steamwebhelper' 195 55
-  STEAM_FOUND="$(cat "${SHOTS}/steam.found" 2>/dev/null || echo 0)"
-  STEAM_MATCH="$(cat "${SHOTS}/steam.match" 2>/dev/null || true)"
-fi
-
-# Reject Wine-stub false positives / blank captures
+# Reject Wine-stub false positives / blank captures / installer-only evidence
 STEAM_PNG_BYTES=0
 [[ -f "${SHOTS}/steam.png" ]] && STEAM_PNG_BYTES="$(stat -c%s "${SHOTS}/steam.png")"
 if [[ "${STEAM_FOUND}" != "1" || -z "${STEAM_MATCH// }" || "${STEAM_PNG_BYTES}" -lt 1000 ]]; then
-  die "STEAM visible UI not observed (found=${STEAM_FOUND} match='${STEAM_MATCH}' png_bytes=${STEAM_PNG_BYTES})"
+  die "STEAM steam.exe visible UI not observed (found=${STEAM_FOUND} match='${STEAM_MATCH}' png_bytes=${STEAM_PNG_BYTES})"
 fi
+# Hard reject: installer window titles must never count as steam.exe launch
+if echo "${STEAM_MATCH}" | grep -Eqi 'Steam[[:space:]]*安裝|SteamSetup|安裝精靈|Steam[[:space:]]*Setup'; then
+  die "STEAM match is installer-only; need staged Steam.exe window: ${STEAM_MATCH}"
+fi
+[[ "${STEAM_LAUNCH_MODE}" == "steam_exe" ]] || die "launch_mode must be steam_exe for launch=PASS (got ${STEAM_LAUNCH_MODE})"
 [[ -f "${SHOTS}/steam.png" ]] || die "STEAM screenshot missing"
-# Keep setup aliases for HTML/evidence compatibility
-cp -a "${SHOTS}/steam.png" "${SHOTS}/steam-setup.png" 2>/dev/null || true
-cp -a "${SHOTS}/steam.tree" "${SHOTS}/steam-setup.tree" 2>/dev/null || true
-printf '%s\n' "${STEAM_MATCH}" >"${SHOTS}/steam-setup.match"
-echo 1 >"${SHOTS}/steam-setup.found"
+# Setup shot is independent evidence; missing setup UI is OK (install=PASS from staged PE)
+if [[ "${STEAM_SETUP_FOUND}" != "1" ]]; then
+  echo "WARN: SteamSetup installer window not observed — install scope still PASS via staged Steam.exe PE"
+fi
+printf '%s\n' "${STEAM_SETUP_MATCH}" >"${NTW8_DIR}/steam-setup.match.txt"
+printf '%s\n' "${STEAM_MATCH}" >"${NTW8_DIR}/steam-exe.match.txt"
+printf '%s\n' "${STEAM_LAUNCH_MODE}" >"${NTW8_DIR}/steam-launch-mode.txt"
 
 # Persist durable evidence copies under tests/strawnt/output/ntw8
 cp -a "${WORK}/line-crypt32.json" "${NTW8_DIR}/line-crypt32.json" 2>/dev/null || true
@@ -442,12 +437,14 @@ export NTW8_STEAM_EXE="${STEAM_EXE}"
 export NTW8_STEAM_MODE="${STEAM_LAUNCH_MODE}"
 export NTW8_LINE_MATCH="${LINE_MATCH}"
 export NTW8_STEAM_MATCH="${STEAM_MATCH}"
+export NTW8_STEAM_SETUP_MATCH="${STEAM_SETUP_MATCH:-}"
+export NTW8_STEAM_SETUP_FOUND="${STEAM_SETUP_FOUND:-0}"
 export NTW8_HOME="${STRAWNT_HOME}"
 export NTW8_LINE_VER="${VER}"
 export NTW8_LINE_FULL="${LINE_FULL}"
 
 python3 <<'PY'
-import json, os, hashlib
+import json, os, hashlib, re
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -465,8 +462,20 @@ steam_exe = os.environ["NTW8_STEAM_EXE"]
 steam_mode = os.environ["NTW8_STEAM_MODE"]
 line_match = os.environ.get("NTW8_LINE_MATCH", "")
 steam_match = os.environ.get("NTW8_STEAM_MATCH", "")
+steam_setup_match = os.environ.get("NTW8_STEAM_SETUP_MATCH", "")
+steam_setup_found = os.environ.get("NTW8_STEAM_SETUP_FOUND", "0") == "1"
 home = Path(os.environ["NTW8_HOME"])
 line_ver = os.environ.get("NTW8_LINE_VER", "")
+
+# Atomic provenance — HTML and JSON MUST share this exact block
+provenance = {
+    "version": version,
+    "git_head": git,
+    "git_head_full": git_full,
+    "timestamp_utc": ts,
+    "engine_pin": pin,
+    "mode": "real",
+}
 
 def sha256(p: Path) -> str | None:
     if not p.is_file():
@@ -484,11 +493,23 @@ def png_ok(p: Path) -> bool:
 
 line_png = shots / "line.png"
 steam_png = shots / "steam.png"
+steam_setup_png = shots / "steam-setup.png"
 line_tree = (shots / "line.tree").read_text(errors="replace") if (shots / "line.tree").is_file() else ""
 steam_tree = (shots / "steam.tree").read_text(errors="replace") if (shots / "steam.tree").is_file() else ""
+steam_setup_tree = (shots / "steam-setup.tree").read_text(errors="replace") if (shots / "steam-setup.tree").is_file() else ""
+
+def installer_title(m: str) -> bool:
+    return bool(re.search(r"Steam\s*安裝|SteamSetup|安裝精靈|Steam\s*Setup", m or "", re.I))
 
 line_ui = png_ok(line_png) and bool(line_match.strip())
-steam_ui = png_ok(steam_png) and bool(steam_match.strip())
+# steam.exe launch evidence: real PNG + non-installer window match + launch_mode=steam_exe
+steam_exe_ui = (
+    png_ok(steam_png)
+    and bool(steam_match.strip())
+    and not installer_title(steam_match)
+    and steam_mode == "steam_exe"
+)
+steam_setup_ui = png_ok(steam_setup_png) and steam_setup_found and bool(steam_setup_match.strip())
 crypt32_marker = home / "prefixes/line/strawnt-crypt32-signature.json"
 wintrust = home / "prefixes/line/drive_c/windows/system32/wintrust.dll"
 shim_ok = crypt32_marker.is_file() and wintrust.is_file()
@@ -498,10 +519,10 @@ steam_install = Path(steam_exe).is_file()
 
 # Overall app status: PARTIAL (login/all_games not claimed) but scopes proven
 line_status = "PARTIAL" if line_install and line_ui and shim_ok else "FAIL"
-steam_status = "PARTIAL" if steam_install and steam_ui else "FAIL"
+steam_status = "PARTIAL" if steam_install and steam_exe_ui else "FAIL"
 
 # Stage top-level PASS only if both apps have real evidence and nothing simulated
-stage_pass = line_status == "PARTIAL" and steam_status == "PARTIAL" and line_ui and steam_ui
+stage_pass = line_status == "PARTIAL" and steam_status == "PARTIAL" and line_ui and steam_exe_ui
 
 line_row = {
     "app": "line",
@@ -525,7 +546,7 @@ line_row = {
     "line_version": line_ver,
     "window_match": line_match.strip(),
     "evidence": {
-        "screenshot": str(line_png.relative_to(out_json.parent.parent.parent)) if False else "tests/strawnt/output/ntw8/shots/line.png",
+        "screenshot": "tests/strawnt/output/ntw8/shots/line.png",
         "tree": "tests/strawnt/output/ntw8/shots/line.tree",
         "png_sha256": sha256(line_png),
         "png_bytes": line_png.stat().st_size if line_png.is_file() else 0,
@@ -545,9 +566,9 @@ line_row = {
     ],
 }
 
-# install = real Steam.exe staged (NSIS extract); launch/visible_ui = real X11 window
+# install = real Steam.exe staged (NSIS extract); launch/visible_ui = steam.exe client only
 steam_scopes_install = "PASS" if steam_install else "FAIL"
-steam_scopes_launch = "PASS" if steam_ui else "FAIL"
+steam_scopes_launch = "PASS" if steam_exe_ui else "FAIL"
 
 steam_row = {
     "app": "steam",
@@ -564,18 +585,23 @@ steam_row = {
     "scopes": {
         "install": steam_scopes_install,
         "launch": steam_scopes_launch,
-        "visible_ui": "PASS" if steam_ui else "FAIL",
+        "visible_ui": "PASS" if steam_exe_ui else "FAIL",
         "login": "UNKNOWN",
         "all_games": "UNKNOWN",
     },
     "staged_pe": steam_exe,
     "window_match": steam_match.strip(),
+    "setup_window_match": steam_setup_match.strip(),
+    "setup_ui_observed": steam_setup_ui,
     "evidence": {
         "screenshot": "tests/strawnt/output/ntw8/shots/steam.png",
         "tree": "tests/strawnt/output/ntw8/shots/steam.tree",
         "setup_screenshot": "tests/strawnt/output/ntw8/shots/steam-setup.png",
+        "setup_tree": "tests/strawnt/output/ntw8/shots/steam-setup.tree",
         "png_sha256": sha256(steam_png),
         "png_bytes": steam_png.stat().st_size if steam_png.is_file() else 0,
+        "setup_png_sha256": sha256(steam_setup_png) if steam_setup_png.is_file() else None,
+        "setup_png_bytes": steam_setup_png.stat().st_size if steam_setup_png.is_file() else 0,
     },
     "honesty": {
         "full_windows_claimed": False,
@@ -585,9 +611,11 @@ steam_row = {
         "simulated": False,
     },
     "notes": [
-        "NSIS extract of SteamSetup → Steam.exe staged under Program Files (x86)/Steam (not Wine stub)",
-        "SteamSetup visible installer UI under GE Wine (EnableLUA=0; no silent /S)",
+        "NSIS extract of SteamSetup → full Steam tree under Program Files (x86)/Steam (not Wine stub)",
+        "launch_mode=steam_exe ONLY: staged Steam.exe real X11 window required for launch/visible_ui PASS",
+        "SteamSetup installer UI is separate install-UI evidence and NEVER alone grants launch=PASS",
         f"launch_mode={steam_mode}",
+        f"setup_ui_observed={steam_setup_ui}",
         "login / all_games remain UNKNOWN — not claimed",
         "No ranked anti-cheat / official Steam Deck claim",
     ],
@@ -604,6 +632,30 @@ prior_stages = {
     "ntw7-packaging": "PASS",
 }
 
+checks = {
+    "line_install_pe_present": {"status": "PASS" if line_install else "FAIL"},
+    "line_crypt32_shim": {"status": "PASS" if shim_ok else "FAIL"},
+    "line_visible_ui": {"status": "PASS" if line_ui else "FAIL", "window_match": line_match.strip()},
+    "steam_install_pe_present": {"status": "PASS" if steam_install else "FAIL"},
+    "steam_exe_launch": {
+        "status": "PASS" if steam_exe_ui else "FAIL",
+        "launch_mode": steam_mode,
+        "window_match": steam_match.strip(),
+        "requires": "staged Steam.exe real window; SteamSetup alone insufficient",
+    },
+    "steam_setup_ui": {
+        "status": "PASS" if steam_setup_ui else "PARTIAL",
+        "window_match": steam_setup_match.strip(),
+        "note": "install-UI evidence only; does not grant steam.exe launch=PASS",
+    },
+    "steam_visible_ui": {"status": "PASS" if steam_exe_ui else "FAIL", "window_match": steam_match.strip()},
+    "launch_mode_is_steam_exe": {"status": "PASS" if steam_mode == "steam_exe" else "FAIL", "launch_mode": steam_mode},
+    "not_simulated": {"status": "PASS"},
+    "no_ranked_claim": {"status": "PASS"},
+    "engine_pin_present": {"status": "PASS" if pin else "FAIL", "pin": pin},
+    "html_json_provenance_atomic": {"status": "PASS"},
+}
+
 payload = {
     "schema": "strawnt-ntw8-golden/v1",
     "stage": "ntw8-golden-closeout",
@@ -615,6 +667,7 @@ payload = {
     "git_head": git,
     "git_head_full": git_full,
     "timestamp_utc": ts,
+    "provenance": provenance,
     "execution_backend": "wine",
     "backend": "wine",
     "engine": "proton-ge",
@@ -641,6 +694,7 @@ payload = {
         "all_games_playable_claimed": False,
         "simulated": False,
         "powered_by_wine": True,
+        "steam_launch_from_setup_ui_alone": False,
     },
     "prior_stages": prior_stages,
     "evidence": {
@@ -649,26 +703,21 @@ payload = {
         "shots_dir": "tests/strawnt/output/ntw8/shots",
         "line_png": "tests/strawnt/output/ntw8/shots/line.png",
         "steam_png": "tests/strawnt/output/ntw8/shots/steam.png",
+        "steam_setup_png": "tests/strawnt/output/ntw8/shots/steam-setup.png",
         "line_tree_snippet": line_tree[:600],
         "steam_tree_snippet": steam_tree[:600],
+        "steam_setup_tree_snippet": steam_setup_tree[:600],
         "crypt32_marker": "strawnt-crypt32-signature.json (prefix line)",
         "installer_line": os.environ.get("NTW8_LINE_FULL", ""),
         "installer_steam": "tests/strawnt/fixtures/launchers/SteamSetup.exe",
     },
-    "checks": {
-        "line_install_pe_present": {"status": "PASS" if line_install else "FAIL"},
-        "line_crypt32_shim": {"status": "PASS" if shim_ok else "FAIL"},
-        "line_visible_ui": {"status": "PASS" if line_ui else "FAIL", "window_match": line_match.strip()},
-        "steam_install_pe_present": {"status": "PASS" if steam_install else "FAIL"},
-        "steam_visible_ui": {"status": "PASS" if steam_ui else "FAIL", "window_match": steam_match.strip()},
-        "not_simulated": {"status": "PASS"},
-        "no_ranked_claim": {"status": "PASS"},
-        "engine_pin_present": {"status": "PASS" if pin else "FAIL", "pin": pin},
-    },
+    "checks": checks,
     "notes": [
         "NTW8 golden closeout: line.exe + steam.exe strict matrix with real window observation",
         "App-level status remains PARTIAL (login / all_games UNKNOWN) — honest",
         "Top-level PASS = evidence complete for declared scopes; not full Windows / ranked",
+        "steam.exe launch=PASS requires launch_mode=steam_exe + staged Steam.exe window (not SteamSetup alone)",
+        "HTML/JSON written atomically from same provenance block",
         "execution_backend=wine · engine=proton-ge@" + pin + " · powered by Wine",
     ],
     "failed_checks": [k for k, v in {
@@ -676,7 +725,8 @@ payload = {
         "line_crypt32_shim": shim_ok,
         "line_visible_ui": line_ui,
         "steam_install_pe_present": steam_install,
-        "steam_visible_ui": steam_ui,
+        "steam_exe_launch": steam_exe_ui,
+        "launch_mode_is_steam_exe": steam_mode == "steam_exe",
         "stage_pass": stage_pass,
     }.items() if not v],
 }
@@ -684,7 +734,7 @@ payload = {
 # Copy large installers are already in ev/; ensure shots stay
 out_json.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
-# HTML closeout
+# HTML closeout — provenance pills MUST mirror JSON provenance exactly
 def esc(s: str) -> str:
     return (
         s.replace("&", "&amp;")
@@ -707,11 +757,25 @@ for key, row in (("line.exe", line_row), ("steam.exe", steam_row)):
         f"<td><code>{esc(row.get('window_match') or '')[:80]}</code></td></tr>\n"
     )
 
+setup_figure = ""
+if steam_setup_ui:
+    setup_figure = f"""
+  <figure>
+    <img src="ntw8/shots/steam-setup.png" alt="SteamSetup installer window"/>
+    <figcaption>SteamSetup install-UI only (NOT steam.exe launch) — {esc(steam_setup_match[:100])}</figcaption>
+  </figure>"""
+
 html = f"""<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8"/>
 <title>StrawNT NTW8 Golden Closeout — {esc(version)}</title>
+<meta name="strawnt-provenance-version" content="{esc(version)}"/>
+<meta name="strawnt-provenance-git" content="{esc(git)}"/>
+<meta name="strawnt-provenance-git-full" content="{esc(git_full)}"/>
+<meta name="strawnt-provenance-ts" content="{esc(ts)}"/>
+<meta name="strawnt-provenance-pin" content="{esc(pin)}"/>
+<meta name="strawnt-steam-launch-mode" content="{esc(steam_mode)}"/>
 <style>
 :root {{
   --bg: #0f1419; --surface: #1a2332; --text: #e8eef4; --muted: #8b9cb3;
@@ -751,13 +815,14 @@ ul {{ padding-left: 1.25rem; }}
 <header>
   <div class="brand">StrawNT</div>
   <h1>NTW8 Golden Closeout — line.exe + steam.exe</h1>
-  <p class="meta">
+  <p class="meta" id="provenance">
     <span class="pill">version {esc(version)}</span>
     <span class="pill">engine proton-ge@{esc(pin)}</span>
     <span class="pill">backend=wine</span>
     <span class="pill">powered by Wine</span>
     <span class="pill">{esc(ts)}</span>
     <span class="pill">git {esc(git)}</span>
+    <span class="pill">launch_mode={esc(steam_mode)}</span>
   </p>
   <p class="status-hero">status: {esc(payload['status'])} · mode: real</p>
 </header>
@@ -779,9 +844,9 @@ ul {{ padding-left: 1.25rem; }}
     <figcaption>line.exe / LineLauncher — {esc(line_match[:100])}</figcaption>
   </figure>
   <figure>
-    <img src="ntw8/shots/steam.png" alt="Steam window capture"/>
-    <figcaption>steam.exe / SteamSetup — {esc(steam_match[:100])}</figcaption>
-  </figure>
+    <img src="ntw8/shots/steam.png" alt="Steam.exe client window capture"/>
+    <figcaption>steam.exe client (launch=PASS evidence) — {esc(steam_match[:100])}</figcaption>
+  </figure>{setup_figure}
 </div>
 
 <h2>Honesty</h2>
@@ -790,6 +855,7 @@ ul {{ padding-left: 1.25rem; }}
   <li><code>ranked_pass_claimed=false</code> — no ranked / official anti-cheat claim.</li>
   <li>Top-level PASS means declared-scope evidence is complete — not full Windows.</li>
   <li>mode=<code>real</code> (Xvfb + xwininfo + PNG) — not simulated.</li>
+  <li>steam.exe <code>launch=PASS</code> requires <code>launch_mode=steam_exe</code> + staged Steam.exe window; SteamSetup alone is insufficient.</li>
 </ul>
 
 <h2>Prior stages</h2>
@@ -797,13 +863,34 @@ ul {{ padding-left: 1.25rem; }}
 {''.join(f'<li>{esc(k)}: <span class="badge pass">{esc(v)}</span></li>' for k,v in prior_stages.items())}
 </ul>
 
-<p class="meta">Evidence JSON: <code>tests/strawnt/output/ntw8-golden.json</code></p>
+<p class="meta">Evidence JSON: <code>tests/strawnt/output/ntw8-golden.json</code> · provenance mirrors JSON atomically</p>
 </div>
 </body>
 </html>
 """
 out_html.write_text(html, encoding="utf-8")
-print(json.dumps({"status": payload["status"], "line": line_status, "steam": steam_status}, indent=2))
+
+# Provenance consistency gate: HTML must embed the same version/git/ts as JSON
+html_text = out_html.read_text(encoding="utf-8")
+for needle, label in ((version, "version"), (git, "git_head"), (ts, "timestamp_utc")):
+    if needle not in html_text:
+        raise SystemExit(f"HTML/JSON provenance drift: {label}={needle!r} missing from HTML")
+json_obj = json.loads(out_json.read_text(encoding="utf-8"))
+for k in ("version", "git_head", "git_head_full", "timestamp_utc"):
+    if json_obj.get(k) != provenance[k] or json_obj.get("provenance", {}).get(k) != provenance[k]:
+        raise SystemExit(f"JSON provenance inconsistency on {k}")
+if json_obj.get("apps", {}).get("steam", {}).get("launch_mode") != "steam_exe":
+    raise SystemExit("steam launch_mode must be steam_exe")
+if installer_title(json_obj.get("apps", {}).get("steam", {}).get("window_match", "")):
+    raise SystemExit("steam window_match looks like installer — refuse launch=PASS")
+
+print(json.dumps({
+    "status": payload["status"],
+    "line": line_status,
+    "steam": steam_status,
+    "launch_mode": steam_mode,
+    "provenance": provenance,
+}, indent=2))
 if not stage_pass:
     raise SystemExit(1)
 PY
@@ -816,10 +903,27 @@ jq -e '(.apps.line.status != null) or (.matrix.line.status != null) or (.claims.
 jq -e '(.apps.steam.status != null) or (.matrix.steam.status != null) or (.claims.steam == true)' "${OUT_JSON}" >/dev/null
 jq -e '(.claims.ranked_pass_claimed // false) == false' "${OUT_JSON}" >/dev/null
 jq -e '.simulated != true' "${OUT_JSON}" >/dev/null
+jq -e '.apps.steam.launch_mode == "steam_exe"' "${OUT_JSON}" >/dev/null
+jq -e '.apps.steam.scopes.launch == "PASS"' "${OUT_JSON}" >/dev/null
+jq -e '.checks.steam_exe_launch.status == "PASS"' "${OUT_JSON}" >/dev/null
+jq -e '(.claims.steam_launch_from_setup_ui_alone // true) == false' "${OUT_JSON}" >/dev/null
+# HTML/JSON provenance must match
+python3 - <<'PY'
+import json, re
+from pathlib import Path
+j = json.loads(Path("tests/strawnt/output/ntw8-golden.json").read_text())
+h = Path("tests/strawnt/output/ntw8-golden.html").read_text()
+for k in ("version", "git_head", "timestamp_utc"):
+    assert j[k] in h, f"HTML missing {k}={j[k]}"
+    assert j["provenance"][k] == j[k], f"provenance.{k} drift"
+assert j["apps"]["steam"]["launch_mode"] == "steam_exe"
+assert "Steam 安裝" not in (j["apps"]["steam"].get("window_match") or "")
+print("provenance HTML/JSON OK")
+PY
 
 # Mirror matrix into durable output
 cp -a "${STRAWNT_HOME}/matrix.json" "${NTW8_DIR}/matrix.json" 2>/dev/null || true
 
 echo "OK: ${OUT_JSON}"
 echo "OK: ${OUT_HTML}"
-jq '{status,mode,version,engine_pin,apps:{line:.apps.line.status,steam:.apps.steam.status},claims}' "${OUT_JSON}"
+jq '{status,mode,version,git_head,timestamp_utc,engine_pin,steam_launch_mode:.apps.steam.launch_mode,apps:{line:.apps.line.status,steam:.apps.steam.status},checks:{steam_exe_launch:.checks.steam_exe_launch.status,steam_setup_ui:.checks.steam_setup_ui.status},claims}' "${OUT_JSON}"

@@ -7,27 +7,27 @@
     "clone": {
       "arch": "win64",
       "created": true,
-      "duration_ms": 768.038218,
+      "duration_ms": 699.682972,
       "mode": "template_clone",
       "name": "steam",
-      "path": "/tmp/strawnt-ntw8.6n7Qxx/home/prefixes/steam",
+      "path": "/tmp/strawnt-ntw8.zaKAMI/home/prefixes/steam",
       "status": "PASS",
-      "template": "/tmp/strawnt-ntw8.6n7Qxx/home/templates/win64"
+      "template": "/tmp/strawnt-ntw8.zaKAMI/home/templates/win64"
     },
     "ensure_template": {
       "arch": "win64",
       "created": false,
       "message": "template already present",
-      "path": "/tmp/strawnt-ntw8.6n7Qxx/home/templates/win64",
+      "path": "/tmp/strawnt-ntw8.zaKAMI/home/templates/win64",
       "status": "PASS"
     },
     "mode": "template_clone"
   },
   "engine": "proton-ge",
   "execution_backend": "wine",
-  "home": "/tmp/strawnt-ntw8.6n7Qxx/home",
+  "home": "/tmp/strawnt-ntw8.zaKAMI/home",
   "name": "steam",
-  "path": "/tmp/strawnt-ntw8.6n7Qxx/home/prefixes/steam",
+  "path": "/tmp/strawnt-ntw8.zaKAMI/home/prefixes/steam",
   "pin": "GE-Proton11-3",
   "powered_by": "Wine",
   "powered_by_wine": true,

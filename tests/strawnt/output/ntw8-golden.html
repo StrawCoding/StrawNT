@@ -2,7 +2,13 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8"/>
-<title>StrawNT NTW8 Golden Closeout — 0.7.1.68</title>
+<title>StrawNT NTW8 Golden Closeout — 0.7.1.69</title>
+<meta name="strawnt-provenance-version" content="0.7.1.69"/>
+<meta name="strawnt-provenance-git" content="e05664c69"/>
+<meta name="strawnt-provenance-git-full" content="e05664c697b493b5cd6175c162b13bf578508e77"/>
+<meta name="strawnt-provenance-ts" content="2026-08-07T21:02:15Z"/>
+<meta name="strawnt-provenance-pin" content="GE-Proton11-3"/>
+<meta name="strawnt-steam-launch-mode" content="steam_exe"/>
 <style>
 :root {
   --bg: #0f1419; --surface: #1a2332; --text: #e8eef4; --muted: #8b9cb3;
@@ -42,13 +48,14 @@ ul { padding-left: 1.25rem; }
 <header>
   <div class="brand">StrawNT</div>
   <h1>NTW8 Golden Closeout — line.exe + steam.exe</h1>
-  <p class="meta">
-    <span class="pill">version 0.7.1.68</span>
+  <p class="meta" id="provenance">
+    <span class="pill">version 0.7.1.69</span>
     <span class="pill">engine proton-ge@GE-Proton11-3</span>
     <span class="pill">backend=wine</span>
     <span class="pill">powered by Wine</span>
-    <span class="pill">2026-08-07T20:53:14Z</span>
-    <span class="pill">git 77c177c0a</span>
+    <span class="pill">2026-08-07T21:02:15Z</span>
+    <span class="pill">git e05664c69</span>
+    <span class="pill">launch_mode=steam_exe</span>
   </p>
   <p class="status-hero">status: PASS · mode: real</p>
 </header>
@@ -60,7 +67,7 @@ ul { padding-left: 1.25rem; }
 </thead>
 <tbody>
 <tr><td>line.exe</td><td><span class='badge partial'>PARTIAL</span></td><td><span class='badge pass'>PASS</span></td><td><span class='badge pass'>PASS</span></td><td><span class='badge pass'>PASS</span></td><td><span class='badge unknown'>UNKNOWN</span></td><td><code>0xe00001 &quot;Banner&quot;: (&quot;steam_proton&quot; &quot;steam_proton&quot;)</code></td></tr>
-<tr><td>steam.exe</td><td><span class='badge partial'>PARTIAL</span></td><td><span class='badge pass'>PASS</span></td><td><span class='badge pass'>PASS</span></td><td><span class='badge pass'>PASS</span></td><td><span class='badge unknown'>UNKNOWN</span></td><td><code>0xe00001 &quot;Steam 安裝&quot;: (&quot;steam_proton&quot; &quot;steam_proton&quot</code></td></tr>
+<tr><td>steam.exe</td><td><span class='badge partial'>PARTIAL</span></td><td><span class='badge pass'>PASS</span></td><td><span class='badge pass'>PASS</span></td><td><span class='badge pass'>PASS</span></td><td><span class='badge unknown'>UNKNOWN</span></td><td><code>0x1000001 &quot;Steam&quot;: (&quot;steam_proton&quot; &quot;steam_proton&quot;)</code></td></tr>
 
 </tbody>
 </table>
@@ -72,8 +79,12 @@ ul { padding-left: 1.25rem; }
     <figcaption>line.exe / LineLauncher —      0xe00001 &quot;Banner&quot;: (&quot;steam_proton&quot; &quot;steam_proton&quot;)  306x306+487+247  +487+247</figcaption>
   </figure>
   <figure>
-    <img src="ntw8/shots/steam.png" alt="Steam window capture"/>
-    <figcaption>steam.exe / SteamSetup —      0xe00001 &quot;Steam 安裝&quot;: (&quot;steam_proton&quot; &quot;steam_proton&quot;)  497x444+391+187  +391+187</figcaption>
+    <img src="ntw8/shots/steam.png" alt="Steam.exe client window capture"/>
+    <figcaption>steam.exe client (launch=PASS evidence) —      0x1000001 &quot;Steam&quot;: (&quot;steam_proton&quot; &quot;steam_proton&quot;)  394x104+443+357  +443+357</figcaption>
+  </figure>
+  <figure>
+    <img src="ntw8/shots/steam-setup.png" alt="SteamSetup installer window"/>
+    <figcaption>SteamSetup install-UI only (NOT steam.exe launch) —      0x1000001 &quot;Steam 安裝&quot;: (&quot;steam_proton&quot; &quot;steam_proton&quot;)  497x444+391+187  +391+187</figcaption>
   </figure>
 </div>
 
@@ -83,6 +94,7 @@ ul { padding-left: 1.25rem; }
   <li><code>ranked_pass_claimed=false</code> — no ranked / official anti-cheat claim.</li>
   <li>Top-level PASS means declared-scope evidence is complete — not full Windows.</li>
   <li>mode=<code>real</code> (Xvfb + xwininfo + PNG) — not simulated.</li>
+  <li>steam.exe <code>launch=PASS</code> requires <code>launch_mode=steam_exe</code> + staged Steam.exe window; SteamSetup alone is insufficient.</li>
 </ul>
 
 <h2>Prior stages</h2>
@@ -90,7 +102,7 @@ ul { padding-left: 1.25rem; }
 <li>ntw0-contract-legal: <span class="badge pass">PASS</span></li><li>ntw1-vendor-engine: <span class="badge pass">PASS</span></li><li>ntw2-shell-electron: <span class="badge pass">PASS</span></li><li>ntw3-optimize: <span class="badge pass">PASS</span></li><li>ntw4-win32-ipc: <span class="badge pass">PASS</span></li><li>ntw5-app-manager: <span class="badge pass">PASS</span></li><li>ntw6-sysapps: <span class="badge pass">PASS</span></li><li>ntw7-packaging: <span class="badge pass">PASS</span></li>
 </ul>
 
-<p class="meta">Evidence JSON: <code>tests/strawnt/output/ntw8-golden.json</code></p>
+<p class="meta">Evidence JSON: <code>tests/strawnt/output/ntw8-golden.json</code> · provenance mirrors JSON atomically</p>
 </div>
 </body>
 </html>

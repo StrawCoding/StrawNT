@@ -4,10 +4,10 @@ xwininfo: Window id: 0x21f (the root window) (has no name)
   Root window id: 0x21f (the root window) (has no name)
   Parent window id: 0x0 (none)
      13 children:
-     0xe00003 (has no name): ("steam_proton" "steam_proton")  1x1+0+0  +0+0
-     0xe00001 "Steam 安裝": ("steam_proton" "steam_proton")  497x444+391+187  +391+187
+     0x1000003 (has no name): ("steam_proton" "steam_proton")  1x1+0+0  +0+0
+     0xe00001 "Input": ("steam_proton" "steam_proton")  104x1+8+27  +8+27
      0xe00002 "Default IME": ("steam_proton" "steam_proton")  1x1+0+0  +0+0
-     0x1000001 "Input": ("steam_proton" "steam_proton")  104x1+8+27  +8+27
+     0x1000001 "Steam 安裝": ("steam_proton" "steam_proton")  497x444+391+187  +391+187
      0x1000002 "Default IME": ("steam_proton" "steam_proton")  1x1+0+0  +0+0
      0x600001 (has no name): ()  1x1+0+0  +0+0
      0x400007 (has no name): ("steam_proton" "steam_proton")  1x1+0+0  +0+0

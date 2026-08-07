@@ -7,17 +7,17 @@
     "clone": {
       "arch": "win64",
       "created": true,
-      "duration_ms": 688.494814,
+      "duration_ms": 632.990589,
       "mode": "template_clone",
       "name": "line",
-      "path": "/tmp/strawnt-ntw8.6n7Qxx/home/prefixes/line",
+      "path": "/tmp/strawnt-ntw8.zaKAMI/home/prefixes/line",
       "status": "PASS",
-      "template": "/tmp/strawnt-ntw8.6n7Qxx/home/templates/win64"
+      "template": "/tmp/strawnt-ntw8.zaKAMI/home/templates/win64"
     },
     "ensure_template": {
       "arch": "win64",
       "created": true,
-      "path": "/tmp/strawnt-ntw8.6n7Qxx/home/templates/win64",
+      "path": "/tmp/strawnt-ntw8.zaKAMI/home/templates/win64",
       "status": "PASS",
       "wineboot": {
         "command": [
@@ -27,7 +27,7 @@
           "wineboot",
           "-u"
         ],
-        "duration_sec": 19.566991872,
+        "duration_sec": 18.735334638,
         "exit_code": 0,
         "pin": "GE-Proton11-3",
         "status": "PASS",
@@ -41,9 +41,9 @@
   },
   "engine": "proton-ge",
   "execution_backend": "wine",
-  "home": "/tmp/strawnt-ntw8.6n7Qxx/home",
+  "home": "/tmp/strawnt-ntw8.zaKAMI/home",
   "name": "line",
-  "path": "/tmp/strawnt-ntw8.6n7Qxx/home/prefixes/line",
+  "path": "/tmp/strawnt-ntw8.zaKAMI/home/prefixes/line",
   "pin": "GE-Proton11-3",
   "powered_by": "Wine",
   "powered_by_wine": true,

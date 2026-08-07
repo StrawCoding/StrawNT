@@ -4,11 +4,11 @@
     "execution_backend": "wine",
     "honesty": "Authenticode soft-pass under Wine builtins (PARTIAL vs native)",
     "installed": [
-      "/tmp/strawnt-ntw8.6n7Qxx/home/prefixes/line/drive_c/windows/system32/wintrust.dll",
-      "/tmp/strawnt-ntw8.6n7Qxx/home/prefixes/line/drive_c/windows/syswow64/wintrust.dll"
+      "/tmp/strawnt-ntw8.zaKAMI/home/prefixes/line/drive_c/windows/system32/wintrust.dll",
+      "/tmp/strawnt-ntw8.zaKAMI/home/prefixes/line/drive_c/windows/syswow64/wintrust.dll"
     ],
     "line_ignore_codesign": true,
-    "marker": "/tmp/strawnt-ntw8.6n7Qxx/home/prefixes/line/strawnt-crypt32-signature.json",
+    "marker": "/tmp/strawnt-ntw8.zaKAMI/home/prefixes/line/strawnt-crypt32-signature.json",
     "powered_by": "Wine",
     "recipe": "crypt32-signature",
     "status": "PASS"
@@ -16,11 +16,11 @@
   "backend": "wine",
   "engine": "proton-ge",
   "execution_backend": "wine",
-  "home": "/tmp/strawnt-ntw8.6n7Qxx/home",
+  "home": "/tmp/strawnt-ntw8.zaKAMI/home",
   "powered_by": "Wine",
   "powered_by_wine": true,
   "prefix": "line",
-  "prefix_path": "/tmp/strawnt-ntw8.6n7Qxx/home/prefixes/line",
+  "prefix_path": "/tmp/strawnt-ntw8.zaKAMI/home/prefixes/line",
   "recipe": "crypt32-signature",
   "status": "PASS"
 }

@@ -5,10 +5,18 @@
   "status": "PASS",
   "mode": "real",
   "simulated": false,
-  "version": "0.7.1.68",
-  "git_head": "daec7a339",
-  "git_head_full": "daec7a33980a92b015e018db866b96f9134e634a",
-  "timestamp_utc": "2026-08-07T20:54:50Z",
+  "version": "0.7.1.69",
+  "git_head": "e05664c69",
+  "git_head_full": "e05664c697b493b5cd6175c162b13bf578508e77",
+  "timestamp_utc": "2026-08-07T21:02:15Z",
+  "provenance": {
+    "version": "0.7.1.69",
+    "git_head": "e05664c69",
+    "git_head_full": "e05664c697b493b5cd6175c162b13bf578508e77",
+    "timestamp_utc": "2026-08-07T21:02:15Z",
+    "engine_pin": "GE-Proton11-3",
+    "mode": "real"
+  },
   "execution_backend": "wine",
   "backend": "wine",
   "engine": "proton-ge",
@@ -37,7 +45,7 @@
       "recipes_applied": [
         "crypt32-signature"
       ],
-      "staged_pe": "/tmp/strawnt-ntw8.6n7Qxx/home/prefixes/line/drive_c/users/steamuser/AppData/Local/LINE/bin/26.3.0.3916/LINE.exe",
+      "staged_pe": "/tmp/strawnt-ntw8.zaKAMI/home/prefixes/line/drive_c/users/steamuser/AppData/Local/LINE/bin/26.3.0.3916/LINE.exe",
       "line_version": "26.3.0.3916",
       "window_match": "0xe00001 \"Banner\": (\"steam_proton\" \"steam_proton\")  306x306+487+247  +487+247",
       "evidence": {
@@ -71,7 +79,7 @@
       "powered_by": "Wine",
       "powered_by_wine": true,
       "prefix": "steam",
-      "launch_mode": "setup_ui",
+      "launch_mode": "steam_exe",
       "scopes": {
         "install": "PASS",
         "launch": "PASS",
@@ -79,14 +87,19 @@
         "login": "UNKNOWN",
         "all_games": "UNKNOWN"
       },
-      "staged_pe": "/tmp/strawnt-ntw8.6n7Qxx/home/prefixes/steam/drive_c/strawnt/apps/steam/steam.exe",
-      "window_match": "0xe00001 \"Steam 安裝\": (\"steam_proton\" \"steam_proton\")  497x444+391+187  +391+187",
+      "staged_pe": "/tmp/strawnt-ntw8.zaKAMI/home/prefixes/steam/drive_c/strawnt/apps/steam/steam.exe",
+      "window_match": "0x1000001 \"Steam\": (\"steam_proton\" \"steam_proton\")  394x104+443+357  +443+357",
+      "setup_window_match": "0x1000001 \"Steam 安裝\": (\"steam_proton\" \"steam_proton\")  497x444+391+187  +391+187",
+      "setup_ui_observed": true,
       "evidence": {
         "screenshot": "tests/strawnt/output/ntw8/shots/steam.png",
         "tree": "tests/strawnt/output/ntw8/shots/steam.tree",
         "setup_screenshot": "tests/strawnt/output/ntw8/shots/steam-setup.png",
-        "png_sha256": "2ac5d36f52c1213fd2ead375ab5aaed270b607dc9cb9186c886acbdd90a82e83",
-        "png_bytes": 52505
+        "setup_tree": "tests/strawnt/output/ntw8/shots/steam-setup.tree",
+        "png_sha256": "c5ef8bdc7e5b6e0f9439ce0829d03a51f30530aa8a6290c1cf58be6bddc15242",
+        "png_bytes": 9860,
+        "setup_png_sha256": "2ac5d36f52c1213fd2ead375ab5aaed270b607dc9cb9186c886acbdd90a82e83",
+        "setup_png_bytes": 52505
       },
       "honesty": {
         "full_windows_claimed": false,
@@ -96,9 +109,11 @@
         "simulated": false
       },
       "notes": [
-        "NSIS extract of SteamSetup → Steam.exe staged under Program Files (x86)/Steam (not Wine stub)",
-        "SteamSetup visible installer UI under GE Wine (EnableLUA=0; no silent /S)",
-        "launch_mode=setup_ui",
+        "NSIS extract of SteamSetup → full Steam tree under Program Files (x86)/Steam (not Wine stub)",
+        "launch_mode=steam_exe ONLY: staged Steam.exe real X11 window required for launch/visible_ui PASS",
+        "SteamSetup installer UI is separate install-UI evidence and NEVER alone grants launch=PASS",
+        "launch_mode=steam_exe",
+        "setup_ui_observed=True",
         "login / all_games remain UNKNOWN — not claimed",
         "No ranked anti-cheat / official Steam Deck claim"
       ]
@@ -125,7 +140,7 @@
       "recipes_applied": [
         "crypt32-signature"
       ],
-      "staged_pe": "/tmp/strawnt-ntw8.6n7Qxx/home/prefixes/line/drive_c/users/steamuser/AppData/Local/LINE/bin/26.3.0.3916/LINE.exe",
+      "staged_pe": "/tmp/strawnt-ntw8.zaKAMI/home/prefixes/line/drive_c/users/steamuser/AppData/Local/LINE/bin/26.3.0.3916/LINE.exe",
       "line_version": "26.3.0.3916",
       "window_match": "0xe00001 \"Banner\": (\"steam_proton\" \"steam_proton\")  306x306+487+247  +487+247",
       "evidence": {
@@ -159,7 +174,7 @@
       "powered_by": "Wine",
       "powered_by_wine": true,
       "prefix": "steam",
-      "launch_mode": "setup_ui",
+      "launch_mode": "steam_exe",
       "scopes": {
         "install": "PASS",
         "launch": "PASS",
@@ -167,14 +182,19 @@
         "login": "UNKNOWN",
         "all_games": "UNKNOWN"
       },
-      "staged_pe": "/tmp/strawnt-ntw8.6n7Qxx/home/prefixes/steam/drive_c/strawnt/apps/steam/steam.exe",
-      "window_match": "0xe00001 \"Steam 安裝\": (\"steam_proton\" \"steam_proton\")  497x444+391+187  +391+187",
+      "staged_pe": "/tmp/strawnt-ntw8.zaKAMI/home/prefixes/steam/drive_c/strawnt/apps/steam/steam.exe",
+      "window_match": "0x1000001 \"Steam\": (\"steam_proton\" \"steam_proton\")  394x104+443+357  +443+357",
+      "setup_window_match": "0x1000001 \"Steam 安裝\": (\"steam_proton\" \"steam_proton\")  497x444+391+187  +391+187",
+      "setup_ui_observed": true,
       "evidence": {
         "screenshot": "tests/strawnt/output/ntw8/shots/steam.png",
         "tree": "tests/strawnt/output/ntw8/shots/steam.tree",
         "setup_screenshot": "tests/strawnt/output/ntw8/shots/steam-setup.png",
-        "png_sha256": "2ac5d36f52c1213fd2ead375ab5aaed270b607dc9cb9186c886acbdd90a82e83",
-        "png_bytes": 52505
+        "setup_tree": "tests/strawnt/output/ntw8/shots/steam-setup.tree",
+        "png_sha256": "c5ef8bdc7e5b6e0f9439ce0829d03a51f30530aa8a6290c1cf58be6bddc15242",
+        "png_bytes": 9860,
+        "setup_png_sha256": "2ac5d36f52c1213fd2ead375ab5aaed270b607dc9cb9186c886acbdd90a82e83",
+        "setup_png_bytes": 52505
       },
       "honesty": {
         "full_windows_claimed": false,
@@ -184,9 +204,11 @@
         "simulated": false
       },
       "notes": [
-        "NSIS extract of SteamSetup → Steam.exe staged under Program Files (x86)/Steam (not Wine stub)",
-        "SteamSetup visible installer UI under GE Wine (EnableLUA=0; no silent /S)",
-        "launch_mode=setup_ui",
+        "NSIS extract of SteamSetup → full Steam tree under Program Files (x86)/Steam (not Wine stub)",
+        "launch_mode=steam_exe ONLY: staged Steam.exe real X11 window required for launch/visible_ui PASS",
+        "SteamSetup installer UI is separate install-UI evidence and NEVER alone grants launch=PASS",
+        "launch_mode=steam_exe",
+        "setup_ui_observed=True",
         "login / all_games remain UNKNOWN — not claimed",
         "No ranked anti-cheat / official Steam Deck claim"
       ]
@@ -202,7 +224,8 @@
     "full_windows_claimed": false,
     "all_games_playable_claimed": false,
     "simulated": false,
-    "powered_by_wine": true
+    "powered_by_wine": true,
+    "steam_launch_from_setup_ui_alone": false
   },
   "prior_stages": {
     "ntw0-contract-legal": "PASS",
@@ -220,8 +243,10 @@
     "shots_dir": "tests/strawnt/output/ntw8/shots",
     "line_png": "tests/strawnt/output/ntw8/shots/line.png",
     "steam_png": "tests/strawnt/output/ntw8/shots/steam.png",
+    "steam_setup_png": "tests/strawnt/output/ntw8/shots/steam-setup.png",
     "line_tree_snippet": "\nxwininfo: Window id: 0x21f (the root window) (has no name)\n\n  Root window id: 0x21f (the root window) (has no name)\n  Parent window id: 0x0 (none)\n     11 children:\n     0xe00003 (has no name): (\"steam_proton\" \"steam_proton\")  1x1+0+0  +0+0\n     0xe00001 \"Banner\": (\"steam_proton\" \"steam_proton\")  306x306+487+247  +487+247\n     0xe00002 \"Default IME\": (\"steam_proton\" \"steam_proton\")  1x1+0+0  +0+0\n     0x600001 (has no name): ()  1x1+0+0  +0+0\n     0x400007 (has no name): (\"steam_proton\" \"steam_proton\")  1x1+0+0  +0+0\n     0x400006 (has no name): (\"steam_proton\" \"steam_proton\")  1x1+0+0  +0+0\n",
-    "steam_tree_snippet": "\nxwininfo: Window id: 0x21f (the root window) (has no name)\n\n  Root window id: 0x21f (the root window) (has no name)\n  Parent window id: 0x0 (none)\n     13 children:\n     0xe00003 (has no name): (\"steam_proton\" \"steam_proton\")  1x1+0+0  +0+0\n     0xe00001 \"Steam 安裝\": (\"steam_proton\" \"steam_proton\")  497x444+391+187  +391+187\n     0xe00002 \"Default IME\": (\"steam_proton\" \"steam_proton\")  1x1+0+0  +0+0\n     0x1000001 \"Input\": (\"steam_proton\" \"steam_proton\")  104x1+8+27  +8+27\n     0x1000002 \"Default IME\": (\"steam_proton\" \"steam_proton\")  1x1+0+0  +0+0\n     0x600001 (has no name): ()  1x1+0+0  +0+",
+    "steam_tree_snippet": "\nxwininfo: Window id: 0x21f (the root window) (has no name)\n\n  Root window id: 0x21f (the root window) (has no name)\n  Parent window id: 0x0 (none)\n     13 children:\n     0xe00001 \"Input\": (\"steam_proton\" \"steam_proton\")  104x1+8+27  +8+27\n     0xe00002 \"Default IME\": (\"steam_proton\" \"steam_proton\")  1x1+0+0  +0+0\n     0x1000003 (has no name): (\"steam_proton\" \"steam_proton\")  1x1+0+0  +0+0\n     0x1000001 \"Steam\": (\"steam_proton\" \"steam_proton\")  394x104+443+357  +443+357\n     0x1000002 \"Default IME\": (\"steam_proton\" \"steam_proton\")  1x1+0+0  +0+0\n     0x600001 (has no name): ()  1x1+0+0  +0+0\n",
+    "steam_setup_tree_snippet": "\nxwininfo: Window id: 0x21f (the root window) (has no name)\n\n  Root window id: 0x21f (the root window) (has no name)\n  Parent window id: 0x0 (none)\n     13 children:\n     0x1000003 (has no name): (\"steam_proton\" \"steam_proton\")  1x1+0+0  +0+0\n     0xe00001 \"Input\": (\"steam_proton\" \"steam_proton\")  104x1+8+27  +8+27\n     0xe00002 \"Default IME\": (\"steam_proton\" \"steam_proton\")  1x1+0+0  +0+0\n     0x1000001 \"Steam 安裝\": (\"steam_proton\" \"steam_proton\")  497x444+391+187  +391+187\n     0x1000002 \"Default IME\": (\"steam_proton\" \"steam_proton\")  1x1+0+0  +0+0\n     0x600001 (has no name): ()  1x1+0+0  +0",
     "crypt32_marker": "strawnt-crypt32-signature.json (prefix line)",
     "installer_line": "/tmp/strawnt-line-assets/LineInst-full.exe",
     "installer_steam": "tests/strawnt/fixtures/launchers/SteamSetup.exe"
@@ -240,9 +265,24 @@
     "steam_install_pe_present": {
       "status": "PASS"
     },
+    "steam_exe_launch": {
+      "status": "PASS",
+      "launch_mode": "steam_exe",
+      "window_match": "0x1000001 \"Steam\": (\"steam_proton\" \"steam_proton\")  394x104+443+357  +443+357",
+      "requires": "staged Steam.exe real window; SteamSetup alone insufficient"
+    },
+    "steam_setup_ui": {
+      "status": "PASS",
+      "window_match": "0x1000001 \"Steam 安裝\": (\"steam_proton\" \"steam_proton\")  497x444+391+187  +391+187",
+      "note": "install-UI evidence only; does not grant steam.exe launch=PASS"
+    },
     "steam_visible_ui": {
       "status": "PASS",
-      "window_match": "0xe00001 \"Steam 安裝\": (\"steam_proton\" \"steam_proton\")  497x444+391+187  +391+187"
+      "window_match": "0x1000001 \"Steam\": (\"steam_proton\" \"steam_proton\")  394x104+443+357  +443+357"
+    },
+    "launch_mode_is_steam_exe": {
+      "status": "PASS",
+      "launch_mode": "steam_exe"
     },
     "not_simulated": {
       "status": "PASS"
@@ -253,12 +293,17 @@
     "engine_pin_present": {
       "status": "PASS",
       "pin": "GE-Proton11-3"
+    },
+    "html_json_provenance_atomic": {
+      "status": "PASS"
     }
   },
   "notes": [
     "NTW8 golden closeout: line.exe + steam.exe strict matrix with real window observation",
     "App-level status remains PARTIAL (login / all_games UNKNOWN) — honest",
     "Top-level PASS = evidence complete for declared scopes; not full Windows / ranked",
+    "steam.exe launch=PASS requires launch_mode=steam_exe + staged Steam.exe window (not SteamSetup alone)",
+    "HTML/JSON written atomically from same provenance block",
     "execution_backend=wine · engine=proton-ge@GE-Proton11-3 · powered by Wine"
   ],
   "failed_checks": []

@@ -11,7 +11,7 @@
       "powered_by_wine": true,
       "prefix": "line",
       "status": "PARTIAL",
-      "updated_at": 1786136049,
+      "updated_at": 1786136367,
       "wine_flavor": "proton-ge"
     },
     "steam.exe": {
@@ -25,7 +25,7 @@
       "powered_by_wine": true,
       "prefix": "steam",
       "status": "PARTIAL",
-      "updated_at": 1786136049,
+      "updated_at": 1786136367,
       "wine_flavor": "proton-ge"
     }
   },
