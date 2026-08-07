@@ -3,9 +3,9 @@
   "stage": "ntw0-contract-legal",
   "status": "PASS",
   "product": "StrawNT",
-  "version": "0.7.1.44",
-  "generated_at": "2026-08-07T16:02:36Z",
-  "git_head": "00dc8d1d1cadab17479784c88b1e34178084a797",
+  "version": "0.7.1.45",
+  "generated_at": "2026-08-07T16:06:31Z",
+  "git_head": "5fcf8f3d68ef7f03f3c92f86a892639648e7851e",
   "backend": "wine",
   "execution_backend": "wine",
   "engine": "proton-ge",
@@ -32,7 +32,8 @@
       "nt6-openable moved to test-legacy-strawnt-nt6-openable (not product target)",
       "components Phase 6 → test-legacy-wincompat; golden-apps backend_default=wine",
       "nt3-real-launchers wine substrate product-tree write_fail removed",
-      "ExecutionBackend::Wine + launcher open/install product default wine"
+      "ExecutionBackend::Wine + launcher open/install product default wine",
+      "root test-wincompat relabeled LEGACY; nt6 wine-ban asserts removed (tick3)"
     ]
   },
   "artifacts": {

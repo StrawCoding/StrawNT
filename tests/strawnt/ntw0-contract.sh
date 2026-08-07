@@ -123,10 +123,44 @@ if ! rg -qi 'Legacy|archive|test-legacy-wincompat' \
     failures+=("components/README.md missing legacy wincompat labeling")
 fi
 
-# golden-apps live contract must default to wine
+# golden-apps live contract must default to wine (not historical native)
 if ! jq -e '[.apps[].backend_default] | all(. == "wine")' \
     "${REPO_ROOT}/components/tests/wincompat/golden-apps.json" >/dev/null 2>&1; then
     failures+=("golden-apps.json backend_default is not wine for all apps")
+fi
+if jq -e '[.apps[].backend_default] | any(. == "native")' \
+    "${REPO_ROOT}/components/tests/wincompat/golden-apps.json" >/dev/null 2>&1; then
+    failures+=("golden-apps.json still has backend_default=native (must be wine)")
+fi
+
+# Root Makefile test-wincompat must not advertise general Phase 6 Windows product acceptance
+if rg -n 'Phase 6: Windows Compatibility Layer' "${REPO_ROOT}/Makefile" \
+    | rg -v -i 'LEGACY|ARCHIVE|not product' >/dev/null 2>&1; then
+    failures+=("Makefile test-wincompat still advertises Phase 6 as general Windows product acceptance")
+fi
+if ! rg -qi 'LEGACY/ARCHIVE.*wincompat|test-legacy-wincompat' "${REPO_ROOT}/Makefile"; then
+    failures+=("Makefile missing LEGACY wincompat labeling for test-wincompat")
+fi
+
+# nt6 must not ban Wine markers in product desktop/open output
+if rg -n 'menu entry must not mention wine|open output mentions wine/proton' \
+    "${REPO_ROOT}/tests/strawnt/nt6-openable.sh" >/dev/null 2>&1; then
+    failures+=("nt6-openable.sh still fails when Wine markers appear in product tree")
+fi
+if ! rg -qi 'path_role|legacy_native|test-legacy-strawnt-nt6' \
+    "${REPO_ROOT}/tests/strawnt/nt6-openable.sh"; then
+    failures+=("nt6-openable.sh missing legacy/path_role labeling")
+fi
+
+# nt3 must not scan product tree and write_fail on Wine markers
+if rg -n 'write_fail "wine substrate markers found|ensure no wine/proton substrate markers' \
+    "${REPO_ROOT}/tests/strawnt/nt3-real-launchers.sh" >/dev/null 2>&1; then
+    failures+=("nt3-real-launchers.sh still has wine substrate product-tree write_fail")
+fi
+
+if rg -n '完整 Windows 相容驗收' "${REPO_ROOT}/components/README.md" \
+    | rg -v -i '不是|非|legacy|archive|廢止' >/dev/null 2>&1; then
+    failures+=("components/README.md still presents Phase 6 as full Windows acceptance")
 fi
 
 # runtime must accept wine as ExecutionBackend
@@ -205,6 +239,7 @@ doc = {
             "components Phase 6 → test-legacy-wincompat; golden-apps backend_default=wine",
             "nt3-real-launchers wine substrate product-tree write_fail removed",
             "ExecutionBackend::Wine + launcher open/install product default wine",
+            "root test-wincompat relabeled LEGACY; nt6 wine-ban asserts removed (tick3)",
         ],
     },
     "artifacts": {

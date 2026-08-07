@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
-# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path.
-# Product default is now execution_backend=wine / proton-ge. Do not treat
-# wine_proton_used=false as a product PASS gate. See tests/archive/native/README.md.
+# LEGACY/ARCHIVE (NTW0 Wine pivot 2026-08-07): native-era evidence path only.
+# Invoked via: make test-legacy-strawnt-nt6-openable — NOT a product Wine gate.
+# Product default is execution_backend=wine / proton-ge (powered by Wine).
+# Do not treat wine_proton_used=false as a product PASS gate.
+# See tests/archive/native/README.md.
 # nt6-openable.sh — Prove StrawNT is openable after install (CLI PATH, app menu,
 # stale handler cleared, real strawnt open side-effects).
 # Emits tests/strawnt/output/nt6-openable.json (top-level PASS|FAIL).
-# Forbidden: Wine/Proton substrate, simulated top-level PASS, ISO/StrawWU OS work.
+# Forbidden: simulated top-level PASS, ISO/StrawWU OS work.
+# NTW0: product tree MAY mention Wine/Proton; this script records path_role=legacy_native.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -51,9 +54,13 @@ doc = {
         "stale_handler_cleared": False,
         "full_windows_compat": False,
         "anticheat_ranked_pass": False,
+        "path_role": "legacy_native",
         "wine_proton_used": False,
+        "product_default_is_wine": True,
         "simulated_ok": False,
     },
+    "path_role": "legacy_native",
+    "product_default_backend": "wine",
 }
 with open(out, "w", encoding="utf-8") as fh:
     json.dump(doc, fh, indent=2, ensure_ascii=False)
@@ -169,7 +176,7 @@ MENU_BODY="$(cat "${MENU_DESKTOP}")"
 echo "${MENU_BODY}" | grep -q 'Name=StrawNT' || write_fail "menu entry missing Name=StrawNT"
 echo "${MENU_BODY}" | grep -q 'TryExec=' || write_fail "menu entry missing TryExec"
 echo "${MENU_BODY}" | grep -q ' status' || write_fail "menu Exec must run status (no bare open %f)"
-echo "${MENU_BODY}" | grep -qi wine && write_fail "menu entry must not mention wine"
+# NTW0 lift_ban: menu/desktop MAY mention Wine/Proton (powered by Wine) — do not fail.
 
 TRY_EXEC="$(awk -F= '/^TryExec=/{print $2; exit}' "${MENU_DESKTOP}")"
 [[ -n "${TRY_EXEC}" ]] || write_fail "empty TryExec"
@@ -245,9 +252,10 @@ OPEN_RC=$?
 set -e
 printf '%s\n' "${OPEN_OUT}" | tee "${OPEN_LOG}" | sed 's/^/  | /'
 [[ "${OPEN_RC}" -eq 0 ]] || write_fail "strawnt open failed rc=${OPEN_RC}"
-echo "${OPEN_OUT}" | grep -qi 'backend=native\|native' \
+# LEGACY path forces STRAWNT_BACKEND=native above for historical evidence;
+# product default remains wine. Do not fail solely because Wine markers appear.
+echo "${OPEN_OUT}" | grep -qiE 'backend=native|backend=wine|native|wine|proton' \
     || write_fail "open output missing backend marker (legacy soft-reset)"
-echo "${OPEN_OUT}" | grep -qiE 'wine|proton' && write_fail "open output mentions wine/proton"
 
 # Observable side effects: non-empty open log + pe-exec-summary / marker / desktop
 [[ -s "${OPEN_LOG}" ]] || write_fail "open.log empty"
@@ -321,8 +329,10 @@ doc = {
     "status": "PASS",
     "version": version,
     "mode": "real",
+    "path_role": "legacy_native",
     "backend": "native",
     "execution_backend": "native",
+    "product_default_backend": "wine",
     "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     "cli_available": cli_available == "1",
     "desktop_exec_exists": desktop_exec_exists == "1",
@@ -358,12 +368,14 @@ doc = {
         "stale_handler_cleared": stale_cleared == "1",
         "full_windows_compat": False,
         "anticheat_ranked_pass": False,
+        "path_role": "legacy_native",
         "wine_proton_used": False,
+        "product_default_is_wine": True,
         "simulated_ok": False,
     },
     "exclusions_honored": [
         "no ISO/os-image/Plymouth/Calamares/kernel/desktop / StrawWU OS changes",
-        "no Wine/Proton substrate; execution_backend=native",
+        "LEGACY/ARCHIVE path_role=legacy_native (product default remains wine/proton-ge)",
         "no WinBox naming",
         "no full Windows compatibility / ranked anti-cheat claim",
         "no simulated top-level PASS",

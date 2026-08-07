@@ -94,6 +94,7 @@ help:
 	@echo "  test-live-install-ux          W3-I2 strawwu-install.desktop + finished copy"
 	@echo "  test-update-notifier          W3-B3 strawwu-update-notifier (replaces update-notifier)"
 	@echo "  test-target-setup             W3-N2 strawwu-target-setup Calamares chroot hook"
+	@echo "  test-wincompat                LEGACY Phase 6 native-era (alias → components test-legacy-wincompat)"
 	@echo "  test-wincompat-os             W3-W0 strawwu-wincompat CLI in rootfs (strawwu status)"
 	@echo "  test-wincompat-registry       W4-W1 launcher ↔ app-registry integration"
 	@echo "  test-wincompat-gui            W5-W4 Windows GUI app launch smoke"
@@ -344,10 +345,13 @@ test-installed-boot: validate-calamares-preflight validate-partition-probe
 test-target-flathub: validate-calamares-preflight validate-partition-probe
 	bash tests/install-e2e/run-target-flathub.sh
 
+# LEGACY/ARCHIVE (NTW0) — Phase 6 native-era wincompat smoke.
+# NOT product Wine-default acceptance; NOT a full Windows claim.
+# Prefer: make -C components test-legacy-wincompat
 test-wincompat:
-	@echo "=== Phase 6: Windows Compatibility Layer ==="
-	cd components && cargo test --workspace
-	bash components/tests/wincompat/generate-compat-matrix.sh
+	@echo "[LEGACY/ARCHIVE NTW0] Phase 6 native-era wincompat — not product Wine acceptance"
+	@echo "Product default: wine/proton-ge (powered by Wine). Prefer: make -C components test-legacy-wincompat"
+	$(MAKE) -C components test-legacy-wincompat
 
 test-wave0-baseline:
 	bash tests/preflight/test-wave0-baseline.sh

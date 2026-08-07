@@ -120,8 +120,11 @@ test-legacy-wincompat: test-execution-backends test-graphics-vulkan test-graphic
 	@echo ""
 	@echo "=== test-legacy-wincompat: PASS (legacy; not product Wine acceptance) ==="
 
-# Compat alias — prefer test-legacy-wincompat
-test-wincompat: test-legacy-wincompat
+# Compat alias (LEGACY/ARCHIVE) — prefer test-legacy-wincompat; not product Wine gate
+test-wincompat:
+	@echo "[LEGACY/ARCHIVE NTW0] test-wincompat is an alias of test-legacy-wincompat"
+	@echo "NOT product Wine-default acceptance; NOT full Windows claim."
+	@$(MAKE) test-legacy-wincompat
 
 test-execution-backends:
 	@echo "=== 6.2 Execution backends + runtime cooperation ==="

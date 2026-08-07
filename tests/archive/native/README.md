@@ -20,8 +20,11 @@
 - `tests/portable/smoke-gx-*.sh`、`gx-closeout.sh`、`pe-closeout.sh`、`smoke-pe-*.sh` — 同上
 - `tests/portable/smoke-pe-real-exec.sh`、`tests/strawnt/nt3-real-launchers.sh` — **不再**因產品樹出現 Wine marker 而 `write_fail`
 - Makefile：**產品目標**僅 `test-strawnt-ntw0-contract`；native-era 改名為 `test-legacy-portable-pe-*`／`test-legacy-portable-gx-*`／`test-legacy-strawnt-nt*`（含 nt3／nt6；help 獨立 Legacy 區）
-- `components/Makefile`：`test-legacy-wincompat`（別名 `test-wincompat`）— **非**完整 Windows／產品 Wine 預設驗收
+- 根 `test-wincompat`：**LEGACY 別名** → `components test-legacy-wincompat`（不再宣稱一般 Phase 6 Windows 產品驗收）
+- `components/Makefile`：`test-legacy-wincompat`（`test-wincompat` 僅相容別名）— **非**完整 Windows／產品 Wine 預設驗收
 - `components/tests/wincompat/golden-apps.json` — 現行 `backend_default=wine`
+- `tests/strawnt/nt6-openable.sh` — `path_role=legacy_native`；**不再**因 menu/open 出現 Wine 字樣而 `write_fail`
+- `tests/strawnt/nt3-real-launchers.sh` — **不再**掃描產品樹 Wine marker 並 `write_fail`
 - launcher／desktop：`X-StrawNT-Backend=wine`；open／install 預設 wine；unit test 允許 wine
 - runtime：`ExecutionBackend::Wine` 為產品預設；native 為 legacy
 - verify bins（`nt_*_verify`、`gx_*_verify`）：輸出可含 `path_role=legacy_native`；**不得**再當產品「禁 Wine」閘
