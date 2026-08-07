@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # ntw5-appmgr.sh — NTW5 system App Manager evidence.
-# Honesty: top-level PASS requires real install/list/launch/prefix via App Manager — never simulated.
+# Honesty: top-level PASS requires real PE-staged install + Wine PE launch via App Manager —
+# never registration-only INSTALLED.json / cmd_marker / simulated.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -26,6 +27,7 @@ cleanup() {
 trap cleanup EXIT
 
 command -v jq >/dev/null || { echo "jq required" >&2; exit 1; }
+command -v x86_64-w64-mingw32-gcc >/dev/null || { echo "x86_64-w64-mingw32-gcc required for PE fixture" >&2; exit 1; }
 
 VERSION="$(tr -d '[:space:]' < "${REPO_ROOT}/VERSION")"
 GIT_HEAD="$(git -C "${REPO_ROOT}" rev-parse HEAD 2>/dev/null || echo unknown)"
@@ -41,9 +43,15 @@ require_file() {
 
 require_file "components/strawnt-appmgr/src/lib.rs"
 require_file "components/strawnt-appmgr/catalog/local-catalog.json"
+require_file "components/strawnt-appmgr/fixtures/strawnt_app_stub.c"
 require_file "docs/schemas/app-manifest.schema.json"
 require_file "hub/resources/desktop/strawnt-app-manager.desktop"
 require_file "third_party/proton-ge/PIN"
+
+echo "== build appmgr PE fixture =="
+make -C "${REPO_ROOT}/components/strawnt-appmgr/fixtures" -j2
+FIXTURE_PE="${REPO_ROOT}/components/strawnt-appmgr/fixtures/build/strawnt_app_stub.exe"
+[[ -f "${FIXTURE_PE}" ]] || { echo "fixture PE missing" >&2; exit 1; }
 
 echo "== build strawwu-launcher + strawnt-appmgr =="
 (cd "${REPO_ROOT}/components" && cargo build -p strawwu-launcher -p strawnt-appmgr -q)
@@ -83,11 +91,11 @@ grep -qi 'powered by Wine' "${HUB_DESKTOP}" || HUB_OK=false
 SCHEMA_OK=false
 [[ -f "${REPO_ROOT}/docs/schemas/app-manifest.schema.json" ]] && SCHEMA_OK=true
 
-python3 - <<'PY' "${RAW}" "${OUT_JSON}" "${VERSION}" "${TS}" "${GIT_HEAD}" "${PIN_TAG}" "${HUB_OK}" "${SCHEMA_OK}"
+python3 - <<'PY' "${RAW}" "${OUT_JSON}" "${VERSION}" "${TS}" "${GIT_HEAD}" "${PIN_TAG}" "${HUB_OK}" "${SCHEMA_OK}" "${FIXTURE_PE}"
 import json, sys
 from pathlib import Path
 
-raw_path, out_path, version, ts, git_head, pin, hub_ok, schema_ok = sys.argv[1:9]
+raw_path, out_path, version, ts, git_head, pin, hub_ok, schema_ok, fixture_pe = sys.argv[1:10]
 raw = json.loads(Path(raw_path).read_text())
 raw["version"] = version
 raw["generated_at"] = ts
@@ -97,9 +105,11 @@ raw["engine_pin"] = pin
 raw["hub"] = "electron"
 raw["hub_app_manager_entry"] = hub_ok.lower() in ("true", "1", "yes")
 raw["schema_present"] = schema_ok.lower() in ("true", "1", "yes")
+raw["fixture_pe"] = fixture_pe
 raw["artifacts"] = {
     "crate": "components/strawnt-appmgr",
     "catalog": "components/strawnt-appmgr/catalog/local-catalog.json",
+    "fixture": "components/strawnt-appmgr/fixtures",
     "schema": "docs/schemas/app-manifest.schema.json",
     "harness": "tests/strawnt/ntw5-appmgr.sh",
     "hub_desktop": "hub/resources/desktop/strawnt-app-manager.desktop",
@@ -118,15 +128,34 @@ claims["simulated"] = False
 raw["install"] = bool(caps.get("install") or claims.get("install"))
 raw["list_launch"] = bool(caps.get("list_launch") or claims.get("list_launch"))
 raw["prefix"] = bool(caps.get("prefix") or claims.get("prefix"))
+
+results = raw.get("results") or {}
+install_line = results.get("install_line") or {}
+launch = results.get("launch") or {}
+notes = raw.setdefault("notes", [])
+failures = raw.setdefault("failures", [])
+
+def fail(msg: str) -> None:
+    failures.append(msg)
+    notes.append(msg)
+    raw["status"] = "FAIL"
+
+if install_line.get("install_mode") != "pe_staged":
+    fail(f"install_line.install_mode={install_line.get('install_mode')!r} (require pe_staged)")
+if launch.get("mode") != "pe":
+    fail(f"launch.mode={launch.get('mode')!r} (require pe — refuse cmd_marker)")
+if (launch.get("honesty") or {}).get("simulated") is True:
+    fail("launch honesty.simulated=true refused")
+if raw.get("simulated") is True:
+    fail("top-level simulated=true refused")
+
 if not raw.get("hub_app_manager_entry"):
-    raw["status"] = "FAIL"
-    raw.setdefault("notes", []).append("Hub App Manager entry missing")
+    fail("Hub App Manager entry missing")
 if not raw.get("schema_present"):
-    raw["status"] = "FAIL"
-    raw.setdefault("notes", []).append("app-manifest schema missing")
+    fail("app-manifest schema missing")
 if raw.get("simulated") is True and raw.get("status") == "PASS":
-    raw["status"] = "FAIL"
-    raw.setdefault("notes", []).append("refusing simulated top-level PASS")
+    fail("refusing simulated top-level PASS")
+
 Path(out_path).write_text(json.dumps(raw, indent=2, sort_keys=False) + "\n")
 print(f"wrote {out_path} status={raw.get('status')}")
 PY
@@ -136,6 +165,9 @@ jq -e '.status == "PASS"' "${OUT_JSON}" >/dev/null
 jq -e '(.capabilities.install == true) or (.claims.install == true)' "${OUT_JSON}" >/dev/null
 jq -e '(.capabilities.list_launch == true) or (.claims.list_launch == true)' "${OUT_JSON}" >/dev/null
 jq -e '(.capabilities.prefix == true) or (.claims.prefix == true)' "${OUT_JSON}" >/dev/null
+jq -e '.results.install_line.install_mode == "pe_staged"' "${OUT_JSON}" >/dev/null
+jq -e '.results.launch.mode == "pe"' "${OUT_JSON}" >/dev/null
+jq -e '.results.launch.honesty.simulated != true' "${OUT_JSON}" >/dev/null
 test -f "${OUT_JSON}"
 
 echo "NTW5 App Manager evidence PASS → ${OUT_JSON}"

@@ -102,7 +102,7 @@
       "channel": "stable",
       "command": "apps channel",
       "execution_backend": "wine",
-      "home": "/tmp/strawnt-ntw5.bvH9Q8/home",
+      "home": "/tmp/strawnt-ntw5.EVZbf1/home",
       "powered_by": "Wine",
       "powered_by_wine": true,
       "status": "PASS"
@@ -111,7 +111,7 @@
       "channel": "beta",
       "command": "apps channel set",
       "execution_backend": "wine",
-      "home": "/tmp/strawnt-ntw5.bvH9Q8/home",
+      "home": "/tmp/strawnt-ntw5.EVZbf1/home",
       "powered_by": "Wine",
       "powered_by_wine": true,
       "status": "PASS"
@@ -147,7 +147,7 @@
           "visible_ui": "UNKNOWN"
         },
         "status": "PARTIAL",
-        "updated_at": 1786128438,
+        "updated_at": 1786129510,
         "via": "strawnt-appmgr",
         "wine_flavor": "proton-ge"
       },
@@ -170,13 +170,15 @@
       "engine": "proton-ge",
       "exe": "line.exe",
       "execution_backend": "wine",
+      "fixture": "/mnt/data/code/project/StrawCoding/StrawNT/components/strawnt-appmgr/fixtures/build/strawnt_app_stub.exe",
       "honesty": {
         "full_windows_claimed": false,
-        "note": "Catalog install registers lifecycle + prefix; real vendor installer UI is PARTIAL until proven",
+        "note": "Staged real Win32 PE via App Manager; vendor LINE/Steam installer UI remains PARTIAL",
         "ranked_anticheat_claimed": false,
         "simulated": false
       },
-      "install_marker": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/line/drive_c/strawnt/apps/line/INSTALLED.json",
+      "install_marker": "/tmp/strawnt-ntw5.EVZbf1/home/prefixes/line/drive_c/strawnt/apps/line/INSTALLED.json",
+      "install_mode": "pe_staged",
       "name": "LINE",
       "powered_by": "Wine",
       "powered_by_wine": true,
@@ -190,17 +192,17 @@
           "clone": {
             "arch": "win64",
             "created": true,
-            "duration_ms": 671.648504,
+            "duration_ms": 652.775727,
             "mode": "template_clone",
             "name": "line",
-            "path": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/line",
+            "path": "/tmp/strawnt-ntw5.EVZbf1/home/prefixes/line",
             "status": "PASS",
-            "template": "/tmp/strawnt-ntw5.bvH9Q8/home/templates/win64"
+            "template": "/tmp/strawnt-ntw5.EVZbf1/home/templates/win64"
           },
           "ensure_template": {
             "arch": "win64",
             "created": true,
-            "path": "/tmp/strawnt-ntw5.bvH9Q8/home/templates/win64",
+            "path": "/tmp/strawnt-ntw5.EVZbf1/home/templates/win64",
             "status": "PASS",
             "wineboot": {
               "command": [
@@ -210,7 +212,7 @@
                 "wineboot",
                 "-u"
               ],
-              "duration_sec": 16.02069525,
+              "duration_sec": 22.080816756,
               "exit_code": 0,
               "pin": "GE-Proton11-3",
               "status": "PASS",
@@ -224,9 +226,9 @@
         },
         "engine": "proton-ge",
         "execution_backend": "wine",
-        "home": "/tmp/strawnt-ntw5.bvH9Q8/home",
+        "home": "/tmp/strawnt-ntw5.EVZbf1/home",
         "name": "line",
-        "path": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/line",
+        "path": "/tmp/strawnt-ntw5.EVZbf1/home/prefixes/line",
         "pin": "GE-Proton11-3",
         "powered_by": "Wine",
         "powered_by_wine": true,
@@ -241,6 +243,7 @@
         "corefonts"
       ],
       "source": "catalog",
+      "staged_pe": "/tmp/strawnt-ntw5.EVZbf1/home/prefixes/line/drive_c/strawnt/apps/line/line.exe",
       "status": "PASS"
     },
     "install_steam": {
@@ -249,13 +252,15 @@
       "engine": "proton-ge",
       "exe": "steam.exe",
       "execution_backend": "wine",
+      "fixture": "/mnt/data/code/project/StrawCoding/StrawNT/components/strawnt-appmgr/fixtures/build/strawnt_app_stub.exe",
       "honesty": {
         "full_windows_claimed": false,
-        "note": "Catalog install registers lifecycle + prefix; real vendor installer UI is PARTIAL until proven",
+        "note": "Staged real Win32 PE via App Manager; vendor LINE/Steam installer UI remains PARTIAL",
         "ranked_anticheat_claimed": false,
         "simulated": false
       },
-      "install_marker": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/steam/drive_c/strawnt/apps/steam/INSTALLED.json",
+      "install_marker": "/tmp/strawnt-ntw5.EVZbf1/home/prefixes/steam/drive_c/strawnt/apps/steam/INSTALLED.json",
+      "install_mode": "pe_staged",
       "name": "Steam",
       "powered_by": "Wine",
       "powered_by_wine": true,
@@ -269,27 +274,27 @@
           "clone": {
             "arch": "win64",
             "created": true,
-            "duration_ms": 672.3896219999999,
+            "duration_ms": 658.405727,
             "mode": "template_clone",
             "name": "steam",
-            "path": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/steam",
+            "path": "/tmp/strawnt-ntw5.EVZbf1/home/prefixes/steam",
             "status": "PASS",
-            "template": "/tmp/strawnt-ntw5.bvH9Q8/home/templates/win64"
+            "template": "/tmp/strawnt-ntw5.EVZbf1/home/templates/win64"
           },
           "ensure_template": {
             "arch": "win64",
             "created": false,
             "message": "template already present",
-            "path": "/tmp/strawnt-ntw5.bvH9Q8/home/templates/win64",
+            "path": "/tmp/strawnt-ntw5.EVZbf1/home/templates/win64",
             "status": "PASS"
           },
           "mode": "template_clone"
         },
         "engine": "proton-ge",
         "execution_backend": "wine",
-        "home": "/tmp/strawnt-ntw5.bvH9Q8/home",
+        "home": "/tmp/strawnt-ntw5.EVZbf1/home",
         "name": "steam",
-        "path": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/steam",
+        "path": "/tmp/strawnt-ntw5.EVZbf1/home/prefixes/steam",
         "pin": "GE-Proton11-3",
         "powered_by": "Wine",
         "powered_by_wine": true,
@@ -302,6 +307,7 @@
         "dxvk"
       ],
       "source": "catalog",
+      "staged_pe": "/tmp/strawnt-ntw5.EVZbf1/home/prefixes/steam/drive_c/strawnt/apps/steam/steam.exe",
       "status": "PASS"
     },
     "launch": {
@@ -313,24 +319,26 @@
       "exit_code": 0,
       "honesty": {
         "full_windows_claimed": false,
+        "note": "Console PE fixture launch via Wine \u2014 vendor GUI remains UNKNOWN/PARTIAL",
         "ranked_anticheat_claimed": false,
         "simulated": false,
-        "visible_ui": "n/a_cmd"
+        "visible_ui": "UNKNOWN"
       },
-      "marker": "STRAWNT_APPMGR_LAUNCH_1786128440",
-      "mode": "cmd_marker",
+      "marker": "STRAWNT_APPMGR_OK",
+      "mode": "pe",
       "powered_by": "Wine",
       "powered_by_wine": true,
       "prefix": "line",
+      "staged_exe": "/tmp/strawnt-ntw5.EVZbf1/home/prefixes/line/drive_c/strawnt/apps/line/line.exe",
       "status": "PASS",
       "stderr_tail": "",
-      "stdout_tail": "fsync: up and running.\nSTRAWNT_APPMGR_LAUNCH_1786128440\r\n"
+      "stdout_tail": "fsync: up and running.\nSTRAWNT_APPMGR_OK\r\n"
     },
     "list": {
       "apps": [
         {
           "compat_status": "PARTIAL",
-          "created_at": "1786128421",
+          "created_at": "1786129487",
           "dedicated_role": "app_manager",
           "engine": "proton-ge",
           "engine_pin": "GE-Proton11-3",
@@ -362,11 +370,11 @@
           "source": "system",
           "system_app": true,
           "update_channel": "stable",
-          "updated_at": "1786128421"
+          "updated_at": "1786129487"
         },
         {
           "compat_status": "PARTIAL",
-          "created_at": "1786128421",
+          "created_at": "1786129487",
           "dedicated_role": "file_manager",
           "engine": "proton-ge",
           "engine_pin": "GE-Proton11-3",
@@ -398,11 +406,11 @@
           "source": "system",
           "system_app": true,
           "update_channel": "stable",
-          "updated_at": "1786128421"
+          "updated_at": "1786129487"
         },
         {
           "compat_status": "PARTIAL",
-          "created_at": "1786128421",
+          "created_at": "1786129487",
           "dedicated_role": "settings",
           "engine": "proton-ge",
           "engine_pin": "GE-Proton11-3",
@@ -434,11 +442,11 @@
           "source": "system",
           "system_app": true,
           "update_channel": "stable",
-          "updated_at": "1786128421"
+          "updated_at": "1786129487"
         },
         {
           "compat_status": "PARTIAL",
-          "created_at": "1786128421",
+          "created_at": "1786129487",
           "dedicated_role": "run_dialog",
           "engine": "proton-ge",
           "engine_pin": "GE-Proton11-3",
@@ -470,11 +478,11 @@
           "source": "system",
           "system_app": true,
           "update_channel": "stable",
-          "updated_at": "1786128421"
+          "updated_at": "1786129487"
         },
         {
           "compat_status": "PARTIAL",
-          "created_at": "1786128421",
+          "created_at": "1786129487",
           "dedicated_role": "task_manager",
           "engine": "proton-ge",
           "engine_pin": "GE-Proton11-3",
@@ -506,11 +514,11 @@
           "source": "system",
           "system_app": true,
           "update_channel": "stable",
-          "updated_at": "1786128421"
+          "updated_at": "1786129487"
         },
         {
           "compat_status": "PARTIAL",
-          "created_at": "1786128421",
+          "created_at": "1786129487",
           "dedicated_role": "app_library",
           "engine": "proton-ge",
           "engine_pin": "GE-Proton11-3",
@@ -542,11 +550,11 @@
           "source": "system",
           "system_app": true,
           "update_channel": "stable",
-          "updated_at": "1786128421"
+          "updated_at": "1786129487"
         },
         {
           "compat_status": "PARTIAL",
-          "created_at": "1786128421",
+          "created_at": "1786129487",
           "dedicated_role": "installer_wizard",
           "engine": "proton-ge",
           "engine_pin": "GE-Proton11-3",
@@ -578,11 +586,11 @@
           "source": "system",
           "system_app": true,
           "update_channel": "stable",
-          "updated_at": "1786128421"
+          "updated_at": "1786129487"
         },
         {
           "compat_status": "PARTIAL",
-          "created_at": "1786128421",
+          "created_at": "1786129487",
           "dedicated_role": "compat_center",
           "engine": "proton-ge",
           "engine_pin": "GE-Proton11-3",
@@ -614,11 +622,11 @@
           "source": "system",
           "system_app": true,
           "update_channel": "stable",
-          "updated_at": "1786128421"
+          "updated_at": "1786129487"
         },
         {
           "compat_status": "PARTIAL",
-          "created_at": "1786128438",
+          "created_at": "1786129510",
           "dedicated_role": null,
           "engine": "proton-ge",
           "engine_pin": "GE-Proton11-3",
@@ -630,11 +638,11 @@
             "simulated": false
           },
           "id": "line",
-          "install_path": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/line/drive_c/strawnt/apps/line",
+          "install_path": "/tmp/strawnt-ntw5.EVZbf1/home/prefixes/line/drive_c/strawnt/apps/line",
           "install_state": "installed",
           "kind": "win32",
           "name": "LINE",
-          "notes": "Catalog install of line \u2014 prefix created; full installer download may remain PARTIAL",
+          "notes": "Catalog install of line \u2014 prefix + staged PE; vendor installer UI remains PARTIAL",
           "permissions": [],
           "powered_by": "Wine",
           "powered_by_wine": true,
@@ -657,11 +665,11 @@
           "source": "catalog",
           "system_app": false,
           "update_channel": "stable",
-          "updated_at": "1786128438"
+          "updated_at": "1786129510"
         },
         {
           "compat_status": "PARTIAL",
-          "created_at": "1786128439",
+          "created_at": "1786129511",
           "dedicated_role": null,
           "engine": "proton-ge",
           "engine_pin": "GE-Proton11-3",
@@ -673,11 +681,11 @@
             "simulated": false
           },
           "id": "steam",
-          "install_path": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/steam/drive_c/strawnt/apps/steam",
+          "install_path": "/tmp/strawnt-ntw5.EVZbf1/home/prefixes/steam/drive_c/strawnt/apps/steam",
           "install_state": "installed",
           "kind": "win32",
           "name": "Steam",
-          "notes": "Catalog install of steam \u2014 prefix created; full installer download may remain PARTIAL",
+          "notes": "Catalog install of steam \u2014 prefix + staged PE; vendor installer UI remains PARTIAL",
           "permissions": [],
           "powered_by": "Wine",
           "powered_by_wine": true,
@@ -699,15 +707,15 @@
           "source": "catalog",
           "system_app": false,
           "update_channel": "stable",
-          "updated_at": "1786128439"
+          "updated_at": "1786129511"
         }
       ],
       "command": "apps list",
       "count": 10,
-      "db": "/tmp/strawnt-ntw5.bvH9Q8/home/appmgr/apps.json",
+      "db": "/tmp/strawnt-ntw5.EVZbf1/home/appmgr/apps.json",
       "engine": "proton-ge",
       "execution_backend": "wine",
-      "home": "/tmp/strawnt-ntw5.bvH9Q8/home",
+      "home": "/tmp/strawnt-ntw5.EVZbf1/home",
       "powered_by": "Wine",
       "powered_by_wine": true,
       "status": "PASS"
@@ -730,7 +738,7 @@
           "app_id": "line",
           "capability": "interop.cross_prefix",
           "default_deny_cross_prefix": false,
-          "granted_at": 1786128440
+          "granted_at": 1786129511
         }
       ],
       "manifest_permissions": [
@@ -759,7 +767,7 @@
         "execution_backend": "wine",
         "message": "prefix already exists",
         "name": "line",
-        "path": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/line",
+        "path": "/tmp/strawnt-ntw5.EVZbf1/home/prefixes/line",
         "powered_by": "Wine",
         "powered_by_wine": true,
         "status": "PASS"
@@ -777,7 +785,7 @@
       "recipe_result": {
         "apply": {
           "execution_backend": "wine",
-          "marker": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/line/strawnt-crypt32-signature.json",
+          "marker": "/tmp/strawnt-ntw5.EVZbf1/home/prefixes/line/strawnt-crypt32-signature.json",
           "powered_by": "Wine",
           "recipe": "crypt32-signature",
           "status": "PARTIAL"
@@ -785,11 +793,11 @@
         "backend": "wine",
         "engine": "proton-ge",
         "execution_backend": "wine",
-        "home": "/tmp/strawnt-ntw5.bvH9Q8/home",
+        "home": "/tmp/strawnt-ntw5.EVZbf1/home",
         "powered_by": "Wine",
         "powered_by_wine": true,
         "prefix": "line",
-        "prefix_path": "/tmp/strawnt-ntw5.bvH9Q8/home/prefixes/line",
+        "prefix_path": "/tmp/strawnt-ntw5.EVZbf1/home/prefixes/line",
         "recipe": "crypt32-signature",
         "status": "PARTIAL"
       },
@@ -817,7 +825,7 @@
       "command": "apps status",
       "engine": "proton-ge",
       "execution_backend": "wine",
-      "home": "/tmp/strawnt-ntw5.bvH9Q8/home",
+      "home": "/tmp/strawnt-ntw5.EVZbf1/home",
       "notes": [
         "App Manager is the system lifecycle owner (NTW5)",
         "Dedicated UI apps smoke in NTW6",
@@ -835,7 +843,7 @@
       "apps": [
         {
           "compat_status": "PARTIAL",
-          "created_at": "1786128421",
+          "created_at": "1786129487",
           "dedicated_role": "app_manager",
           "engine": "proton-ge",
           "engine_pin": "GE-Proton11-3",
@@ -867,11 +875,11 @@
           "source": "system",
           "system_app": true,
           "update_channel": "stable",
-          "updated_at": "1786128421"
+          "updated_at": "1786129487"
         },
         {
           "compat_status": "PARTIAL",
-          "created_at": "1786128421",
+          "created_at": "1786129487",
           "dedicated_role": "file_manager",
           "engine": "proton-ge",
           "engine_pin": "GE-Proton11-3",
@@ -903,11 +911,11 @@
           "source": "system",
           "system_app": true,
           "update_channel": "stable",
-          "updated_at": "1786128421"
+          "updated_at": "1786129487"
         },
         {
           "compat_status": "PARTIAL",
-          "created_at": "1786128421",
+          "created_at": "1786129487",
           "dedicated_role": "settings",
           "engine": "proton-ge",
           "engine_pin": "GE-Proton11-3",
@@ -939,11 +947,11 @@
           "source": "system",
           "system_app": true,
           "update_channel": "stable",
-          "updated_at": "1786128421"
+          "updated_at": "1786129487"
         },
         {
           "compat_status": "PARTIAL",
-          "created_at": "1786128421",
+          "created_at": "1786129487",
           "dedicated_role": "run_dialog",
           "engine": "proton-ge",
           "engine_pin": "GE-Proton11-3",
@@ -975,11 +983,11 @@
           "source": "system",
           "system_app": true,
           "update_channel": "stable",
-          "updated_at": "1786128421"
+          "updated_at": "1786129487"
         },
         {
           "compat_status": "PARTIAL",
-          "created_at": "1786128421",
+          "created_at": "1786129487",
           "dedicated_role": "task_manager",
           "engine": "proton-ge",
           "engine_pin": "GE-Proton11-3",
@@ -1011,11 +1019,11 @@
           "source": "system",
           "system_app": true,
           "update_channel": "stable",
-          "updated_at": "1786128421"
+          "updated_at": "1786129487"
         },
         {
           "compat_status": "PARTIAL",
-          "created_at": "1786128421",
+          "created_at": "1786129487",
           "dedicated_role": "app_library",
           "engine": "proton-ge",
           "engine_pin": "GE-Proton11-3",
@@ -1047,11 +1055,11 @@
           "source": "system",
           "system_app": true,
           "update_channel": "stable",
-          "updated_at": "1786128421"
+          "updated_at": "1786129487"
         },
         {
           "compat_status": "PARTIAL",
-          "created_at": "1786128421",
+          "created_at": "1786129487",
           "dedicated_role": "installer_wizard",
           "engine": "proton-ge",
           "engine_pin": "GE-Proton11-3",
@@ -1083,11 +1091,11 @@
           "source": "system",
           "system_app": true,
           "update_channel": "stable",
-          "updated_at": "1786128421"
+          "updated_at": "1786129487"
         },
         {
           "compat_status": "PARTIAL",
-          "created_at": "1786128421",
+          "created_at": "1786129487",
           "dedicated_role": "compat_center",
           "engine": "proton-ge",
           "engine_pin": "GE-Proton11-3",
@@ -1119,13 +1127,13 @@
           "source": "system",
           "system_app": true,
           "update_channel": "stable",
-          "updated_at": "1786128421"
+          "updated_at": "1786129487"
         }
       ],
       "command": "apps sysapps",
       "count": 8,
       "execution_backend": "wine",
-      "home": "/tmp/strawnt-ntw5.bvH9Q8/home",
+      "home": "/tmp/strawnt-ntw5.EVZbf1/home",
       "powered_by": "Wine",
       "powered_by_wine": true,
       "roles": [
@@ -1155,17 +1163,19 @@
   "simulated": false,
   "stage": "ntw5-app-manager",
   "status": "PASS",
-  "version": "0.7.1.58",
-  "generated_at": "2026-08-07T18:46:55Z",
-  "git_head": "e7e7491d9891ebfc0a885d55304a9dff0b788768",
+  "version": "0.7.1.59",
+  "generated_at": "2026-08-07T19:04:41Z",
+  "git_head": "6c34eb76bf398641a9c37a05baf0e6f73940bb70",
   "pin": "GE-Proton11-3",
   "engine_pin": "GE-Proton11-3",
   "hub": "electron",
   "hub_app_manager_entry": true,
   "schema_present": true,
+  "fixture_pe": "/mnt/data/code/project/StrawCoding/StrawNT/components/strawnt-appmgr/fixtures/build/strawnt_app_stub.exe",
   "artifacts": {
     "crate": "components/strawnt-appmgr",
     "catalog": "components/strawnt-appmgr/catalog/local-catalog.json",
+    "fixture": "components/strawnt-appmgr/fixtures",
     "schema": "docs/schemas/app-manifest.schema.json",
     "harness": "tests/strawnt/ntw5-appmgr.sh",
     "hub_desktop": "hub/resources/desktop/strawnt-app-manager.desktop",

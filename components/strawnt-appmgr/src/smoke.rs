@@ -104,6 +104,20 @@ pub fn run_appmgr_smoke(home: Option<&Path>) -> Result<Value, AppMgrError> {
             launch.get("status").and_then(|v| v.as_str()).unwrap_or("?")
         ));
     }
+    if launch.get("mode").and_then(|v| v.as_str()) != Some("pe") {
+        failures.push(format!(
+            "launch mode={} (require pe — not cmd_marker)",
+            launch.get("mode").and_then(|v| v.as_str()).unwrap_or("?")
+        ));
+    }
+    if launch
+        .get("honesty")
+        .and_then(|h| h.get("simulated"))
+        .and_then(|v| v.as_bool())
+        == Some(true)
+    {
+        failures.push("launch honesty.simulated=true refused for NTW5 PASS".into());
+    }
 
     // Uninstall a disposable catalog copy is ok for steam after list/launch proven.
     let uninstall = match uninstall_app("steam", home) {
@@ -119,10 +133,32 @@ pub fn run_appmgr_smoke(home: Option<&Path>) -> Result<Value, AppMgrError> {
         failures.push(format!("sysapps count {sys_count} < 7"));
     }
 
+    let line_pe = line.get("install_mode").and_then(|v| v.as_str()) == Some("pe_staged")
+        && line
+            .get("staged_pe")
+            .and_then(|v| v.as_str())
+            .map(|p| Path::new(p).is_file())
+            .unwrap_or(false);
+    let steam_pe = steam.get("install_mode").and_then(|v| v.as_str()) == Some("pe_staged")
+        && steam
+            .get("staged_pe")
+            .and_then(|v| v.as_str())
+            .map(|p| Path::new(p).is_file())
+            .unwrap_or(false);
+    if !line_pe {
+        failures.push("install line missing pe_staged PE file".into());
+    }
+    if !steam_pe {
+        failures.push("install steam missing pe_staged PE file".into());
+    }
+
     let install_ok = line.get("status").and_then(|v| v.as_str()) == Some("PASS")
-        && steam.get("status").and_then(|v| v.as_str()) == Some("PASS");
+        && steam.get("status").and_then(|v| v.as_str()) == Some("PASS")
+        && line_pe
+        && steam_pe;
     let list_launch_ok = has_line
-        && launch.get("status").and_then(|v| v.as_str()) == Some("PASS");
+        && launch.get("status").and_then(|v| v.as_str()) == Some("PASS")
+        && launch.get("mode").and_then(|v| v.as_str()) == Some("pe");
     let prefix_ok = prefix.get("status").and_then(|v| v.as_str()) == Some("PASS");
 
     let capabilities = json!({

@@ -132,3 +132,4 @@ tests/strawnt/output/ntw1-hello.json
 
 # NTW4 PE fixture build artifacts (rebuild via fixtures/Makefile)
 components/strawnt-interop/fixtures/build/
+components/strawnt-appmgr/fixtures/build/

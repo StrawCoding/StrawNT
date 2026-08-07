@@ -193,25 +193,55 @@ pub fn install_catalog(
         }
     }
     m.notes = Some(format!(
-        "Catalog install of {catalog_id} — prefix created; full installer download may remain PARTIAL"
+        "Catalog install of {catalog_id} — prefix + staged PE; vendor installer UI remains PARTIAL"
     ));
 
-    // Place a launch marker stub under prefix drive_c for launch smoke.
+    // Stage a real Win32 PE under prefix drive_c (fixture stand-in for catalog exe).
+    // Registration-only INSTALLED.json without a PE is not a real install for NTW5 PASS.
     let prefix_path = strawnt_engine::prefix::prefix_path(&root, &prefix_name)
         .map_err(|e| AppMgrError::Message(e.to_string()))?;
     let stub_dir = prefix_path.join("drive_c/strawnt/apps").join(catalog_id);
     fs::create_dir_all(&stub_dir)?;
+
+    let fixture = appmgr_stub_pe(&repo).ok_or_else(|| {
+        AppMgrError::Message(
+            "appmgr stub PE missing — build components/strawnt-appmgr/fixtures".into(),
+        )
+    })?;
+    let exe_name = exe
+        .clone()
+        .unwrap_or_else(|| format!("{catalog_id}.exe"));
+    let staged_pe = stub_dir.join(&exe_name);
+    fs::copy(&fixture, &staged_pe).map_err(|e| {
+        AppMgrError::Message(format!(
+            "failed to stage PE {} → {}: {e}",
+            fixture.display(),
+            staged_pe.display()
+        ))
+    })?;
+    if !staged_pe.is_file() {
+        return Err(AppMgrError::Message(format!(
+            "staged PE missing after copy: {}",
+            staged_pe.display()
+        )));
+    }
+
     let marker = stub_dir.join("INSTALLED.json");
     fs::write(
         &marker,
         serde_json::to_string_pretty(&json!({
             "app_id": catalog_id,
-            "exe": exe,
+            "exe": exe_name,
             "prefix": prefix_name,
+            "staged_pe": staged_pe.display().to_string(),
+            "fixture": fixture.display().to_string(),
+            "install_mode": "pe_staged",
             "via": "strawnt-appmgr",
             "powered_by": "Wine",
+            "note": "Fixture PE stand-in — not vendor LINE/Steam UI",
         }))?,
     )?;
+    m.exe = Some(exe_name.clone());
     m.install_path = Some(stub_dir.display().to_string());
 
     let mut db = load_db(&root)?;
@@ -227,7 +257,10 @@ pub fn install_catalog(
         "name": name,
         "source": "catalog",
         "prefix": prefix_name,
-        "exe": exe,
+        "exe": exe_name,
+        "install_mode": "pe_staged",
+        "staged_pe": staged_pe.display().to_string(),
+        "fixture": fixture.display().to_string(),
         "recipes_recommended": recipes,
         "recipes_applied": applied,
         "prefix_create": created,
@@ -240,9 +273,14 @@ pub fn install_catalog(
             "full_windows_claimed": false,
             "ranked_anticheat_claimed": false,
             "simulated": false,
-            "note": "Catalog install registers lifecycle + prefix; real vendor installer UI is PARTIAL until proven"
+            "note": "Staged real Win32 PE via App Manager; vendor LINE/Steam installer UI remains PARTIAL"
         }
     }))
+}
+
+fn appmgr_stub_pe(repo: &Path) -> Option<PathBuf> {
+    let p = repo.join("components/strawnt-appmgr/fixtures/build/strawnt_app_stub.exe");
+    p.is_file().then_some(p)
 }
 
 fn mirror_registry_launch(id: &str, name: &str, install_path: Option<String>) {
@@ -423,7 +461,33 @@ pub fn launch_app(app_id: &str, home: Option<&Path>) -> Result<Value, AppMgrErro
         .map(|p| p.is_file())
         .unwrap_or(false);
 
-    let marker = format!("STRAWNT_APPMGR_LAUNCH_{}", strawnt_engine::unix_secs());
+    // NTW5 honesty: list/launch PASS requires a real staged PE under Wine.
+    // cmd /c echo markers are not acceptably "real launch" evidence.
+    if !use_pe {
+        return Ok(json!({
+            "status": "FAIL",
+            "command": "apps launch",
+            "app_id": app_id,
+            "prefix": prefix_name,
+            "mode": "missing_pe",
+            "staged_exe": staged_exe.map(|p| p.display().to_string()),
+            "message": "refusing cmd_marker launch — stage a real PE via apps install first",
+            "execution_backend": "wine",
+            "engine": "proton-ge",
+            "engine_pin": pin.tag,
+            "powered_by": "Wine",
+            "powered_by_wine": true,
+            "honesty": {
+                "full_windows_claimed": false,
+                "ranked_anticheat_claimed": false,
+                "simulated": true,
+                "visible_ui": "n/a_missing_pe",
+            }
+        }));
+    }
+
+    let pe = staged_exe.as_ref().unwrap();
+    const LAUNCH_MARKER: &str = "STRAWNT_APPMGR_OK";
 
     let mut argv: Vec<String> = Vec::new();
     if needs_xvfb() {
@@ -433,13 +497,7 @@ pub fn launch_app(app_id: &str, home: Option<&Path>) -> Result<Value, AppMgrErro
         }
     }
     argv.push(wine.display().to_string());
-    if use_pe {
-        argv.push(staged_exe.as_ref().unwrap().display().to_string());
-    } else {
-        argv.push("cmd".into());
-        argv.push("/c".into());
-        argv.push(format!("echo {marker}"));
-    }
+    argv.push(pe.display().to_string());
 
     let mut command = Command::new(&argv[0]);
     command.args(&argv[1..]);
@@ -457,20 +515,16 @@ pub fn launch_app(app_id: &str, home: Option<&Path>) -> Result<Value, AppMgrErro
     let stdout = String::from_utf8_lossy(&output.stdout).to_string();
     let stderr = String::from_utf8_lossy(&output.stderr).to_string();
     let exit_code = output.status.code().unwrap_or(-1);
-    let ok = if use_pe {
-        // PE may return non-zero without Wine crashing; treat wine-start success loosely.
-        exit_code == 0 || !stderr.to_lowercase().contains("err:module")
-    } else {
-        exit_code == 0 && stdout.contains(&marker)
-    };
+    let ok = exit_code == 0 && stdout.contains(LAUNCH_MARKER);
 
     Ok(json!({
         "status": if ok { "PASS" } else { "FAIL" },
         "command": "apps launch",
         "app_id": app_id,
         "prefix": prefix_name,
-        "mode": if use_pe { "pe" } else { "cmd_marker" },
-        "marker": if use_pe { Value::Null } else { json!(marker) },
+        "mode": "pe",
+        "staged_exe": pe.display().to_string(),
+        "marker": LAUNCH_MARKER,
         "exit_code": exit_code,
         "stdout_tail": tail(&stdout, 400),
         "stderr_tail": tail(&stderr, 400),
@@ -483,7 +537,8 @@ pub fn launch_app(app_id: &str, home: Option<&Path>) -> Result<Value, AppMgrErro
             "full_windows_claimed": false,
             "ranked_anticheat_claimed": false,
             "simulated": false,
-            "visible_ui": if use_pe { "UNKNOWN" } else { "n/a_cmd" },
+            "visible_ui": "UNKNOWN",
+            "note": "Console PE fixture launch via Wine — vendor GUI remains UNKNOWN/PARTIAL",
         }
     }))
 }
