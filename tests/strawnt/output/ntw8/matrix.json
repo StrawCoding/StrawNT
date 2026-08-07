@@ -20,7 +20,7 @@
       "engine": "proton-ge",
       "execution_backend": "wine",
       "name": "steam.exe",
-      "notes": "NTW8 golden: SteamSetup under GE Wine with real window; login/all_games UNKNOWN; no ranked claim",
+      "notes": "NTW8 golden: staged Steam.exe real window (launch_mode=steam_exe); SteamSetup=install-UI only; login/all_games UNKNOWN; no ranked claim",
       "powered_by": "Wine",
       "powered_by_wine": true,
       "prefix": "steam",

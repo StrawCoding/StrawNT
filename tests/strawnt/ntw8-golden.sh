@@ -389,7 +389,9 @@ steam_extra = {
     "staged_pe": steam_exe,
     "launch_mode": steam_mode,
     "scopes": {
-        # NSIS extract stages real Steam.exe (not Wine stub); setup_ui is honest launch path
+        # NSIS extract stages real Steam.exe (not Wine stub).
+        # launch/visible_ui PASS requires staged steam.exe window (launch_mode=steam_exe).
+        # SteamSetup install-UI is separate evidence and never alone grants launch=PASS.
         "install": "PASS",
         "launch": "PASS",
         "visible_ui": "PASS",
@@ -415,7 +417,7 @@ set_entry(
 set_entry(
     "steam.exe",
     "PARTIAL",
-    "NTW8 golden: SteamSetup under GE Wine with real window; login/all_games UNKNOWN; no ranked claim",
+    "NTW8 golden: staged Steam.exe real window (launch_mode=steam_exe); SteamSetup=install-UI only; login/all_games UNKNOWN; no ranked claim",
     "steam",
     steam_extra,
 )
